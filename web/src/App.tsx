@@ -31,6 +31,8 @@ import { PersonalAssistant } from './features/PersonalAssistant';
 import { LocalVideoPose } from './features/LocalVideoPose';
 import { PrivacyCenter } from './features/PrivacyCenter';
 import { SportNotebook } from './features/SportNotebook';
+import { MediaGallery } from './features/MediaGallery';
+import { deleteEntryMedia } from './lib/mediaLibrary';
 
 type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -397,7 +399,7 @@ export default function App() {
   };
   const remove = async (entry: Entry) => {
     if (!window.confirm('Supprimer définitivement « ' + entry.title + ' » ?')) return;
-    try { await removeEntry(entry.id); await refresh(); }
+    try { await removeEntry(entry.id); await deleteEntryMedia(session!.user.id, entry.id).catch(() => setError('Entrée supprimée, mais ses médias locaux n’ont pas pu être nettoyés.')); await refresh(); }
     catch (e) { setError(e instanceof Error ? e.message : 'Suppression impossible.'); }
   };
   const createGroceries = async (title: string, items: string[]) => {
@@ -466,6 +468,7 @@ export default function App() {
           {currentModule.id === 'sport' && <><SportLibrary /><SportProgress entries={moduleEntries} /><SportNotebook entries={moduleEntries} onCreate={createFromTool} /><LocalVideoPose /></>}
           {currentModule.id === 'challenges' && <ChallengeIdeas entries={moduleEntries} onCreate={createFromTool} />}
           {currentModule.id === 'passions' && <PassionPath entries={moduleEntries} onUpdate={updateData} />}
+          {(['sport', 'cuisine', 'decouvertes', 'passions'] as const).includes(currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions') && <MediaGallery ownerId={session.user.id} module={currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions'} entries={moduleEntries.map((e) => ({ id: e.id, title: e.title }))} />}
           {currentModule.id === 'spiritualite' && <><AutomaticPrayerTimes entries={moduleEntries} onCreate={createFromTool} /><PrayerPlanner entries={moduleEntries} onCreate={createFromTool} /><p className="privacy-hint"><BookOpen size={16} /> Les horaires automatiques nécessitent une connexion et une ville choisie. Les calculs peuvent varier selon les sources locales.</p></>}
           {currentModule.id === 'sante' && <p className="privacy-hint"><Heart size={16} /> Le suivi est informatif. Il ne constitue pas un diagnostic et ne remplace pas un professionnel de santé.</p>}
           <div className="section-row"><h2>Mes entrées <span className="count">{moduleEntries.length}</span></h2></div>
