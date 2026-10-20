@@ -19,6 +19,7 @@ export function LocalVideoPose() {
   const running = useRef(false);
   const fileRef = useRef<HTMLInputElement>(null);
   useEffect(() => () => { running.current = false; cancelAnimationFrame(frame.current); model.current?.close(); }, []);
+  useEffect(() => { if (!prefs.video) { running.current = false; cancelAnimationFrame(frame.current); model.current?.close(); model.current = null; setActive(false); } }, [prefs.video]);
   useEffect(() => () => { if (videoUrl) URL.revokeObjectURL(videoUrl); }, [videoUrl]);
   const choose = (file?: File) => {
     running.current = false; cancelAnimationFrame(frame.current);
@@ -82,6 +83,7 @@ export function LocalVideoPose() {
   };
   return <section className="tool-card">
     <h3>Observation vidéo des mouvements</h3>
+    {!prefs.video && <p className="privacy-hint">Active l'analyse dans Profil pour charger le modèle.</p>}
     <p className="muted">Choisis une vidéo de tennis, de Pilates ou de yoga pour afficher les points de posture détectés par un modèle sur ton appareil. C'est un outil d'observation, pas encore une évaluation fiable de la technique.</p>
     <label>Vidéo personnelle<input ref={fileRef} type="file" accept="video/*" onChange={(e) => { choose(e.target.files?.[0]); e.target.value = ''; }} /></label>
     {videoUrl && <div className="video-analysis">
