@@ -34,11 +34,15 @@ Deno.serve(async (request) => {
   const { data: owner, error: ownerError } = await supabase.rpc('is_app_owner');
   if (ownerError || owner !== true) return json({ error: 'Accès refusé.' }, 403, cors);
   let prompt = '';
+  let agenda: { date: string; title: string; time: string }[] = [];
   try {
     if (Number(request.headers.get('content-length') || 0) > 5000) throw new Error('Too large');
     const body = await request.json();
     if (typeof body?.message !== 'string') throw new Error('Invalid');
     prompt = body.message.trim();
+    if (Array.isArray(body.agenda)) {
+      agenda = body.agenda.slice(0, 8).filter((item: any) => item && typeof item.date === 'string' && typeof item.title === 'string' && typeof item.time === 'string' && item.title.length <= 120 && item.date.length === 10 && item.time.length <= 5).map((item: any) => ({ date: item.date, title: item.title, time: item.time }));
+    }
     if (prompt.length < 2 || prompt.length > 1200) throw new Error('Invalid');
   } catch { return json({ error: 'Question invalide (2 à 1200 caractères).' }, 400, cors); }
   try {
@@ -49,7 +53,7 @@ Deno.serve(async (request) => {
         store: false, max_completion_tokens: 500,
         messages: [
           { role: 'system', content: 'Tu es l’assistant personnel de My Thirties. Réponds en français, clairement et brièvement. Aide à organiser la vie quotidienne, les apprentissages, les voyages et les loisirs. Tu ne vois aucune donnée personnelle de l’application. Ne prétends pas avoir consulté le calendrier, les finances, la santé ou les journaux. N’exécute aucune action. Ne donne pas de diagnostic médical ni de conseil financier personnalisé. Pour une demande sensible, invite à consulter une personne compétente. N’invente pas de faits récents.' },
-          { role: 'user', content: prompt },
+          { role: 'user', content: prompt + (agenda.length ? '\n\nAgenda sélectionné : ' + JSON.stringify(agenda) : '') },
         ],
       }),
     });
