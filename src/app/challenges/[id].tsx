@@ -28,7 +28,7 @@ export default function ChallengeDetail() {
   const current = data.records.find((r) => r.dayNumber === selected);
   useEffect(() => { setPlan(current?.plan ?? ''); }, [selected, current?.plan]);
 
-  if (!data.item) return <Screen title="Challenge introuvable" back><AppText>Ce programme n'existe plus.</AppText></Screen>;
+  if (!data.item) return <Screen title="Challenge introuvable" back><AppText>Ce programme n’existe plus.</AppText></Screen>;
   const item = data.item;
   const state: DayState = current?.state ?? 'not_done';
   const done = data.records.filter((r) => r.state === 'done').length;
