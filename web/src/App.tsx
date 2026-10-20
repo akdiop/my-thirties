@@ -29,6 +29,8 @@ import { AutomaticPrayerTimes } from './features/AutomaticPrayerTimes';
 import { BrowserReminders } from './features/BrowserReminders';
 import { PersonalAssistant } from './features/PersonalAssistant';
 import { LocalVideoPose } from './features/LocalVideoPose';
+import { PrivacyCenter } from './features/PrivacyCenter';
+import { SportNotebook } from './features/SportNotebook';
 
 type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -333,6 +335,7 @@ function Profile({ email, entries, onLogout, onRestored }: { email: string; entr
       <p className="fineprint">La restauration ajoute les entrées au compte. Elle ne supprime pas les données existantes et peut créer des doublons. Vérifie toujours ton fichier de sauvegarde.</p>
       {message && <p role="status">{message}</p>}
     </section>
+    <PrivacyCenter />
     <BrowserReminders entries={entries} />
     <section className="panel"><h2>À propos de cette version</h2><p className="muted">Application web privée en cours de développement. L'export d'agenda est manuel ; les notifications web ne fonctionnent qu'avec la page ouverte. L'assistant IA nécessite un déploiement sécurisé et l'analyse vidéo reste expérimentale. La synchronisation iOS native est encore à réaliser.</p></section>
   </div>;
@@ -441,7 +444,7 @@ export default function App() {
             <button className="button light" onClick={() => setEditor({ module: moduleById('quotidien') })}><Plus size={17} /> Ajouter une tâche</button>
           </div>
           <PersonalBrief entries={entries} onGo={go} />
-          <PersonalAssistant />
+          <PersonalAssistant entries={entries} />
           <div className="section-row"><h2>Mes prochains rendez-vous</h2><button className="text-button" onClick={() => go('quotidien')}>Voir l'agenda <ChevronRight size={15} /></button></div>
           <div className="upcoming">{upcoming.length ? upcoming.map((e) => <div className="upcoming-item" key={e.id}><span className="date-chip">{humanDate(e.entry_date)}</span><strong>{e.title}</strong><span className="muted">{moduleById(e.module).name}</span></div>) : <p className="muted">Aucun événement à venir.</p>}</div>
           <div className="section-row"><h2>Mes espaces</h2><button className="text-button" onClick={() => go('spaces')}>Tout voir <ChevronRight size={15} /></button></div>
@@ -460,7 +463,7 @@ export default function App() {
           {currentModule.id === 'finances' && <><FinanceSummary entries={moduleEntries} /><FinanceInsights entries={moduleEntries} /></>}
           {currentModule.id === 'cuisine' && <><KitchenPlanner entries={moduleEntries} onCreate={createFromTool} onGenerate={createGroceries} /><KitchenTools entries={moduleEntries} onGenerate={createGroceries} /><RecipeIdeas entries={moduleEntries} onCreate={createFromTool} /></>}
           {currentModule.id === 'decouvertes' && <><TravelPlanner entries={moduleEntries} onUpdate={updateData} /><TravelTools entries={moduleEntries} onGenerate={createGroceries} /></>}
-          {currentModule.id === 'sport' && <><SportLibrary /><SportProgress entries={moduleEntries} /><LocalVideoPose /></>}
+          {currentModule.id === 'sport' && <><SportLibrary /><SportProgress entries={moduleEntries} /><SportNotebook entries={moduleEntries} onCreate={createFromTool} /><LocalVideoPose /></>}
           {currentModule.id === 'challenges' && <ChallengeIdeas entries={moduleEntries} onCreate={createFromTool} />}
           {currentModule.id === 'passions' && <PassionPath entries={moduleEntries} onUpdate={updateData} />}
           {currentModule.id === 'spiritualite' && <><AutomaticPrayerTimes entries={moduleEntries} onCreate={createFromTool} /><PrayerPlanner entries={moduleEntries} onCreate={createFromTool} /><p className="privacy-hint"><BookOpen size={16} /> Les horaires automatiques nécessitent une connexion et une ville choisie. Les calculs peuvent varier selon les sources locales.</p></>}
