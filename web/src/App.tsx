@@ -31,6 +31,8 @@ import { PersonalAssistant } from './features/PersonalAssistant';
 import { LocalVideoPose } from './features/LocalVideoPose';
 import { PrivacyCenter } from './features/PrivacyCenter';
 import { SportNotebook } from './features/SportNotebook';
+import { PersonalProfile, ProfileGreeting } from './features/PersonalProfile';
+import { PROFILE_KIND } from './lib/profile';
 
 type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -284,7 +286,7 @@ function EntryCard({ entry, module, onEdit, onDelete, onUpdate }: {
   </article>;
 }
 
-function Profile({ email, entries, onLogout, onRestored }: { email: string; entries: Entry[]; onLogout: () => Promise<void>; onRestored: () => Promise<void> }) {
+function Profile({ email, entries, profileEntry, onSaveProfile, onLogout, onRestored }: { email: string; entries: Entry[]; profileEntry: Entry | undefined; onSaveProfile: (input: EntryInput, id?: string) => Promise<void>; onLogout: () => Promise<void>; onRestored: () => Promise<void> }) {
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [busy, setBusy] = useState(false);
@@ -319,6 +321,7 @@ function Profile({ email, entries, onLogout, onRestored }: { email: string; entr
   };
   return <div className="content-width">
     <span className="eyebrow">MON COMPTE</span><h1>Profil & confidentialité</h1>
+    <PersonalProfile key={profileEntry?.id ?? 'new'} entry={profileEntry} onSave={onSaveProfile} />
     <section className="panel form-stack">
       <h2>Compte personnel</h2><p>{email}</p>
       <p className="muted">La session est conservée dans l'onglet de navigation, pas dans un stockage de données personnel permanent.</p>
@@ -346,7 +349,9 @@ export default function App() {
   const [authReady, setAuthReady] = useState(false);
   const [owner, setOwner] = useState<boolean | null>(null);
   const [screen, setScreen] = useState<Screen>('home');
-  const [entries, setEntries] = useState<Entry[]>([]);
+  const [allEntries, setEntries] = useState<Entry[]>([]);
+  const profileEntry = allEntries.find((e) => e.kind === PROFILE_KIND);
+  const entries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND), [allEntries]);
   const [loading, setLoading] = useState(false);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState('');
@@ -436,6 +441,7 @@ export default function App() {
         {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
         {loading && <div className="sync-status" role="status">Synchronisation…</div>}
         {screen === 'home' && <div className="content-width">
+          <ProfileGreeting entry={profileEntry} onEdit={() => go('settings')} />
           <span className="eyebrow">TON ESPACE, TON RYTHME</span><h1>Une journée à la fois<span className="heading-dot">.</span></h1>
           <p className="lead">Organisation, bien-être et petits projets : tout ce qui compte, au même endroit.</p>
           <div className="home-hero">
@@ -451,7 +457,7 @@ export default function App() {
           <div className="module-grid">{modules.map((m) => <button className="module-card" key={m.id} onClick={() => go(m.id)}><span className="module-symbol">{m.symbol}</span><strong>{m.name}</strong><small>{m.description}</small><ChevronRight className="module-arrow" size={16} /></button>)}</div>
         </div>}
         {screen === 'spaces' && <div className="content-width"><span className="eyebrow">MES UNIVERS</span><h1>Tous mes espaces</h1><p className="lead">Onze espaces pour accompagner tes projets et tes habitudes.</p><div className="module-grid">{modules.map((m) => <button className="module-card" key={m.id} onClick={() => go(m.id)}><span className="module-symbol">{m.symbol}</span><strong>{m.name}</strong><small>{m.description}</small><ChevronRight className="module-arrow" size={16} /></button>)}</div></div>}
-        {screen === 'settings' && <Profile email={session.user.email ?? ''} entries={entries} onRestored={refresh} onLogout={async () => { await signOut(); setEntries([]); }} />}
+        {screen === 'settings' && <Profile email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { await signOut(); setEntries([]); }} />}
         {currentModule && <div className="content-width">
           <button className="back-link" onClick={() => go('spaces')}><ArrowLeft size={16} /> Mes espaces</button>
           <span className="eyebrow">MON ESPACE PERSONNEL</span>
