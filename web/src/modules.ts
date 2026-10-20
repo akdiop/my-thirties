@@ -90,8 +90,9 @@ export const modules: Module[] = [
     ],
   },
   {
-    id: 'passions', name: 'Mes passions', symbol: '✎', description: 'Apprendre un hobby sur 6 ou 12 mois',
+    id: 'passions', name: 'Mes passions', symbol: '✎', description: 'Séries TV, découvertes et apprentissage de hobbies',
     kinds: [
+      { id: 'series', label: 'Série TV', fields: [{ id: 'season', label: 'Saison en cours', type: 'number' }, { id: 'episode', label: 'Prochain épisode', type: 'number' }, { id: 'status', label: 'Statut', type: 'select', options: ['À regarder', 'En cours', 'En pause', 'Terminée'] }, note] },
       { id: 'hobby', label: 'Hobby', fields: [{ id: 'duration', label: 'Parcours', type: 'select', options: ['6 mois', '12 mois'] }, { id: 'goal', label: 'Objectif', type: 'textarea' }, { id: 'next', label: 'Prochaine étape', type: 'textarea' }] },
       { id: 'practice', label: 'Séance de pratique', fields: [date, { id: 'hobby', label: 'Hobby', type: 'text' }, { id: 'duration', label: 'Minutes', type: 'number' }, note] },
     ],
