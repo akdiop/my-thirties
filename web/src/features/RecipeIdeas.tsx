@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { Entry, EntryInput } from '../lib/cloud';
-import { PERSONALIZED_RECIPES } from '../../../src/cuisine/recipeIndex';
-import type { CuratedCategory } from '../../../src/cuisine/types';
+import { PERSONALIZED_RECIPES } from '../recipes/recipeIndex';
+import type { CuratedCategory } from '../recipes/types';
 
 const categories: { id: CuratedCategory; label: string }[] = [
   { id: 'petit-dejeuner', label: 'Petit-déjeuner' },
