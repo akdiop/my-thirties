@@ -22,6 +22,8 @@ import { TravelPlanner } from './features/TravelPlanner';
 import { PrayerPlanner } from './features/PrayerPlanner';
 import { PersonalBrief } from './features/PersonalBrief';
 import { RecipeIdeas } from './features/RecipeIdeas';
+import { SportProgress } from './features/SportProgress';
+import { ChallengeIdeas } from './features/ChallengeIdeas';
 
 type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -30,6 +32,7 @@ const value = (obj: Record<string, unknown>, key: string) => typeof obj[key] ===
 const humanDate = (date: string | null) => date ? new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 const money = (amount: number, currency: string) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: currency === 'XOF' ? 0 : 2 }).format(amount) + ' ' + currency;
 const safeNumber = (v: unknown) => typeof v === 'string' || typeof v === 'number' ? Number(v) : NaN;
+const safeLink = (v: unknown) => { try { const url = new URL(String(v)); return url.protocol === 'https:' ? url.href : null; } catch { return null; } };
 const nav: { id: Screen; label: string; icon: typeof Home }[] = [
   { id: 'home', label: 'Accueil', icon: Home },
   { id: 'quotidien', label: 'Agenda', icon: CalendarDays },
@@ -265,6 +268,7 @@ function EntryCard({ entry, module, onEdit, onDelete, onUpdate }: {
         <button aria-label={'Supprimer ' + entry.title} className="icon-button danger" onClick={() => onDelete(entry)}><Trash2 size={17} /></button>
       </div>
     </div>
+    {(module.id === 'sport' || module.id === 'challenges') && safeLink(entry.data.video) && <p className="entry-note"><a href={safeLink(entry.data.video)!} target="_blank" rel="noopener noreferrer">Ouvrir la vidéo pédagogique ↗</a></p>}
     {module.id === 'listes' && <Checklist entry={entry} onUpdate={onUpdate} />}
     {module.id === 'equilibre' && entry.kind === 'booster' && <BoosterPlan entry={entry} onUpdate={onUpdate} />}
     {module.id === 'challenges' && <ChallengeCalendar key={entry.id} entry={entry} onUpdate={onUpdate} />}
@@ -449,7 +453,8 @@ export default function App() {
           {currentModule.id === 'finances' && <><FinanceSummary entries={moduleEntries} /><FinanceInsights entries={moduleEntries} /></>}
           {currentModule.id === 'cuisine' && <><KitchenPlanner entries={moduleEntries} onCreate={createFromTool} onGenerate={createGroceries} /><KitchenTools entries={moduleEntries} onGenerate={createGroceries} /><RecipeIdeas entries={moduleEntries} onCreate={createFromTool} /></>}
           {currentModule.id === 'decouvertes' && <><TravelPlanner entries={moduleEntries} onUpdate={updateData} /><TravelTools entries={moduleEntries} onGenerate={createGroceries} /></>}
-          {currentModule.id === 'sport' && <SportLibrary />}
+          {currentModule.id === 'sport' && <><SportLibrary /><SportProgress entries={moduleEntries} /></>}
+          {currentModule.id === 'challenges' && <ChallengeIdeas entries={moduleEntries} onCreate={createFromTool} />}
           {currentModule.id === 'passions' && <PassionPath entries={moduleEntries} onUpdate={updateData} />}
           {currentModule.id === 'spiritualite' && <><PrayerPlanner entries={moduleEntries} onCreate={createFromTool} /><p className="privacy-hint"><BookOpen size={16} /> Les horaires sont saisis manuellement avec leur source. Le calendrier hégirien et les textes vérifiés nécessitent encore une intégration.</p></>}
           {currentModule.id === 'sante' && <p className="privacy-hint"><Heart size={16} /> Le suivi est informatif. Il ne constitue pas un diagnostic et ne remplace pas un professionnel de santé.</p>}
