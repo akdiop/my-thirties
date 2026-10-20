@@ -51,7 +51,7 @@ export default function Challenges() {
             { value: '7', label: '7 jours' }, { value: '14', label: '14 jours' }, { value: '30', label: '30 jours' },
           ]} />
           <Button label="Créer mon challenge" onPress={create} disabled={!title.trim()} />
-          <AppText variant="caption" color={c.textMuted}>Vous pouvez planifier des journées de repos et adapter chaque séance. Aucun jour manqué n'efface votre progression.</AppText>
+          <AppText variant="caption" color={c.textMuted}>Vous pouvez planifier des journées de repos et adapter chaque séance. Aucun jour manqué n’efface votre progression.</AppText>
         </Card>
       ) : null}
       {challenges.map((item) => {
