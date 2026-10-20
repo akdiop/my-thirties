@@ -159,3 +159,48 @@ export type Routine = typeof routine.$inferSelect;
 export type RoutineItem = typeof routineItem.$inferSelect;
 export type List = typeof list.$inferSelect;
 export type ListItem = typeof listItem.$inferSelect;
+
+export const challenge = sqliteTable('challenge', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  discipline: text('discipline').notNull(),
+  startDate: text('start_date').notNull(),
+  days: integer('days').notNull(),
+  status: text('status').notNull().default('active'),
+  ...timestamps,
+});
+
+export const challengeDay = sqliteTable('challenge_day', {
+  id: text('id').primaryKey(),
+  challengeId: text('challenge_id').notNull().references(() => challenge.id, { onDelete: 'cascade' }),
+  dayNumber: integer('day_number').notNull(),
+  state: text('state', { enum: ['not_done', 'done', 'rest'] }).notNull().default('not_done'),
+  plan: text('plan'),
+  notes: text('notes'),
+  ...timestamps,
+}, (t) => [uniqueIndex('challenge_day_unique').on(t.challengeId, t.dayNumber)]);
+
+export const journalEntry = sqliteTable('journal_entry', {
+  id: text('id').primaryKey(),
+  kind: text('kind', { enum: ['emotion', 'gratitude'] }).notNull(),
+  entryDate: text('entry_date').notNull(),
+  emotion: text('emotion'),
+  trigger: text('trigger'),
+  reaction: text('reaction'),
+  reflection: text('reflection'),
+  ...timestamps,
+}, (t) => [index('journal_entry_date_idx').on(t.entryDate)]);
+
+export const sportSession = sqliteTable('sport_session', {
+  id: text('id').primaryKey(),
+  discipline: text('discipline').notNull(),
+  sessionDate: text('session_date').notNull(),
+  durationMinutes: integer('duration_minutes'),
+  notes: text('notes'),
+  ...timestamps,
+}, (t) => [index('sport_session_date_idx').on(t.sessionDate)]);
+
+export type Challenge = typeof challenge.$inferSelect;
+export type ChallengeDay = typeof challengeDay.$inferSelect;
+export type JournalEntry = typeof journalEntry.$inferSelect;
+export type SportSession = typeof sportSession.$inferSelect;
