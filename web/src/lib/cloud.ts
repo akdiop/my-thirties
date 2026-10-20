@@ -98,3 +98,12 @@ export async function removeEntry(id: string) {
   const { error } = await cloud.from('entries').delete().eq('id', id);
   if (error) throw error;
 }
+
+export async function restoreEntries(inputs: EntryInput[]) {
+  if (!cloud) throw new Error('Connexion non configurée.');
+  if (inputs.length < 1 || inputs.length > 500) {
+    throw new Error('La restauration accepte actuellement de 1 à 500 entrées par fichier.');
+  }
+  const { error } = await cloud.from('entries').insert(inputs);
+  if (error) throw error;
+}
