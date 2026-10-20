@@ -21,11 +21,14 @@ function occurs(entry: Entry, date: Date): boolean {
 
 function CalendarRow({ entry, day, onUpdate }: { entry: Entry; day: Date; onUpdate: Props['onUpdate'] }) {
   const date = iso(day);
-  const completed = entry.data.completed === true || (entry.data.completions && typeof entry.data.completions === 'object' && (entry.data.completions as Record<string, boolean>)[date] === true);
+  const recurring = entry.kind === 'routine' || ['Quotidienne', 'Hebdomadaire'].includes(String(entry.data.frequency || ''));
+  const completed = recurring
+    ? entry.data.completions && typeof entry.data.completions === 'object' && (entry.data.completions as Record<string, boolean>)[date] === true
+    : entry.data.completed === true;
   const toggle = (next: boolean) => {
     const completions = entry.data.completions && typeof entry.data.completions === 'object'
       ? entry.data.completions as Record<string, boolean> : {};
-    return onUpdate(entry, entry.kind === 'routine' ? { ...entry.data, completions: { ...completions, [date]: next } } : { ...entry.data, completed: next });
+    return onUpdate(entry, recurring ? { ...entry.data, completions: { ...completions, [date]: next } } : { ...entry.data, completed: next });
   };
   return <div className="calendar-agenda-item">
     {entry.kind === 'task' || entry.kind === 'routine'
