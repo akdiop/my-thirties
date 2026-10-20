@@ -306,3 +306,19 @@ textarea{resize:vertical;min-height:90px}
 .context-preview{white-space:pre-wrap;overflow-wrap:anywhere}
 .sport-comparison{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 @media(max-width:700px){.privacy-integration{flex-direction:column}.sport-comparison{grid-template-columns:1fr}}
+.profile-head{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.profile-avatar{border-radius:50%;object-fit:cover;flex:none;border:3px solid #f1e9df}
+.profile-avatar.placeholder{display:grid;place-items:center;background:#e2d3c5;color:#6b3f2e;font-family:'Cormorant Garamond',serif;font-weight:700}
+.profile-photo-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1;min-width:200px}
+.profile-photo-actions .fineprint{flex-basis:100%;margin:0;color:#8b7c70}
+.profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.profile-birthday{margin:0;padding:10px 14px;border-radius:12px;background:#f1e9df;color:#6b3f2e;font-weight:600}
+.profile-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:-6px}
+.profile-chips:empty{display:none}
+.profile-chip{padding:4px 11px;border-radius:999px;background:#efe3d6;color:#6b3f2e;font-size:.78rem;font-weight:600}
+.profile-greeting{display:flex;align-items:center;gap:14px;border:0;background:transparent;padding:0;margin:0 0 18px;text-align:left;color:inherit}
+.profile-greeting strong{display:block;font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#6b3f2e;line-height:1.1}
+.profile-greeting small{color:#8b7c70}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:640px){.profile-grid{grid-template-columns:1fr}}
+label.button{flex-direction:row;cursor:pointer}
