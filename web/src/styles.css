@@ -716,3 +716,24 @@ input,select,textarea{border-radius:12px}
 .privacy-switch input:checked{background:#5E7A5F}
 .privacy-switch input:checked::after{transform:translateX(20px)}
 @media(max-width:700px){.privacy-integration{flex-direction:row}}
+
+/* Mobile : pas de zoom automatique ni de défilement horizontal */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{max-width:100%;overflow-x:hidden}
+body{min-width:0;overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent}
+input,select,textarea{font-size:16px !important;max-width:100%}
+button,a,label,select{touch-action:manipulation}
+.phone,.screen,.module-top,.profile-screen{min-width:0;max-width:100%}
+.screen *{min-width:0}
+img,svg,video,canvas{max-width:100%}
+table{display:block;max-width:100%;overflow-x:auto}
+.phone{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+.screen,.profile-screen{padding-top:calc(24px + env(safe-area-inset-top))}
+.modal-overlay{padding:env(safe-area-inset-top) 0 0}
+.editor{max-height:calc(100dvh - 24px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+@media (max-width:480px){
+  .editor{width:100%;border-radius:22px 22px 0 0;margin-top:auto}
+  .modal-overlay{align-items:flex-end}
+  .lesson-grid,.brief-grid,.health-stats,.sport-stats,.booster-grid,.finance-filters{grid-template-columns:1fr !important}
+  .button-group{flex-wrap:wrap}
+}
