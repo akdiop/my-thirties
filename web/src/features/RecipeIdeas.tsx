@@ -1,54 +1,74 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { Entry, EntryInput } from '../lib/cloud';
+import { PERSONALIZED_RECIPES } from '../../../src/cuisine/recipeIndex';
+import type { CuratedCategory } from '../../../src/cuisine/types';
 
-const ideas = [
-  {
-    title: 'Poulet yassa doux',
-    duration: '70', portions: '4',
-    ingredients: '800 g poulet\n5 pièces oignons\n2 pièces citrons\n3 càs huile\n2 càs moutarde\n2 pièces gousses d’ail\n300 g riz\nSel et poivre',
-    steps: '1. Émincer les oignons et hacher l’ail. Mélanger citron, moutarde, ail et un peu d’huile.\n2. Enrober le poulet de marinade et laisser reposer au frais.\n3. Faire revenir le poulet, puis les oignons, dans une casserole. Ajouter la marinade et un peu d’eau.\n4. Laisser mijoter jusqu’à cuisson complète du poulet, sans partie rosée à cœur.\n5. Cuire le riz séparément selon les indications du paquet. Servir avec la sauce aux oignons.',
-    storage: 'Réfrigérer les restes rapidement, dans les deux heures, et les consommer dans les jours suivants selon les recommandations locales.',
-  },
-  {
-    title: 'Riz aux légumes colorés',
-    duration: '35', portions: '4',
-    ingredients: '300 g riz\n2 pièces carottes\n1 pièce courgette\n1 pièce oignon\n2 càs huile\n600 ml eau\nSel, poivre et herbes',
-    steps: '1. Rincer le riz. Couper les légumes en petits dés.\n2. Faire revenir l’oignon dans l’huile, puis ajouter les carottes et la courgette.\n3. Verser le riz et mélanger une minute. Ajouter l’eau et assaisonner.\n4. Couvrir et cuire doucement selon le temps indiqué pour le riz, en vérifiant l’eau.\n5. Laisser reposer quelques minutes avant de servir.',
-    storage: 'Refroidir le riz cuit rapidement et le conserver au réfrigérateur. Éviter de le laisser longtemps à température ambiante.',
-  },
-  {
-    title: 'Pâtes à la tomate et aux herbes',
-    duration: '25', portions: '3',
-    ingredients: '300 g pâtes\n400 g tomates concassées\n1 pièce oignon\n2 pièces gousses d’ail\n2 càs huile\n1 càc herbes séchées\nSel et poivre',
-    steps: '1. Porter une grande casserole d’eau à ébullition et cuire les pâtes selon le paquet.\n2. Faire revenir l’oignon émincé dans l’huile, puis ajouter l’ail.\n3. Ajouter les tomates et les herbes, puis laisser mijoter 10 à 15 minutes.\n4. Mélanger les pâtes égouttées à la sauce. Ajouter un peu d’eau de cuisson si nécessaire.\n5. Goûter et ajuster l’assaisonnement.',
-    storage: 'Conserver au réfrigérateur rapidement après refroidissement et réchauffer soigneusement avant de servir.',
-  },
-] as const;
+const categories: { id: CuratedCategory; label: string }[] = [
+  { id: 'petit-dejeuner', label: 'Petit-déjeuner' },
+  { id: 'dejeuner', label: 'Déjeuner' },
+  { id: 'diner', label: 'Dîner' },
+  { id: 'casse-croute', label: 'Casse-croûte' },
+  { id: 'smoothie', label: 'Smoothie' },
+  { id: 'shot', label: 'Shot' },
+];
+const PAGE_SIZE = 12;
 
 export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void> }) {
+  const [category, setCategory] = useState<CuratedCategory>('petit-dejeuner');
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [busy, setBusy] = useState('');
   const [message, setMessage] = useState('');
-  const create = async (recipe: typeof ideas[number]) => {
-    setBusy(recipe.title); setMessage('');
+  const filtered = useMemo(() => PERSONALIZED_RECIPES.filter((r) =>
+    r.category === category && r.title.toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr'))
+  ), [category, search]);
+  const visible = filtered.slice(0, page * PAGE_SIZE);
+  const existing = new Set(entries.filter((e) => e.kind === 'recipe').map((e) => String(e.data.libraryId ?? '')));
+  const create = async (recipe: (typeof PERSONALIZED_RECIPES)[number]) => {
+    setBusy(recipe.id); setMessage('');
     try {
-      await onCreate({ module: 'cuisine', kind: 'recipe', title: recipe.title, entry_date: null,
-        data: { portions: recipe.portions, duration: recipe.duration, ingredients: recipe.ingredients,
-          steps: recipe.steps, storage: recipe.storage } });
+      await onCreate({
+        module: 'cuisine', kind: 'recipe', title: recipe.title, entry_date: null,
+        data: { libraryId: recipe.id, category: recipe.category, portions: String(recipe.servings),
+          duration: String(recipe.prepMin + recipe.cookMin),
+          ingredients: recipe.ingredients.split(';').join('\n'),
+          steps: recipe.steps.map((step, index) => String(index + 1) + '. ' + step).join('\n'),
+          storage: recipe.storage },
+      });
       setMessage('Recette ajoutée : ' + recipe.title);
-    } catch { setMessage('Impossible d’ajouter cette recette.'); } finally { setBusy(''); }
+    } catch { setMessage('Impossible d’ajouter cette recette.'); }
+    finally { setBusy(''); }
   };
-  return <section className="tool-card"><h3>Idées de recettes pour débuter</h3>
-    <p className="muted">Des bases simples à adapter à tes goûts et aux ingrédients disponibles.</p>
-    <div className="lesson-grid">{ideas.map((recipe) => {
-      const exists = entries.some((e) => e.kind === 'recipe' && e.title === recipe.title);
-      return <article className="lesson-card" key={recipe.title}>
-        <h3>{recipe.title}</h3><p>{recipe.duration} min environ · {recipe.portions} portions</p>
-        <details><summary>Voir les étapes</summary><p className="recipe-steps">{recipe.steps}</p></details>
-        <button className="button secondary" disabled={Boolean(busy) || exists} onClick={() => void create(recipe)}>
-          {exists ? 'Dans mes recettes' : 'Ajouter à mes recettes'}</button>
+  return <section className="tool-card">
+    <h3>Ma bibliothèque de 300 recettes</h3>
+    <p className="muted">50 recettes par catégorie, adaptées à tes goûts. Pois chiches et lait de coco inclus. Les shots sont des boissons plaisir, sans promesse de détox.</p>
+    <div className="recipe-filters">
+      <label>Catégorie
+        <select value={category} onChange={(e) => { setCategory(e.target.value as CuratedCategory); setPage(1); }}>
+          {categories.map((c) => <option key={c.id} value={c.id}>{c.label} (50)</option>)}
+        </select>
+      </label>
+      <label>Rechercher
+        <input type="search" value={search} placeholder="Ex. poulet, mangue…" onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
+      </label>
+    </div>
+    <p className="muted">{filtered.length} recette(s) dans cette sélection</p>
+    <div className="lesson-grid">{visible.map((recipe) => {
+      const isAdded = existing.has(recipe.id);
+      return <article className="lesson-card" key={recipe.id}>
+        <h3>{recipe.title}</h3>
+        <p>{recipe.prepMin + recipe.cookMin} min environ · {recipe.servings} portions</p>
+        <details><summary>Ingrédients et préparation</summary>
+          <p className="recipe-steps">{recipe.ingredients.split(';').join('\n')}</p>
+          <p className="recipe-steps">{recipe.steps.map((step, i) => String(i + 1) + '. ' + step).join('\n')}</p>
+        </details>
+        <button className="button secondary" disabled={Boolean(busy) || isAdded} onClick={() => void create(recipe)}>
+          {isAdded ? 'Dans mes recettes' : busy === recipe.id ? 'Ajout…' : 'Ajouter à mes recettes'}
+        </button>
       </article>;
     })}</div>
+    {visible.length < filtered.length && <button className="button secondary" onClick={() => setPage((p) => p + 1)}>Afficher 12 recettes de plus</button>}
     {message && <p role="status">{message}</p>}
-    <p className="fineprint">Recettes indicatives : vérifier les allergènes, les températures et la cuisson des aliments selon les ingrédients utilisés.</p>
+    <p className="fineprint">Quantités indicatives à adapter au nombre de personnes. Vérifier allergènes, conservation et cuisson des ingrédients.</p>
   </section>;
 }
