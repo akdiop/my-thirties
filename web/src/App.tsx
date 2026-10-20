@@ -4,9 +4,10 @@ import {
   ArrowLeft, BookOpen, CalendarDays, ChevronRight, CircleHelp, Coffee, Download,
   Heart, Home, LayoutGrid, Leaf, LogOut, Plus, Save, Settings, ShieldCheck, Trash2, X,
 } from 'lucide-react';
-import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
-import { downloadBackup, makeEncryptedBackup } from './lib/backup';
+import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
+import { downloadBackup, makeEncryptedBackup, parseEncryptedBackup } from './lib/backup';
 import { moduleById, modules, type Field, type Module } from './modules';
+import { validateRestore } from './lib/restore';
 
 type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -249,7 +250,7 @@ function EntryCard({ entry, module, onEdit, onDelete, onUpdate }: {
   </article>;
 }
 
-function Profile({ email, entries, onLogout }: { email: string; entries: Entry[]; onLogout: () => Promise<void> }) {
+function Profile({ email, entries, onLogout, onRestored }: { email: string; entries: Entry[]; onLogout: () => Promise<void>; onRestored: () => Promise<void> }) {
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [busy, setBusy] = useState(false);
@@ -265,6 +266,23 @@ function Profile({ email, entries, onLogout }: { email: string; entries: Entry[]
     } catch (e) { setMessage(e instanceof Error ? e.message : 'Export impossible.'); }
     finally { setBusy(false); }
   };
+  const restoreFile = async (file: File | undefined) => {
+    if (!file) return;
+    setMessage('');
+    if (!password) return setMessage('Saisis d’abord la phrase secrète de la sauvegarde.');
+    setBusy(true);
+    try {
+      if (file.size > 8_000_000) throw new Error('Fichier trop volumineux.');
+      const raw = await parseEncryptedBackup(await file.text(), password);
+      const validated = validateRestore(raw);
+      if (!window.confirm('Importer ' + validated.length + ' entrées ? Elles seront ajoutées aux données existantes, sans suppression. Une seconde importation créera des doublons.')) return;
+      await restoreEntries(validated);
+      await onRestored();
+      setPassword(''); setConfirmation('');
+      setMessage(validated.length + ' entrées restaurées.');
+    } catch { setMessage('Restauration impossible : vérifie le fichier, la phrase secrète et le format.'); }
+    finally { setBusy(false); }
+  };
   return <div className="content-width">
     <span className="eyebrow">MON COMPTE</span><h1>Profil & confidentialité</h1>
     <section className="panel form-stack">
@@ -277,7 +295,10 @@ function Profile({ email, entries, onLogout }: { email: string; entries: Entry[]
       <label>Phrase secrète (12 caractères minimum)<input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
       <label>Confirmer la phrase secrète<input type="password" autoComplete="new-password" value={confirmation} onChange={(e) => setConfirmation(e.target.value)} /></label>
       <button className="button primary" disabled={busy || password.length < 12 || password !== confirmation} onClick={() => void exportData()}><Download size={17} /> {busy ? 'Chiffrement…' : 'Exporter mes données'}</button>
-      <p className="fineprint">La restauration de sauvegarde n'est pas encore intégrée. Ne considère pas cet export comme ton unique moyen de récupération.</p>
+      <label>Restaurer une sauvegarde chiffrée (500 entrées maximum par fichier)
+        <input type="file" accept=".json,application/json" disabled={busy} onChange={(e) => { const file = e.target.files?.[0]; void restoreFile(file); e.target.value = ''; }} />
+      </label>
+      <p className="fineprint">La restauration ajoute les entrées au compte. Elle ne supprime pas les données existantes et peut créer des doublons. Vérifie toujours ton fichier de sauvegarde.</p>
       {message && <p role="status">{message}</p>}
     </section>
     <section className="panel"><h2>À propos de cette version</h2><p className="muted">Application web privée en cours de développement. Certaines intégrations (calendriers externes, horaires automatiques de prière, vidéos et assistant IA) nécessitent encore une configuration et des tests.</p></section>
@@ -388,7 +409,7 @@ export default function App() {
           <div className="module-grid">{modules.map((m) => <button className="module-card" key={m.id} onClick={() => go(m.id)}><span className="module-symbol">{m.symbol}</span><strong>{m.name}</strong><small>{m.description}</small><ChevronRight className="module-arrow" size={16} /></button>)}</div>
         </div>}
         {screen === 'spaces' && <div className="content-width"><span className="eyebrow">MES UNIVERS</span><h1>Tous mes espaces</h1><p className="lead">Onze espaces pour accompagner tes projets et tes habitudes.</p><div className="module-grid">{modules.map((m) => <button className="module-card" key={m.id} onClick={() => go(m.id)}><span className="module-symbol">{m.symbol}</span><strong>{m.name}</strong><small>{m.description}</small><ChevronRight className="module-arrow" size={16} /></button>)}</div></div>}
-        {screen === 'settings' && <Profile email={session.user.email ?? ''} entries={entries} onLogout={async () => { await signOut(); setEntries([]); }} />}
+        {screen === 'settings' && <Profile email={session.user.email ?? ''} entries={entries} onRestored={refresh} onLogout={async () => { await signOut(); setEntries([]); }} />}
         {currentModule && <div className="content-width">
           <button className="back-link" onClick={() => go('spaces')}><ArrowLeft size={16} /> Mes espaces</button>
           <span className="eyebrow">MON ESPACE PERSONNEL</span>
