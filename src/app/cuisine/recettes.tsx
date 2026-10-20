@@ -1,11 +1,12 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, ScrollView, TextInput, View } from 'react-native';
 
 import { HeaderAdd } from '@/components/HeaderAdd';
 import { AppText, Button, Card, Screen } from '@/components/ui';
 import { Segmented } from '@/components/ui/Segmented';
 import { categoryLabel, originLabel, RECIPE_LIBRARY } from '@/cuisine/cuisine';
+import { RECIPE_CATEGORIES } from '@/cuisine/recipeCategories';
 import { useData, useMutate } from '@/hooks/useData';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -13,12 +14,15 @@ export default function Recettes() {
   const { c } = useTheme();
   const mutate = useMutate();
   const [tab, setTab] = useState<'mine' | 'library'>('mine');
+  const [category, setCategory] = useState<string>('petit-dejeuner');
+  const [search, setSearch] = useState('');
   const recipes = useData(({ life }) => life.listRecipes());
+  const filteredLibrary = RECIPE_LIBRARY.filter((r) => r.category === category && r.title.toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr')));
   const imported = new Set(recipes.map((r) => r.libraryId).filter(Boolean));
 
   return (
     <Screen title="Mes recettes" back right={<HeaderAdd label="Nouvelle recette" onPress={() => router.push({ pathname: '/cuisine/edition/[id]', params: { id: 'new' } })} />}>
-      <Segmented label="Recettes" value={tab} onChange={setTab} options={[{ value: 'mine', label: `Les miennes (${recipes.length})` }, { value: 'library', label: 'Idées de base' }]} />
+      <Segmented label="Recettes" value={tab} onChange={setTab} options={[{ value: 'mine', label: `Les miennes (${recipes.length})` }, { value: 'library', label: 'Bibliothèque (300)' }]} />
       {tab === 'mine' ? (
         recipes.length ? (
           recipes.map((r) => (
@@ -36,8 +40,19 @@ export default function Recettes() {
         )
       ) : (
         <>
-          <AppText variant="caption" color={c.textMuted}>Recettes simples à adapter : les quantités sont indicatives, ajustez-les une fois la recette ajoutée.</AppText>
-          {RECIPE_LIBRARY.map((r) => (
+          <AppText variant="caption" color={c.textMuted}>50 recettes par catégorie, avec ingrédients et étapes. Les quantités sont indicatives.</AppText>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingVertical: 4 }}>
+            {RECIPE_CATEGORIES.map((item) => (
+              <Pressable key={item.id} accessibilityRole="button" accessibilityState={{ selected: category === item.id }}
+                onPress={() => setCategory(item.id)} style={{ backgroundColor: category === item.id ? '#D8C5B5' : '#F5F1E6', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 16 }}>
+                <AppText style={{ color: '#6B4A38' }}>{item.label}</AppText>
+              </Pressable>
+            ))}
+          </ScrollView>
+          <TextInput accessibilityLabel="Rechercher une recette" placeholder="Rechercher dans cette catégorie…" placeholderTextColor={c.textMuted}
+            value={search} onChangeText={setSearch} style={{ backgroundColor: '#F5F1E6', color: '#6B4A38', padding: 12, borderRadius: 12 }} />
+          <AppText variant="caption" color={c.textMuted}>{filteredLibrary.length} recette(s)</AppText>
+          {filteredLibrary.map((r) => (
             <Card key={r.libraryId} style={{ gap: 6 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
                 <AppText style={{ fontFamily: 'Inter_600SemiBold', flex: 1 }}>{r.title}</AppText>
