@@ -10,7 +10,9 @@ import { AgendaItemRow } from '@/features/agenda/AgendaItemRow';
 import { challengeView, formatAmount } from '@/features/challengeView';
 import { BudgetCard } from '@/features/finances/BudgetCard';
 import { useAgenda } from '@/features/agenda/useAgenda';
+import { Avatar } from '@/features/profile/Avatar';
 import { useData, useMutate } from '@/hooks/useData';
+import { birthdayLine } from '@/profile/profile';
 import { useToday } from '@/hooks/useToday';
 import { useAppData } from '@/state/appData';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -65,8 +67,15 @@ export default function Accueil() {
   return (
     <Screen
       title={`${greeting(now)}, ${profile?.firstName ?? ''}`}
-      subtitle={formatLongDate(now, profile?.timezone)}
-      right={<Sparkles size={22} color={c.primary} accessibilityLabel="Assistant, prévu en phase 5" />}
+      subtitle={[formatLongDate(now, profile?.timezone), birthdayLine(profile?.birthDate ?? null, now)].filter(Boolean).join(' · ')}
+      right={
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <Sparkles size={22} color={c.primary} accessibilityLabel="Assistant, prévu en phase 5" />
+          <Pressable accessibilityRole="button" accessibilityLabel="Mon profil" onPress={() => router.push('/mon-profil')}>
+            <Avatar photo={profile?.photoUri} name={profile?.firstName} size={40} />
+          </Pressable>
+        </View>
+      }
     >
       <CalmButton />
 

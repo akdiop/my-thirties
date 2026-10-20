@@ -17,6 +17,16 @@ export const profile = sqliteTable('profile', {
   country: text('country').notNull().default('SN'),
   timezone: text('timezone').notNull(),
   currency: text('currency', { enum: ['XOF', 'EUR', 'USD'] }).notNull().default('XOF'),
+  lastName: text('last_name'),
+  birthDate: text('birth_date'),
+  city: text('city'),
+  situation: text('situation'),
+  children: text('children'),
+  job: text('job'),
+  hobbies: text('hobbies', { mode: 'json' }).$type<string[]>().notNull().default([]),
+  languages: text('languages', { mode: 'json' }).$type<string[]>().notNull().default([]),
+  personalValues: text('personal_values', { mode: 'json' }).$type<string[]>().notNull().default([]),
+  intention: text('intention'),
   ...timestamps,
 });
 

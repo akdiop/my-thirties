@@ -32,7 +32,7 @@ export function createRepository(db: Database, deviceId: string) {
       return values;
     },
 
-    updateProfile(id: string, patch: Partial<Pick<Profile, 'firstName' | 'currency' | 'country' | 'timezone'>>) {
+    updateProfile(id: string, patch: Partial<Omit<Profile, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'deviceId'>>) {
       db.update(profile).set({ ...patch, updatedAt: new Date().toISOString(), deviceId }).where(eq(profile.id, id)).run();
     },
 

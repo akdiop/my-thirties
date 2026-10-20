@@ -34,6 +34,7 @@ const config: ExpoConfig = {
         { name: 'LockWidget', displayName: 'My Thirties', description: 'Aperçu discret sur écran verrouillé', supportedFamilies: ['accessoryCircular', 'accessoryRectangular', 'accessoryInline'] },
       ],
     }],
+    ['expo-image-picker', { photosPermission: 'My thirties utilise une photo de votre choix pour votre profil.', cameraPermission: false, microphonePermission: false }],
     'expo-notifications',
     ['expo-sensors', { motionPermission: 'My thirties lit le nombre de pas compté par votre iPhone pour l’afficher dans Ma santé.' }],
     ['expo-location', { locationWhenInUsePermission: 'My thirties utilise votre position, une seule fois et arrondie, pour calculer les horaires des prières.' }],

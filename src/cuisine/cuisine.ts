@@ -1,3 +1,5 @@
+import { PERSONALIZED_RECIPES } from './recipeIndex';
+import { parseCuratedIngredient } from './recipeParser';
 export type Ingredient = { name: string; qty: number | null; unit: string };
 
 export type RecipeLike = {
@@ -25,6 +27,11 @@ export const CATEGORIES = [
   { id: 'petit-dejeuner', label: 'Petit-déjeuner' },
   { id: 'dessert', label: 'Dessert' },
   { id: 'boisson', label: 'Boisson' },
+  { id: 'dejeuner', label: 'Déjeuner' },
+  { id: 'diner', label: 'Dîner' },
+  { id: 'casse-croute', label: 'Casse-croûte' },
+  { id: 'smoothie', label: 'Smoothie' },
+  { id: 'shot', label: 'Shot' },
 ] as const;
 
 export const SLOT_LABEL = { dejeuner: 'Déjeuner', diner: 'Dîner' } as const;
@@ -114,6 +121,12 @@ export type LibraryRecipe = Omit<RecipeLike, 'id'> & { libraryId: string; origin
 
 /** Recettes de base à adapter : quantités indicatives, à ajuster à vos goûts et à votre matériel. */
 export const RECIPE_LIBRARY: LibraryRecipe[] = [
+  ...PERSONALIZED_RECIPES.map((r) => ({
+    libraryId: r.id, title: r.title, origin: 'maison', category: r.category,
+    servings: r.servings, prepMin: r.prepMin, cookMin: r.cookMin,
+    ingredients: r.ingredients.split(';').map(parseCuratedIngredient),
+    steps: r.steps, storage: r.storage,
+  })),
   {
     libraryId: 'yassa-poulet',
     title: 'Yassa au poulet',
