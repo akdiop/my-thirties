@@ -49,6 +49,7 @@ export const modules: Module[] = [
     kinds: [
       { id: 'emotion', label: 'Journal émotionnel', fields: [date, { id: 'emotion', label: 'Émotion', type: 'text' }, { id: 'trigger', label: 'Déclencheur', type: 'textarea' }, { id: 'reaction', label: 'Réaction', type: 'textarea' }, { id: 'reflection', label: 'Ce qui m’a aidée', type: 'textarea' }] },
       { id: 'gratitude', label: 'Gratitude', fields: [date, { id: 'positive', label: 'Trois choses positives', type: 'textarea' }, { id: 'learning', label: 'Ce que j’ai appris', type: 'textarea' }] },
+      { id: 'review', label: 'Bilan personnel', fields: [date, { id: 'period', label: 'Période', type: 'select', options: ['week', 'month'] }, { id: 'positive', label: 'Ce qui m’a fait du bien', type: 'textarea' }, { id: 'challenge', label: 'Ce qui a été difficile', type: 'textarea' }, { id: 'intention', label: 'Ce que j’aimerais essayer', type: 'textarea' }] },
       { id: 'booster', label: 'Booster personnel', fields: [{ id: 'axis', label: 'Axe', type: 'select', options: ['Anxiété', 'Nervosité', 'Impulsivité', 'Patience', 'Confiance en soi', 'Gestion des conflits', 'Lâcher-prise', 'Affirmation de soi'] }, { id: 'goal', label: 'Objectif du mois', type: 'textarea' }, { id: 'practice', label: 'Exercice facultatif', type: 'textarea' }, { id: 'days', label: 'Durée du programme', type: 'select', options: ['7', '14', '30'] }] },
     ],
   },
