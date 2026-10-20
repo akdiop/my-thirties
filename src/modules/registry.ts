@@ -30,14 +30,14 @@ export type ModuleDefinition = {
   phase: 2 | 3 | 4;
   status: FeatureStatus;
   sensitive: boolean;
-  route?: '/quotidien' | '/listes';
+  route?: '/quotidien' | '/listes' | '/challenges' | '/sport' | '/equilibre';
 };
 
 export const MODULES: readonly ModuleDefinition[] = [
   { id: 'quotidien', label: 'Mon quotidien', description: 'Tâches, routines et planification', icon: 'calendar-check', tone: 'blush', phase: 2, status: 'partial', sensitive: false, route: '/quotidien' },
   { id: 'sante', label: 'Ma santé', description: 'Cycle, sommeil, alimentation, rendez-vous', icon: 'heart', tone: 'sage', phase: 3, status: 'not-developed', sensitive: true },
   { id: 'sport', label: 'Mon sport', description: 'Tennis, Pilates, yoga et journal', icon: 'dumbbell', tone: 'sage', phase: 3, status: 'not-developed', sensitive: false },
-  { id: 'challenges', label: 'Mes challenges', description: 'Calendriers de 30 jours en parallèle', icon: 'trophy', tone: 'sage', phase: 3, status: 'not-developed', sensitive: false },
+  { id: 'challenges', label: 'Mes challenges', description: 'Calendriers de 30 jours en parallèle', icon: 'trophy', tone: 'sage', phase: 3, status: 'partial', sensitive: false, route: '/challenges' },
   { id: 'equilibre', label: 'Mon équilibre', description: 'Axes, Booster, journaux, apaisement', icon: 'flower', tone: 'sand', phase: 3, status: 'not-developed', sensitive: true },
   { id: 'spiritualite', label: 'Ma spiritualité', description: 'Prières, Coran, dhikr, calendrier hégirien', icon: 'moon', tone: 'sand', phase: 3, status: 'not-developed', sensitive: true },
   { id: 'finances', label: 'Mes finances', description: 'Budget multidevise, abonnements, épargne', icon: 'wallet', tone: 'blush', phase: 4, status: 'not-developed', sensitive: true },
