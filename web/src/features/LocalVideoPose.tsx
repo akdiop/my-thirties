@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import { useIntegrationPrefs } from '../lib/integrations';
 
 type Point = { x: number; y: number; visibility?: number };
 const pairs = [[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]] as const;
 
 export function LocalVideoPose() {
+  const { prefs } = useIntegrationPrefs();
   const [videoUrl, setVideoUrl] = useState('');
   const [fileName, setFileName] = useState('');
   const [status, setStatus] = useState('');
@@ -29,7 +31,7 @@ export function LocalVideoPose() {
     setVideoUrl(URL.createObjectURL(file)); setFileName(file.name);
   };
   const analyze = async () => {
-    if (!video.current || !canvas.current || !videoUrl || busy) return;
+    if (!prefs.video || !video.current || !canvas.current || !videoUrl || busy) return;
     setBusy(true); setStatus('');
     try {
       const { FilesetResolver, PoseLandmarker } = await import('@mediapipe/tasks-vision');
@@ -86,7 +88,7 @@ export function LocalVideoPose() {
       <div className="video-stage"><video ref={video} src={videoUrl} controls playsInline preload="metadata" aria-label={'Vidéo ' + fileName} />
         <canvas ref={canvas} aria-hidden="true" /></div>
       <div className="button-group">{active ? <button className="button secondary" onClick={stop}>Arrêter l'observation</button>
-        : <button className="button secondary" disabled={busy} onClick={() => void analyze()}>{busy ? 'Chargement du modèle…' : 'Activer les points de posture'}</button>}
+        : <button className="button secondary" disabled={!prefs.video || busy} onClick={() => void analyze()}>{busy ? 'Chargement du modèle…' : 'Activer les points de posture'}</button>}
         <button className="button ghost" onClick={() => { stop(); choose(); if (fileRef.current) fileRef.current.value = ''; }}>Retirer la vidéo</button></div>
     </div>}
     {status && <p role="status">{status}</p>}
