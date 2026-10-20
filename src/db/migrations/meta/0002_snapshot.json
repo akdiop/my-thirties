@@ -1,9 +1,6 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "fb1d381a-66f1-4aa3-9e45-4ce00b40f72a",
-  "prevId": "85f1254c-61fc-47b7-919c-a02fc4cf7466",
-  "tables": {
   "id": "706e5c63-b3b6-40d2-89e7-ba0269705eb6",
   "prevId": "85f1254c-61fc-47b7-919c-a02fc4cf7466",
   "tables": {
@@ -531,12 +528,6 @@
         },
         "title": {
           "name": "title",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "title": {
-          "name": "title",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -688,8 +679,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "date": {
-          "name": "date",
         "description": {
           "name": "description",
           "type": "text",
@@ -697,8 +686,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "start_time": {
-          "name": "start_time",
         "feeling": {
           "name": "feeling",
           "type": "text",
@@ -706,23 +693,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "end_time": {
-          "name": "end_time",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "category": {
-          "name": "category",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'perso'"
-        },
-        "location": {
-          "name": "location",
         "created_at": {
           "name": "created_at",
           "type": "text",
@@ -744,22 +714,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "notes": {
-          "name": "notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "recurrence": {
-          "name": "recurrence",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "exceptions": {
-          "name": "exceptions",
         "device_id": {
           "name": "device_id",
           "type": "text",
@@ -799,9 +753,6 @@
           "autoincrement": false,
           "default": "'[]'"
         },
-        "reminder_minutes": {
-          "name": "reminder_minutes",
-          "type": "integer",
         "learned": {
           "name": "learned",
           "type": "text",
@@ -809,8 +760,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "source_type": {
-          "name": "source_type",
         "success": {
           "name": "success",
           "type": "text",
@@ -818,8 +767,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "source_id": {
-          "name": "source_id",
         "reflection": {
           "name": "reflection",
           "type": "text",
@@ -871,12 +818,6 @@
         }
       },
       "indexes": {
-        "event_date_idx": {
-          "name": "event_date_idx",
-          "columns": [
-            "date"
-          ],
-          "isUnique": false
         "gratitude_entry_date_unique": {
           "name": "gratitude_entry_date_unique",
           "columns": [
@@ -1108,11 +1049,6 @@
       "columns": {
         "module_id": {
           "name": "module_id",
-    "module_setting": {
-      "name": "module_setting",
-      "columns": {
-        "module_id": {
-          "name": "module_id",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
@@ -1339,17 +1275,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "enabled": {
-          "name": "enabled",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": true
-        },
-        "position": {
-          "name": "position",
-          "type": "integer",
         "date": {
           "name": "date",
           "type": "text",
@@ -1393,7 +1318,6 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
       "indexes": {
         "prayer_log_unique": {
           "name": "prayer_log_unique",
@@ -1551,8 +1475,6 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "routine": {
-      "name": "routine",
     "program_check": {
       "name": "program_check",
       "columns": {
@@ -1563,8 +1485,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "name": {
-          "name": "name",
         "enrollment_id": {
           "name": "enrollment_id",
           "type": "text",
@@ -1572,16 +1492,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "kind": {
-          "name": "kind",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'perso'"
-        },
-        "weekdays": {
-          "name": "weekdays",
         "day": {
           "name": "day",
           "type": "integer",
@@ -1617,8 +1527,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "time": {
-          "name": "time",
         "deleted_at": {
           "name": "deleted_at",
           "type": "text",
@@ -1626,17 +1534,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "remind": {
-          "name": "remind",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": false
-        },
-        "position": {
-          "name": "position",
-          "type": "integer",
         "device_id": {
           "name": "device_id",
           "type": "text",
@@ -1742,8 +1639,6 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "routine_check": {
-      "name": "routine_check",
     "routine": {
       "name": "routine",
       "columns": {
@@ -1754,8 +1649,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "routine_item_id": {
-          "name": "routine_item_id",
         "name": {
           "name": "name",
           "type": "text",
@@ -1763,8 +1656,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "date": {
-          "name": "date",
         "kind": {
           "name": "kind",
           "type": "text",
@@ -1831,39 +1722,12 @@
           "autoincrement": false
         }
       },
-      "indexes": {
-        "routine_check_item_date": {
-          "name": "routine_check_item_date",
-          "columns": [
-            "routine_item_id",
-            "date"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {
-        "routine_check_routine_item_id_routine_item_id_fk": {
-          "name": "routine_check_routine_item_id_routine_item_id_fk",
-          "tableFrom": "routine_check",
-          "tableTo": "routine_item",
-          "columnsFrom": [
-            "routine_item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "routine_item": {
-      "name": "routine_item",
     "routine_check": {
       "name": "routine_check",
       "columns": {
@@ -1874,8 +1738,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "routine_id": {
-          "name": "routine_id",
         "routine_item_id": {
           "name": "routine_item_id",
           "type": "text",
@@ -1883,18 +1745,9 @@
           "notNull": true,
           "autoincrement": false
         },
-        "title": {
-          "name": "title",
         "date": {
           "name": "date",
           "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "position": {
-          "name": "position",
-          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -1928,14 +1781,6 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
-      "foreignKeys": {
-        "routine_item_routine_id_routine_id_fk": {
-          "name": "routine_item_routine_id_routine_id_fk",
-          "tableFrom": "routine_item",
-          "tableTo": "routine",
-          "columnsFrom": [
-            "routine_id"
       "indexes": {
         "routine_check_item_date": {
           "name": "routine_check_item_date",
@@ -1965,8 +1810,6 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "subtask": {
-      "name": "subtask",
     "routine_item": {
       "name": "routine_item",
       "columns": {
@@ -1977,8 +1820,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "task_id": {
-          "name": "task_id",
         "routine_id": {
           "name": "routine_id",
           "type": "text",
@@ -1992,14 +1833,6 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "done": {
-          "name": "done",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": false
         },
         "position": {
           "name": "position",
@@ -2039,12 +1872,6 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "subtask_task_id_task_id_fk": {
-          "name": "subtask_task_id_task_id_fk",
-          "tableFrom": "subtask",
-          "tableTo": "task",
-          "columnsFrom": [
-            "task_id"
         "routine_item_routine_id_routine_id_fk": {
           "name": "routine_item_routine_id_routine_id_fk",
           "tableFrom": "routine_item",
@@ -2063,8 +1890,6 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "task": {
-      "name": "task",
     "sleep_entry": {
       "name": "sleep_entry",
       "columns": {
@@ -2075,8 +1900,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "title": {
-          "name": "title",
         "date": {
           "name": "date",
           "type": "text",
@@ -2084,51 +1907,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "notes": {
-          "name": "notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "due_date": {
-          "name": "due_date",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "due_time": {
-          "name": "due_time",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "priority": {
-          "name": "priority",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "focus_date": {
-          "name": "focus_date",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "recurrence": {
-          "name": "recurrence",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "reminder_minutes": {
-          "name": "reminder_minutes",
         "bed_time": {
           "name": "bed_time",
           "type": "text",
@@ -2150,21 +1928,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "completed_at": {
-          "name": "completed_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "postponed_count": {
-          "name": "postponed_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
         "created_at": {
           "name": "created_at",
           "type": "text",
@@ -2195,19 +1958,6 @@
         }
       },
       "indexes": {
-        "task_due_idx": {
-          "name": "task_due_idx",
-          "columns": [
-            "due_date"
-          ],
-          "isUnique": false
-        },
-        "task_focus_idx": {
-          "name": "task_focus_idx",
-          "columns": [
-            "focus_date"
-          ],
-          "isUnique": false
         "sleep_entry_date_unique": {
           "name": "sleep_entry_date_unique",
           "columns": [
@@ -2221,8 +1971,6 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "challenge": {
-      "name": "challenge",
     "spiritual_journal": {
       "name": "spiritual_journal",
       "columns": {
@@ -2233,15 +1981,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "discipline": {
-          "name": "discipline",
         "date": {
           "name": "date",
           "type": "text",
@@ -2249,29 +1988,12 @@
           "notNull": true,
           "autoincrement": false
         },
-        "start_date": {
-          "name": "start_date",
         "text": {
           "name": "text",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "days": {
-          "name": "days",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "status": {
-          "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'active'"
         },
         "created_at": {
           "name": "created_at",
@@ -2308,8 +2030,6 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "challenge_day": {
-      "name": "challenge_day",
     "subtask": {
       "name": "subtask",
       "columns": {
@@ -2320,8 +2040,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "challenge_id": {
-          "name": "challenge_id",
         "task_id": {
           "name": "task_id",
           "type": "text",
@@ -2329,9 +2047,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "day_number": {
-          "name": "day_number",
-          "type": "integer",
         "title": {
           "name": "title",
           "type": "text",
@@ -2339,26 +2054,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "state": {
-          "name": "state",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'not_done'"
-        },
-        "plan": {
-          "name": "plan",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "notes": {
-          "name": "notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
         "done": {
           "name": "done",
           "type": "integer",
@@ -2403,23 +2098,6 @@
           "autoincrement": false
         }
       },
-      "indexes": {
-        "challenge_day_unique": {
-          "name": "challenge_day_unique",
-          "columns": [
-            "challenge_id",
-            "day_number"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {
-        "challenge_day_challenge_id_challenge_id_fk": {
-          "name": "challenge_day_challenge_id_challenge_id_fk",
-          "tableFrom": "challenge_day",
-          "tableTo": "challenge",
-          "columnsFrom": [
-            "challenge_id"
       "indexes": {},
       "foreignKeys": {
         "subtask_task_id_task_id_fk": {
@@ -2440,8 +2118,6 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "journal_entry": {
-      "name": "journal_entry",
     "task": {
       "name": "task",
       "columns": {
@@ -2452,8 +2128,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "kind": {
-          "name": "kind",
         "title": {
           "name": "title",
           "type": "text",
@@ -2461,15 +2135,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "entry_date": {
-          "name": "entry_date",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "emotion": {
-          "name": "emotion",
         "notes": {
           "name": "notes",
           "type": "text",
@@ -2484,8 +2149,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "trigger": {
-          "name": "trigger",
         "due_time": {
           "name": "due_time",
           "type": "text",
@@ -2493,8 +2156,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "reaction": {
-          "name": "reaction",
         "priority": {
           "name": "priority",
           "type": "integer",
@@ -2510,8 +2171,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "reflection": {
-          "name": "reflection",
         "recurrence": {
           "name": "recurrence",
           "type": "text",
@@ -2571,10 +2230,6 @@
         }
       },
       "indexes": {
-        "journal_entry_date_idx": {
-          "name": "journal_entry_date_idx",
-          "columns": [
-            "entry_date"
         "task_due_idx": {
           "name": "task_due_idx",
           "columns": [
@@ -2595,8 +2250,6 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "sport_session": {
-      "name": "sport_session",
     "workout_session": {
       "name": "workout_session",
       "columns": {
@@ -2621,8 +2274,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "session_date": {
-          "name": "session_date",
         "title": {
           "name": "title",
           "type": "text",
@@ -2630,8 +2281,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "duration_minutes": {
-          "name": "duration_minutes",
         "duration_min": {
           "name": "duration_min",
           "type": "integer",
@@ -2690,10 +2339,6 @@
         }
       },
       "indexes": {
-        "sport_session_date_idx": {
-          "name": "sport_session_date_idx",
-          "columns": [
-            "session_date"
         "workout_date_idx": {
           "name": "workout_date_idx",
           "columns": [
@@ -2718,5 +2363,4 @@
   "internal": {
     "indexes": {}
   }
-}
 }

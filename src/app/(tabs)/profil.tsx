@@ -40,7 +40,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default function Profil() {
-  const { repo, org, wellbeing, sqlite } = useSession();
   const { repo, org, well, life, sqlite } = useSession();
   const refresh = useRefresh();
   const { profile, modules } = useAppData();
@@ -89,10 +88,9 @@ export default function Profil() {
         Alert.alert('Sauvegarde', 'Saisissez deux fois la même phrase secrète d’au moins 12 caractères.');
         return;
       }
-      await shareExport(repo, org, wellbeing, exportPassword);
+      await shareExport(repo, org, well, life, exportPassword);
       setExportPassword('');
       setExportConfirm('');
-      await shareExport(repo, org, well, life);
     } catch (e) {
       Alert.alert('Export impossible', e instanceof Error ? e.message : String(e));
     } finally {

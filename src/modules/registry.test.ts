@@ -6,9 +6,6 @@ describe('module registry', () => {
     expect(new Set(MODULES.map((m) => m.id)).size).toBe(11);
   });
 
-  it('marks only implemented spaces as partly built', () => {
-    const built = MODULES.filter((m) => m.status !== 'not-developed').map((m) => m.id);
-    expect(built).toEqual(['quotidien', 'challenges', 'listes']);
   it('routes exactly the spaces that are built', () => {
     const built = MODULES.filter((m) => m.status !== 'not-developed').map((m) => m.id);
     expect(built).toEqual(['quotidien', 'sante', 'sport', 'challenges', 'equilibre', 'spiritualite', 'finances', 'cuisine', 'decouvertes', 'passions', 'listes']);
