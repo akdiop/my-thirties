@@ -8,12 +8,18 @@ export type Settings = {
   appearance: Appearance;
   lockDelayMs: number;
   notifications: NotificationSettings;
+  briefingTime: string | null;
+  eveningTime: string | null;
+  deviceCalendars: boolean;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
   appearance: 'light',
   lockDelayMs: 60_000,
   notifications: { enabled: true, disabledCategories: [], quietHours: { start: '22:00', end: '07:00' } },
+  briefingTime: '07:30',
+  eveningTime: '20:30',
+  deviceCalendars: false,
 };
 
 type SettingsStore = Settings & {

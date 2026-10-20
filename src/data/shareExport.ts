@@ -3,11 +3,12 @@ import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
 import { buildExport, exportFileName } from './exportData';
+import type { OrganisationRepository } from './organisation';
 import type { Repository } from './repository';
 
-export async function shareExport(repo: Repository) {
+export async function shareExport(repo: Repository, org: OrganisationRepository) {
   const now = new Date();
-  const payload = buildExport(repo.dumpAll(), now, Constants.expoConfig?.version ?? '0.0.0');
+  const payload = buildExport({ ...repo.dumpAll(), ...org.dumpAll() }, now, Constants.expoConfig?.version ?? '0.0.0');
   const file = new File(Paths.cache, exportFileName(now));
   if (file.exists) file.delete();
   file.create();

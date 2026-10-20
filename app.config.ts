@@ -15,6 +15,7 @@ const config: ExpoConfig = {
     config: { usesNonExemptEncryption: false },
     infoPlist: {
       NSFaceIDUsageDescription: 'My thirties utilise Face ID pour déverrouiller vos données personnelles.',
+      NSCalendarsFullAccessUsageDescription: 'My thirties affiche vos calendriers (Google, iCloud) dans son agenda, en lecture seule.',
     },
   },
   android: {
@@ -27,6 +28,7 @@ const config: ExpoConfig = {
     ['expo-sqlite', { useSQLCipher: true }],
     ['expo-local-authentication', { faceIDPermission: 'My thirties utilise Face ID pour déverrouiller vos données personnelles.' }],
     'expo-notifications',
+    ['expo-calendar', { calendarPermission: 'My thirties affiche vos calendriers (Google, iCloud) dans son agenda, en lecture seule.' }],
     'expo-font',
     ['expo-splash-screen', { image: './assets/splash-icon.png', imageWidth: 160, backgroundColor: '#FAF7F2' }],
   ],

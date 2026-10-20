@@ -25,7 +25,7 @@ export default function Espaces() {
             key={module.id}
             accessibilityRole="button"
             accessibilityLabel={module.label}
-            onPress={() => router.push({ pathname: '/espace/[id]', params: { id: module.id } })}
+            onPress={() => (module.route ? router.push(module.route) : router.push({ pathname: '/espace/[id]', params: { id: module.id } }))}
             style={({ pressed }) => ({
               width: '31%',
               aspectRatio: 0.95,

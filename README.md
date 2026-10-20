@@ -30,17 +30,19 @@ L'application utilise des modules natifs (SQLCipher, Face ID) : elle ne fonction
 npx eas-cli@latest build --profile development --platform ios
 ```
 
-Installation sur iPhone via TestFlight (compte Apple Developer requis).
+Installation sur iPhone via TestFlight (compte Apple Developer requis, environ 99 USD par an). Sans compte payant, une installation de 7 jours est possible depuis un Mac avec Xcode et un identifiant Apple gratuit (`npx expo run:ios --device`).
 
 ## Structure
 
 ```
 src/
-  app/          écrans (Expo Router) : onglets, espaces, respiration, modules
+  agenda/       dates, récurrence, agenda, tâches, routines (logique pure, testée)
+  app/          écrans (Expo Router) : onglets, agenda, tâches, routines, listes, espaces
   components/   design system et composants partagés
   db/           schéma Drizzle, migrations, ouverture de la base chiffrée
   data/         accès aux données, export, suppression
-  features/     verrou, profil, respiration
+  features/     verrou, profil, respiration, agenda, tâches
+  lists/        logique des listes et modèles
   modules/      registre des 11 espaces et de leurs statuts
   notifications/ planificateur (heures silencieuses, limite iOS) et envoi
   security/     code, clés, trousseau, Face ID

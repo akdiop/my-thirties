@@ -4,6 +4,8 @@ import { Alert, Switch, TextInput, View } from 'react-native';
 
 import { AppText, Button, Card, ListRow, Screen } from '@/components/ui';
 import { Segmented } from '@/components/ui/Segmented';
+import { TimeField } from '@/components/form/DateTimeField';
+import { requestCalendarAccess } from '@/features/agenda/deviceCalendar';
 import { useSession } from '@/db/DatabaseProvider';
 import { shareExport } from '@/data/shareExport';
 import { useRefresh } from '@/data/useRefresh';
@@ -37,7 +39,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default function Profil() {
-  const { repo, sqlite } = useSession();
+  const { repo, org, sqlite } = useSession();
   const refresh = useRefresh();
   const { profile, modules } = useAppData();
   const settings = useSettings();
@@ -79,7 +81,7 @@ export default function Profil() {
   const exportData = async () => {
     setExporting(true);
     try {
-      await shareExport(repo);
+      await shareExport(repo, org);
     } catch (e) {
       Alert.alert('Export impossible', e instanceof Error ? e.message : String(e));
     } finally {
@@ -175,6 +177,31 @@ export default function Profil() {
         <ListRow
           label="Heures silencieuses"
           value={settings.notifications.quietHours ? `${settings.notifications.quietHours.start} – ${settings.notifications.quietHours.end}` : 'Aucune'}
+        />
+        <View style={{ paddingVertical: 10, gap: 6 }}>
+          <AppText variant="label">Briefing du matin</AppText>
+          <TimeField label="Briefing du matin" value={settings.briefingTime} onChange={(v) => save('briefingTime', v)} optional />
+        </View>
+        <View style={{ paddingVertical: 10, gap: 6 }}>
+          <AppText variant="label">Bilan du soir</AppText>
+          <TimeField label="Bilan du soir" value={settings.eveningTime} onChange={(v) => save('eveningTime', v)} optional />
+        </View>
+        <ListRow
+          label="Calendriers de l’iPhone"
+          right={
+            <Switch
+              value={settings.deviceCalendars}
+              trackColor={{ true: c.secondary }}
+              accessibilityLabel="Afficher les calendriers de l’iPhone"
+              onValueChange={async (v) => {
+                if (v && !(await requestCalendarAccess())) {
+                  Alert.alert('Accès refusé', 'Autorisez My thirties dans Réglages › Calendriers de l’iPhone.');
+                  return;
+                }
+                save('deviceCalendars', v);
+              }}
+            />
+          }
         />
         <ListRow label="Espaces affichés" value={`${enabledCount} sur 11`} onPress={() => router.push('/modules')} last />
       </Section>
