@@ -336,3 +336,68 @@ textarea{resize:vertical;min-height:90px}
 .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:640px){.profile-grid{grid-template-columns:1fr}}
 label.button{flex-direction:row;cursor:pointer}
+/* Photos d'illustration */
+.hero-photo{position:relative;min-height:230px;border-radius:20px;overflow:hidden;background-size:cover;background-position:center;display:flex;align-items:flex-end;margin-bottom:18px}
+.hero-photo.compact{min-height:120px;border-radius:14px 14px 0 0;margin:0}
+.hero-watermark{position:absolute;right:-6px;top:-14px;font-family:'Cormorant Garamond',serif;font-size:6.5rem;font-weight:600;color:rgba(255,250,245,.18);letter-spacing:-.04em;pointer-events:none;white-space:nowrap}
+.hero-photo.compact .hero-watermark{font-size:3.6rem;top:-8px}
+.hero-shade{width:100%;padding:22px;background:linear-gradient(180deg,rgba(60,33,22,0) 0%,rgba(60,33,22,.55) 100%)}
+.hero-photo.compact .hero-shade{min-height:120px;background:transparent}
+.hero-title h2{color:#fffaf5;font-size:2.6rem;margin:0}
+.hero-title span{color:#f1e3d6;font-size:.85rem;letter-spacing:.04em}
+.hero-change{position:absolute;top:12px;right:12px;display:flex;flex-direction:row;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;background:rgba(255,250,245,.88);color:#6b3f2e;font-size:.72rem;font-weight:600;cursor:pointer}
+.hero-remove{position:absolute;top:12px;left:12px;width:28px;height:28px;border:0;border-radius:50%;background:rgba(255,250,245,.88);color:#6b3f2e;font-size:1rem;line-height:1}
+.hero-error{position:absolute;left:12px;bottom:8px;margin:0;padding:4px 9px;border-radius:8px;background:#fffaf5;color:#9b3b2e;font-size:.75rem}
+/* Onglets en pilule */
+.pill-tabs{display:flex;gap:6px;padding:5px;margin:6px 0 18px;border-radius:999px;background:#f1e9df;width:fit-content;max-width:100%}
+.pill-tabs button{border:0;background:transparent;border-radius:999px;padding:9px 20px;color:#6b3f2e;font-size:.82rem;font-weight:600}
+.pill-tabs button.active{background:#6b3f2e;color:#fffaf5}
+/* Mon sport */
+.sport-hub{margin-bottom:28px}
+.sport-menu{background:#fffdfa;border:1px solid #eee5dc;border-radius:18px;overflow:hidden}
+.sport-row{width:100%;display:flex;align-items:center;gap:14px;padding:16px 18px;border:0;border-bottom:1px solid #f0e8df;background:transparent;color:#3c3029;font-size:.92rem;text-align:left}
+.sport-row svg{color:#6b3f2e;flex:none}
+.sport-row span{flex:1}
+.sport-row .chev{color:#b29b88;transition:transform .15s}
+.sport-row.open .chev{transform:rotate(90deg)}
+.sport-row-wrap:last-child .sport-row{border-bottom:0}
+.sport-panel{padding:4px 18px 20px;border-bottom:1px solid #f0e8df}
+.sport-panel h4{color:#6b3f2e;margin:18px 0 8px}
+.benefits{margin:6px 0 14px;padding-left:18px;color:#5c4d43;font-size:.86rem;line-height:1.8}
+.video-list{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.video-list a{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:#f6efe7;color:#6b3f2e;text-decoration:none;font-size:.85rem;font-weight:600}
+.program-list{display:grid;gap:10px}
+.program-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:14px;background:#f6efe7}
+.program-item div{display:flex;flex-direction:column}
+.goal-list{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.goal-list li{display:flex;align-items:center;gap:8px;color:#3c3029;font-size:.88rem}
+.goal-list svg{color:#8f9f7a}
+/* Mes challenges */
+.challenges-board{margin-bottom:28px}
+.active-challenge{background:#fffdfa;border:1px solid #eee5dc;border-radius:20px;padding:14px 14px 18px}
+.active-challenge .hero-photo{margin-bottom:14px}
+.active-head{display:flex;justify-content:space-between;align-items:baseline;margin:0 4px 8px;color:#6b3f2e}
+.day-dots{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:18px 4px 12px;justify-items:center}
+.day-dot{width:42px;height:42px;border-radius:50%;border:1.5px solid #e2d6c9;background:#fffdfa;color:#6b3f2e;font-size:.82rem;font-weight:600;display:grid;place-items:center;padding:0}
+.day-dot.done{background:#5e7a5f;border-color:#5e7a5f;color:#fff}
+.day-dot.rest,.day-dot.planned-rest{background:#e9e4dc;border-color:#e9e4dc;color:#8b7c70}
+.day-dot.today{background:#c09072;border-color:#c09072;color:#fff}
+.day-dot.today.done{background:#5e7a5f;box-shadow:0 0 0 3px #c09072}
+.day-dot.selected{box-shadow:0 0 0 3px rgba(107,63,46,.35)}
+.dot-legend{display:flex;gap:16px;flex-wrap:wrap;margin:0 4px 14px;font-size:.75rem;color:#7d7069}
+.dot-legend span{display:flex;align-items:center;gap:6px}
+.dot-legend .day-dot{width:13px;height:13px;border-width:1.5px}
+.day-session{background:#f6efe7;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.day-session p{margin:0;color:#3c3029;font-size:.9rem}
+.day-session .fineprint{color:#8b7c70}
+.button.wide{width:100%;margin-top:14px;border-radius:999px;min-height:50px}
+.challenge-switch{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.challenge-switch button{border:1px solid #e2d5c8;background:#fffdfa;border-radius:999px;padding:7px 14px;font-size:.78rem;color:#6b3f2e}
+.challenge-switch button.active{background:#efe3d6;font-weight:700}
+.board-subtitle{font-family:'Cormorant Garamond',serif;font-size:1.6rem;margin:26px 0 12px}
+.template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.template-card{background:#fffdfa;border:1px solid #eee5dc;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.template-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px}
+.template-body strong{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#6b3f2e}
+.template-body .muted{font-size:.78rem;margin-bottom:8px}
+@media (max-width:420px){.day-dots{gap:7px}.day-dot{width:38px;height:38px}.hero-title h2{font-size:2.1rem}}

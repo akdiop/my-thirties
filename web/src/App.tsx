@@ -11,7 +11,6 @@ import { validateRestore } from './lib/restore';
 import { consolidateIngredients } from './lib/groceries';
 import { CalendarBoard } from './features/CalendarBoard';
 import { BoosterPlan } from './features/BoosterPlan';
-import { SportLibrary } from './features/SportLibrary';
 import { TravelTools } from './features/TravelTools';
 import { FinanceInsights } from './features/FinanceInsights';
 import { HealthOverview } from './features/HealthOverview';
@@ -22,19 +21,19 @@ import { TravelPlanner } from './features/TravelPlanner';
 import { PrayerPlanner } from './features/PrayerPlanner';
 import { PersonalBrief } from './features/PersonalBrief';
 import { RecipeIdeas } from './features/RecipeIdeas';
-import { SportProgress } from './features/SportProgress';
-import { ChallengeIdeas } from './features/ChallengeIdeas';
 import { BalanceReview } from './features/BalanceReview';
 import { AutomaticPrayerTimes } from './features/AutomaticPrayerTimes';
 import { BrowserReminders } from './features/BrowserReminders';
 import { PersonalAssistant } from './features/PersonalAssistant';
-import { LocalVideoPose } from './features/LocalVideoPose';
 import { PrivacyCenter } from './features/PrivacyCenter';
-import { SportNotebook } from './features/SportNotebook';
 import { MediaGallery } from './features/MediaGallery';
 import { deleteEntryMedia } from './lib/mediaLibrary';
 import { PersonalProfile, ProfileGreeting } from './features/PersonalProfile';
 import { PROFILE_KIND } from './lib/profile';
+import { PHOTO_KIND } from './lib/photos';
+import { PhotoProvider } from './features/HeroPhoto';
+import { SportHub } from './features/SportHub';
+import { ChallengesBoard } from './features/ChallengesBoard';
 
 type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -353,7 +352,10 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('home');
   const [allEntries, setEntries] = useState<Entry[]>([]);
   const profileEntry = allEntries.find((e) => e.kind === PROFILE_KIND);
-  const entries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND), [allEntries]);
+  const entries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND), [allEntries]);
+  const photoEntries = useMemo(() => allEntries.filter((e) => e.kind === PHOTO_KIND), [allEntries]);
+  const photos = useMemo(() => Object.fromEntries(photoEntries.flatMap((e) =>
+    typeof e.data.image === 'string' && /^data:image\/jpeg;base64,/.test(e.data.image) ? [[e.title, e.data.image]] : [])), [photoEntries]);
   const [loading, setLoading] = useState(false);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState('');
@@ -428,7 +430,17 @@ export default function App() {
   const upcoming = entries.filter((e) => e.entry_date && e.entry_date >= today()).sort((a, b) => (a.entry_date ?? '').localeCompare(b.entry_date ?? '')).slice(0, 5);
   const go = (next: Screen) => { setScreen(next); setSearch(''); window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
-  return <div className="app-shell">
+  const savePhoto = async (slot: string, image: string | null) => {
+    const existing = photoEntries.find((e) => e.title === slot);
+    try {
+      if (!image) { if (existing) await removeEntry(existing.id); }
+      else if (existing) await editEntry(existing.id, { data: { image } });
+      else await createEntry({ module: 'quotidien', kind: PHOTO_KIND, title: slot, entry_date: null, data: { image } });
+      await refresh();
+    } catch (e) { setError(e instanceof Error ? e.message : 'Photo impossible à enregistrer.'); throw e; }
+  };
+
+  return <PhotoProvider value={{ photos, save: savePhoto }}><div className="app-shell">
     <aside className="sidebar">
       <div className="brand"><span className="logo-mark">M<span>·</span></span><div><strong>my thirties</strong><small>MY PERSONAL SPACE</small></div></div>
       <p className="sidebar-label">NAVIGATION</p>
@@ -471,8 +483,8 @@ export default function App() {
           {currentModule.id === 'finances' && <><FinanceSummary entries={moduleEntries} /><FinanceInsights entries={moduleEntries} /></>}
           {currentModule.id === 'cuisine' && <><KitchenPlanner entries={moduleEntries} onCreate={createFromTool} onGenerate={createGroceries} /><KitchenTools entries={moduleEntries} onGenerate={createGroceries} /><RecipeIdeas entries={moduleEntries} onCreate={createFromTool} /></>}
           {currentModule.id === 'decouvertes' && <><TravelPlanner entries={moduleEntries} onUpdate={updateData} /><TravelTools entries={moduleEntries} onGenerate={createGroceries} /></>}
-          {currentModule.id === 'sport' && <><SportLibrary /><SportProgress entries={moduleEntries} /><SportNotebook entries={moduleEntries} onCreate={createFromTool} /><LocalVideoPose /></>}
-          {currentModule.id === 'challenges' && <ChallengeIdeas entries={moduleEntries} onCreate={createFromTool} />}
+          {currentModule.id === 'sport' && <SportHub entries={moduleEntries} challengeEntries={entries.filter((e) => e.module === 'challenges')} onCreate={createFromTool} onGoChallenges={() => go('challenges')} />}
+          {currentModule.id === 'challenges' && <ChallengesBoard entries={moduleEntries} onCreate={createFromTool} onUpdate={updateData} />}
           {currentModule.id === 'passions' && <PassionPath entries={moduleEntries} onUpdate={updateData} />}
           {(['sport', 'cuisine', 'decouvertes', 'passions'] as const).includes(currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions') && <MediaGallery ownerId={session.user.id} module={currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions'} entries={moduleEntries.map((e) => ({ id: e.id, title: e.title }))} />}
           {currentModule.id === 'spiritualite' && <><AutomaticPrayerTimes entries={moduleEntries} onCreate={createFromTool} /><PrayerPlanner entries={moduleEntries} onCreate={createFromTool} /><p className="privacy-hint"><BookOpen size={16} /> Les horaires automatiques nécessitent une connexion et une ville choisie. Les calculs peuvent varier selon les sources locales.</p></>}
@@ -488,5 +500,5 @@ export default function App() {
     <nav className="mobile-nav" aria-label="Navigation principale">{nav.map(({ id, label, icon: Icon }) => <button key={id} className={screen === id ? 'active' : ''} onClick={() => go(id)}><Icon size={20} /><span>{label}</span></button>)}</nav>
     {editor && <Editor key={editor.initial?.id ?? editor.module.id} module={editor.module} initial={editor.initial} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
     <div className="screen-reader-note"><CircleHelp size={14} /> Les changements sont enregistrés dans ton espace cloud privé.</div>
-  </div>;
+  </div></PhotoProvider>;
 }
