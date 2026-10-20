@@ -87,7 +87,7 @@ describe('wellbeing repository (SQLite)', () => {
     expect(checks.find((c) => c.step === -1)?.journal).toBe('Réunion de jeudi');
   });
 
-  it('logs prayers, dhikr and Quran pages', () => {
+  it('logs prayers and dhikr', () => {
     well.togglePrayer('2026-10-20', 'fajr', true);
     well.togglePrayer('2026-10-20', 'dhuhr', true);
     well.togglePrayer('2026-10-20', 'dhuhr', false);
@@ -95,8 +95,6 @@ describe('wellbeing repository (SQLite)', () => {
     well.saveDhikr('2026-10-20', 'r5', 100);
     well.saveDhikr('2026-10-20', null, 0);
     expect(well.dhikrTotal('2026-10-01', '2026-10-31')).toBe(100);
-    well.addQuranPages('2026-10-20', 2, null);
-    expect(well.quranLogs('2026-10-20', '2026-10-20')[0]?.pages).toBe(2);
   });
 
   it('keeps one gratitude entry per day', () => {

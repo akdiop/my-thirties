@@ -326,14 +326,6 @@ export const dhikrSession = sqliteTable('dhikr_session', {
   ...timestamps,
 });
 
-export const quranLog = sqliteTable('quran_log', {
-  id: text('id').primaryKey(),
-  date: text('date').notNull(),
-  pages: integer('pages').notNull(),
-  note: text('note'),
-  ...timestamps,
-});
-
 export const spiritualJournal = sqliteTable('spiritual_journal', {
   id: text('id').primaryKey(),
   date: text('date').notNull(),

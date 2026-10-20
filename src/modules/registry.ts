@@ -39,7 +39,7 @@ export const MODULES: readonly ModuleDefinition[] = [
   { id: 'sport', label: 'Mon sport', description: 'Tennis, Pilates, yoga et journal', icon: 'dumbbell', tone: 'sage', phase: 3, status: 'partial', sensitive: false, route: '/sport' },
   { id: 'challenges', label: 'Mes challenges', description: 'Calendriers de 30 jours en parallèle', icon: 'trophy', tone: 'sage', phase: 3, status: 'operational', sensitive: false, route: '/challenges' },
   { id: 'equilibre', label: 'Mon équilibre', description: 'Axes, Booster, journaux, apaisement', icon: 'flower', tone: 'sand', phase: 3, status: 'operational', sensitive: true, route: '/equilibre' },
-  { id: 'spiritualite', label: 'Ma spiritualité', description: 'Prières, Coran, dhikr, calendrier hégirien', icon: 'moon', tone: 'sand', phase: 3, status: 'partial', sensitive: true, route: '/spiritualite' },
+  { id: 'spiritualite', label: 'Ma spiritualité', description: 'Prières, dhikr, calendrier hégirien, journal', icon: 'moon', tone: 'sand', phase: 3, status: 'partial', sensitive: true, route: '/spiritualite' },
   { id: 'finances', label: 'Mes finances', description: 'Budget multidevise, abonnements, épargne', icon: 'wallet', tone: 'blush', phase: 4, status: 'not-developed', sensitive: true },
   { id: 'cuisine', label: 'Ma cuisine', description: 'Recettes et batch cooking', icon: 'cooking-pot', tone: 'blush', phase: 4, status: 'not-developed', sensitive: false },
   { id: 'decouvertes', label: 'Mes découvertes', description: 'Destinations et prochain voyage', icon: 'compass', tone: 'sage', phase: 4, status: 'not-developed', sensitive: false },

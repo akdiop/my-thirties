@@ -179,5 +179,82 @@ export const PROGRAMS: Program[] = [
   },
 ];
 
+const ANXIETE_WEEK2: ProgramDay[] = [
+  { title: 'Carte des inquiétudes', steps: ['Classez vos inquiétudes : santé, travail, proches, argent, autre.', 'Entourez celle qui revient le plus.'], question: 'Quel thème revient le plus souvent ?' },
+  { title: 'Le petit pas', steps: ['Choisissez une inquiétude.', 'Faites une action de moins de 10 minutes qui la concerne.'], question: 'Comment me suis-je sentie après avoir agi ?' },
+  { title: 'Parler à soi avec douceur', steps: ['Écrivez ce que vous diriez à une amie dans votre situation.', 'Relisez-le à voix basse.'], question: 'Qu’est-ce qui change quand je me parle ainsi ?' },
+  { title: 'Ancrage en mouvement', steps: ['Marche de 10 minutes en comptant vos pas par 4.', 'Inspirez sur 4 pas, expirez sur 6.'], question: 'Mon esprit s’est-il calmé en marchant ?' },
+  { title: 'Moins d’écrans anxiogènes', steps: ['Repérez une source d’informations qui vous inquiète.', 'Limitez-la à un moment choisi dans la journée.'], question: 'Ai-je remarqué une différence ?' },
+  { title: 'Ressources', steps: ['Listez 3 personnes ou ressources qui vous aident quand ça va mal.', 'Envoyez un message à l’une d’elles.'], question: 'Sur qui puis-je compter ?' },
+  { title: 'Bilan de deux semaines', steps: ['Relisez vos réponses.', 'Choisissez deux stratégies à garder.', 'Programmez-les dans l’agenda si vous le souhaitez.'], question: 'Qu’est-ce qui a vraiment changé en deux semaines ?' },
+];
+
+const NERVOSITE_WEEK2: ProgramDay[] = [
+  { title: 'Matin apaisé', steps: ['Pas de téléphone pendant les 15 premières minutes.', 'Trois respirations lentes au réveil.'], question: 'Comment a commencé ma journée ?' },
+  { title: 'Relâcher les épaules', steps: ['Toutes les 2 heures : épaules vers les oreilles, puis relâchez.', '5 fois.'], question: 'Où ma tension revient-elle ?' },
+  { title: 'Moins de caféine', steps: ['Remplacez une boisson excitante par de l’eau ou une infusion.'], question: 'Ai-je senti une différence en fin de journée ?' },
+  { title: 'Une chose à la fois', steps: ['Pendant une heure, faites une seule tâche à la fois.', 'Fermez les notifications.'], question: 'Comment me suis-je sentie pendant cette heure ?' },
+  { title: 'Lieu calme', steps: ['Imaginez un lieu où vous vous sentez en paix.', 'Décrivez-le en 5 détails, 3 minutes.'], question: 'Quel détail m’apaise le plus ?' },
+  { title: 'Dire non', steps: ['Repérez une demande qui ajoute de la pression.', 'Déclinez-la ou reportez-la, poliment.'], question: 'Qu’ai-je ressenti en posant cette limite ?' },
+  { title: 'Bilan de deux semaines', steps: ['Relisez la quinzaine.', 'Gardez trois habitudes.'], question: 'Quelles habitudes m’ont le plus apaisée ?' },
+];
+
+const IMPULSIVITE_WEEK2: ProgramDay[] = [
+  { title: 'Mes signaux d’alerte', steps: ['Notez ce qui se passe dans votre corps juste avant de réagir vite.'], question: 'Quel est mon premier signal ?' },
+  { title: 'Compter jusqu’à dix', steps: ['Lors d’un agacement, comptez lentement jusqu’à 10 avant de parler.'], question: 'Ma réponse a-t-elle été différente ?' },
+  { title: 'Sortir de la pièce', steps: ['Préparez une phrase pour faire une pause : « Je reviens dans cinq minutes. »', 'Utilisez-la si besoin.'], question: 'La pause m’a-t-elle aidée ?' },
+  { title: 'Les achats', steps: ['Avant tout achat non prévu, attendez 24 heures.', 'Notez-le dans une liste de souhaits.'], question: 'Ai-je toujours envie de cet achat le lendemain ?' },
+  { title: 'Réparer', steps: ['Repensez à une réaction regrettée.', 'Écrivez ce que vous pourriez dire pour réparer.'], question: 'Suis-je prête à le dire ?' },
+  { title: 'Écoute active', steps: ['Dans une conversation, reformulez avant de répondre.'], question: 'Qu’est-ce que la reformulation a changé ?' },
+  { title: 'Bilan de deux semaines', steps: ['Comptez vos pauses et vos réparations.', 'Félicitez-vous pour chacune.'], question: 'Quel progrès suis-je fière d’avoir fait ?' },
+];
+
+const CONFIANCE_7: ProgramDay[] = [
+  { title: 'Mes preuves', steps: ['Listez 5 choses que vous avez réussies cette année.'], question: 'Quelle qualité ces réussites montrent-elles ?' },
+  { title: 'Mes forces', steps: ['Demandez à une personne de confiance ce qu’elle apprécie chez vous.'], question: 'Qu’ai-je appris sur moi ?' },
+  { title: 'Un petit défi', steps: ['Choisissez une action un peu hors de votre zone de confort.', 'Faites-la aujourd’hui.'], question: 'Comment me suis-je sentie après ?' },
+  { title: 'Le juge intérieur', steps: ['Notez une phrase critique que vous vous dites souvent.', 'Réécrivez-la de façon juste et bienveillante.'], question: 'Laquelle des deux phrases est la plus vraie ?' },
+  { title: 'Posture', steps: ['Deux minutes debout, épaules ouvertes, respiration lente, avant un moment important.'], question: 'Ai-je remarqué une différence ?' },
+  { title: 'Accepter un compliment', steps: ['Au prochain compliment, répondez simplement « merci ».'], question: 'Qu’ai-je ressenti ?' },
+  { title: 'Bilan', steps: ['Ajoutez les preuves de la semaine à votre liste.'], question: 'De quoi suis-je fière cette semaine ?' },
+];
+
+const LACHER_PRISE_7: ProgramDay[] = [
+  { title: 'Les deux colonnes', steps: ['Listez vos préoccupations.', 'Séparez ce qui dépend de vous et ce qui n’en dépend pas.'], question: 'Qu’est-ce qui ne dépend pas de moi ?' },
+  { title: 'Une action', steps: ['Choisissez une action dans la colonne « dépend de moi ».', 'Faites-la.'], question: 'Qu’ai-je ressenti en agissant ?' },
+  { title: 'Laisser passer', steps: ['Quand une pensée revient, nommez-la : « une inquiétude ».', 'Revenez à votre respiration.'], question: 'Combien de fois ai-je laissé passer une pensée ?' },
+  { title: 'Le parfait', steps: ['Faites une tâche « assez bien » plutôt que parfaite.'], question: 'Qu’est-il arrivé de grave ? Rien ?' },
+  { title: 'Gratitude', steps: ['Notez trois choses qui vont bien malgré tout.'], question: 'Qu’est-ce qui va bien en ce moment ?' },
+  { title: 'Confier', steps: ['Confiez une inquiétude par écrit, dans la prière ou à une personne de confiance.'], question: 'Me suis-je sentie plus légère ?' },
+  { title: 'Bilan', steps: ['Relisez la semaine.'], question: 'Qu’ai-je réussi à laisser aller ?' },
+];
+
+const MONTH_THEMES: { theme: string; days: ProgramDay[] }[] = [
+  { theme: 'Semaine 1 · Observer', days: PROGRAMS[0]!.days.slice(0, 3).concat(PROGRAMS[1]!.days.slice(0, 2), PROGRAMS[2]!.days.slice(0, 2)) },
+  { theme: 'Semaine 2 · Apaiser', days: [PROGRAMS[0]!.days[4]!, PROGRAMS[1]!.days[2]!, PROGRAMS[1]!.days[3]!, NERVOSITE_WEEK2[0]!, NERVOSITE_WEEK2[4]!, ANXIETE_WEEK2[3]!, LACHER_PRISE_7[2]!] },
+  { theme: 'Semaine 3 · Réagir autrement', days: [PROGRAMS[2]!.days[2]!, PROGRAMS[2]!.days[3]!, IMPULSIVITE_WEEK2[1]!, IMPULSIVITE_WEEK2[2]!, PROGRAMS[2]!.days[4]!, IMPULSIVITE_WEEK2[5]!, NERVOSITE_WEEK2[5]!] },
+  { theme: 'Semaine 4 · Consolider', days: [CONFIANCE_7[0]!, CONFIANCE_7[3]!, ANXIETE_WEEK2[2]!, ANXIETE_WEEK2[5]!, LACHER_PRISE_7[4]!, LACHER_PRISE_7[5]!, CONFIANCE_7[5]!] },
+];
+
+const MONTH_CLOSING: ProgramDay[] = [
+  { title: 'Relire le mois', steps: ['Relisez vos réponses des quatre semaines.', 'Soulignez ce qui vous a le plus aidée.'], question: 'Qu’est-ce qui a changé depuis le premier jour ?' },
+  { title: 'Mes intentions', steps: ['Ouvrez le bilan du mois.', 'Choisissez trois stratégies à garder le mois prochain.'], question: 'Quelles sont mes trois intentions ?' },
+];
+
+PROGRAMS.push(
+  { id: 'anxiete-14', axisId: 'anxiete', title: 'Apaiser l’anxiété · 14 jours', objective: 'Deux semaines pour réduire la place des inquiétudes et agir sur ce qui dépend de moi.', days: [...PROGRAMS[0]!.days, ...ANXIETE_WEEK2] },
+  { id: 'nervosite-14', axisId: 'nervosite', title: 'Retrouver mon calme · 14 jours', objective: 'Deux semaines pour installer des pauses et des limites qui apaisent.', days: [...PROGRAMS[1]!.days, ...NERVOSITE_WEEK2] },
+  { id: 'impulsivite-14', axisId: 'impulsivite', title: 'Réagir avec recul · 14 jours', objective: 'Deux semaines pour créer l’espace entre l’émotion et la réaction, et réparer quand il le faut.', days: [...PROGRAMS[2]!.days, ...IMPULSIVITE_WEEK2] },
+  { id: 'confiance-7', axisId: 'confiance', title: 'Croire en moi', objective: 'Une semaine pour rassembler des preuves et oser un petit défi.', days: CONFIANCE_7 },
+  { id: 'lacher-prise-7', axisId: 'lacher-prise', title: 'Lâcher prise', objective: 'Une semaine pour distinguer ce qui dépend de moi et alléger le reste.', days: LACHER_PRISE_7 },
+  {
+    id: 'equilibre-30',
+    axisId: 'emotions',
+    title: 'Mon mois d’équilibre · 30 jours',
+    objective: 'Un mois progressif qui croise anxiété, nervosité et impulsivité : observer, apaiser, réagir autrement, consolider.',
+    days: [...MONTH_THEMES.flatMap((w) => w.days.map((d) => ({ ...d, title: `${w.theme.split(' · ')[1]} · ${d.title}` }))), ...MONTH_CLOSING],
+  },
+);
+
 export const programById = (id: string) => PROGRAMS.find((p) => p.id === id);
 export const axisById = (id: string) => AXES.find((a) => a.id === id);

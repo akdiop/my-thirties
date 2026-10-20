@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { AppText, Button, Card, ListRow, Screen } from '@/components/ui';
+import { VideoCard } from '@/components/VideoCard';
 import { ficheById, YOGA_SESSIONS } from '@/sport/content';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -31,6 +32,7 @@ export default function YogaSession() {
         />
       }
     >
+      <VideoCard mediaKey={`yoga-seance-${session.minutes}`} />
       <Card style={{ paddingVertical: 4 }}>
         {fiches.map((f, i) => (
           <ListRow key={f.id} label={`${i + 1}. ${f.title}`} onPress={() => router.push({ pathname: '/sport/fiche/[id]', params: { id: f.id } })} last={i === fiches.length - 1} />

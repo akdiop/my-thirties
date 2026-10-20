@@ -13,7 +13,6 @@ export type Settings = {
   eveningTime: string | null;
   deviceCalendars: boolean;
   prayer: PrayerSettings;
-  quranPagesPerDay: number;
   healthForSport: boolean;
   stepsEnabled: boolean;
   stepGoal: number;
@@ -27,7 +26,6 @@ export const DEFAULT_SETTINGS: Settings = {
   eveningTime: '20:30',
   deviceCalendars: false,
   prayer: DEFAULT_PRAYER_SETTINGS,
-  quranPagesPerDay: 2,
   healthForSport: false,
   stepsEnabled: false,
   stepGoal: 8000,

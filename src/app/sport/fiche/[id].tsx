@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { View } from 'react-native';
 
 import { AppText, Button, Card, Screen } from '@/components/ui';
+import { VideoCard } from '@/components/VideoCard';
 import { DISCIPLINE_LABEL, ficheById } from '@/sport/content';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -45,9 +46,7 @@ export default function Fiche() {
       }
     >
       <AppText>{fiche.summary}</AppText>
-      <Card tone="sand" style={{ minHeight: 120, alignItems: 'center', justifyContent: 'center' }}>
-        <AppText variant="caption" center>Vidéo de démonstration à choisir avec vous</AppText>
-      </Card>
+      <VideoCard mediaKey={fiche.id} />
       <Block title="Comment faire" items={fiche.steps} />
       <Block title="Erreurs fréquentes" items={fiche.errors} />
       <Block title="Exercices" items={fiche.drills} tone="sage" />

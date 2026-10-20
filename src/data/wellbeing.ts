@@ -16,7 +16,6 @@ import {
   prayerLog,
   programCheck,
   programEnrollment,
-  quranLog,
   sleepEntry,
   spiritualJournal,
   workoutSession,
@@ -341,16 +340,6 @@ export function createWellbeingRepository(db: Database, deviceId: string) {
         .reduce((s, r) => s + r.total, 0);
     },
 
-    quranLogs(from: string, to: string) {
-      return db.select().from(quranLog).where(and(gte(quranLog.date, from), lte(quranLog.date, to), alive(quranLog))).orderBy(desc(quranLog.date)).all();
-    },
-    addQuranPages(date: string, pages: number, note: string | null) {
-      db.insert(quranLog).values({ id: uuid(), date, pages, note, ...created(deviceId) }).run();
-    },
-    deleteQuranLog(id: string) {
-      db.update(quranLog).set({ deletedAt: nowIso(), ...touched(deviceId) }).where(eq(quranLog.id, id)).run();
-    },
-
     listJournal(limit = 100) {
       return db.select().from(spiritualJournal).where(alive(spiritualJournal)).orderBy(desc(spiritualJournal.date), desc(spiritualJournal.createdAt)).limit(limit).all();
     },
@@ -377,7 +366,6 @@ export function createWellbeingRepository(db: Database, deviceId: string) {
         monthlyReflection: db.select().from(monthlyReflection).all(),
         prayerLog: db.select().from(prayerLog).all(),
         dhikrSession: db.select().from(dhikrSession).all(),
-        quranLog: db.select().from(quranLog).all(),
         spiritualJournal: db.select().from(spiritualJournal).all(),
       };
     },

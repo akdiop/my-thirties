@@ -70,6 +70,7 @@ function Journal() {
 function Booster() {
   const today = useToday();
   const { c } = useTheme();
+  const [length, setLength] = useState<7 | 14 | 30>(7);
   const progress = useData(
     ({ well }) =>
       PROGRAMS.map((p) => {
@@ -81,9 +82,16 @@ function Booster() {
       }),
     [today],
   );
+  const shown = progress.filter(({ p, day }) => p.days.length === length || day !== null);
   return (
     <View style={{ gap: 12 }}>
-      {progress.map(({ p, day, ratio }) => (
+      <Segmented
+        label="Durée"
+        value={String(length)}
+        onChange={(v) => setLength(Number(v) as 7 | 14 | 30)}
+        options={[{ value: '7', label: '7 jours' }, { value: '14', label: '14 jours' }, { value: '30', label: '30 jours' }]}
+      />
+      {shown.map(({ p, day, ratio }) => (
         <Pressable key={p.id} accessibilityRole="button" onPress={() => router.push({ pathname: '/equilibre/programme/[id]', params: { id: p.id } })}>
           <Card tone={day ? 'sage' : 'surface'} style={{ gap: 6 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

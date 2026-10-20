@@ -19,11 +19,9 @@ export default function Spiritualite() {
   const { c } = useTheme();
   const mutate = useMutate();
   const settings = useSettings((s) => s.prayer);
-  const pagesGoal = useSettings((s) => s.quranPagesPerDay);
   const times = prayerTimes(now, settings);
   const next = nextPrayer(now, settings);
   const done = useData(({ well }) => well.prayersDone(today), [today]);
-  const pagesToday = useData(({ well }) => well.quranLogs(today, today).reduce((s, l) => s + l.pages, 0), [today]);
 
   return (
     <Screen
@@ -71,7 +69,6 @@ export default function Spiritualite() {
       <AppText variant="caption" color={c.textMuted}>Le suivi des prières est facultatif et reste privé.</AppText>
       <Card style={{ paddingVertical: 4 }}>
         <ListRow label="Dhikr et compteur" value="libre ou routine" onPress={() => router.push('/spiritualite/dhikr')} />
-        <ListRow label="Lecture du Coran" value={`${pagesToday} / ${pagesGoal} pages`} onPress={() => router.push('/spiritualite/coran')} />
         <ListRow label="Journal spirituel" onPress={() => router.push('/spiritualite/journal')} last />
       </Card>
     </Screen>

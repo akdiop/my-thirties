@@ -167,17 +167,6 @@ CREATE TABLE `program_enrollment` (
 	`device_id` text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `quran_log` (
-	`id` text PRIMARY KEY NOT NULL,
-	`date` text NOT NULL,
-	`pages` integer NOT NULL,
-	`note` text,
-	`created_at` text NOT NULL,
-	`updated_at` text NOT NULL,
-	`deleted_at` text,
-	`device_id` text NOT NULL
-);
---> statement-breakpoint
 CREATE TABLE `sleep_entry` (
 	`id` text PRIMARY KEY NOT NULL,
 	`date` text NOT NULL,

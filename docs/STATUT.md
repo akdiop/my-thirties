@@ -33,14 +33,13 @@ Mis à jour à chaque phase. Statuts : Opérationnel · Partiellement opération
 | Ma santé : cycle et prévisions indicatives, symptômes, humeur, énergie, douleurs | 3 | Opérationnel | 7 tests du cycle ; à tester sur iPhone |
 | Sommeil, hydratation, journal alimentaire | 3 | Opérationnel | Tests unitaires + SQLite |
 | Compteur de pas (capteur de mouvement de l'iPhone), objectif, 7 jours | 3 | Opérationnel | Tests unitaires ; lecture des pas à tester sur iPhone |
-| Mon sport : fiches tennis, Pilates (sol, Reformer), yoga, séances 10/20/30/45 min, journal | 3 | Partiellement opérationnel | Fiches à relire ; vidéos de démonstration à choisir |
+| Mon sport : fiches tennis, Pilates (sol, Reformer), yoga, séances 10/20/30/45 min, journal | 3 | Partiellement opérationnel | Fiches à relire ; vidéos en cours de choix (s’ouvrent dans YouTube) |
 | Analyser ma technique | 5 | Non développé | — |
 | Mes challenges : plusieurs en parallèle, calendrier 3 statuts, fiche du jour, reporter, adapter, pause, archives, recommencer, propositions du mois, rappel | 3 | Opérationnel | 9 tests + tests SQLite |
 | Séance réalisée → challenge → agenda | 3 | Opérationnel | Test SQLite (suppression de la séance = jour décoché) |
-| Mon équilibre : 10 axes, 3 programmes Booster de 7 jours, journal émotionnel et tendances, gratitude, bilan mensuel | 3 | Opérationnel | Tests unitaires + SQLite ; contenus à relire ; programmes de 14 et 30 jours à écrire |
+| Mon équilibre : 10 axes, 9 programmes Booster (7, 14 et 30 jours), journal émotionnel et tendances, gratitude, bilan mensuel | 3 | Opérationnel | Tests unitaires + SQLite ; contenus à relire |
 | Ma spiritualité : horaires des 5 prières (adhan, 11 méthodes, Hanafi, ajustements), calendrier hégirien, suivi facultatif | 3 | Opérationnel | 9 tests ; à comparer avec votre mosquée |
 | Compteur de dhikr (libre, routines 5/10/30 min) | 3 | Opérationnel | Tests unitaires |
-| Lecture du Coran : objectif et suivi des pages | 3 | Partiellement opérationnel | Texte du Coran pas encore intégré (Tanzil, après validation) |
 | Journal spirituel, rappels de prière, prières dans l'agenda | 3 | Opérationnel | Tests unitaires |
 | Santé → Sport (suggestion d'intensité, sur autorisation) | 3 | Opérationnel | Tests unitaires ; désactivé par défaut |
 | Onglet Bien-être | 3 | Opérationnel | À tester sur iPhone |

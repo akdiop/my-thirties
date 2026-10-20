@@ -5,6 +5,7 @@ import { View } from 'react-native';
 import { dayLabel } from '@/agenda/dates';
 import { adapt, dateForDay, templateById, UNIT_LABEL, type ChallengeUnit } from '@/challenges/challenges';
 import { AppText, Button, Card, Screen } from '@/components/ui';
+import { VideoCard } from '@/components/VideoCard';
 import { formatAmount } from '@/features/challengeView';
 import { useData, useMutate } from '@/hooks/useData';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -90,9 +91,7 @@ export default function ChallengeDay() {
           <AppText variant="caption">Le jour compte comme réalisé une fois la version adaptée faite.</AppText>
         </Card>
       ) : null}
-      <Card tone="sand" style={{ minHeight: 110, alignItems: 'center', justifyContent: 'center' }}>
-        <AppText variant="caption" center>Vidéo de démonstration à choisir avec vous</AppText>
-      </Card>
+      {ch.templateId ? <VideoCard mediaKey={`challenge-${ch.templateId}`} /> : null}
       {t ? (
         <>
           <Card style={{ gap: 8 }}>

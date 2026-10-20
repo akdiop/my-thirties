@@ -15,7 +15,7 @@ export type SportFiche = {
   minutes?: number;
 };
 
-export const SPORT_NOTICE = 'Fiches pédagogiques à relire. Les vidéos de démonstration seront choisies avec vous. En cas de douleur, arrêtez et demandez un avis médical.';
+export const SPORT_NOTICE = 'Fiches pédagogiques à relire. Les vidéos de démonstration sont choisies par vous et s’ouvrent dans YouTube. En cas de douleur, arrêtez et demandez un avis médical.';
 
 export const DISCIPLINE_LABEL: Record<Discipline, string> = { tennis: 'Tennis', pilates: 'Pilates', yoga: 'Yoga' };
 
