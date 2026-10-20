@@ -24,6 +24,7 @@ import { PersonalBrief } from './features/PersonalBrief';
 import { RecipeIdeas } from './features/RecipeIdeas';
 import { SportProgress } from './features/SportProgress';
 import { ChallengeIdeas } from './features/ChallengeIdeas';
+import { BalanceReview } from './features/BalanceReview';
 
 type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -447,7 +448,7 @@ export default function App() {
           <span className="eyebrow">MON ESPACE PERSONNEL</span>
           <div className="module-title-row"><div><h1>{currentModule.name}</h1><p className="lead">{currentModule.description}</p></div><button className="button primary" onClick={() => setEditor({ module: currentModule })}><Plus size={17} /> Ajouter</button></div>
           {currentModule.sensitive && <p className="privacy-hint"><ShieldCheck size={16} /> Espace personnel sensible : données accessibles uniquement au compte autorisé. Ne saisis pas d'informations réelles avant validation de la sécurité.</p>}
-          {currentModule.id === 'equilibre' && <><CalmSpace /><EquilibriumInsights entries={moduleEntries} /></>}
+          {currentModule.id === 'equilibre' && <><CalmSpace /><EquilibriumInsights entries={moduleEntries} /><BalanceReview entries={moduleEntries} onCreate={createFromTool} /></>}
           {currentModule.id === 'sante' && <HealthOverview entries={moduleEntries} />}
           {currentModule.id === 'quotidien' && <CalendarBoard entries={moduleEntries} onUpdate={updateData} />}
           {currentModule.id === 'finances' && <><FinanceSummary entries={moduleEntries} /><FinanceInsights entries={moduleEntries} /></>}
