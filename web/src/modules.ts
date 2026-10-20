@@ -35,6 +35,7 @@ export const modules: Module[] = [
     id: 'sport', name: 'Mon sport', symbol: '✦', description: 'Tennis, Pilates, Yoga et journal de séances',
     kinds: [
       { id: 'session', label: 'Séance', fields: [date, discipline, { id: 'duration', label: 'Durée (minutes)', type: 'number' }, { id: 'technique', label: 'Technique travaillée', type: 'text' }, note] },
+      { id: 'technique_note', label: 'Observation technique', fields: [date, discipline, { id: 'focus', label: 'Point observé', type: 'text' }, { id: 'observation', label: 'Observation', type: 'textarea' }, { id: 'next', label: 'Prochaine séance', type: 'textarea' }] },
       { id: 'learning', label: 'Apprentissage', fields: [discipline, { id: 'topic', label: 'Technique / posture', type: 'text' }, { id: 'video', label: 'Lien vers une vidéo pédagogique', type: 'text' }, note] },
     ],
   },
