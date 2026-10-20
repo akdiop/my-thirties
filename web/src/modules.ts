@@ -14,9 +14,9 @@ export const modules: Module[] = [
   {
     id: 'quotidien', name: 'Mon quotidien', symbol: '◷', description: 'Agenda, tâches et routines',
     kinds: [
-      { id: 'task', label: 'Tâche', fields: [date, { id: 'priority', label: 'Priorité', type: 'select', options: ['Normale', 'Haute', 'Basse'] }, note] },
-      { id: 'event', label: 'Événement', fields: [date, { id: 'time', label: 'Heure', type: 'time' }, { id: 'location', label: 'Lieu', type: 'text' }, note] },
-      { id: 'routine', label: 'Routine', fields: [{ id: 'time', label: 'Heure', type: 'time' }, { id: 'frequency', label: 'Fréquence', type: 'select', options: ['Quotidienne', 'Hebdomadaire', 'Personnalisée'] }, note] },
+      { id: 'task', label: 'Tâche', fields: [date, { id: 'time', label: 'Heure (facultative)', type: 'time' }, { id: 'priority', label: 'Priorité', type: 'select', options: ['Normale', 'Haute', 'Basse'] }, note] },
+      { id: 'event', label: 'Événement', fields: [date, { id: 'time', label: 'Heure', type: 'time' }, { id: 'location', label: 'Lieu', type: 'text' }, { id: 'frequency', label: 'Répétition', type: 'select', options: ['Aucune', 'Quotidienne', 'Hebdomadaire'] }, note] },
+      { id: 'routine', label: 'Routine', fields: [date, { id: 'time', label: 'Heure', type: 'time' }, { id: 'frequency', label: 'Fréquence', type: 'select', options: ['Quotidienne', 'Hebdomadaire'] }, note] },
     ],
   },
   {
@@ -24,6 +24,9 @@ export const modules: Module[] = [
     kinds: [
       { id: 'cycle', label: 'Cycle menstruel', fields: [date, { id: 'endDate', label: 'Fin des règles (facultatif)', type: 'date' }, { id: 'symptoms', label: 'Symptômes', type: 'textarea' }, note] },
       { id: 'sleep', label: 'Sommeil', fields: [date, { id: 'hours', label: 'Durée (heures)', type: 'number' }, { id: 'quality', label: 'Qualité ressentie', type: 'select', options: ['Bonne', 'Moyenne', 'Difficile'] }, note] },
+      { id: 'hydration', label: 'Hydratation (sans objectif imposé)', fields: [date, { id: 'glasses', label: 'Verres bus (facultatif)', type: 'number' }, note] },
+      { id: 'mood', label: 'Humeur et énergie', fields: [date, { id: 'mood', label: 'Humeur', type: 'select', options: ['Sereine', 'Joyeuse', 'Fatiguée', 'Stressée', 'Autre'] }, { id: 'energy', label: 'Énergie ressentie', type: 'select', options: ['Faible', 'Modérée', 'Bonne'] }, note] },
+      { id: 'food', label: 'Journal alimentaire bienveillant', fields: [date, { id: 'meals', label: 'Repas, découvertes et ressentis (facultatif)', type: 'textarea' }] },
       { id: 'symptom', label: 'Symptôme', fields: [date, { id: 'symptoms', label: 'Symptômes', type: 'textarea' }, note] },
       { id: 'appointment', label: 'Rendez-vous', fields: [date, { id: 'time', label: 'Heure', type: 'time' }, { id: 'practitioner', label: 'Professionnel', type: 'text' }, note] },
     ],
@@ -54,6 +57,7 @@ export const modules: Module[] = [
     kinds: [
       { id: 'prayer', label: 'Prière', fields: [date, { id: 'prayer', label: 'Prière', type: 'select', options: ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'] }, note] },
       { id: 'dhikr', label: 'Dhikr', fields: [date, note] },
+      { id: 'invocation', label: 'Invocation personnelle', fields: [date, { id: 'text', label: 'Texte personnel', type: 'textarea' }, note] },
       { id: 'reading', label: 'Lecture', fields: [date, { id: 'surah', label: 'Sourate / passage', type: 'text' }, note] },
     ],
   },
@@ -63,7 +67,8 @@ export const modules: Module[] = [
       { id: 'income', label: 'Revenu', fields: [date, amount, currency, { id: 'category', label: 'Catégorie', type: 'text' }, note] },
       { id: 'expense', label: 'Dépense', fields: [date, amount, currency, { id: 'category', label: 'Catégorie', type: 'text' }, note] },
       { id: 'subscription', label: 'Abonnement', fields: [amount, currency, { id: 'frequency', label: 'Fréquence', type: 'select', options: ['Mensuelle', 'Annuelle', 'Autre'] }, { id: 'nextDate', label: 'Prochaine échéance', type: 'date' }, note] },
-      { id: 'goal', label: 'Objectif d’épargne', fields: [amount, currency, { id: 'deadline', label: 'Échéance', type: 'date' }, note] },
+      { id: 'goal', label: 'Objectif d’épargne', fields: [amount, currency, { id: 'saved', label: 'Déjà épargné', type: 'number' }, { id: 'deadline', label: 'Échéance', type: 'date' }, note] },
+      { id: 'budget', label: 'Budget mensuel', fields: [amount, currency, { id: 'category', label: 'Catégorie (facultatif)', type: 'text' }, { id: 'month', label: 'Mois (AAAA-MM)', type: 'text' }, note] },
     ],
   },
   {
