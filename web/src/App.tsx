@@ -18,6 +18,8 @@ import { EquilibriumInsights } from './features/EquilibriumInsights';
 import { KitchenPlanner } from './features/KitchenPlanner';
 import { PassionPath } from './features/PassionPath';
 import { TravelPlanner } from './features/TravelPlanner';
+import { TravelSuggestions } from './features/TravelSuggestions';
+import { SeriesTracker } from './features/SeriesTracker';
 import { PrayerPlanner } from './features/PrayerPlanner';
 import { PersonalBrief } from './features/PersonalBrief';
 import { RecipeIdeas } from './features/RecipeIdeas';
@@ -482,10 +484,10 @@ export default function App() {
           {currentModule.id === 'quotidien' && <CalendarBoard entries={moduleEntries} onUpdate={updateData} />}
           {currentModule.id === 'finances' && <><FinanceSummary entries={moduleEntries} /><FinanceInsights entries={moduleEntries} /></>}
           {currentModule.id === 'cuisine' && <><KitchenPlanner entries={moduleEntries} onCreate={createFromTool} onGenerate={createGroceries} /><KitchenTools entries={moduleEntries} onGenerate={createGroceries} /><RecipeIdeas entries={moduleEntries} onCreate={createFromTool} /></>}
-          {currentModule.id === 'decouvertes' && <><TravelPlanner entries={moduleEntries} onUpdate={updateData} /><TravelTools entries={moduleEntries} onGenerate={createGroceries} /></>}
+          {currentModule.id === 'decouvertes' && <><TravelSuggestions entries={moduleEntries} onCreate={createFromTool} /><TravelPlanner entries={moduleEntries} onUpdate={updateData} /><TravelTools entries={moduleEntries} onGenerate={createGroceries} /></>}
           {currentModule.id === 'sport' && <SportHub entries={moduleEntries} challengeEntries={entries.filter((e) => e.module === 'challenges')} onCreate={createFromTool} onGoChallenges={() => go('challenges')} />}
           {currentModule.id === 'challenges' && <ChallengesBoard entries={moduleEntries} onCreate={createFromTool} onUpdate={updateData} />}
-          {currentModule.id === 'passions' && <PassionPath entries={moduleEntries} onUpdate={updateData} />}
+          {currentModule.id === 'passions' && <><SeriesTracker entries={moduleEntries} onCreate={createFromTool} onUpdate={updateData} /><PassionPath entries={moduleEntries} onUpdate={updateData} /></>}
           {(['sport', 'cuisine', 'decouvertes', 'passions'] as const).includes(currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions') && <MediaGallery ownerId={session.user.id} module={currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions'} entries={moduleEntries.map((e) => ({ id: e.id, title: e.title }))} />}
           {currentModule.id === 'spiritualite' && <><AutomaticPrayerTimes entries={moduleEntries} onCreate={createFromTool} /><PrayerPlanner entries={moduleEntries} onCreate={createFromTool} /><p className="privacy-hint"><BookOpen size={16} /> Les horaires automatiques nécessitent une connexion et une ville choisie. Les calculs peuvent varier selon les sources locales.</p></>}
           {currentModule.id === 'sante' && <p className="privacy-hint"><Heart size={16} /> Le suivi est informatif. Il ne constitue pas un diagnostic et ne remplace pas un professionnel de santé.</p>}
