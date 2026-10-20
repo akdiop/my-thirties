@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Entry, EntryInput } from '../lib/cloud';
+import { useIntegrationPrefs } from '../lib/integrations';
 
 const names = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'] as const;
 const methods = [{ id: 3, label: 'Muslim World League' }, { id: 2, label: 'ISNA' },
@@ -19,6 +20,7 @@ export function AutomaticPrayerTimes({ entries, onCreate }: {
   entries: Entry[];
   onCreate: (input: EntryInput) => Promise<void>;
 }) {
+  const { prefs } = useIntegrationPrefs();
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('');
   const [date, setDate] = useState(today);
@@ -30,7 +32,7 @@ export function AutomaticPrayerTimes({ entries, onCreate }: {
   const [timezone, setTimezone] = useState('');
   const [controller] = useState(() => ({ current: null as AbortController | null }));
   const lookup = async () => {
-    if (!city.trim() || !country.trim() || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+    if (!prefs.prayer || !city.trim() || !country.trim() || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
     controller.current?.abort();
     const abort = new AbortController(); controller.current = abort;
     setBusy(true); setPreview(null); setMessage('');
@@ -68,13 +70,14 @@ export function AutomaticPrayerTimes({ entries, onCreate }: {
   };
   return <section className="tool-card">
     <h3>Horaires de prière automatiques</h3>
+    {!prefs.prayer && <p className="privacy-hint">Service désactivé. Active-le dans Profil → Centre de confidentialité.</p>}
     <p className="muted">Calculs fournis par AlAdhan. La ville et le pays sont envoyés à ce service uniquement lorsque tu demandes les horaires. Aucune géolocalisation précise n'est demandée.</p>
     <div className="planner-form"><label>Ville<input value={city} onChange={(e) => { setCity(e.target.value); setPreview(null); }} maxLength={80} placeholder="Dakar" /></label>
       <label>Pays<input value={country} onChange={(e) => { setCountry(e.target.value); setPreview(null); }} maxLength={80} placeholder="Sénégal" /></label>
       <label>Date<input type="date" value={date} onChange={(e) => { setDate(e.target.value); setPreview(null); }} /></label>
       <label>Méthode de calcul<select value={method} onChange={(e) => { setMethod(Number(e.target.value)); setPreview(null); }}>
         {methods.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}</select></label></div>
-    <button className="button secondary" disabled={busy || !city.trim() || !country.trim() || !date} onClick={() => void lookup()}>
+    <button className="button secondary" disabled={!prefs.prayer || busy || !city.trim() || !country.trim() || !date} onClick={() => void lookup()}>
       {busy ? 'Recherche…' : 'Calculer les horaires'}</button>
     {preview && <div className="prayer-form">
       <div className="prayer-times">{names.map((name) => <div className="prayer-item" key={name}><strong>{name}</strong><span>{preview[name]}</span></div>)}</div>
