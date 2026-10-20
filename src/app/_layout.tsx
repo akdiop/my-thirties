@@ -16,6 +16,7 @@ import { DatabaseProvider } from '@/db/DatabaseProvider';
 import { useRefresh } from '@/data/useRefresh';
 import { LockGate } from '@/features/lock/LockGate';
 import { NotificationSync } from '@/notifications/NotificationSync';
+import { WidgetSync } from '@/widgets/WidgetSync';
 import { Welcome } from '@/features/profile/Welcome';
 import { useAppData } from '@/state/appData';
 import { ThemeProvider, useTheme } from '@/theme/ThemeProvider';
@@ -45,6 +46,7 @@ export default function RootLayout() {
             <DatabaseProvider fallback={<Loading />} onError={(e) => <DatabaseError error={e} />}>
               <ProfileGate>
                 <NotificationSync />
+                <WidgetSync />
                 <Stack screenOptions={{ headerShown: false }} />
               </ProfileGate>
             </DatabaseProvider>
