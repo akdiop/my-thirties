@@ -42,7 +42,6 @@ export function buildPlan(t: Pick<ChallengeTemplate, 'start' | 'step' | 'stepEve
 }
 
 export const CHALLENGE_TEMPLATES: ChallengeTemplate[] = [
-  ...LEARNING_CHALLENGE_TEMPLATES,
   {
     id: 'squats',
     title: 'Squat challenge',
@@ -118,6 +117,7 @@ export const CHALLENGE_TEMPLATES: ChallengeTemplate[] = [
     cautions: 'Adaptez ou sautez une posture inconfortable.',
     alternative: 'Séance de 10 minutes.',
   },
+  ...LEARNING_CHALLENGE_TEMPLATES,
 ];
 
 export const templateById = (id: string | null) => CHALLENGE_TEMPLATES.find((t) => t.id === id);
@@ -158,6 +158,6 @@ export function postponeFrom(plan: number[], day: number) {
 export function proposals(activeTemplateIds: string[], recentCompletion: number | null) {
   const easier = recentCompletion !== null && recentCompletion < 0.6;
   const available = CHALLENGE_TEMPLATES.filter((t) => !activeTemplateIds.includes(t.id));
-  return [...available.filter((t) => !t.id.startsWith('learning-')).slice(0, 3), ...available.filter((t) => t.id.startsWith('learning-')).slice(0, 3)]
+  return [...available.filter((t) => !t.id.startsWith('learning-')).slice(0, 1), ...available.filter((t) => t.id.startsWith('learning-')).slice(0, 2)]
     .map((t) => ({ template: t, easier, reason: easier ? 'Version allégée : le mois dernier a été chargé.' : 'Nouveau défi pour ce mois.' }));
 }
