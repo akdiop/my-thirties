@@ -17,7 +17,6 @@ export function PassionPath({ entries, onUpdate }: {
 }) {
   const hobbies = entries.filter((e) => e.kind === 'hobby');
   const [selected, setSelected] = useState<string | null>(null);
-  const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   if (!hobbies.length) return <section className="tool-card"><h3>Mon parcours d'apprentissage</h3>
@@ -35,7 +34,7 @@ export function PassionPath({ entries, onUpdate }: {
   };
   return <section className="tool-card">
     <h3>Mon parcours d'apprentissage</h3>
-    <label>Mon hobby<select value={entry.id} onChange={(e) => { setSelected(e.target.value); setDraft(''); }}>
+    <label>Mon hobby<select value={entry.id} onChange={(e) => { setSelected(e.target.value); }}>
       {hobbies.map((h) => <option key={h.id} value={h.id}>{h.title}</option>)}</select></label>
     <p className="muted">{months} mois · {completed} étape(s) cochée(s). Les étapes sont personnalisables.</p>
     <div className="progress-track"><div style={{ width: (completed / months * 100) + '%' }} /></div>
@@ -46,20 +45,26 @@ export function PassionPath({ entries, onUpdate }: {
         <label className="checklist-item"><input type="checkbox" checked={stage?.completed === true} disabled={busy}
           onChange={(e) => void save(month, { completed: e.target.checked })} />
           <span><strong>Mois {month}</strong> · {title}</span></label>
-        <details><summary>Personnaliser / notes</summary>
-          <label>Objectif du mois<input defaultValue={stage?.title || ''} key={entry.id + '-' + month + '-title'} id={'path-' + month}
-            placeholder={stages[i % stages.length]} onChange={(e) => { if (e.target.value.length > 180) e.target.value = e.target.value.slice(0, 180); }} /></label>
-          <button className="button ghost" disabled={busy} onClick={() => {
-            const input = document.getElementById('path-' + month) as HTMLInputElement | null;
-            void save(month, { title: input?.value.trim() || '' });
-          }}>Enregistrer l'objectif</button>
-          <label>Mes notes<textarea key={entry.id + '-' + month + '-notes'} defaultValue={stage?.notes || ''}
-            onChange={(e) => setDraft(e.target.value)} rows={2} /></label>
-          <button className="button ghost" disabled={busy} onClick={() => void save(month, { notes: draft })}>Enregistrer les notes</button>
-        </details>
+        <MonthEditor key={entry.id + '-' + month} month={month} suggestion={stages[i % stages.length]!}
+          title={stage?.title || ''} notes={stage?.notes || ''} busy={busy} onSave={save} />
       </div>;
     })}</div>
     {error && <p className="error" role="alert">{error}</p>}
     <p className="fineprint">Suggestions générales : choisis tes propres ressources, adapte les objectifs et prends des pauses si nécessaire.</p>
   </section>;
+}
+
+function MonthEditor({ month, suggestion, title, notes, busy, onSave }: {
+  month: number; suggestion: string; title: string; notes: string; busy: boolean;
+  onSave: (month: number, patch: { title?: string; notes?: string }) => Promise<void>;
+}) {
+  const [draftTitle, setDraftTitle] = useState(title);
+  const [draftNotes, setDraftNotes] = useState(notes);
+  return <details><summary>Personnaliser / notes</summary>
+    <label>Objectif du mois<input maxLength={180} value={draftTitle} placeholder={suggestion}
+      onChange={(e) => setDraftTitle(e.target.value)} /></label>
+    <button className="button ghost" disabled={busy} onClick={() => void onSave(month, { title: draftTitle.trim() })}>Enregistrer l'objectif</button>
+    <label>Mes notes<textarea rows={2} value={draftNotes} onChange={(e) => setDraftNotes(e.target.value)} /></label>
+    <button className="button ghost" disabled={busy} onClick={() => void onSave(month, { notes: draftNotes })}>Enregistrer les notes</button>
+  </details>;
 }
