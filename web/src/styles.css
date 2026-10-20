@@ -207,3 +207,27 @@ textarea{resize:vertical;min-height:90px}
 .travel-row{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:12px 0;border-top:1px solid #eee5dc;font-size:.84rem}
 .travel-row .button{white-space:nowrap}
 @media(max-width:480px){.travel-row{align-items:flex-start;flex-direction:column}}
+
+.calendar-modes{display:flex;gap:7px;margin:14px 0}
+.calendar-modes button{background:#f1e8df;border:1px solid #e1d3c5;border-radius:9px;padding:8px 15px;font-size:.8rem;color:#6b3f2e}
+.calendar-modes button.active{background:#6b3f2e;color:#fffaf5}
+.calendar-single{grid-template-columns:1fr}
+.finance-filters{display:flex;gap:14px;margin:14px 0 20px;flex-wrap:wrap}
+.finance-filters label{min-width:145px}
+.finance-stats,.health-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}
+.finance-stats>div{background:#f0f1e9;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.finance-stats span{font-size:.75rem;color:#5e7a5f}
+.finance-stats strong{font-size:1.12rem;color:#6b3f2e;overflow-wrap:anywhere}
+.finance-category{margin:15px 0}
+.finance-category>div:first-child{display:flex;justify-content:space-between;gap:12px;margin-bottom:7px;font-size:.8rem}
+.finance-category strong{color:#5e7a5f}
+.subscription-row{display:flex;justify-content:space-between;gap:15px;border-bottom:1px solid #e9dfd3;padding:12px 0;font-size:.82rem}
+.health-stats .stat-card{background:#f0f1e9}
+.health-stats .stat-card strong{font-size:1.15rem}
+.health-timeline{display:flex;align-items:center;gap:14px;border-top:1px solid #eee5dc;padding:12px 0;font-size:.8rem}
+.health-timeline>span{min-width:76px;color:#88786d}
+.health-timeline>strong{flex:1}
+.health-timeline>small{color:#7c8f6f}
+.emotion-tags{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.equilibrium-insights .lesson-card .fineprint{margin-top:13px}
+@media(max-width:760px){.finance-stats,.health-stats{grid-template-columns:1fr}.calendar-head h3{font-size:1.35rem}.calendar-head .icon-button{padding:5px}.subscription-row{flex-direction:column;gap:4px}}
