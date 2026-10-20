@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import {
-  ArrowLeft, BookOpen, CalendarDays, Check, ChevronRight, CircleHelp, Coffee, Download,
+  ArrowLeft, BookOpen, CalendarDays, ChevronRight, CircleHelp, Coffee, Download,
   Heart, Home, LayoutGrid, Leaf, LogOut, Plus, Save, Settings, ShieldCheck, Trash2, X,
 } from 'lucide-react';
 import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
 import { downloadBackup, makeEncryptedBackup } from './lib/backup';
-import { moduleById, modules, type Field, type Kind, type Module } from './modules';
+import { moduleById, modules, type Field, type Module } from './modules';
 
 type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
