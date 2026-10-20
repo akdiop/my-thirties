@@ -20,6 +20,7 @@ import { KitchenPlanner } from './features/KitchenPlanner';
 import { PassionPath } from './features/PassionPath';
 import { TravelPlanner } from './features/TravelPlanner';
 import { PrayerPlanner } from './features/PrayerPlanner';
+import { PersonalBrief } from './features/PersonalBrief';
 
 type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -428,6 +429,7 @@ export default function App() {
               <p>{upcoming.length ? upcoming.length + ' éléments à venir dans ton espace.' : 'Ton espace est prêt à accueillir tes projets.'}</p></div>
             <button className="button light" onClick={() => setEditor({ module: moduleById('quotidien') })}><Plus size={17} /> Ajouter une tâche</button>
           </div>
+          <PersonalBrief entries={entries} onGo={go} />
           <div className="section-row"><h2>Mes prochains rendez-vous</h2><button className="text-button" onClick={() => go('quotidien')}>Voir l'agenda <ChevronRight size={15} /></button></div>
           <div className="upcoming">{upcoming.length ? upcoming.map((e) => <div className="upcoming-item" key={e.id}><span className="date-chip">{humanDate(e.entry_date)}</span><strong>{e.title}</strong><span className="muted">{moduleById(e.module).name}</span></div>) : <p className="muted">Aucun événement à venir.</p>}</div>
           <div className="section-row"><h2>Mes espaces</h2><button className="text-button" onClick={() => go('spaces')}>Tout voir <ChevronRight size={15} /></button></div>
