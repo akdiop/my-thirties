@@ -1,7 +1,7 @@
 import { circuit } from './exercises';
 
-export type ChallengeCategory = 'Sport' | 'Bien-être' | 'Habitudes';
-export const CATEGORIES: ChallengeCategory[] = ['Sport', 'Bien-être', 'Habitudes'];
+export type ChallengeCategory = 'Sport' | 'Bien-être' | 'Habitudes' | 'Apprentissage' | 'Créativité' | 'Organisation';
+export const CATEGORIES: ChallengeCategory[] = ['Sport', 'Bien-être', 'Habitudes', 'Apprentissage', 'Créativité', 'Organisation'];
 
 export type ChallengeTemplate = {
   id: string;
@@ -88,7 +88,7 @@ export const TEMPLATES: ChallengeTemplate[] = [
 
 export const templateById = (id: unknown) => TEMPLATES.find((t) => t.id === id);
 
-export const templateLength = (id: string) => (/-21$/.test(id) ? 21 : 30);
+export const templateLength = (id: string) => { const match = id.match(/-(7|14|21|30)$/); return match ? Number(match[1]) : 30; };
 
 /** Jour du défi (1 = premier jour) pour une date donnée, ou 0 s'il n'a pas commencé. */
 export function dayNumber(start: string, today: string) {
