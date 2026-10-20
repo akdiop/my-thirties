@@ -1,19 +1,16 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import {
-  ArrowLeft, BookOpen, CalendarDays, ChevronRight, CircleHelp, Coffee, Download,
-  Heart, Home, LayoutGrid, Leaf, LogOut, Plus, Save, Settings, ShieldCheck, Trash2, X,
+  BookOpen, CalendarDays, ChevronRight, Coffee, Download,
+  Heart, Home, LayoutGrid, Leaf, LogOut, Plus, Save, Settings, ShieldCheck, Trash2, UserRound, X,
 } from 'lucide-react';
 import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
 import { downloadBackup, makeEncryptedBackup, parseEncryptedBackup } from './lib/backup';
 import { moduleById, modules, type Field, type Module } from './modules';
 import { validateRestore } from './lib/restore';
 import { consolidateIngredients } from './lib/groceries';
-import { CalendarBoard } from './features/CalendarBoard';
 import { BoosterPlan } from './features/BoosterPlan';
 import { TravelTools } from './features/TravelTools';
-import { FinanceInsights } from './features/FinanceInsights';
-import { HealthOverview } from './features/HealthOverview';
 import { EquilibriumInsights } from './features/EquilibriumInsights';
 import { KitchenPlanner } from './features/KitchenPlanner';
 import { PassionPath } from './features/PassionPath';
@@ -28,27 +25,34 @@ import { PersonalAssistant } from './features/PersonalAssistant';
 import { PrivacyCenter } from './features/PrivacyCenter';
 import { MediaGallery } from './features/MediaGallery';
 import { deleteEntryMedia } from './lib/mediaLibrary';
-import { PersonalProfile, ProfileGreeting } from './features/PersonalProfile';
-import { PROFILE_KIND } from './lib/profile';
+import { PersonalProfile, ProfileAvatar } from './features/PersonalProfile';
+import { birthdayLine, PROFILE_KIND, readProfile } from './lib/profile';
 import { PHOTO_KIND } from './lib/photos';
 import { PhotoProvider } from './features/HeroPhoto';
 import { SportHub } from './features/SportHub';
 import { ChallengesBoard } from './features/ChallengesBoard';
+import { Home as HomeScreen } from './screens/Home';
+import { Agenda } from './screens/Agenda';
+import { Wellbeing } from './screens/Wellbeing';
+import { Spaces } from './screens/Spaces';
+import { Calm } from './screens/Calm';
+import { HealthTop } from './screens/HealthTop';
+import { FinanceTop } from './screens/FinanceTop';
+import { CuisineTop, EquilibreTop, SpiritTop, TravelTop, type CuisineTab, type EquilibreTab, type SpiritTab } from './screens/ModuleTops';
+import { ScreenHeader, SectionTitle } from './ui/kit';
 
-type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
+type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
 const today = () => new Date().toLocaleDateString('en-CA');
 const value = (obj: Record<string, unknown>, key: string) => typeof obj[key] === 'string' ? obj[key] as string : '';
 const humanDate = (date: string | null) => date ? new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
-const money = (amount: number, currency: string) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: currency === 'XOF' ? 0 : 2 }).format(amount) + ' ' + currency;
-const safeNumber = (v: unknown) => typeof v === 'string' || typeof v === 'number' ? Number(v) : NaN;
 const safeLink = (v: unknown) => { try { const url = new URL(String(v)); return url.protocol === 'https:' ? url.href : null; } catch { return null; } };
 const nav: { id: Screen; label: string; icon: typeof Home }[] = [
   { id: 'home', label: 'Accueil', icon: Home },
-  { id: 'quotidien', label: 'Agenda', icon: CalendarDays },
-  { id: 'equilibre', label: 'Bien-être', icon: Leaf },
+  { id: 'agenda', label: 'Agenda', icon: CalendarDays },
+  { id: 'bienetre', label: 'Bien-être', icon: Leaf },
   { id: 'spaces', label: 'Espaces', icon: LayoutGrid },
-  { id: 'settings', label: 'Profil', icon: Settings },
+  { id: 'settings', label: 'Profil', icon: UserRound },
 ];
 
 function Login({ onSignedIn }: { onSignedIn: () => void }) {
@@ -82,12 +86,14 @@ function Login({ onSignedIn }: { onSignedIn: () => void }) {
   );
 }
 
-function Editor({ module, initial, onSave, onCancel, busy }: {
-  module: Module; initial?: Entry; onSave: (input: EntryInput, id?: string) => Promise<void>; onCancel: () => void; busy: boolean;
+type Preset = { kind: string; data: Record<string, string>; title?: string };
+
+function Editor({ module, initial, preset, onSave, onCancel, busy }: {
+  module: Module; initial?: Entry; preset?: Preset; onSave: (input: EntryInput, id?: string) => Promise<void>; onCancel: () => void; busy: boolean;
 }) {
-  const [kindId, setKindId] = useState(initial?.kind ?? module.kinds[0]!.id);
-  const [title, setTitle] = useState(initial?.title ?? '');
-  const [form, setForm] = useState<Record<string, DataValue>>(initial?.data as Record<string, DataValue> ?? {});
+  const [kindId, setKindId] = useState(initial?.kind ?? (preset && module.kinds.some((k) => k.id === preset.kind) ? preset.kind : module.kinds[0]!.id));
+  const [title, setTitle] = useState(initial?.title ?? preset?.title ?? '');
+  const [form, setForm] = useState<Record<string, DataValue>>(initial?.data as Record<string, DataValue> ?? preset?.data ?? {});
   const [error, setError] = useState('');
   const kind = module.kinds.find((k) => k.id === kindId) ?? module.kinds[0]!;
   const update = (id: string, val: string) => setForm((f) => ({ ...f, [id]: val }));
@@ -198,42 +204,6 @@ function Checklist({ entry, onUpdate }: { entry: Entry; onUpdate: (entry: Entry,
   )}</div>;
 }
 
-function FinanceSummary({ entries }: { entries: Entry[] }) {
-  const totals = useMemo(() => {
-    const sums: Record<string, { income: number; expense: number }> = {};
-    for (const e of entries) {
-      if (e.kind !== 'income' && e.kind !== 'expense') continue;
-      const currency = value(e.data, 'currency') || 'XOF', n = safeNumber(e.data.amount);
-      if (!Number.isFinite(n) || n < 0) continue;
-      sums[currency] ??= { income: 0, expense: 0 };
-      sums[currency][e.kind] += n;
-    }
-    return sums;
-  }, [entries]);
-  return <div className="finance-grid">
-    {Object.entries(totals).map(([currency, totals]) =>
-      <div className="stat-card" key={currency}>
-        <span className="eyebrow">SOLDE · {currency}</span><strong>{money(totals.income - totals.expense, currency)}</strong>
-        <span className="muted">Revenus {money(totals.income, currency)} · Dépenses {money(totals.expense, currency)}</span>
-      </div>)}
-    {!Object.keys(totals).length && <p className="muted">Ajoute un revenu ou une dépense pour voir ton bilan.</p>}
-    <p className="fineprint">Chaque devise est calculée séparément, sans taux de change inventé.</p>
-  </div>;
-}
-
-function CalmSpace() {
-  const [open, setOpen] = useState(false);
-  return <section className="calm-card">
-    <div><span className="eyebrow">PAUSE DOUCE</span><h3>Besoin de te recentrer ?</h3><p>Un moment sans objectif ni performance.</p></div>
-    <button className="button secondary" onClick={() => setOpen(!open)}>{open ? 'Fermer' : 'J’ai besoin de me calmer'}</button>
-    {open && <div className="calm-guide">
-      <p>Observe les sensations de tes pieds au sol et regarde autour de toi.</p>
-      <p>Respire tranquillement, sans forcer. Tu peux prendre ton temps.</p>
-      <p>Note ce que tu ressens dans ton journal, uniquement si tu en as envie.</p>
-    </div>}
-  </section>;
-}
-
 function KitchenTools({ entries, onGenerate }: { entries: Entry[]; onGenerate: (title: string, items: string[]) => Promise<void> }) {
   const recipes = entries.filter((e) => e.kind === 'recipe');
   const [selected, setSelected] = useState<string[]>([]);
@@ -320,14 +290,25 @@ function Profile({ email, entries, profileEntry, onSaveProfile, onLogout, onRest
     } catch { setMessage('Restauration impossible : vérifie le fichier, la phrase secrète et le format.'); }
     finally { setBusy(false); }
   };
-  return <div className="content-width">
-    <span className="eyebrow">MON COMPTE</span><h1>Profil & confidentialité</h1>
-    <PersonalProfile key={profileEntry?.id ?? 'new'} entry={profileEntry} onSave={onSaveProfile} />
+  const me = readProfile(profileEntry);
+  const line = [me.city, birthdayLine(me.birthDate, new Date())].filter(Boolean).join(' · ');
+  return <div className="profile-screen">
+    <header className="profile-top">
+      <ProfileAvatar profile={me} size={64} />
+      <div><h1>{[me.firstName, me.lastName].filter(Boolean).join(' ') || 'Mon profil'}</h1><p>{line || email}</p></div>
+    </header>
+    {(me.hobbies.length > 0 || me.situation) && <div className="chip-row">{[me.situation, me.job, ...me.hobbies].filter(Boolean).slice(0, 8).map((t) => <span key={t} className="chip">{t}</span>)}</div>}
+    <details className="group" open={!profileEntry}>
+      <summary>Modifier mon profil</summary>
+      <PersonalProfile key={profileEntry?.id ?? 'new'} entry={profileEntry} onSave={onSaveProfile} />
+    </details>
+    <p className="sec">Compte</p>
     <section className="panel form-stack">
       <h2>Compte personnel</h2><p>{email}</p>
       <p className="muted">La session est conservée dans l'onglet de navigation, pas dans un stockage de données personnel permanent.</p>
       <button className="button secondary" onClick={() => void onLogout()}><LogOut size={16} /> Se déconnecter</button>
     </section>
+    <p className="sec">Mes données</p>
     <section className="panel form-stack">
       <h2>Sauvegarde chiffrée</h2><p>Un fichier AES-256-GCM, protégé par une phrase secrète, est généré sur ton appareil. Les données ne sont pas envoyées à un service d'export.</p>
       <label>Phrase secrète (12 caractères minimum)<input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
@@ -339,6 +320,7 @@ function Profile({ email, entries, profileEntry, onSaveProfile, onLogout, onRest
       <p className="fineprint">La restauration ajoute les entrées au compte. Elle ne supprime pas les données existantes et peut créer des doublons. Vérifie toujours ton fichier de sauvegarde.</p>
       {message && <p role="status">{message}</p>}
     </section>
+    <p className="sec">Confidentialité et rappels</p>
     <PrivacyCenter />
     <BrowserReminders entries={entries} />
     <section className="panel"><h2>À propos de cette version</h2><p className="muted">Application web privée en cours de développement. L'export d'agenda est manuel ; les notifications web ne fonctionnent qu'avec la page ouverte. L'assistant IA nécessite un déploiement sécurisé et l'analyse vidéo reste expérimentale. La synchronisation iOS native est encore à réaliser.</p></section>
@@ -359,7 +341,11 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState('');
-  const [editor, setEditor] = useState<{ module: Module; initial?: Entry } | null>(null);
+  const [editor, setEditor] = useState<{ module: Module; initial?: Entry; preset?: Preset } | null>(null);
+  const [cuisineTab, setCuisineTab] = useState<CuisineTab>('recettes');
+  const [travelTab, setTravelTab] = useState<'destinations' | 'voyage'>('destinations');
+  const [equilibreTab, setEquilibreTab] = useState<EquilibreTab>('axes');
+  const [spiritTab, setSpiritTab] = useState<SpiritTab>('home');
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -426,9 +412,12 @@ export default function App() {
   if (!owner) return <main className="auth-layout"><section className="auth-card"><h1>Accès non autorisé</h1><p>Ce compte n'est pas enregistré comme propriétaire de l'application.</p><button className="button secondary" onClick={() => void signOut()}>Se déconnecter</button></section></main>;
 
   const currentModule = modules.find((m) => m.id === screen);
-  const moduleEntries = currentModule ? entries.filter((e) => e.module === currentModule.id && (e.title.toLowerCase().includes(search.toLowerCase()) || !search)) : [];
-  const upcoming = entries.filter((e) => e.entry_date && e.entry_date >= today()).sort((a, b) => (a.entry_date ?? '').localeCompare(b.entry_date ?? '')).slice(0, 5);
-  const go = (next: Screen) => { setScreen(next); setSearch(''); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const allModuleEntries = currentModule ? entries.filter((e) => e.module === currentModule.id) : [];
+  const moduleEntries = allModuleEntries.filter((e) => !search || e.title.toLowerCase().includes(search.toLowerCase()));
+  const go = (next: Screen) => { setScreen(next); setSearch(''); window.scrollTo({ top: 0 }); };
+  const openEntry = (e: Entry) => setEditor({ module: moduleById(e.module), initial: e });
+  const addIn = (module: ModuleId, kind?: string, data?: Record<string, string>, title?: string) => setEditor({ module: moduleById(module), preset: kind ? { kind, data: data ?? {}, title } : undefined });
+  const removeQuiet = async (entry: Entry) => { await removeEntry(entry.id); await refresh(); };
 
   const savePhoto = async (slot: string, image: string | null) => {
     const existing = photoEntries.find((e) => e.title === slot);
@@ -440,65 +429,62 @@ export default function App() {
     } catch (e) { setError(e instanceof Error ? e.message : 'Photo impossible à enregistrer.'); throw e; }
   };
 
-  return <PhotoProvider value={{ photos, save: savePhoto }}><div className="app-shell">
-    <aside className="sidebar">
-      <div className="brand"><span className="logo-mark">M<span>·</span></span><div><strong>my thirties</strong><small>MY PERSONAL SPACE</small></div></div>
-      <p className="sidebar-label">NAVIGATION</p>
-      {nav.map(({ id, label, icon: Icon }) => <button key={id} className={'nav-link ' + (screen === id ? 'active' : '')} onClick={() => go(id)}><Icon size={19} />{label}</button>)}
-      <p className="sidebar-label spaces-label">MES ESPACES</p>
-      {modules.filter((m) => !['quotidien', 'equilibre'].includes(m.id)).map((m) => <button key={m.id} className={'nav-link small ' + (screen === m.id ? 'active' : '')} onClick={() => go(m.id)}><span className="nav-symbol">{m.symbol}</span>{m.name}</button>)}
-      <div className="sidebar-bottom"><ShieldCheck size={17} /> Espace personnel privé</div>
-    </aside>
-    <div className="main-area">
-      <header className="topbar"><span className="topbar-name">MY THIRTIES <span>·</span> MON ESPACE</span><span className="topbar-date">{new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</span></header>
-      <main className="page">
-        {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
-        {loading && <div className="sync-status" role="status">Synchronisation…</div>}
-        {screen === 'home' && <div className="content-width">
-          <ProfileGreeting entry={profileEntry} onEdit={() => go('settings')} />
-          <span className="eyebrow">TON ESPACE, TON RYTHME</span><h1>Une journée à la fois<span className="heading-dot">.</span></h1>
-          <p className="lead">Organisation, bien-être et petits projets : tout ce qui compte, au même endroit.</p>
-          <div className="home-hero">
-            <div><span className="eyebrow">AUJOURD'HUI</span><h2>{new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</h2>
-              <p>{upcoming.length ? upcoming.length + ' éléments à venir dans ton espace.' : 'Ton espace est prêt à accueillir tes projets.'}</p></div>
-            <button className="button light" onClick={() => setEditor({ module: moduleById('quotidien') })}><Plus size={17} /> Ajouter une tâche</button>
-          </div>
-          <PersonalBrief entries={entries} onGo={go} />
-          <PersonalAssistant entries={entries} />
-          <div className="section-row"><h2>Mes prochains rendez-vous</h2><button className="text-button" onClick={() => go('quotidien')}>Voir l'agenda <ChevronRight size={15} /></button></div>
-          <div className="upcoming">{upcoming.length ? upcoming.map((e) => <div className="upcoming-item" key={e.id}><span className="date-chip">{humanDate(e.entry_date)}</span><strong>{e.title}</strong><span className="muted">{moduleById(e.module).name}</span></div>) : <p className="muted">Aucun événement à venir.</p>}</div>
-          <div className="section-row"><h2>Mes espaces</h2><button className="text-button" onClick={() => go('spaces')}>Tout voir <ChevronRight size={15} /></button></div>
-          <div className="module-grid">{modules.map((m) => <button className="module-card" key={m.id} onClick={() => go(m.id)}><span className="module-symbol">{m.symbol}</span><strong>{m.name}</strong><small>{m.description}</small><ChevronRight className="module-arrow" size={16} /></button>)}</div>
-        </div>}
-        {screen === 'spaces' && <div className="content-width"><span className="eyebrow">MES UNIVERS</span><h1>Tous mes espaces</h1><p className="lead">Onze espaces pour accompagner tes projets et tes habitudes.</p><div className="module-grid">{modules.map((m) => <button className="module-card" key={m.id} onClick={() => go(m.id)}><span className="module-symbol">{m.symbol}</span><strong>{m.name}</strong><small>{m.description}</small><ChevronRight className="module-arrow" size={16} /></button>)}</div></div>}
-        {screen === 'settings' && <Profile email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { await signOut(); setEntries([]); }} />}
-        {currentModule && <div className="content-width">
-          <button className="back-link" onClick={() => go('spaces')}><ArrowLeft size={16} /> Mes espaces</button>
-          <span className="eyebrow">MON ESPACE PERSONNEL</span>
-          <div className="module-title-row"><div><h1>{currentModule.name}</h1><p className="lead">{currentModule.description}</p></div><button className="button primary" onClick={() => setEditor({ module: currentModule })}><Plus size={17} /> Ajouter</button></div>
-          {currentModule.sensitive && <p className="privacy-hint"><ShieldCheck size={16} /> Espace personnel sensible : données accessibles uniquement au compte autorisé. Ne saisis pas d'informations réelles avant validation de la sécurité.</p>}
-          {currentModule.id === 'equilibre' && <><CalmSpace /><EquilibriumInsights entries={moduleEntries} /><BalanceReview entries={moduleEntries} onCreate={createFromTool} /></>}
-          {currentModule.id === 'sante' && <HealthOverview entries={moduleEntries} />}
-          {currentModule.id === 'quotidien' && <CalendarBoard entries={moduleEntries} onUpdate={updateData} />}
-          {currentModule.id === 'finances' && <><FinanceSummary entries={moduleEntries} /><FinanceInsights entries={moduleEntries} /></>}
-          {currentModule.id === 'cuisine' && <><KitchenPlanner entries={moduleEntries} onCreate={createFromTool} onGenerate={createGroceries} /><KitchenTools entries={moduleEntries} onGenerate={createGroceries} /><RecipeIdeas entries={moduleEntries} onCreate={createFromTool} /></>}
-          {currentModule.id === 'decouvertes' && <><TravelPlanner entries={moduleEntries} onUpdate={updateData} /><TravelTools entries={moduleEntries} onGenerate={createGroceries} /></>}
-          {currentModule.id === 'sport' && <SportHub entries={moduleEntries} challengeEntries={entries.filter((e) => e.module === 'challenges')} onCreate={createFromTool} onGoChallenges={() => go('challenges')} />}
-          {currentModule.id === 'challenges' && <ChallengesBoard entries={moduleEntries} onCreate={createFromTool} onUpdate={updateData} />}
-          {currentModule.id === 'passions' && <PassionPath entries={moduleEntries} onUpdate={updateData} />}
-          {(['sport', 'cuisine', 'decouvertes', 'passions'] as const).includes(currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions') && <MediaGallery ownerId={session.user.id} module={currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions'} entries={moduleEntries.map((e) => ({ id: e.id, title: e.title }))} />}
-          {currentModule.id === 'spiritualite' && <><AutomaticPrayerTimes entries={moduleEntries} onCreate={createFromTool} /><PrayerPlanner entries={moduleEntries} onCreate={createFromTool} /><p className="privacy-hint"><BookOpen size={16} /> Les horaires automatiques nécessitent une connexion et une ville choisie. Les calculs peuvent varier selon les sources locales.</p></>}
-          {currentModule.id === 'sante' && <p className="privacy-hint"><Heart size={16} /> Le suivi est informatif. Il ne constitue pas un diagnostic et ne remplace pas un professionnel de santé.</p>}
-          <div className="section-row"><h2>Mes entrées <span className="count">{moduleEntries.length}</span></h2></div>
-          <label className="search-label">Rechercher dans cet espace<input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher par titre…" /></label>
-          <div className="entries">{moduleEntries.length ? moduleEntries.map((entry) =>
-            <EntryCard key={entry.id} entry={entry} module={currentModule} onEdit={(e) => setEditor({ module: currentModule, initial: e })} onDelete={(e) => void remove(e)} onUpdate={updateData} />
-          ) : <div className="empty-state"><Coffee size={32} /><h3>Un espace à remplir à ton rythme</h3><p>Aucune entrée pour le moment.</p><button className="button secondary" onClick={() => setEditor({ module: currentModule })}>Créer ma première entrée</button></div>}</div>
-        </div>}
-      </main>
-    </div>
-    <nav className="mobile-nav" aria-label="Navigation principale">{nav.map(({ id, label, icon: Icon }) => <button key={id} className={screen === id ? 'active' : ''} onClick={() => go(id)}><Icon size={20} /><span>{label}</span></button>)}</nav>
-    {editor && <Editor key={editor.initial?.id ?? editor.module.id} module={editor.module} initial={editor.initial} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
-    <div className="screen-reader-note"><CircleHelp size={14} /> Les changements sont enregistrés dans ton espace cloud privé.</div>
+  const entryList = currentModule && <section className="entries-section">
+    <SectionTitle>Mes entrées <span className="count">{allModuleEntries.length}</span></SectionTitle>
+    {allModuleEntries.length > 4 && <input className="search-field" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher dans cet espace…" />}
+    <div className="entries">{moduleEntries.length ? moduleEntries.map((entry) =>
+      <EntryCard key={entry.id} entry={entry} module={currentModule} onEdit={openEntry} onDelete={(e) => void remove(e)} onUpdate={updateData} />
+    ) : <div className="empty-soft"><Coffee size={28} /><p>Un espace à remplir à ton rythme.</p><button className="button ghost" onClick={() => setEditor({ module: currentModule })}>Créer ma première entrée</button></div>}</div>
+  </section>;
+
+  const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings'] as Screen[]).includes(screen);
+
+  return <PhotoProvider value={{ photos, save: savePhoto }}><div className={'app' + (screen === 'calme' ? ' calm-mode' : '')}>
+    <main className="phone">
+      {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
+      {loading && <div className="sync-status" role="status">Synchronisation…</div>}
+      {screen === 'home' && <HomeScreen entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} />}
+      {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} />}
+      {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
+      {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}
+      {screen === 'calme' && <Calm onQuit={() => go('home')} onWrite={() => addIn('equilibre', 'emotion', { date: today() })} />}
+      {screen === 'assistant' && <div className="screen"><ScreenHeader title="Assistant" onBack={() => go('home')} /><PersonalBrief entries={entries} onGo={go} /><PersonalAssistant entries={entries} /></div>}
+      {screen === 'settings' && <div className="screen"><Profile email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { await signOut(); setEntries([]); }} /></div>}
+      {currentModule && <div className="screen">
+        <ScreenHeader title={currentModule.name} onBack={() => go('spaces')}
+          right={<button className="icon-btn" aria-label="Ajouter" onClick={() => setEditor({ module: currentModule })}><Plus size={24} /></button>} />
+        {currentModule.id === 'quotidien' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'task', { date: today() })} onOpen={openEntry} onUpdate={updateData} embedded />}
+        {currentModule.id === 'sante' && <HealthTop entries={allModuleEntries} onAdd={(kind) => addIn('sante', kind, { date: today() })} />}
+        {currentModule.id === 'sport' && <SportHub entries={allModuleEntries} challengeEntries={entries.filter((e) => e.module === 'challenges')} onCreate={createFromTool} onGoChallenges={() => go('challenges')} />}
+        {currentModule.id === 'challenges' && <ChallengesBoard entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} />}
+        {currentModule.id === 'finances' && <FinanceTop entries={allModuleEntries} onAdd={(kind) => addIn('finances', kind, { date: today() })} onOpen={openEntry} />}
+        {currentModule.id === 'cuisine' && <><CuisineTop tab={cuisineTab} onTab={setCuisineTab} entries={allModuleEntries} />
+          {cuisineTab === 'recettes' && <RecipeIdeas entries={allModuleEntries} onCreate={createFromTool} />}
+          {cuisineTab === 'semaine' && <><KitchenPlanner entries={allModuleEntries} onCreate={createFromTool} onGenerate={createGroceries} /><KitchenTools entries={allModuleEntries} onGenerate={createGroceries} /></>}
+          {cuisineTab === 'courses' && <div className="entries">{entries.filter((e) => e.module === 'listes' && String(e.data.category) === 'Courses').map((e) =>
+            <EntryCard key={e.id} entry={e} module={moduleById('listes')} onEdit={openEntry} onDelete={(x) => void remove(x)} onUpdate={updateData} />)}
+            {!entries.some((e) => e.module === 'listes' && String(e.data.category) === 'Courses') && <p className="muted">Planifie ta semaine puis génère tes courses.</p>}</div>}
+        </>}
+        {currentModule.id === 'decouvertes' && <><TravelTop tab={travelTab} onTab={setTravelTab} entries={allModuleEntries} onCreate={createFromTool} onAdd={(kind) => addIn('decouvertes', kind)} />
+          {travelTab === 'voyage' && <><TravelPlanner entries={allModuleEntries} onUpdate={updateData} /><TravelTools entries={allModuleEntries} onGenerate={createGroceries} /></>}</>}
+        {currentModule.id === 'equilibre' && <><EquilibreTop tab={equilibreTab} onTab={setEquilibreTab} entries={allModuleEntries}
+            onAxis={(axis) => { const b = allModuleEntries.find((e) => e.kind === 'booster' && String(e.data.axis) === axis); if (b) { setEquilibreTab('booster'); } else addIn('equilibre', 'booster', { axis, days: '14' }, 'Booster · ' + axis); }}
+            booster={<div className="entries">{allModuleEntries.filter((e) => e.kind === 'booster').map((e) => <EntryCard key={e.id} entry={e} module={currentModule} onEdit={openEntry} onDelete={(x) => void remove(x)} onUpdate={updateData} />)}</div>} />
+          {equilibreTab === 'journal' && <><EquilibriumInsights entries={allModuleEntries} /><BalanceReview entries={allModuleEntries} onCreate={createFromTool} /></>}
+          <button className="calm-pill" onClick={() => go('calme')}>J’ai besoin de me calmer</button></>}
+        {currentModule.id === 'spiritualite' && <><SpiritTop tab={spiritTab} onTab={setSpiritTab} entries={allModuleEntries} onCreate={createFromTool} onRemove={removeQuiet} />
+          {spiritTab === 'horaires' && <><AutomaticPrayerTimes entries={allModuleEntries} onCreate={createFromTool} /><PrayerPlanner entries={allModuleEntries} onCreate={createFromTool} />
+            <p className="disclaimer"><BookOpen size={14} /> Les horaires automatiques nécessitent une connexion et une ville choisie. Les calculs peuvent varier selon les sources locales.</p></>}</>}
+        {currentModule.id === 'passions' && <PassionPath entries={allModuleEntries} onUpdate={updateData} />}
+        {(['sport', 'cuisine', 'decouvertes', 'passions'] as const).includes(currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions') && <MediaGallery ownerId={session.user.id} module={currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions'} entries={allModuleEntries.map((e) => ({ id: e.id, title: e.title }))} />}
+        {currentModule.id === 'sante' && <p className="disclaimer"><Heart size={14} /> Le suivi est informatif. Il ne constitue pas un diagnostic et ne remplace pas un professionnel de santé.</p>}
+        {!(currentModule.id === 'spiritualite' && spiritTab === 'home') && currentModule.id !== 'challenges' && entryList}
+      </div>}
+    </main>
+    {(tabScreen || currentModule) && screen !== 'calme' && <nav className="tabbar" aria-label="Navigation principale">{nav.map(({ id, label, icon: Icon }) => {
+      const on = screen === id || (id === 'spaces' && Boolean(currentModule));
+      return <button key={id} className={on ? 'on' : ''} aria-current={on ? 'page' : undefined} onClick={() => go(id)}><Icon size={24} strokeWidth={on ? 2.2 : 1.6} /><span>{label}</span></button>;
+    })}</nav>}
+    {editor && <Editor key={(editor.initial?.id ?? editor.module.id) + (editor.preset?.kind ?? '')} module={editor.module} initial={editor.initial} preset={editor.preset} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
   </div></PhotoProvider>;
 }

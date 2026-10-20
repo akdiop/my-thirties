@@ -4,7 +4,7 @@ import { shrinkHero } from '../lib/photos';
 
 type Photos = { photos: Record<string, string>; save: (slot: string, image: string | null) => Promise<void> };
 
-const PhotoContext = createContext<Photos>({ photos: {}, save: async () => {} });
+export const PhotoContext = createContext<Photos>({ photos: {}, save: async () => {} });
 
 export const PhotoProvider = ({ value, children }: { value: Photos; children: ReactNode }) =>
   <PhotoContext.Provider value={value}>{children}</PhotoContext.Provider>;
