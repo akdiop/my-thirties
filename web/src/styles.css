@@ -231,3 +231,38 @@ textarea{resize:vertical;min-height:90px}
 .emotion-tags{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
 .equilibrium-insights .lesson-card .fineprint{margin-top:13px}
 @media(max-width:760px){.finance-stats,.health-stats{grid-template-columns:1fr}.calendar-head h3{font-size:1.35rem}.calendar-head .icon-button{padding:5px}.subscription-row{flex-direction:column;gap:4px}}
+
+/* Planning: cuisine, voyages, apprentissages et spiritualité */
+.planner-form{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:17px 0}
+.planner-form label{flex:1;min-width:145px}
+.planner-form>.button{flex-shrink:0}
+.meal-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin:15px 0}
+.meal-day{background:#f2efe7;border:1px solid #e6ddd2;border-radius:12px;padding:12px 9px;min-height:102px;overflow-wrap:anywhere}
+.meal-day>strong{font-size:.74rem;color:#6b3f2e;text-transform:capitalize}
+.meal-day>p{font-size:.74rem;line-height:1.4;margin:9px 0;color:#52684d}
+.meal-day>small{font-size:.7rem;color:#9a8b7d}
+.path-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0}
+.path-month{background:#f5f0e9;border-radius:14px;padding:15px;min-width:0}
+.path-month .checklist-item{flex-direction:row}
+.path-month details{margin-top:10px}
+.path-month summary{cursor:pointer;font-size:.77rem;color:#5e7a5f;font-weight:700}
+.path-month details label{margin-top:12px}
+.path-month details .button{margin-top:8px}
+.travel-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+.travel-summary>div{background:#f0f1e9;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.travel-summary span{font-size:.7rem;color:#67795e}
+.travel-summary strong{font-size:.85rem;color:#6b3f2e;overflow-wrap:anywhere}
+.travel-itinerary{background:#faf7f2;padding:15px;border-radius:12px;margin:14px 0}
+.travel-itinerary p{white-space:pre-line;overflow-wrap:anywhere;font-size:.82rem;margin-bottom:0}
+.travel-check{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee5dc}
+.travel-check .checklist-item{flex-direction:row;flex:1}
+.prayer-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:18px 0}
+.prayer-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:13px 5px;background:#f0f1e9;border-radius:12px}
+.prayer-item strong{font-size:.78rem;color:#6b3f2e}
+.prayer-item span{font-size:.9rem;color:#5e7a5f}
+.prayer-item small{font-size:.67rem;color:#827568}
+.prayer-form{border-top:1px solid #eee5dc;padding-top:15px;margin-top:12px}
+.prayer-times{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:14px 0}
+@media(max-width:1000px){.meal-week{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:760px){.meal-week{grid-template-columns:repeat(2,minmax(0,1fr))}.path-grid{grid-template-columns:1fr}.travel-summary{grid-template-columns:1fr}.prayer-times{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:390px){.prayer-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
