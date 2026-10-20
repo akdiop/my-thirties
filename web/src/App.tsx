@@ -231,7 +231,7 @@ function KitchenTools({ entries, onGenerate }: { entries: Entry[]; onGenerate: (
       onChange={(e) => setSelected((v) => e.target.checked ? [...v, r.id] : v.filter((id) => id !== r.id))} />{r.title}</label>)}
     {recipes.filter((r) => selected.includes(r.id)).map((r) => <label key={r.id} className="serving-label">
       Portions souhaitées pour {r.title}
-      <input type="number" min="1" max="50" step="1" value={servings[r.id] ?? Number(r.data.portions) || 1}
+      <input type="number" min="1" max="50" step="1" value={servings[r.id] ?? (Number(r.data.portions) || 1)}
         onChange={(e) => setServings((v) => ({ ...v, [r.id]: Number(e.target.value) }))} />
     </label>)}
     <button className="button secondary" disabled={!selected.length} onClick={() => void generate()}>Créer la liste de courses</button>
