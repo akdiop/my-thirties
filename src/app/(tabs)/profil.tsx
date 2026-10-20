@@ -19,6 +19,7 @@ import { useLock } from '@/state/lock';
 import { useSettings, type Appearance, type Settings } from '@/state/settings';
 import { useTheme } from '@/theme/ThemeProvider';
 import { radius } from '@/theme/tokens';
+import { clearWidgets } from '@/widgets/WidgetSync';
 
 const LOCK_DELAYS = [
   { value: '0', label: 'Immédiat' },
@@ -110,6 +111,7 @@ export default function Profil() {
               text: 'Tout supprimer',
               style: 'destructive',
               onPress: async () => {
+                clearWidgets();
                 await wipeEverything(sqlite);
                 useAppData.getState().load({ profile: null, modules: [] });
                 useLock.getState().setStatus('setup');
