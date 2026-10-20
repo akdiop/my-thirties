@@ -11,13 +11,31 @@ import { radius } from '@/theme/tokens';
 export function AgendaItemRow({ item }: { item: AgendaItem }) {
   const { c } = useTheme();
   const color =
-    item.kind === 'event' ? categoryOf(item.category).color : item.kind === 'task' ? c.primary : item.kind === 'routine' ? c.rest : c.textMuted;
-  const subtitle =
-    item.kind === 'task' ? 'Tâche' : item.kind === 'routine' ? 'Routine' : item.kind === 'external' ? item.subtitle ?? 'Calendrier' : categoryOf(item.category).label;
+    item.kind === 'event'
+      ? categoryOf(item.category).color
+      : item.kind === 'task'
+        ? c.primary
+        : item.kind === 'routine'
+          ? c.rest
+          : item.kind === 'prayer'
+            ? '#4A6350'
+            : item.kind === 'workout'
+              ? c.success
+              : c.textMuted;
+  const subtitle = {
+    task: 'Tâche',
+    routine: 'Routine',
+    external: item.subtitle ?? 'Calendrier',
+    prayer: 'Prière',
+    workout: 'Séance réalisée',
+    event: categoryOf(item.category).label,
+  }[item.kind];
   const open = () => {
     if (item.kind === 'event') router.push({ pathname: '/evenement/[id]', params: { id: item.id, date: item.date } });
     else if (item.kind === 'task') router.push({ pathname: '/taches/[id]', params: { id: item.id } });
     else if (item.kind === 'routine') router.push({ pathname: '/routines/[id]', params: { id: item.id, date: item.date } });
+    else if (item.kind === 'prayer') router.push('/spiritualite');
+    else if (item.kind === 'workout') router.push({ pathname: '/sport/seance/[id]', params: { id: item.id } });
   };
   return (
     <Pressable

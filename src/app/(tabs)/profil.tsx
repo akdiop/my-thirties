@@ -39,7 +39,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default function Profil() {
-  const { repo, org, sqlite } = useSession();
+  const { repo, org, well, life, sqlite } = useSession();
   const refresh = useRefresh();
   const { profile, modules } = useAppData();
   const settings = useSettings();
@@ -81,7 +81,7 @@ export default function Profil() {
   const exportData = async () => {
     setExporting(true);
     try {
-      await shareExport(repo, org);
+      await shareExport(repo, org, well, life);
     } catch (e) {
       Alert.alert('Export impossible', e instanceof Error ? e.message : String(e));
     } finally {
@@ -202,6 +202,10 @@ export default function Profil() {
               }}
             />
           }
+        />
+        <ListRow
+          label="Adapter le sport à ma santé"
+          right={<Switch value={settings.healthForSport} onValueChange={(v) => save('healthForSport', v)} trackColor={{ true: c.secondary }} accessibilityLabel="Utiliser mes données de santé pour adapter le sport" />}
         />
         <ListRow label="Espaces affichés" value={`${enabledCount} sur 11`} onPress={() => router.push('/modules')} last />
       </Section>
