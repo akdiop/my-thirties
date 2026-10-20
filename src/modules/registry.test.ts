@@ -9,6 +9,9 @@ describe('module registry', () => {
   it('marks only implemented spaces as partly built', () => {
     const built = MODULES.filter((m) => m.status !== 'not-developed').map((m) => m.id);
     expect(built).toEqual(['quotidien', 'challenges', 'listes']);
+  it('routes exactly the spaces that are built', () => {
+    const built = MODULES.filter((m) => m.status !== 'not-developed').map((m) => m.id);
+    expect(built).toEqual(['quotidien', 'sante', 'sport', 'challenges', 'equilibre', 'spiritualite', 'finances', 'cuisine', 'decouvertes', 'passions', 'listes']);
     expect(MODULES.filter((m) => m.route).map((m) => m.id)).toEqual(built);
   });
 

@@ -2,6 +2,7 @@ import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import type { SQLiteDatabase } from 'expo-sqlite';
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
+import { createLifeRepository, type LifeRepository } from '@/data/life';
 import { createOrganisationRepository, type OrganisationRepository } from '@/data/organisation';
 import { createRepository, type Repository } from '@/data/repository';
 import { createWellbeingRepository, type WellbeingRepository } from '@/data/wellbeing';
@@ -11,6 +12,7 @@ import { openEncryptedDatabase, type Database } from './client';
 import migrations from './migrations/migrations';
 
 type Session = { db: Database; sqlite: SQLiteDatabase; repo: Repository; org: OrganisationRepository; wellbeing: WellbeingRepository };
+type Session = { db: Database; sqlite: SQLiteDatabase; repo: Repository; org: OrganisationRepository; well: WellbeingRepository; life: LifeRepository };
 
 const SessionContext = createContext<Session | null>(null);
 
@@ -62,6 +64,8 @@ function Migrated({ opened, children, fallback, onError }: { opened: Opened; chi
       repo: createRepository(opened.db, opened.deviceId),
       org: createOrganisationRepository(opened.db, opened.deviceId),
       wellbeing: createWellbeingRepository(opened.db, opened.deviceId),
+      well: createWellbeingRepository(opened.db, opened.deviceId),
+      life: createLifeRepository(opened.db, opened.deviceId),
     }),
     [opened],
   );

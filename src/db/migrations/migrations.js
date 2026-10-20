@@ -4,6 +4,8 @@ import journal from './meta/_journal.json';
 import m0000 from './0000_init.sql';
 import m0001 from './0001_organisation.sql';
 import m0002 from './0002_wellbeing.sql';
+import m0002 from './0002_bien_etre.sql';
+import m0003 from './0003_vie_pratique.sql';
 
   export default {
     journal,
@@ -11,6 +13,8 @@ import m0002 from './0002_wellbeing.sql';
       m0000,
 m0001,
 m0002
+m0002,
+m0003
     }
   }
   

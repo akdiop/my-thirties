@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import type { NotificationSettings } from '@/notifications/planner';
+import { DEFAULT_PRAYER_SETTINGS, type PrayerSettings } from '@/spiritualite/prayer';
 
 export type Appearance = 'system' | 'light' | 'dark';
 
@@ -12,6 +13,10 @@ export type Settings = {
   eveningTime: string | null;
   deviceCalendars: boolean;
   widgetAgendaEnabled: boolean;
+  prayer: PrayerSettings;
+  healthForSport: boolean;
+  stepsEnabled: boolean;
+  stepGoal: number;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -22,6 +27,10 @@ export const DEFAULT_SETTINGS: Settings = {
   eveningTime: '20:30',
   deviceCalendars: false,
   widgetAgendaEnabled: false,
+  prayer: DEFAULT_PRAYER_SETTINGS,
+  healthForSport: false,
+  stepsEnabled: false,
+  stepGoal: 8000,
 };
 
 type SettingsStore = Settings & {
