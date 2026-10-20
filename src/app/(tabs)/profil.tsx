@@ -47,6 +47,8 @@ export default function Profil() {
   const [name, setName] = useState(profile?.firstName ?? '');
   const [faceId, setFaceId] = useState<boolean | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [exportPassword, setExportPassword] = useState('');
+  const [exportConfirm, setExportConfirm] = useState('');
 
   useEffect(() => {
     Promise.all([biometricsAvailable(), readLockConfig()]).then(([available, cfg]) => setFaceId(available ? cfg.biometricEnabled : null));
@@ -81,7 +83,13 @@ export default function Profil() {
   const exportData = async () => {
     setExporting(true);
     try {
-      await shareExport(repo, org);
+      if (exportPassword.trim().length < 12 || exportPassword !== exportConfirm) {
+        Alert.alert('Sauvegarde', 'Saisissez deux fois la même phrase secrète d’au moins 12 caractères.');
+        return;
+      }
+      await shareExport(repo, org, exportPassword);
+      setExportPassword('');
+      setExportConfirm('');
     } catch (e) {
       Alert.alert('Export impossible', e instanceof Error ? e.message : String(e));
     } finally {
@@ -208,7 +216,15 @@ export default function Profil() {
 
       <Section title="Mes données">
         <View style={{ paddingVertical: 12, gap: 10 }}>
-          <Button label="Exporter mes données" variant="outline" loading={exporting} onPress={exportData} />
+          <AppText variant="caption" color={c.textMuted}>Sauvegarde chiffrée. Conservez votre phrase secrète : elle ne pourra pas être récupérée. La restauration dans l’application reste à développer.</AppText>
+          <TextInput accessibilityLabel="Phrase secrète de sauvegarde" placeholder="Phrase secrète (12 caractères minimum)" placeholderTextColor={c.textMuted}
+            secureTextEntry value={exportPassword} onChangeText={setExportPassword} autoCapitalize="none"
+            style={{ minHeight: 48, borderRadius: radius.md, borderWidth: 1, borderColor: c.border, paddingHorizontal: 14, color: c.text }} />
+          <TextInput accessibilityLabel="Confirmer la phrase secrète" placeholder="Confirmer la phrase secrète" placeholderTextColor={c.textMuted}
+            secureTextEntry value={exportConfirm} onChangeText={setExportConfirm} autoCapitalize="none"
+            style={{ minHeight: 48, borderRadius: radius.md, borderWidth: 1, borderColor: c.border, paddingHorizontal: 14, color: c.text }} />
+          <Button label="Exporter une sauvegarde chiffrée" variant="outline" loading={exporting}
+            disabled={exportPassword.trim().length < 12 || exportPassword !== exportConfirm} onPress={exportData} />
           <Button label="Supprimer toutes mes données…" variant="danger" onPress={confirmDelete} />
         </View>
       </Section>
