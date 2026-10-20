@@ -8,7 +8,7 @@ const DayView = (props: DayWidgetProps, environment: WidgetEnvironment) => {
   'widget';
   if (!props.visible) return (
     <VStack spacing={8}>
-      <Text modifiers={[font({ weight: 'semibold', size: 17 }), foregroundStyle('#5A392B')]}>My Thirties</Text>
+      <Text modifiers={[font({ weight: 'semibold', size: 17 }), foregroundStyle('#6B4A38')]}>My Thirties</Text>
       <Text modifiers={[font({ size: 12 })]}>Votre espace personnel</Text>
     </VStack>
   );
@@ -21,7 +21,7 @@ const DayView = (props: DayWidgetProps, environment: WidgetEnvironment) => {
   );
   return (
     <VStack spacing={6}>
-      <Text modifiers={[font({ weight: 'semibold', size: 16 }), foregroundStyle('#5A392B')]}>{props.heading}</Text>
+      <Text modifiers={[font({ weight: 'semibold', size: 16 }), foregroundStyle('#6B4A38')]}>{props.heading}</Text>
       <Text>{props.summary}</Text>
       <Text>{props.priorityOne}</Text>
       <Text>{props.priorityTwo}</Text>
