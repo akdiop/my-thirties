@@ -37,27 +37,27 @@ Mis à jour à chaque phase. Statuts : Opérationnel · Partiellement opération
 
 ## Application web installable (PWA) — branche de développement
 
-**Ne pas confondre « code présent » et « service en production ».** Aucun compte Supabase dédié ni déploiement web n'a encore été configuré.
+**Ne pas confondre « code présent » et « service en production ».** Projet Supabase My Thirties créé séparément de SaxalWér, migration RLS appliquée et tables vérifiées. Aucun compte propriétaire créé ni accès Vercel autorisé ; déploiement et essais réels non terminés.
 
 | Fonctionnalité web | Statut | Limites |
 | --- | --- | --- |
 | Design crème/chocolat/sauge, navigation responsive | Implémenté, build automatisé | Vérifier Safari iPhone et desktop |
 | Manifest PWA et icône d'accueil | Implémenté, build automatisé | Vérifier ajout à l'écran d'accueil |
-| Authentification et contrôle propriétaire | Code présent, configuration requise | Supabase personnel, compte et RLS à créer/tester |
-| Stockage synchronisé des 11 espaces | Code présent, configuration requise | Tables cloud à créer, sécurité et tests réels |
-| Agenda mensuel et tâches cochables | Implémenté, non testé sur appareils | Pas encore de synchronisation Google/iCloud |
-| Santé (cycle, sommeil, symptômes) | Partiel | Pas de prévisions ni de sources médicales intégrées |
+| Authentification et contrôle propriétaire | Configuration partielle | Projet Supabase créé et RLS déployée ; compte Auth propriétaire et tests RLS en conditions réelles manquants |
+| Stockage synchronisé des 11 espaces | Configuration partielle | Tables cloud créées ; Vercel et tests réels manquants ; iOS non synchronisé |
+| Agenda jour/semaine/mois et tâches cochables | Implémenté, tests CI en cours | Récurrences quotidiennes/hebdomadaires ; pas de synchronisation Google/iCloud |
+| Santé (cycle, sommeil, symptômes, humeur, énergie, hydratation, repas) | Partiel | Tableau de bord descriptif, sans prévisions médicales |
 | Sport (séances et fiches d'apprentissage) | Partiel | Vidéos et analyse de technique absentes |
 | Challenges 7/14/30 jours | Partiel | Calendriers, statuts, notes ; pas de programmes vidéo |
 | Équilibre (émotions, gratitude, booster) | Partiel | Journaux et programme cochable ; recommandations IA absentes |
-| Spiritualité (suivi personnel) | Partiel | Horaires et textes religieux vérifiés absents |
-| Finances | Partiel | Transactions, abonnements, objectifs ; pas de change actualisé |
-| Cuisine | Partiel | Recettes, portions et listes consolidées ; pas de batch cooking complet |
-| Voyages | Partiel | Projets, valises et checklists ; pas de données touristiques actualisées |
-| Passions | Partiel | Objectifs et journal ; parcours guidés incomplets |
+| Spiritualité (suivi personnel) | Partiel | Horaires saisis manuellement avec source, pas de calcul automatique ni de textes vérifiés |
+| Finances | Partiel | Budgets mensuels, répartition des dépenses, abonnements, épargne ; pas de change actualisé |
+| Cuisine | Partiel | Recettes, calendrier de repas hebdomadaire, liste de courses consolidée ; batch cooking guidé et tutoriels absents |
+| Voyages | Partiel | Projets, budget, itinéraire, préparatifs et valises ; formalités et données touristiques actualisées absentes |
+| Passions | Partiel | Parcours 6/12 mois avec étapes personnalisables et progression ; tutoriels externes absents |
 | Listes | Partiel | Listes cochables et génération depuis cuisine/voyage |
 | Sauvegarde et restauration web | Code présent, non testé avec Supabase | AES-256-GCM ; import limité à 500 entrées, ajout sans dédoublonnage |
-| IA, analyse vidéo, notifications push | Non développé | Exigent services externes, budget et consentement |
+| IA, analyse vidéo, notifications push | Non développé | Aperçu du jour à règles locales, pas un modèle IA ; intégrations externes et consentements nécessaires |
 | Offline avec données personnelles | Non développé | Service worker sans cache de données sensibles |
 
-**Prochain jalon bloquant :** créer un projet Supabase distinct, configurer le compte propriétaire, appliquer et tester les politiques RLS, puis déployer une preview Vercel protégée. Les tests CI ne remplacent pas les tests sur appareils et la validation de sécurité.
+**Prochain jalon bloquant :** créer le compte Auth personnel, lui attribuer le rôle propriétaire, désactiver les inscriptions publiques, tester les politiques RLS avec des sessions réelles, autoriser l'accès à l'équipe Vercel puis déployer une preview protégée. Les tests CI ne remplacent pas les tests sur appareils et la validation de sécurité.
