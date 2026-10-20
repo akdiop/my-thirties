@@ -1,8 +1,11 @@
 name: Tests et contrôles
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
 on:
   pull_request:
   push:
-    branches: [main, feat/security-and-life-modules-20261020]
+    branches: [main]
 jobs:
   quality:
     runs-on: ubuntu-latest
