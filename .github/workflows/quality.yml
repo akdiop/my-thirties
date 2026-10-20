@@ -2,7 +2,7 @@ name: Tests et contrôles
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, feat/security-and-life-modules-20261020]
 jobs:
   quality:
     runs-on: ubuntu-latest
