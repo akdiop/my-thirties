@@ -31,8 +31,6 @@ Mis à jour à chaque phase. Statuts : Opérationnel · Partiellement opération
 | Widgets déplaçables et masquables | 2 | Non développé | Prévu avec les widgets des phases 3-4 |
 | Planification intelligente | 5 | Non développé | — |
 | Challenges iPhone (calendriers et suivi) | 3 | Partiellement opérationnel | Écrans et tables présents ; tests sur iPhone et ressources pédagogiques manquants |
-| Santé, sport, équilibre, spiritualité sur iPhone | 3 | Non développé | — |
-| Finances, cuisine, voyages, passions | 4 | Non développé | — |
 | Ma santé : cycle et prévisions indicatives, symptômes, humeur, énergie, douleurs | 3 | Opérationnel | 7 tests du cycle ; à tester sur iPhone |
 | Sommeil, hydratation, journal alimentaire | 3 | Opérationnel | Tests unitaires + SQLite |
 | Compteur de pas (capteur de mouvement de l'iPhone), objectif, 7 jours | 3 | Opérationnel | Tests unitaires ; lecture des pas à tester sur iPhone |
@@ -53,7 +51,7 @@ Mis à jour à chaque phase. Statuts : Opérationnel · Partiellement opération
 | Mes découvertes : envies / prévus / vécus, dates, itinéraire, réservations, à voir, budget relié aux dépenses, préparatifs, valise, agenda | 4 | Opérationnel | Tests SQLite ; aucun prix ni condition d'entrée inventé |
 | Mes passions : parcours 6 ou 12 mois, jalons, journal, statistiques, matériel, séances dans l'agenda | 4 | Opérationnel | Tests unitaires + SQLite |
 | Accueil : carte Budget | 4 | Opérationnel | À tester sur iPhone |
-| Version web | — | Non développé | En attente de votre accord (voir réponse sur le web) |
+| Version web (dossier web/, Supabase) | — | Partiellement opérationnel | Écran de connexion vérifié localement ; connexion réelle à tester |
 | Assistant IA, analyse vidéo | 5 | Non développé | — |
 
 ## Application web installable (PWA) — branche de développement

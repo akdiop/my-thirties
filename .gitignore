@@ -16,3 +16,8 @@ expo-env.d.ts
 !.env.example
 coverage/
 .DS_Store
+!web/.env.production
+
+# Artefacts de build de la version web
+web/tsconfig.tsbuildinfo
+web/public/apple-touch-icon.png
