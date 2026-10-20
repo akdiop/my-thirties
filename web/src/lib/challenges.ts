@@ -1,7 +1,8 @@
+import { SUGGESTED_TEMPLATES } from './challengeSuggestions';
 import { circuit } from './exercises';
 
-export type ChallengeCategory = 'Sport' | 'Cuisine' | 'Bien-être' | 'Habitudes';
-export const CATEGORIES: ChallengeCategory[] = ['Sport', 'Cuisine', 'Bien-être', 'Habitudes'];
+export type ChallengeCategory = 'Sport' | 'Cuisine' | 'Bien-être' | 'Habitudes' | 'Apprentissage' | 'Créativité' | 'Organisation';
+export const CATEGORIES: ChallengeCategory[] = ['Sport', 'Cuisine', 'Bien-être', 'Habitudes', 'Apprentissage', 'Créativité', 'Organisation'];
 
 export type ChallengeTemplate = {
   id: string;
@@ -205,6 +206,9 @@ TEMPLATES.push(
     day: (n) => pick(['Note toutes tes dépenses du jour dans Mes finances.', 'Journée sans dépense non essentielle.', 'Vérifie un abonnement : le garder ou le résilier ?', 'Mets de côté une petite somme dans ton objectif d’épargne.', 'Prépare ton repas au lieu d’acheter.', 'Compare un achat prévu avant de payer.', 'Fais le point du budget de la semaine.'], n),
   },
 );
+
+// Suggestions d'apprentissage, de créativité et d'organisation (reprises de la PR #10).
+TEMPLATES.push(...SUGGESTED_TEMPLATES);
 
 export const templateById = (id: unknown) => TEMPLATES.find((t) => t.id === id);
 

@@ -801,3 +801,4 @@ table{display:block;max-width:100%;overflow-x:auto}
 .series-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .ep-label{font-size:.82rem;font-weight:600;color:#6B3F2E}
 .stars{display:flex;gap:2px}.stars button{border:0;background:transparent;padding:4px}
+.pill-tabs{overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}.pill-tabs::-webkit-scrollbar{display:none}.pill-tabs button{flex:0 0 auto;padding:9px 16px;white-space:nowrap}

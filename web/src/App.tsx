@@ -43,6 +43,7 @@ import { ScreenHeader, SectionTitle, Segmented } from './ui/kit';
 import { GuidedField } from './ui/fields';
 import { LearningPaths } from './features/LearningPaths';
 import { SeriesTracker } from './features/SeriesTracker';
+import { TravelSuggestions } from './features/TravelSuggestions';
 
 type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -463,6 +464,7 @@ export default function App() {
             {!entries.some((e) => e.module === 'listes' && String(e.data.category) === 'Courses') && <p className="muted">Planifie ta semaine puis génère tes courses.</p>}</div>}
         </>}
         {currentModule.id === 'decouvertes' && <><TravelTop tab={travelTab} onTab={setTravelTab} entries={allModuleEntries} onCreate={createFromTool} onAdd={(kind) => addIn('decouvertes', kind)} />
+          {travelTab === 'destinations' && <TravelSuggestions entries={allModuleEntries} onCreate={createFromTool} />}
           {travelTab === 'voyage' && <><TravelPlanner entries={allModuleEntries} onUpdate={updateData} /><TravelTools entries={allModuleEntries} onGenerate={createGroceries} /></>}</>}
         {currentModule.id === 'equilibre' && <><EquilibreTop tab={equilibreTab} onTab={setEquilibreTab} entries={allModuleEntries}
             onAxis={(axis) => { const b = allModuleEntries.find((e) => e.kind === 'booster' && String(e.data.axis) === axis); if (b) { setEquilibreTab('booster'); } else addIn('equilibre', 'booster', { axis, days: '14' }, 'Booster · ' + axis); }}
