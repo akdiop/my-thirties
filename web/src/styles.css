@@ -201,3 +201,9 @@ textarea{resize:vertical;min-height:90px}
 .lesson-card h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem}
 .lesson-card p{font-size:.83rem;color:#5e6b58;margin:0}
 @media(max-width:760px){.calendar-panel{padding:14px}.calendar-cell{min-height:41px}.booster-grid{grid-template-columns:repeat(7,minmax(0,1fr))}.lesson-grid{grid-template-columns:1fr}}
+
+.serving-label{max-width:330px;margin:12px 0;font-size:.8rem}
+.serving-label input{max-width:130px}
+.travel-row{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:12px 0;border-top:1px solid #eee5dc;font-size:.84rem}
+.travel-row .button{white-space:nowrap}
+@media(max-width:480px){.travel-row{align-items:flex-start;flex-direction:column}}
