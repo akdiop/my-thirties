@@ -14,7 +14,7 @@ export const modules: Module[] = [
   {
     id: 'quotidien', name: 'Mon quotidien', symbol: '◷', description: 'Agenda, tâches et routines',
     kinds: [
-      { id: 'task', label: 'Tâche', fields: [date, { id: 'time', label: 'Heure (facultative)', type: 'time' }, { id: 'priority', label: 'Priorité', type: 'select', options: ['Normale', 'Haute', 'Basse'] }, note] },
+      { id: 'task', label: 'Tâche', fields: [date, { id: 'time', label: 'Heure (facultative)', type: 'time' }, { id: 'priority', label: 'Priorité', type: 'select', options: ['Normale', 'Haute', 'Basse'] }, { id: 'frequency', label: 'Répétition', type: 'select', options: ['Aucune', 'Quotidienne', 'Hebdomadaire'] }, { id: 'subtasksText', label: 'Sous-tâches (une par ligne)', type: 'textarea' }, note] },
       { id: 'event', label: 'Événement', fields: [date, { id: 'time', label: 'Heure', type: 'time' }, { id: 'location', label: 'Lieu', type: 'text' }, { id: 'frequency', label: 'Répétition', type: 'select', options: ['Aucune', 'Quotidienne', 'Hebdomadaire'] }, note] },
       { id: 'routine', label: 'Routine', fields: [date, { id: 'time', label: 'Heure', type: 'time' }, { id: 'frequency', label: 'Fréquence', type: 'select', options: ['Quotidienne', 'Hebdomadaire'] }, note] },
     ],
