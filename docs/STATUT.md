@@ -14,7 +14,7 @@ Mis à jour à chaque phase. Statuts : Opérationnel · Partiellement opération
 | Profil (prénom, devise, apparence) | 1 | Opérationnel | À tester sur iPhone |
 | Espaces affichés / masqués | 1 | Opérationnel | Tests unitaires du registre |
 | « J'ai besoin de me calmer » (respiration guidée) | 1 | Opérationnel | Tests unitaires du rythme |
-| Export JSON | 1 | Opérationnel | Test du format ; partage à tester sur iPhone |
+| Export chiffré AES-256-GCM | 1 | Partiellement opérationnel | Phrase secrète ajoutée ; à tester sur iPhone ; restauration native non développée |
 | Suppression totale des données | 1 | Opérationnel | À tester sur iPhone |
 | Moteur de notifications (heures silencieuses, limite iOS de 64) | 1 | Opérationnel | Planificateur testé ; envoi réel à tester sur iPhone |
 | Compte Supabase, sauvegarde et synchronisation | 2 | En attente de configuration | Projet Supabase à créer |
@@ -30,6 +30,9 @@ Mis à jour à chaque phase. Statuts : Opérationnel · Partiellement opération
 | Accueil : journée, priorités, routines, bilan du soir | 2 | Opérationnel | À tester sur iPhone |
 | Widgets déplaçables et masquables | 2 | Non développé | Prévu avec les widgets des phases 3-4 |
 | Planification intelligente | 5 | Non développé | — |
+| Challenges iPhone (calendriers et suivi) | 3 | Partiellement opérationnel | Écrans et tables présents ; tests sur iPhone et ressources pédagogiques manquants |
+| Santé, sport, équilibre, spiritualité sur iPhone | 3 | Non développé | — |
+| Finances, cuisine, voyages, passions | 4 | Non développé | — |
 | Ma santé : cycle et prévisions indicatives, symptômes, humeur, énergie, douleurs | 3 | Opérationnel | 7 tests du cycle ; à tester sur iPhone |
 | Sommeil, hydratation, journal alimentaire | 3 | Opérationnel | Tests unitaires + SQLite |
 | Compteur de pas (capteur de mouvement de l'iPhone), objectif, 7 jours | 3 | Opérationnel | Tests unitaires ; lecture des pas à tester sur iPhone |
@@ -52,3 +55,30 @@ Mis à jour à chaque phase. Statuts : Opérationnel · Partiellement opération
 | Accueil : carte Budget | 4 | Opérationnel | À tester sur iPhone |
 | Version web | — | Non développé | En attente de votre accord (voir réponse sur le web) |
 | Assistant IA, analyse vidéo | 5 | Non développé | — |
+
+## Application web installable (PWA) — branche de développement
+
+**Ne pas confondre « code présent » et « service en production ».** Projet Supabase My Thirties créé séparément de SaxalWér, migration RLS appliquée et tables vérifiées. Aucun compte propriétaire créé ni accès Vercel autorisé ; déploiement et essais réels non terminés.
+
+| Fonctionnalité web | Statut | Limites |
+| --- | --- | --- |
+| Design crème/chocolat/sauge, navigation responsive | Implémenté, build automatisé | Vérifier Safari iPhone et desktop |
+| Manifest PWA et icône d'accueil | Implémenté, build automatisé | Vérifier ajout à l'écran d'accueil |
+| Authentification et contrôle propriétaire | Configuration partielle | Projet Supabase créé et RLS déployée ; compte Auth propriétaire et tests RLS en conditions réelles manquants |
+| Stockage synchronisé des 11 espaces | Configuration partielle | Tables cloud créées ; Vercel et tests réels manquants ; iOS non synchronisé |
+| Agenda jour/semaine/mois et tâches cochables | Implémenté, tests CI en cours | Récurrences quotidiennes/hebdomadaires ; pas de synchronisation Google/iCloud |
+| Santé (cycle, sommeil, symptômes, humeur, énergie, hydratation, repas) | Partiel | Tableau de bord descriptif, sans prévisions médicales |
+| Sport (séances et fiches d'apprentissage) | Partiel | Vidéos et analyse de technique absentes |
+| Challenges 7/14/30 jours | Partiel | Calendriers, statuts, notes ; pas de programmes vidéo |
+| Équilibre (émotions, gratitude, booster) | Partiel | Journaux et programme cochable ; recommandations IA absentes |
+| Spiritualité (suivi personnel) | Partiel | Horaires saisis manuellement avec source, pas de calcul automatique ni de textes vérifiés |
+| Finances | Partiel | Budgets mensuels, répartition des dépenses, abonnements, épargne ; pas de change actualisé |
+| Cuisine | Partiel | Recettes, calendrier de repas hebdomadaire, liste de courses consolidée ; batch cooking guidé et tutoriels absents |
+| Voyages | Partiel | Projets, budget, itinéraire, préparatifs et valises ; formalités et données touristiques actualisées absentes |
+| Passions | Partiel | Parcours 6/12 mois avec étapes personnalisables et progression ; tutoriels externes absents |
+| Listes | Partiel | Listes cochables et génération depuis cuisine/voyage |
+| Sauvegarde et restauration web | Code présent, non testé avec Supabase | AES-256-GCM ; import limité à 500 entrées, ajout sans dédoublonnage |
+| IA, analyse vidéo, notifications push | Non développé | Aperçu du jour à règles locales, pas un modèle IA ; intégrations externes et consentements nécessaires |
+| Offline avec données personnelles | Non développé | Service worker sans cache de données sensibles |
+
+**Prochain jalon bloquant :** créer le compte Auth personnel, lui attribuer le rôle propriétaire, désactiver les inscriptions publiques, tester les politiques RLS avec des sessions réelles, autoriser l'accès à l'équipe Vercel puis déployer une preview protégée. Les tests CI ne remplacent pas les tests sur appareils et la validation de sécurité.

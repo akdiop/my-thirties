@@ -12,6 +12,7 @@ export type Settings = {
   briefingTime: string | null;
   eveningTime: string | null;
   deviceCalendars: boolean;
+  widgetAgendaEnabled: boolean;
   prayer: PrayerSettings;
   healthForSport: boolean;
   stepsEnabled: boolean;
@@ -25,6 +26,7 @@ export const DEFAULT_SETTINGS: Settings = {
   briefingTime: '07:30',
   eveningTime: '20:30',
   deviceCalendars: false,
+  widgetAgendaEnabled: false,
   prayer: DEFAULT_PRAYER_SETTINGS,
   healthForSport: false,
   stepsEnabled: false,

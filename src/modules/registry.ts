@@ -30,11 +30,21 @@ export type ModuleDefinition = {
   phase: 2 | 3 | 4;
   status: FeatureStatus;
   sensitive: boolean;
+  route?: '/quotidien' | '/listes' | '/challenges' | '/sport' | '/equilibre';
   route?: '/quotidien' | '/listes' | '/sante' | '/sport' | '/challenges' | '/equilibre' | '/spiritualite' | '/finances' | '/cuisine' | '/decouvertes' | '/passions';
 };
 
 export const MODULES: readonly ModuleDefinition[] = [
   { id: 'quotidien', label: 'Mon quotidien', description: 'Tâches, routines et planification', icon: 'calendar-check', tone: 'blush', phase: 2, status: 'partial', sensitive: false, route: '/quotidien' },
+  { id: 'sante', label: 'Ma santé', description: 'Cycle, sommeil, alimentation, rendez-vous', icon: 'heart', tone: 'sage', phase: 3, status: 'not-developed', sensitive: true },
+  { id: 'sport', label: 'Mon sport', description: 'Tennis, Pilates, yoga et journal', icon: 'dumbbell', tone: 'sage', phase: 3, status: 'not-developed', sensitive: false },
+  { id: 'challenges', label: 'Mes challenges', description: 'Calendriers de 30 jours en parallèle', icon: 'trophy', tone: 'sage', phase: 3, status: 'partial', sensitive: false, route: '/challenges' },
+  { id: 'equilibre', label: 'Mon équilibre', description: 'Axes, Booster, journaux, apaisement', icon: 'flower', tone: 'sand', phase: 3, status: 'not-developed', sensitive: true },
+  { id: 'spiritualite', label: 'Ma spiritualité', description: 'Prières, Coran, dhikr, calendrier hégirien', icon: 'moon', tone: 'sand', phase: 3, status: 'not-developed', sensitive: true },
+  { id: 'finances', label: 'Mes finances', description: 'Budget multidevise, abonnements, épargne', icon: 'wallet', tone: 'blush', phase: 4, status: 'not-developed', sensitive: true },
+  { id: 'cuisine', label: 'Ma cuisine', description: 'Recettes et batch cooking', icon: 'cooking-pot', tone: 'blush', phase: 4, status: 'not-developed', sensitive: false },
+  { id: 'decouvertes', label: 'Mes découvertes', description: 'Destinations et prochain voyage', icon: 'compass', tone: 'sage', phase: 4, status: 'not-developed', sensitive: false },
+  { id: 'passions', label: 'Mes passions', description: 'Un hobby sur six ou douze mois', icon: 'brush', tone: 'sand', phase: 4, status: 'not-developed', sensitive: false },
   { id: 'sante', label: 'Ma santé', description: 'Cycle, sommeil, alimentation, rendez-vous', icon: 'heart', tone: 'sage', phase: 3, status: 'operational', sensitive: true, route: '/sante' },
   { id: 'sport', label: 'Mon sport', description: 'Tennis, Pilates, yoga et journal', icon: 'dumbbell', tone: 'sage', phase: 3, status: 'partial', sensitive: false, route: '/sport' },
   { id: 'challenges', label: 'Mes challenges', description: 'Calendriers de 30 jours en parallèle', icon: 'trophy', tone: 'sage', phase: 3, status: 'operational', sensitive: false, route: '/challenges' },

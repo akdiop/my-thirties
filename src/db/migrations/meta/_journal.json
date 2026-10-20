@@ -19,6 +19,8 @@
     {
       "idx": 2,
       "version": "6",
+      "when": 1792520000000,
+      "tag": "0002_wellbeing",
       "when": 1792518451754,
       "tag": "0002_bien_etre",
       "breakpoints": true

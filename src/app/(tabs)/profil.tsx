@@ -19,6 +19,7 @@ import { useLock } from '@/state/lock';
 import { useSettings, type Appearance, type Settings } from '@/state/settings';
 import { useTheme } from '@/theme/ThemeProvider';
 import { radius } from '@/theme/tokens';
+import { clearWidgets } from '@/widgets/WidgetSync';
 
 const LOCK_DELAYS = [
   { value: '0', label: 'Immédiat' },
@@ -39,6 +40,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default function Profil() {
+  const { repo, org, wellbeing, sqlite } = useSession();
   const { repo, org, well, life, sqlite } = useSession();
   const refresh = useRefresh();
   const { profile, modules } = useAppData();
@@ -47,6 +49,8 @@ export default function Profil() {
   const [name, setName] = useState(profile?.firstName ?? '');
   const [faceId, setFaceId] = useState<boolean | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [exportPassword, setExportPassword] = useState('');
+  const [exportConfirm, setExportConfirm] = useState('');
 
   useEffect(() => {
     Promise.all([biometricsAvailable(), readLockConfig()]).then(([available, cfg]) => setFaceId(available ? cfg.biometricEnabled : null));
@@ -81,6 +85,13 @@ export default function Profil() {
   const exportData = async () => {
     setExporting(true);
     try {
+      if (exportPassword.trim().length < 12 || exportPassword !== exportConfirm) {
+        Alert.alert('Sauvegarde', 'Saisissez deux fois la même phrase secrète d’au moins 12 caractères.');
+        return;
+      }
+      await shareExport(repo, org, wellbeing, exportPassword);
+      setExportPassword('');
+      setExportConfirm('');
       await shareExport(repo, org, well, life);
     } catch (e) {
       Alert.alert('Export impossible', e instanceof Error ? e.message : String(e));
@@ -102,6 +113,7 @@ export default function Profil() {
               text: 'Tout supprimer',
               style: 'destructive',
               onPress: async () => {
+                clearWidgets();
                 await wipeEverything(sqlite);
                 useAppData.getState().load({ profile: null, modules: [] });
                 useLock.getState().setStatus('setup');
@@ -210,9 +222,34 @@ export default function Profil() {
         <ListRow label="Espaces affichés" value={`${enabledCount} sur 11`} onPress={() => router.push('/modules')} last />
       </Section>
 
+      <Section title="Widgets iPhone">
+        <ListRow
+          label="Afficher mes priorités dans les widgets"
+          right={<Switch
+            value={settings.widgetAgendaEnabled}
+            onValueChange={(enabled) => save('widgetAgendaEnabled', enabled)}
+            trackColor={{ true: c.secondary }}
+            accessibilityLabel="Afficher mes priorités dans les widgets iPhone"
+          />}
+        />
+        <View style={{ paddingVertical: 8 }}>
+          <AppText variant="caption" color={c.textMuted}>
+            Désactivé par défaut. Si activé, les titres de deux priorités peuvent rester visibles sur l’écran d’accueil même lorsque le téléphone est verrouillé. L’écran verrouillé n’affiche que leur nombre.
+          </AppText>
+        </View>
+      </Section>
+
       <Section title="Mes données">
         <View style={{ paddingVertical: 12, gap: 10 }}>
-          <Button label="Exporter mes données" variant="outline" loading={exporting} onPress={exportData} />
+          <AppText variant="caption" color={c.textMuted}>Sauvegarde chiffrée. Conservez votre phrase secrète : elle ne pourra pas être récupérée. La restauration dans l’application reste à développer.</AppText>
+          <TextInput accessibilityLabel="Phrase secrète de sauvegarde" placeholder="Phrase secrète (12 caractères minimum)" placeholderTextColor={c.textMuted}
+            secureTextEntry value={exportPassword} onChangeText={setExportPassword} autoCapitalize="none"
+            style={{ minHeight: 48, borderRadius: radius.md, borderWidth: 1, borderColor: c.border, paddingHorizontal: 14, color: c.text }} />
+          <TextInput accessibilityLabel="Confirmer la phrase secrète" placeholder="Confirmer la phrase secrète" placeholderTextColor={c.textMuted}
+            secureTextEntry value={exportConfirm} onChangeText={setExportConfirm} autoCapitalize="none"
+            style={{ minHeight: 48, borderRadius: radius.md, borderWidth: 1, borderColor: c.border, paddingHorizontal: 14, color: c.text }} />
+          <Button label="Exporter une sauvegarde chiffrée" variant="outline" loading={exporting}
+            disabled={exportPassword.trim().length < 12 || exportPassword !== exportConfirm} onPress={exportData} />
           <Button label="Supprimer toutes mes données…" variant="danger" onPress={confirmDelete} />
         </View>
       </Section>

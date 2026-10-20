@@ -11,6 +11,7 @@ import { useSettings } from '@/state/settings';
 import { openEncryptedDatabase, type Database } from './client';
 import migrations from './migrations/migrations';
 
+type Session = { db: Database; sqlite: SQLiteDatabase; repo: Repository; org: OrganisationRepository; wellbeing: WellbeingRepository };
 type Session = { db: Database; sqlite: SQLiteDatabase; repo: Repository; org: OrganisationRepository; well: WellbeingRepository; life: LifeRepository };
 
 const SessionContext = createContext<Session | null>(null);
@@ -62,6 +63,7 @@ function Migrated({ opened, children, fallback, onError }: { opened: Opened; chi
       sqlite: opened.sqlite,
       repo: createRepository(opened.db, opened.deviceId),
       org: createOrganisationRepository(opened.db, opened.deviceId),
+      wellbeing: createWellbeingRepository(opened.db, opened.deviceId),
       well: createWellbeingRepository(opened.db, opened.deviceId),
       life: createLifeRepository(opened.db, opened.deviceId),
     }),
