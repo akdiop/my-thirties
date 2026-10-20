@@ -11,6 +11,7 @@ export type Settings = {
   briefingTime: string | null;
   eveningTime: string | null;
   deviceCalendars: boolean;
+  widgetAgendaEnabled: boolean;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -20,6 +21,7 @@ export const DEFAULT_SETTINGS: Settings = {
   briefingTime: '07:30',
   eveningTime: '20:30',
   deviceCalendars: false,
+  widgetAgendaEnabled: false,
 };
 
 type SettingsStore = Settings & {
