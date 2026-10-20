@@ -30,7 +30,7 @@ export async function makeEncryptedBackup(entries: Entry[], password: string) {
     format: 'my-thirties-web-backup', version: 1, createdAt: new Date().toISOString(),
     entries: entries.map(({ module, kind, title, entry_date, data }) => ({ module, kind, title, entry_date, data })),
   }));
-  const ciphertext = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plaintext));
+  const ciphertext = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv as BufferSource }, key, plaintext as BufferSource));
   const envelope: Envelope = {
     format: 'my-thirties-web-encrypted', version: 1, iterations,
     salt: hex(salt), iv: hex(iv), ciphertext: hex(ciphertext),
@@ -45,7 +45,7 @@ export async function parseEncryptedBackup(content: string, password: string) {
     !/^[0-9a-f]{24}$/.test(envelope.iv) || !/^[0-9a-f]+$/.test(envelope.ciphertext) ||
     envelope.ciphertext.length > 15_000_000) throw new Error('Fichier de sauvegarde invalide.');
   const key = await derive(password, fromHex(envelope.salt), iterations);
-  const bytes = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromHex(envelope.iv) }, key, fromHex(envelope.ciphertext));
+  const bytes = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromHex(envelope.iv) as BufferSource }, key, fromHex(envelope.ciphertext) as BufferSource);
   const parsed: unknown = JSON.parse(dec.decode(bytes));
   if (!parsed || typeof parsed !== 'object' || !('format' in parsed) ||
     parsed.format !== 'my-thirties-web-backup' || !('entries' in parsed) ||
