@@ -41,7 +41,7 @@ export const modules: Module[] = [
   {
     id: 'challenges', name: 'Mes challenges', symbol: '◇', description: 'Plusieurs programmes et calendriers indépendants',
     kinds: [
-      { id: 'challenge', label: 'Challenge', fields: [discipline, { id: 'days', label: 'Durée', type: 'select', options: ['7', '14', '30'] }, { id: 'start', label: 'Date de début', type: 'date' }, { id: 'plan', label: 'Programme / exercices adaptés', type: 'textarea' }] },
+      { id: 'challenge', label: 'Challenge', fields: [discipline, { id: 'days', label: 'Durée', type: 'select', options: ['7', '14', '30'] }, { id: 'start', label: 'Date de début', type: 'date' }, { id: 'plan', label: 'Programme / exercices adaptés', type: 'textarea' }, { id: 'video', label: 'Lien vidéo pédagogique (facultatif)', type: 'text' }] },
     ],
   },
   {
