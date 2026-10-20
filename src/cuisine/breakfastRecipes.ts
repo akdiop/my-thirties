@@ -9,7 +9,8 @@ export const BREAKFAST_RECIPES: CuratedRecipe[] = [
     "cookMin": 0,
     "ingredients": "50 g flocons d’avoine;200 ml lait;1 banane;1 pincée cannelle",
     "steps": [
-      "Faire chauffer le lait avec les flocons en remuant 6 à 8 minutes.",
+      "Verser le lait dans une casserole et ajouter les flocons d’avoine.",
+      "Cuire à feu doux en remuant 6 à 8 minutes.",
       "Verser dans un bol et garnir selon la variante."
     ],
     "storage": "Conserver rapidement au réfrigérateur les préparations périssables et consommer dans les jours suivants."
@@ -23,7 +24,8 @@ export const BREAKFAST_RECIPES: CuratedRecipe[] = [
     "cookMin": 0,
     "ingredients": "50 g flocons d’avoine;200 ml lait;100 g mangue;1 pincée vanille",
     "steps": [
-      "Faire chauffer le lait avec les flocons en remuant 6 à 8 minutes.",
+      "Verser le lait dans une casserole et ajouter les flocons d’avoine.",
+      "Cuire à feu doux en remuant 6 à 8 minutes.",
       "Verser dans un bol et garnir selon la variante."
     ],
     "storage": "Conserver rapidement au réfrigérateur les préparations périssables et consommer dans les jours suivants."
@@ -37,7 +39,8 @@ export const BREAKFAST_RECIPES: CuratedRecipe[] = [
     "cookMin": 0,
     "ingredients": "50 g flocons d’avoine;200 ml lait;1 pomme;1 pincée cannelle",
     "steps": [
-      "Faire chauffer le lait avec les flocons en remuant 6 à 8 minutes.",
+      "Verser le lait dans une casserole et ajouter les flocons d’avoine.",
+      "Cuire à feu doux en remuant 6 à 8 minutes.",
       "Verser dans un bol et garnir selon la variante."
     ],
     "storage": "Conserver rapidement au réfrigérateur les préparations périssables et consommer dans les jours suivants."
@@ -51,7 +54,8 @@ export const BREAKFAST_RECIPES: CuratedRecipe[] = [
     "cookMin": 0,
     "ingredients": "50 g flocons d’avoine;200 ml lait;80 g fraises;50 g yaourt nature",
     "steps": [
-      "Faire chauffer le lait avec les flocons en remuant 6 à 8 minutes.",
+      "Verser le lait dans une casserole et ajouter les flocons d’avoine.",
+      "Cuire à feu doux en remuant 6 à 8 minutes.",
       "Verser dans un bol et garnir selon la variante."
     ],
     "storage": "Conserver rapidement au réfrigérateur les préparations périssables et consommer dans les jours suivants."
@@ -65,7 +69,8 @@ export const BREAKFAST_RECIPES: CuratedRecipe[] = [
     "cookMin": 0,
     "ingredients": "50 g flocons d’avoine;200 ml lait;3 dattes;1 c. à c. graines de sésame",
     "steps": [
-      "Faire chauffer le lait avec les flocons en remuant 6 à 8 minutes.",
+      "Verser le lait dans une casserole et ajouter les flocons d’avoine.",
+      "Cuire à feu doux en remuant 6 à 8 minutes.",
       "Verser dans un bol et garnir selon la variante."
     ],
     "storage": "Conserver rapidement au réfrigérateur les préparations périssables et consommer dans les jours suivants."
@@ -305,7 +310,8 @@ export const BREAKFAST_RECIPES: CuratedRecipe[] = [
     "ingredients": "180 g yaourt nature;1 mangue;40 g granola sans noix",
     "steps": [
       "Verser le yaourt dans un bol.",
-      "Laver, découper et ajouter les garnitures juste avant de servir."
+      "Laver et découper les fruits et garnitures.",
+      "Les ajouter sur le yaourt juste avant de servir."
     ],
     "storage": "Conserver rapidement au réfrigérateur les préparations périssables et consommer dans les jours suivants."
   },
@@ -319,7 +325,8 @@ export const BREAKFAST_RECIPES: CuratedRecipe[] = [
     "ingredients": "180 g yaourt nature;100 g fraises;30 g flocons d’avoine",
     "steps": [
       "Verser le yaourt dans un bol.",
-      "Laver, découper et ajouter les garnitures juste avant de servir."
+      "Laver et découper les fruits et garnitures.",
+      "Les ajouter sur le yaourt juste avant de servir."
     ],
     "storage": "Conserver rapidement au réfrigérateur les préparations périssables et consommer dans les jours suivants."
   },
@@ -333,7 +340,8 @@ export const BREAKFAST_RECIPES: CuratedRecipe[] = [
     "ingredients": "180 g yaourt nature;1 banane;1 c. à c. cacao",
     "steps": [
       "Verser le yaourt dans un bol.",
-      "Laver, découper et ajouter les garnitures juste avant de servir."
+      "Laver et découper les fruits et garnitures.",
+      "Les ajouter sur le yaourt juste avant de servir."
     ],
     "storage": "Conserver rapidement au réfrigérateur les préparations périssables et consommer dans les jours suivants."
   },
@@ -347,7 +355,8 @@ export const BREAKFAST_RECIPES: CuratedRecipe[] = [
     "ingredients": "180 g yaourt nature;1 pêche;1 c. à c. sésame",
     "steps": [
       "Verser le yaourt dans un bol.",
-      "Laver, découper et ajouter les garnitures juste avant de servir."
+      "Laver et découper les fruits et garnitures.",
+      "Les ajouter sur le yaourt juste avant de servir."
     ],
     "storage": "Conserver rapidement au réfrigérateur les préparations périssables et consommer dans les jours suivants."
   },
@@ -361,7 +370,8 @@ export const BREAKFAST_RECIPES: CuratedRecipe[] = [
     "ingredients": "180 g yaourt nature;120 g ananas;5 feuilles menthe",
     "steps": [
       "Verser le yaourt dans un bol.",
-      "Laver, découper et ajouter les garnitures juste avant de servir."
+      "Laver et découper les fruits et garnitures.",
+      "Les ajouter sur le yaourt juste avant de servir."
     ],
     "storage": "Conserver rapidement au réfrigérateur les préparations périssables et consommer dans les jours suivants."
   },

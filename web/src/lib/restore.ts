@@ -13,7 +13,7 @@ export function validateRestore(raw: unknown[]): EntryInput[] {
     const r = item as Record<string, unknown>;
     const module = r.module as ModuleId;
     if (typeof r.module !== 'string' || !moduleKinds.has(module) ||
-      typeof r.kind !== 'string' || !(moduleKinds.get(module)?.has(r.kind) || (module === 'quotidien' && r.kind === 'profile')) ||
+      typeof r.kind !== 'string' || !(moduleKinds.get(module)?.has(r.kind) || (module === 'quotidien' && (r.kind === 'profile' || r.kind === 'photo'))) ||
       typeof r.title !== 'string' || !r.title.trim() || r.title.length > 180 ||
       !(r.entry_date === null || (typeof r.entry_date === 'string' && datePattern.test(r.entry_date))) ||
       !r.data || typeof r.data !== 'object' || Array.isArray(r.data) ||
