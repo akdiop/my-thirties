@@ -27,6 +27,13 @@ const config: ExpoConfig = {
     'expo-secure-store',
     ['expo-sqlite', { useSQLCipher: true }],
     ['expo-local-authentication', { faceIDPermission: 'My thirties utilise Face ID pour déverrouiller vos données personnelles.' }],
+    ['expo-widgets', {
+      groupIdentifier: 'group.com.akdiop.mythirties',
+      widgets: [
+        { name: 'DayWidget', displayName: 'Ma journée', description: 'Priorités du jour, sur autorisation', supportedFamilies: ['systemSmall', 'systemMedium'] },
+        { name: 'LockWidget', displayName: 'My Thirties', description: 'Aperçu discret sur écran verrouillé', supportedFamilies: ['accessoryCircular', 'accessoryRectangular', 'accessoryInline'] },
+      ],
+    }],
     'expo-notifications',
     ['expo-calendar', { calendarPermission: 'My thirties affiche vos calendriers (Google, iCloud) dans son agenda, en lecture seule.' }],
     'expo-font',
