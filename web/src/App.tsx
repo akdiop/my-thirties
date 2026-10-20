@@ -21,6 +21,7 @@ import { PassionPath } from './features/PassionPath';
 import { TravelPlanner } from './features/TravelPlanner';
 import { PrayerPlanner } from './features/PrayerPlanner';
 import { PersonalBrief } from './features/PersonalBrief';
+import { RecipeIdeas } from './features/RecipeIdeas';
 
 type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -446,7 +447,7 @@ export default function App() {
           {currentModule.id === 'sante' && <HealthOverview entries={moduleEntries} />}
           {currentModule.id === 'quotidien' && <CalendarBoard entries={moduleEntries} onUpdate={updateData} />}
           {currentModule.id === 'finances' && <><FinanceSummary entries={moduleEntries} /><FinanceInsights entries={moduleEntries} /></>}
-          {currentModule.id === 'cuisine' && <><KitchenPlanner entries={moduleEntries} onCreate={createFromTool} onGenerate={createGroceries} /><KitchenTools entries={moduleEntries} onGenerate={createGroceries} /></>}
+          {currentModule.id === 'cuisine' && <><KitchenPlanner entries={moduleEntries} onCreate={createFromTool} onGenerate={createGroceries} /><KitchenTools entries={moduleEntries} onGenerate={createGroceries} /><RecipeIdeas entries={moduleEntries} onCreate={createFromTool} /></>}
           {currentModule.id === 'decouvertes' && <><TravelPlanner entries={moduleEntries} onUpdate={updateData} /><TravelTools entries={moduleEntries} onGenerate={createGroceries} /></>}
           {currentModule.id === 'sport' && <SportLibrary />}
           {currentModule.id === 'passions' && <PassionPath entries={moduleEntries} onUpdate={updateData} />}
