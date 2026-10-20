@@ -214,6 +214,23 @@ export default function Profil() {
         <ListRow label="Espaces affichés" value={`${enabledCount} sur 11`} onPress={() => router.push('/modules')} last />
       </Section>
 
+      <Section title="Widgets iPhone">
+        <ListRow
+          label="Afficher mes priorités dans les widgets"
+          right={<Switch
+            value={settings.widgetAgendaEnabled}
+            onValueChange={(enabled) => save('widgetAgendaEnabled', enabled)}
+            trackColor={{ true: c.secondary }}
+            accessibilityLabel="Afficher mes priorités dans les widgets iPhone"
+          />}
+        />
+        <View style={{ paddingVertical: 8 }}>
+          <AppText variant="caption" color={c.textMuted}>
+            Désactivé par défaut. Si activé, les titres de deux priorités peuvent rester visibles sur l’écran d’accueil même lorsque le téléphone est verrouillé. L’écran verrouillé n’affiche que leur nombre.
+          </AppText>
+        </View>
+      </Section>
+
       <Section title="Mes données">
         <View style={{ paddingVertical: 12, gap: 10 }}>
           <AppText variant="caption" color={c.textMuted}>Sauvegarde chiffrée. Conservez votre phrase secrète : elle ne pourra pas être récupérée. La restauration dans l’application reste à développer.</AppText>
