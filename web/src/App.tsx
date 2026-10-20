@@ -8,6 +8,9 @@ import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEnt
 import { downloadBackup, makeEncryptedBackup, parseEncryptedBackup } from './lib/backup';
 import { moduleById, modules, type Field, type Module } from './modules';
 import { validateRestore } from './lib/restore';
+import { CalendarBoard } from './features/CalendarBoard';
+import { BoosterPlan } from './features/BoosterPlan';
+import { SportLibrary } from './features/SportLibrary';
 
 type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -244,6 +247,7 @@ function EntryCard({ entry, module, onEdit, onDelete, onUpdate }: {
       </div>
     </div>
     {module.id === 'listes' && <Checklist entry={entry} onUpdate={onUpdate} />}
+    {module.id === 'equilibre' && entry.kind === 'booster' && <BoosterPlan entry={entry} onUpdate={onUpdate} />}
     {module.id === 'challenges' && <ChallengeCalendar key={entry.id} entry={entry} onUpdate={onUpdate} />}
     {module.id !== 'listes' && module.id !== 'challenges' && kind?.fields.filter((f) => f.type === 'textarea' && value(entry.data, f.id))
       .slice(0, 2).map((f) => <p key={f.id} className="entry-note"><strong>{f.label} : </strong>{value(entry.data, f.id)}</p>)}
@@ -416,9 +420,10 @@ export default function App() {
           <div className="module-title-row"><div><h1>{currentModule.name}</h1><p className="lead">{currentModule.description}</p></div><button className="button primary" onClick={() => setEditor({ module: currentModule })}><Plus size={17} /> Ajouter</button></div>
           {currentModule.sensitive && <p className="privacy-hint"><ShieldCheck size={16} /> Espace personnel sensible : données accessibles uniquement au compte autorisé. Ne saisis pas d'informations réelles avant validation de la sécurité.</p>}
           {currentModule.id === 'equilibre' && <CalmSpace />}
+          {currentModule.id === 'quotidien' && <CalendarBoard entries={moduleEntries} onUpdate={updateData} />}
           {currentModule.id === 'finances' && <FinanceSummary entries={moduleEntries} />}
           {currentModule.id === 'cuisine' && <KitchenTools entries={moduleEntries} onGenerate={createGroceries} />}
-          {currentModule.id === 'sport' && <div className="tool-card"><h3>Apprendre et progresser</h3><p>Tennis : coups, service, placement et tactique. Pilates : respiration, alignement et contrôle. Yoga : postures, mobilité et récupération.</p><p className="fineprint">Les tutoriels vérifiés et l'analyse de vidéos sont en préparation. L'application n'analyse pas encore tes mouvements.</p></div>}
+          {currentModule.id === 'sport' && <SportLibrary />}
           {currentModule.id === 'spiritualite' && <p className="privacy-hint"><BookOpen size={16} /> Les horaires de prière automatiques et les textes religieux vérifiés seront intégrés après configuration des sources.</p>}
           {currentModule.id === 'sante' && <p className="privacy-hint"><Heart size={16} /> Le suivi est informatif. Il ne constitue pas un diagnostic et ne remplace pas un professionnel de santé.</p>}
           <div className="section-row"><h2>Mes entrées <span className="count">{moduleEntries.length}</span></h2></div>
