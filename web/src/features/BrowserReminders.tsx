@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Entry } from '../lib/cloud';
+import { useIntegrationPrefs } from '../lib/integrations';
 
 const key = 'my-thirties-reminder-settings-v1';
 type Prefs = { enabled: boolean; minutes: number; };
@@ -16,6 +17,7 @@ const today = () => {
 const validTime = (value: unknown): value is string => typeof value === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 
 export function BrowserReminders({ entries }: { entries: Entry[] }) {
+  const { prefs: integration } = useIntegrationPrefs();
   const [prefs, setPrefs] = useState<Prefs>(readPrefs);
   const [message, setMessage] = useState('');
   const [now, setNow] = useState(() => Date.now());
@@ -23,10 +25,10 @@ export function BrowserReminders({ entries }: { entries: Entry[] }) {
   const supported = typeof Notification !== 'undefined' && window.isSecureContext;
   useEffect(() => { localStorage.setItem(key, JSON.stringify(prefs)); }, [prefs]);
   useEffect(() => {
-    if (!prefs.enabled || !supported || Notification.permission !== 'granted') return;
+    if (!integration.notifications || !prefs.enabled || !supported || Notification.permission !== 'granted') return;
     const interval = window.setInterval(() => setNow(Date.now()), 30000);
     return () => window.clearInterval(interval);
-  }, [prefs.enabled, supported]);
+  }, [integration.notifications, prefs.enabled, supported]);
   const reminders = useMemo(() => {
     const day = today();
     return entries.filter((e) => (e.module === 'quotidien' || (e.module === 'sante' && e.kind === 'appointment')) &&
@@ -45,8 +47,9 @@ export function BrowserReminders({ entries }: { entries: Entry[] }) {
       seen.add(k);
       try { new Notification('My Thirties · Rappel', { body: item.title, tag: k }); } catch { setMessage('Ce navigateur ne permet pas l’affichage de cette notification.'); }
     }
-  }, [now, reminders, prefs, supported, seen]);
+  }, [now, reminders, prefs, supported, seen, integration.notifications]);
   const activate = async () => {
+    if (!integration.notifications) { setMessage('Active les notifications dans le centre de confidentialité.'); return; }
     if (!supported) { setMessage('Les notifications ne sont pas prises en charge dans ce navigateur ou sans HTTPS.'); return; }
     try {
       const result = await Notification.requestPermission();
@@ -55,6 +58,7 @@ export function BrowserReminders({ entries }: { entries: Entry[] }) {
     } catch { setMessage('Impossible de demander la permission.'); }
   };
   return <section className="panel form-stack"><h2>Notifications de l'agenda</h2>
+    {!integration.notifications && <p className="privacy-hint">Active les notifications dans Profil → Centre de confidentialité.</p>}
     <p className="muted">Rappels locaux facultatifs pour les tâches, événements et rendez-vous avec une heure. Aucune information n'est transmise à un service de notifications.</p>
     <label>Délai avant l'événement<select value={prefs.minutes} onChange={(e) => setPrefs((p) => ({ ...p, minutes: Number(e.target.value) }))}>
       {[0, 5, 15, 30, 60].map((n) => <option key={n} value={n}>{n === 0 ? 'À l’heure prévue' : n + ' minutes avant'}</option>)}</select></label>
