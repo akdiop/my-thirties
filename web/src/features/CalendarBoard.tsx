@@ -13,7 +13,7 @@ function occurs(entry: Entry, date: Date): boolean {
   const key = iso(date);
   const frequency = String(entry.data.frequency || '');
   const origin = entry.entry_date || String(entry.data.date || '');
-  if (!origin) return false;
+  if (!origin) return entry.kind === 'routine' && frequency === 'Quotidienne';
   if (frequency === 'Quotidienne' && key >= origin) return true;
   if (frequency === 'Hebdomadaire' && key >= origin && dayOfWeek(parse(origin)) === dayOfWeek(date)) return true;
   return origin === key;
