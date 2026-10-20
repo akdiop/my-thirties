@@ -56,6 +56,7 @@ export const modules: Module[] = [
     id: 'spiritualite', name: 'Ma spiritualité', symbol: '☾', description: 'Prières, dhikr et lecture', sensitive: true,
     kinds: [
       { id: 'prayer', label: 'Prière', fields: [date, { id: 'prayer', label: 'Prière', type: 'select', options: ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'] }, note] },
+      { id: 'prayer_schedule', label: 'Horaires vérifiés (saisie manuelle)', fields: [date, { id: 'city', label: 'Ville', type: 'text' }, { id: 'source', label: 'Source consultée', type: 'text' }, ...['Fajr','Dhuhr','Asr','Maghrib','Isha'].map((name) => ({ id: name, label: name, type: 'time' as const }))] },
       { id: 'dhikr', label: 'Dhikr', fields: [date, note] },
       { id: 'invocation', label: 'Invocation personnelle', fields: [date, { id: 'text', label: 'Texte personnel', type: 'textarea' }, note] },
       { id: 'reading', label: 'Lecture', fields: [date, { id: 'surah', label: 'Sourate / passage', type: 'text' }, note] },
