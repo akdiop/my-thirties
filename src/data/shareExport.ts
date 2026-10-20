@@ -6,10 +6,11 @@ import { buildExport } from './exportData';
 import { encryptExport } from './encryptedExport';
 import type { OrganisationRepository } from './organisation';
 import type { Repository } from './repository';
+import type { WellbeingRepository } from './wellbeing';
 
-export async function shareExport(repo: Repository, org: OrganisationRepository, password: string) {
+export async function shareExport(repo: Repository, org: OrganisationRepository, wellbeing: WellbeingRepository, password: string) {
   const now = new Date();
-  const payload = buildExport({ ...repo.dumpAll(), ...org.dumpAll() }, now, Constants.expoConfig?.version ?? '0.0.0');
+  const payload = buildExport({ ...repo.dumpAll(), ...org.dumpAll(), ...wellbeing.dumpAll() }, now, Constants.expoConfig?.version ?? '0.0.0');
   const encrypted = await encryptExport(payload, password);
   const file = new File(Paths.cache, 'my-thirties-export-' + now.toISOString().slice(0, 10) + '.encrypted.json');
   if (file.exists) file.delete();
