@@ -16,6 +16,10 @@ import { TravelTools } from './features/TravelTools';
 import { FinanceInsights } from './features/FinanceInsights';
 import { HealthOverview } from './features/HealthOverview';
 import { EquilibriumInsights } from './features/EquilibriumInsights';
+import { KitchenPlanner } from './features/KitchenPlanner';
+import { PassionPath } from './features/PassionPath';
+import { TravelPlanner } from './features/TravelPlanner';
+import { PrayerPlanner } from './features/PrayerPlanner';
 
 type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -80,8 +84,8 @@ function Editor({ module, initial, onSave, onCancel, busy }: {
       const previous = Array.isArray(form.items) ? form.items as { id: string; text: string; checked: boolean }[] : [];
       const lines = String(form.itemsText ?? '').split('\n').map((x) => x.trim()).filter(Boolean);
       data.items = lines.map((text, index) => ({
-        id: previous[index]?.text === text ? previous[index].id : crypto.randomUUID(),
-        text, checked: previous[index]?.text === text ? previous[index].checked : false,
+        id: previous.find((x, j) => x.text === text && lines.slice(0, index).filter((v) => v === text).length === previous.slice(0, j).filter((v) => v.text === text).length)?.id ?? crypto.randomUUID(),
+        text, checked: previous.find((x, j) => x.text === text && lines.slice(0, index).filter((v) => v === text).length === previous.slice(0, j).filter((v) => v.text === text).length)?.checked ?? false,
       }));
     }
     if (module.id === 'challenges' && !initial) data.progress = {};
@@ -368,6 +372,10 @@ export default function App() {
       setEditor(null); await refresh();
     } finally { setWorking(false); }
   };
+  const createFromTool = async (input: EntryInput) => {
+    await createEntry(input);
+    await refresh();
+  };
   const updateData = async (entry: Entry, data: Record<string, unknown>) => {
     try { await editEntry(entry.id, { data }); await refresh(); }
     catch (e) { setError(e instanceof Error ? e.message : 'Mise à jour impossible.'); }
@@ -436,10 +444,11 @@ export default function App() {
           {currentModule.id === 'sante' && <HealthOverview entries={moduleEntries} />}
           {currentModule.id === 'quotidien' && <CalendarBoard entries={moduleEntries} onUpdate={updateData} />}
           {currentModule.id === 'finances' && <><FinanceSummary entries={moduleEntries} /><FinanceInsights entries={moduleEntries} /></>}
-          {currentModule.id === 'cuisine' && <KitchenTools entries={moduleEntries} onGenerate={createGroceries} />}
-          {currentModule.id === 'decouvertes' && <TravelTools entries={moduleEntries} onGenerate={createGroceries} />}
+          {currentModule.id === 'cuisine' && <><KitchenPlanner entries={moduleEntries} onCreate={createFromTool} onGenerate={createGroceries} /><KitchenTools entries={moduleEntries} onGenerate={createGroceries} /></>}
+          {currentModule.id === 'decouvertes' && <><TravelPlanner entries={moduleEntries} onUpdate={updateData} /><TravelTools entries={moduleEntries} onGenerate={createGroceries} /></>}
           {currentModule.id === 'sport' && <SportLibrary />}
-          {currentModule.id === 'spiritualite' && <p className="privacy-hint"><BookOpen size={16} /> Les horaires de prière automatiques et les textes religieux vérifiés seront intégrés après configuration des sources.</p>}
+          {currentModule.id === 'passions' && <PassionPath entries={moduleEntries} onUpdate={updateData} />}
+          {currentModule.id === 'spiritualite' && <><PrayerPlanner entries={moduleEntries} onCreate={createFromTool} /><p className="privacy-hint"><BookOpen size={16} /> Les horaires sont saisis manuellement avec leur source. Le calendrier hégirien et les textes vérifiés nécessitent encore une intégration.</p></>}
           {currentModule.id === 'sante' && <p className="privacy-hint"><Heart size={16} /> Le suivi est informatif. Il ne constitue pas un diagnostic et ne remplace pas un professionnel de santé.</p>}
           <div className="section-row"><h2>Mes entrées <span className="count">{moduleEntries.length}</span></h2></div>
           <label className="search-label">Rechercher dans cet espace<input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher par titre…" /></label>
