@@ -8,6 +8,7 @@ import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEnt
 import { downloadBackup, makeEncryptedBackup, parseEncryptedBackup } from './lib/backup';
 import { moduleById, modules, type Field, type Module } from './modules';
 import { validateRestore } from './lib/restore';
+import { consolidateIngredients } from './lib/groceries';
 import { CalendarBoard } from './features/CalendarBoard';
 import { BoosterPlan } from './features/BoosterPlan';
 import { SportLibrary } from './features/SportLibrary';
@@ -213,20 +214,28 @@ function CalmSpace() {
 function KitchenTools({ entries, onGenerate }: { entries: Entry[]; onGenerate: (title: string, items: string[]) => Promise<void> }) {
   const recipes = entries.filter((e) => e.kind === 'recipe');
   const [selected, setSelected] = useState<string[]>([]);
+  const [servings, setServings] = useState<Record<string, number>>({});
   if (!recipes.length) return null;
   const generate = async () => {
-    const ingredients = recipes.filter((r) => selected.includes(r.id))
-      .flatMap((r) => value(r.data, 'ingredients').split('\n').map((x) => x.trim()).filter(Boolean));
-    const unique = Array.from(new Map(ingredients.map((x) => [x.toLocaleLowerCase('fr-FR'), x])).values());
-    if (unique.length) await onGenerate('Courses pour mes recettes', unique);
+    const ingredients = consolidateIngredients(recipes.filter((r) => selected.includes(r.id)).map((r) => {
+      const base = Number(r.data.portions) || 1;
+      const desired = servings[r.id] || base;
+      return { lines: value(r.data, 'ingredients'), multiplier: desired / base };
+    }));
+    if (ingredients.length) await onGenerate('Courses pour mes recettes', ingredients);
     setSelected([]);
   };
   return <div className="tool-card">
     <h3>Ma liste de courses</h3><p className="muted">Sélectionne des recettes pour regrouper leurs ingrédients.</p>
     {recipes.map((r) => <label className="checklist-item" key={r.id}><input type="checkbox" checked={selected.includes(r.id)}
       onChange={(e) => setSelected((v) => e.target.checked ? [...v, r.id] : v.filter((id) => id !== r.id))} />{r.title}</label>)}
+    {recipes.filter((r) => selected.includes(r.id)).map((r) => <label key={r.id} className="serving-label">
+      Portions souhaitées pour {r.title}
+      <input type="number" min="1" max="50" step="1" value={servings[r.id] ?? Number(r.data.portions) || 1}
+        onChange={(e) => setServings((v) => ({ ...v, [r.id]: Number(e.target.value) }))} />
+    </label>)}
     <button className="button secondary" disabled={!selected.length} onClick={() => void generate()}>Créer la liste de courses</button>
-    <p className="fineprint">Vérifie les quantités : seuls les ingrédients identiques sont regroupés.</p>
+    <p className="fineprint">Les unités g/kg et ml/cl/l sont regroupées. Vérifie les ingrédients sans quantité reconnue.</p>
   </div>;
 }
 
