@@ -157,7 +157,7 @@ export function postponeFrom(plan: number[], day: number) {
 
 export function proposals(activeTemplateIds: string[], recentCompletion: number | null) {
   const easier = recentCompletion !== null && recentCompletion < 0.6;
-  return CHALLENGE_TEMPLATES.filter((t) => !activeTemplateIds.includes(t.id))
-    .slice(0, 6)
+  const available = CHALLENGE_TEMPLATES.filter((t) => !activeTemplateIds.includes(t.id));
+  return [...available.filter((t) => !t.id.startsWith('learning-')).slice(0, 3), ...available.filter((t) => t.id.startsWith('learning-')).slice(0, 3)]
     .map((t) => ({ template: t, easier, reason: easier ? 'Version allégée : le mois dernier a été chargé.' : 'Nouveau défi pour ce mois.' }));
 }
