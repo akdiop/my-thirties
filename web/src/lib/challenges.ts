@@ -1,3 +1,4 @@
+import { SUGGESTED_TEMPLATES } from './challengeSuggestions';
 import { circuit } from './exercises';
 
 export type ChallengeCategory = 'Sport' | 'Bien-être' | 'Habitudes' | 'Apprentissage' | 'Créativité' | 'Organisation';
@@ -22,6 +23,7 @@ const PILATES = ['The Hundred', 'Roll-up', 'Cercles de jambe', 'Pont (shoulder b
 const YOGA = ['Salutation au soleil', 'Chien tête en bas', 'Guerrier II', 'Arbre', 'Posture de l’enfant', 'Torsion assise', 'Pigeon', 'Relaxation finale'];
 
 export const TEMPLATES: ChallengeTemplate[] = [
+  ...SUGGESTED_TEMPLATES,
   {
     id: 'squats-30', category: 'Sport', discipline: 'Squats', title: 'Défi 30 jours Squats', tagline: 'Jambes · Fessiers · Posture', tone: 'chocolat',
     day: (n) => restEvery(n, 4) ? null : `3 séries de ${Math.min(40, 10 + 2 * Math.floor(activeBefore(n, 4) / 2))} squats, 1 min de pause entre les séries. Genoux dans l’axe des pieds.`,
