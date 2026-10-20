@@ -12,6 +12,7 @@ import { consolidateIngredients } from './lib/groceries';
 import { CalendarBoard } from './features/CalendarBoard';
 import { BoosterPlan } from './features/BoosterPlan';
 import { SportLibrary } from './features/SportLibrary';
+import { TravelTools } from './features/TravelTools';
 
 type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -376,7 +377,7 @@ export default function App() {
   const createGroceries = async (title: string, items: string[]) => {
     try {
       await createEntry({ module: 'listes', kind: 'list', title, entry_date: null, data: {
-        category: 'Courses', itemsText: items.join('\n'),
+        category: title.startsWith('Valise') ? 'Valise' : 'Courses', itemsText: items.join('\n'),
         items: items.map((text) => ({ id: crypto.randomUUID(), text, checked: false })),
       } });
       await refresh(); setScreen('listes');
@@ -432,6 +433,7 @@ export default function App() {
           {currentModule.id === 'quotidien' && <CalendarBoard entries={moduleEntries} onUpdate={updateData} />}
           {currentModule.id === 'finances' && <FinanceSummary entries={moduleEntries} />}
           {currentModule.id === 'cuisine' && <KitchenTools entries={moduleEntries} onGenerate={createGroceries} />}
+          {currentModule.id === 'decouvertes' && <TravelTools entries={moduleEntries} onGenerate={createGroceries} />}
           {currentModule.id === 'sport' && <SportLibrary />}
           {currentModule.id === 'spiritualite' && <p className="privacy-hint"><BookOpen size={16} /> Les horaires de prière automatiques et les textes religieux vérifiés seront intégrés après configuration des sources.</p>}
           {currentModule.id === 'sante' && <p className="privacy-hint"><Heart size={16} /> Le suivi est informatif. Il ne constitue pas un diagnostic et ne remplace pas un professionnel de santé.</p>}
