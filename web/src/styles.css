@@ -737,3 +737,67 @@ table{display:block;max-width:100%;overflow-x:auto}
   .lesson-grid,.brief-grid,.health-stats,.sport-stats,.booster-grid,.finance-filters{grid-template-columns:1fr !important}
   .button-group{flex-wrap:wrap}
 }
+/* Champs guidés */
+.gfield{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:.8rem;font-weight:600;color:#6B3F2E;min-width:0}
+.gfield legend{padding:0;margin-bottom:8px;font-size:.8rem;font-weight:600;color:#6B3F2E}
+.gfield legend small,.gfield>small{font-weight:400;color:#7A6355}
+.gchips{display:flex;flex-wrap:wrap;gap:8px}
+.gchips.kinds{padding-bottom:4px;border-bottom:1px solid #EFE5DA}
+.gchip{min-height:38px;padding:8px 14px;border-radius:999px;border:1px solid #E2D6C9;background:#FFFDF9;color:#2B1A12;font-size:.84rem;font-weight:500}
+.gchip.on{background:#5E7A5F;border-color:#5E7A5F;color:#fff;font-weight:600}
+.gchip.add{border-style:dashed;color:#6B3F2E}
+.gchips.small .gchip{min-height:32px;padding:5px 11px;font-size:.78rem}
+.gcustom{display:flex;gap:8px}.gcustom input{flex:1}
+.gscale{display:flex;gap:10px}
+.gdot{width:44px;height:44px;border-radius:22px;border:1.5px solid #D9C7B5;background:#FFFDF9;color:#6B3F2E;font-weight:600}
+.gdot.on{background:#B68F72;border-color:#B68F72;color:#fff}
+.gscale-legend{display:flex;justify-content:space-between;max-width:260px;font-size:.72rem;font-weight:400;color:#7A6355}
+.gstepper{display:flex;align-items:center;gap:8px}
+.gstepper button{width:44px;height:44px;border-radius:22px;border:0;background:#E9DCCF;color:#6B3F2E;display:grid;place-items:center;flex:none}
+.gstepper input{width:120px;text-align:center;font-weight:600;font-variant-numeric:tabular-nums}
+.gunit{font-weight:500;color:#7A6355}
+.gnote{border-top:1px solid #EFE5DA;padding-top:6px}
+.gnote summary{cursor:pointer;color:#6B3F2E;font-weight:600;font-size:.82rem;padding:6px 0;list-style:none}
+.gnote summary::before{content:'+ '}
+.gnote[open] summary::before{content:'− '}
+.gnote textarea{width:100%;margin-top:6px}
+/* Parcours d'apprentissage */
+.learning{display:flex;flex-direction:column;gap:14px}
+.active-path{background:#FFFDF9;border:1px solid #EFE5DA;border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.path-list{display:flex;flex-direction:column}
+.path-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #EFE5DA}
+.path-item .button{padding:8px 12px;min-height:38px;font-size:.78rem;flex:none}
+.steps{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.step{border-radius:14px;background:#FAF7F2;border:1px solid #EFE5DA}
+.step.current{border-color:#B68F72;background:#FFFDF9}
+.step-head{width:100%;display:flex;align-items:center;gap:12px;padding:12px;border:0;background:transparent;text-align:left;color:#2B1A12}
+.step-num{width:30px;height:30px;border-radius:15px;display:grid;place-items:center;flex:none;font-weight:600;font-size:.82rem;border:1.5px solid #D9C7B5;color:#6B3F2E}
+.step.done .step-num{background:#5E7A5F;border-color:#5E7A5F;color:#fff}
+.step.current .step-num{background:#B68F72;border-color:#B68F72;color:#fff}
+.step-title{flex:1;display:flex;flex-direction:column;min-width:0}
+.step-title strong{font-size:.9rem}.step-title small{font-size:.74rem;color:#7A6355}
+.step.done .step-title strong{color:#5C4A3F}
+.step-head .chev{color:#B29B88;transition:transform .15s}
+.step-head[aria-expanded=true] .chev{transform:rotate(180deg)}
+.step-body{padding:0 14px 14px 54px;display:flex;flex-direction:column;gap:10px}
+.step-tasks{margin:0;padding-left:16px;font-size:.84rem;line-height:1.5;color:#3C2B22}
+.phrases{background:#F3E9DF;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.eyebrow-s{display:flex;align-items:center;gap:6px;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:#6B3F2E}
+.phrase{display:flex;align-items:center;gap:8px}
+.phrase>div{flex:1;display:flex;flex-direction:column}
+.phrase strong{font-size:.88rem;color:#2B1A12}.phrase small{font-size:.74rem;color:#7A6355}
+/* Séries */
+.series{display:flex;flex-direction:column;gap:12px}
+.series-card{background:#FFFDF9;border:1px solid #EFE5DA;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.series-head{display:flex;align-items:center;gap:12px}
+.series-badge{width:42px;height:42px;border-radius:12px;background:#3C2116;color:#D4B483;display:grid;place-items:center;font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;flex:none}
+.series-title{flex:1;display:flex;flex-direction:column;min-width:0}
+.series-title strong{font-size:.95rem}.series-title small{font-size:.74rem;color:#7A6355}
+.series-status{font-size:.7rem;font-weight:600;padding:4px 9px;border-radius:999px;background:#F3E9DF;color:#6B3F2E}
+.series-status.s-encours{background:#E8EDE2;color:#3D5443}
+.series-status.s-terminée{background:#5E7A5F;color:#fff}
+.series-progress{display:flex;justify-content:space-between;font-size:.84rem;font-weight:600}
+.series-progress small{font-weight:400;color:#7A6355}
+.series-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.ep-label{font-size:.82rem;font-weight:600;color:#6B3F2E}
+.stars{display:flex;gap:2px}.stars button{border:0;background:transparent;padding:4px}

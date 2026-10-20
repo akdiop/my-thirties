@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
 import { downloadBackup, makeEncryptedBackup, parseEncryptedBackup } from './lib/backup';
-import { moduleById, modules, type Field, type Module } from './modules';
+import { moduleById, modules, type Module } from './modules';
 import { validateRestore } from './lib/restore';
 import { consolidateIngredients } from './lib/groceries';
 import { BoosterPlan } from './features/BoosterPlan';
@@ -39,7 +39,10 @@ import { Calm } from './screens/Calm';
 import { HealthTop } from './screens/HealthTop';
 import { FinanceTop } from './screens/FinanceTop';
 import { CuisineTop, EquilibreTop, SpiritTop, TravelTop, type CuisineTab, type EquilibreTab, type SpiritTab } from './screens/ModuleTops';
-import { ScreenHeader, SectionTitle } from './ui/kit';
+import { ScreenHeader, SectionTitle, Segmented } from './ui/kit';
+import { GuidedField } from './ui/fields';
+import { LearningPaths } from './features/LearningPaths';
+import { SeriesTracker } from './features/SeriesTracker';
 
 type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -91,15 +94,19 @@ type Preset = { kind: string; data: Record<string, string>; title?: string };
 function Editor({ module, initial, preset, onSave, onCancel, busy }: {
   module: Module; initial?: Entry; preset?: Preset; onSave: (input: EntryInput, id?: string) => Promise<void>; onCancel: () => void; busy: boolean;
 }) {
-  const [kindId, setKindId] = useState(initial?.kind ?? (preset && module.kinds.some((k) => k.id === preset.kind) ? preset.kind : module.kinds[0]!.id));
+  const [kindId, setKindId] = useState(initial?.kind ?? (preset && module.kinds.some((k) => k.id === preset.kind) ? preset.kind : module.kinds.find((k) => !k.hidden)!.id));
   const [title, setTitle] = useState(initial?.title ?? preset?.title ?? '');
-  const [form, setForm] = useState<Record<string, DataValue>>(initial?.data as Record<string, DataValue> ?? preset?.data ?? {});
+  const [form, setForm] = useState<Record<string, DataValue>>(initial?.data as Record<string, DataValue> ?? { date: today(), start: today(), ...(preset?.data ?? {}) });
   const [error, setError] = useState('');
   const kind = module.kinds.find((k) => k.id === kindId) ?? module.kinds[0]!;
   const update = (id: string, val: string) => setForm((f) => ({ ...f, [id]: val }));
   const submit = async (event: FormEvent) => {
     event.preventDefault(); setError('');
-    if (!title.trim()) return setError('Ajoute un titre.');
+    const flat = Object.fromEntries(Object.entries(form).map(([k, v]) => [k, typeof v === 'string' ? v : ''])) as Record<string, string>;
+    const finalTitle = title.trim() || kind.title?.(flat).trim().replace(/\s·\s*$/, '') || '';
+    if (!finalTitle) return setError('Ajoute un titre.');
+    const missing = kind.fields.find((f) => !f.optional && ['chips', 'select'].includes(f.type) && f.id !== 'frequency' && !flat[f.id] && ['mood', 'prayer', 'category', 'axis', 'status', 'emotion'].includes(f.id));
+    if (missing) return setError('Choisis : ' + missing.label.toLowerCase() + '.');
     const data: Record<string, unknown> = { ...form };
     if (module.id === 'listes') {
       const previous = Array.isArray(form.items) ? form.items as { id: string; text: string; checked: boolean }[] : [];
@@ -112,39 +119,28 @@ function Editor({ module, initial, preset, onSave, onCancel, busy }: {
     if (module.id === 'challenges' && !initial) data.progress = {};
     const entryDate = typeof data.date === 'string' && data.date ? data.date
       : typeof data.start === 'string' && data.start ? data.start : null;
-    try { await onSave({ module: module.id, kind: kind.id, title: title.trim(), entry_date: entryDate, data }, initial?.id); }
+    try { await onSave({ module: module.id, kind: kind.id, title: finalTitle, entry_date: entryDate, data }, initial?.id); }
     catch (e) { setError(e instanceof Error ? e.message : 'Enregistrement impossible.'); }
   };
   return (
     <div className="modal-overlay" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel(); }}>
       <section className="editor" role="dialog" aria-modal="true" aria-label={initial ? 'Modifier une entrée' : 'Nouvelle entrée'}>
-        <div className="editor-head"><h2>{initial ? 'Modifier' : 'Nouvelle entrée'}</h2><button className="icon-button" onClick={onCancel} aria-label="Fermer"><X size={20} /></button></div>
+        <div className="editor-head"><h2>{initial ? 'Modifier' : module.name}</h2><button className="icon-button" onClick={onCancel} aria-label="Fermer"><X size={20} /></button></div>
         <form onSubmit={submit} className="form-stack">
-          <label>Type
-            <select value={kindId} disabled={Boolean(initial)} onChange={(e) => { setKindId(e.target.value); setForm({}); }}>
-              {module.kinds.map((k) => <option key={k.id} value={k.id}>{k.label}</option>)}
-            </select>
-          </label>
-          <label>Titre<input autoFocus maxLength={180} required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Donner un nom…" /></label>
-          {kind.fields.map((field) => <FieldInput key={field.id} field={field} current={String(form[field.id] ?? '')} onChange={(v) => update(field.id, v)} />)}
+          {module.kinds.filter((k) => !k.hidden).length > 1 && !initial && <div className="gchips kinds" role="radiogroup" aria-label="Type">
+            {module.kinds.filter((k) => !k.hidden).map((k) => <button type="button" key={k.id} role="radio" aria-checked={k.id === kindId} className={'gchip' + (k.id === kindId ? ' on' : '')}
+              onClick={() => { setKindId(k.id); setForm({ date: today(), start: today(), ...(preset?.kind === k.id ? preset.data : {}) }); }}>{k.label}</button>)}
+          </div>}
+          <label className="gfield">{kind.title ? 'Titre (facultatif)' : 'Titre'}
+            <input maxLength={180} value={title} onChange={(e) => setTitle(e.target.value)}
+              placeholder={kind.title ? (kind.title(Object.fromEntries(Object.entries(form).map(([k, v]) => [k, typeof v === 'string' ? v : '']))).replace(/\s·\s*$/, '') || 'Rempli automatiquement') : 'Donner un nom…'} /></label>
+          {kind.fields.map((field) => <GuidedField key={kind.id + field.id} field={field} value={String(form[field.id] ?? '')} onChange={(v) => update(field.id, v)} />)}
           {error && <p role="alert" className="error">{error}</p>}
           <div className="editor-actions"><button type="button" className="button ghost" onClick={onCancel}>Annuler</button><button className="button primary" type="submit" disabled={busy}><Save size={16} /> {busy ? 'Enregistrement…' : 'Enregistrer'}</button></div>
         </form>
       </section>
     </div>
   );
-}
-
-function FieldInput({ field, current, onChange }: { field: Field; current: string; onChange: (value: string) => void }) {
-  return <label>{field.label}
-    {field.type === 'textarea' ? <textarea rows={4} value={current} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder ?? ''} /> :
-      field.type === 'select' ? <select value={current} onChange={(e) => onChange(e.target.value)}>
-        <option value="">Choisir…</option>{field.options?.map((x) => <option key={x} value={x}>{x}</option>)}
-      </select> :
-      <input type={field.type} value={current} onChange={(e) => onChange(e.target.value)}
-        step={field.type === 'number' ? 'any' : undefined} min={field.type === 'number' ? '0' : undefined}
-        placeholder={field.placeholder ?? ''} />}
-  </label>;
 }
 
 function ChallengeCalendar({ entry, onUpdate }: { entry: Entry; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void> }) {
@@ -346,6 +342,7 @@ export default function App() {
   const [travelTab, setTravelTab] = useState<'destinations' | 'voyage'>('destinations');
   const [equilibreTab, setEquilibreTab] = useState<EquilibreTab>('axes');
   const [spiritTab, setSpiritTab] = useState<SpiritTab>('home');
+  const [passionTab, setPassionTab] = useState<'parcours' | 'series' | 'libre'>('parcours');
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -475,10 +472,15 @@ export default function App() {
         {currentModule.id === 'spiritualite' && <><SpiritTop tab={spiritTab} onTab={setSpiritTab} entries={allModuleEntries} onCreate={createFromTool} onRemove={removeQuiet} />
           {spiritTab === 'horaires' && <><AutomaticPrayerTimes entries={allModuleEntries} onCreate={createFromTool} /><PrayerPlanner entries={allModuleEntries} onCreate={createFromTool} />
             <p className="disclaimer"><BookOpen size={14} /> Les horaires automatiques nécessitent une connexion et une ville choisie. Les calculs peuvent varier selon les sources locales.</p></>}</>}
-        {currentModule.id === 'passions' && <PassionPath entries={allModuleEntries} onUpdate={updateData} />}
+        {currentModule.id === 'passions' && <>
+          <Segmented label="Passions" value={passionTab} onChange={setPassionTab} options={[{ value: 'parcours', label: 'Parcours' }, { value: 'series', label: 'Séries' }, { value: 'libre', label: 'Hobby libre' }]} />
+          {passionTab === 'parcours' && <LearningPaths entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} />}
+          {passionTab === 'series' && <SeriesTracker entries={allModuleEntries} onUpdate={updateData} onAdd={() => addIn('passions', 'series', { status: 'À voir', seasons: '1', episodes: '10' })} />}
+          {passionTab === 'libre' && <PassionPath entries={allModuleEntries} onUpdate={updateData} />}
+        </>}
         {(['sport', 'cuisine', 'decouvertes', 'passions'] as const).includes(currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions') && <MediaGallery ownerId={session.user.id} module={currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions'} entries={allModuleEntries.map((e) => ({ id: e.id, title: e.title }))} />}
         {currentModule.id === 'sante' && <p className="disclaimer"><Heart size={14} /> Le suivi est informatif. Il ne constitue pas un diagnostic et ne remplace pas un professionnel de santé.</p>}
-        {!(currentModule.id === 'spiritualite' && spiritTab === 'home') && currentModule.id !== 'challenges' && entryList}
+        {!(currentModule.id === 'spiritualite' && spiritTab === 'home') && currentModule.id !== 'challenges' && !(currentModule.id === 'passions' && passionTab !== 'libre') && entryList}
       </div>}
     </main>
     {(tabScreen || currentModule) && screen !== 'calme' && <nav className="tabbar" aria-label="Navigation principale">{nav.map(({ id, label, icon: Icon }) => {

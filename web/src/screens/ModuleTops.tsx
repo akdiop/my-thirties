@@ -126,7 +126,7 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onRemove }: { tab: Sp
       <button className="dhikr-btn" onClick={() => setCount((c) => c + 1)} aria-label={'Compter ' + phrase}><strong>{count}</strong><small>{phrase}</small><span className="dhikr-ring" style={{ background: `conic-gradient(#5E7A5F ${Math.min(1, count / 33) * 360}deg, #E3E8DB 0)` }} /></button>
       <p className="muted center">{count >= 33 ? '33 atteints · continue librement' : `${33 - count} pour atteindre 33`}</p>
       <div className="two-btn"><button className="button ghost" onClick={() => setCount(0)}>Remettre à zéro</button>
-        <button className="button primary" disabled={!count || saving} onClick={async () => { setSaving(true); try { await onCreate({ module: 'spiritualite', kind: 'dhikr', title: `${phrase} · ${count}`, entry_date: day, data: { date: day, notes: `${count} × ${phrase}` } }); setCount(0); } finally { setSaving(false); } }}>Enregistrer</button></div>
+        <button className="button primary" disabled={!count || saving} onClick={async () => { setSaving(true); try { await onCreate({ module: 'spiritualite', kind: 'dhikr', title: `${phrase} · ${count}`, entry_date: day, data: { date: day, phrase, count: String(count) } }); setCount(0); } finally { setSaving(false); } }}>Enregistrer</button></div>
     </div>}
     {tab === 'hijri' && <div className="soft-card hijri-card">{Array.from({ length: 7 }, (_, i) => { const d = new Date(Date.now() + i * 86_400_000); return <div className="prio-row" key={i}>
       <span>{d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'short' })}</span><small>{hijri(d)}</small></div>; })}
