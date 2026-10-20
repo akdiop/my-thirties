@@ -284,3 +284,16 @@ textarea{resize:vertical;min-height:90px}
 .sport-stats .stat-card{background:#f0f1e9}
 .sport-stats strong{font-size:1rem}
 @media(max-width:760px){.sport-stats{grid-template-columns:1fr}}
+
+.calendar-export{margin:12px 0 17px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.calendar-export .fineprint{flex:1;min-width:220px;margin:0}
+.ai-assistant{margin-top:18px}
+.ai-assistant .checklist-item{display:flex;flex-direction:row;align-items:flex-start;font-weight:400;line-height:1.55}
+.ai-assistant .checklist-item input{width:18px;min-height:18px;flex-shrink:0;margin-top:3px}
+.ai-answer{background:#f0f1e9;border-radius:12px;padding:17px;margin:15px 0;white-space:pre-line;overflow-wrap:anywhere}
+.ai-answer p{margin:9px 0 0}
+.video-analysis{margin:15px 0}
+.video-stage{position:relative;max-width:700px;background:#221c19;border-radius:12px;overflow:hidden}
+.video-stage video{display:block;width:100%;max-height:420px;object-fit:contain}
+.video-stage canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.video-analysis .button-group{margin:12px 0}
