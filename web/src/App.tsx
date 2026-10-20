@@ -25,6 +25,10 @@ import { RecipeIdeas } from './features/RecipeIdeas';
 import { SportProgress } from './features/SportProgress';
 import { ChallengeIdeas } from './features/ChallengeIdeas';
 import { BalanceReview } from './features/BalanceReview';
+import { AutomaticPrayerTimes } from './features/AutomaticPrayerTimes';
+import { BrowserReminders } from './features/BrowserReminders';
+import { PersonalAssistant } from './features/PersonalAssistant';
+import { LocalVideoPose } from './features/LocalVideoPose';
 
 type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -329,7 +333,8 @@ function Profile({ email, entries, onLogout, onRestored }: { email: string; entr
       <p className="fineprint">La restauration ajoute les entrées au compte. Elle ne supprime pas les données existantes et peut créer des doublons. Vérifie toujours ton fichier de sauvegarde.</p>
       {message && <p role="status">{message}</p>}
     </section>
-    <section className="panel"><h2>À propos de cette version</h2><p className="muted">Application web privée en cours de développement. Certaines intégrations (calendriers externes, horaires automatiques de prière, vidéos et assistant IA) nécessitent encore une configuration et des tests.</p></section>
+    <BrowserReminders entries={entries} />
+    <section className="panel"><h2>À propos de cette version</h2><p className="muted">Application web privée en cours de développement. L'export d'agenda est manuel ; les notifications web ne fonctionnent qu'avec la page ouverte. L'assistant IA nécessite un déploiement sécurisé et l'analyse vidéo reste expérimentale. La synchronisation iOS native est encore à réaliser.</p></section>
   </div>;
 }
 
@@ -436,6 +441,7 @@ export default function App() {
             <button className="button light" onClick={() => setEditor({ module: moduleById('quotidien') })}><Plus size={17} /> Ajouter une tâche</button>
           </div>
           <PersonalBrief entries={entries} onGo={go} />
+          <PersonalAssistant />
           <div className="section-row"><h2>Mes prochains rendez-vous</h2><button className="text-button" onClick={() => go('quotidien')}>Voir l'agenda <ChevronRight size={15} /></button></div>
           <div className="upcoming">{upcoming.length ? upcoming.map((e) => <div className="upcoming-item" key={e.id}><span className="date-chip">{humanDate(e.entry_date)}</span><strong>{e.title}</strong><span className="muted">{moduleById(e.module).name}</span></div>) : <p className="muted">Aucun événement à venir.</p>}</div>
           <div className="section-row"><h2>Mes espaces</h2><button className="text-button" onClick={() => go('spaces')}>Tout voir <ChevronRight size={15} /></button></div>
@@ -454,10 +460,10 @@ export default function App() {
           {currentModule.id === 'finances' && <><FinanceSummary entries={moduleEntries} /><FinanceInsights entries={moduleEntries} /></>}
           {currentModule.id === 'cuisine' && <><KitchenPlanner entries={moduleEntries} onCreate={createFromTool} onGenerate={createGroceries} /><KitchenTools entries={moduleEntries} onGenerate={createGroceries} /><RecipeIdeas entries={moduleEntries} onCreate={createFromTool} /></>}
           {currentModule.id === 'decouvertes' && <><TravelPlanner entries={moduleEntries} onUpdate={updateData} /><TravelTools entries={moduleEntries} onGenerate={createGroceries} /></>}
-          {currentModule.id === 'sport' && <><SportLibrary /><SportProgress entries={moduleEntries} /></>}
+          {currentModule.id === 'sport' && <><SportLibrary /><SportProgress entries={moduleEntries} /><LocalVideoPose /></>}
           {currentModule.id === 'challenges' && <ChallengeIdeas entries={moduleEntries} onCreate={createFromTool} />}
           {currentModule.id === 'passions' && <PassionPath entries={moduleEntries} onUpdate={updateData} />}
-          {currentModule.id === 'spiritualite' && <><PrayerPlanner entries={moduleEntries} onCreate={createFromTool} /><p className="privacy-hint"><BookOpen size={16} /> Les horaires sont saisis manuellement avec leur source. Le calendrier hégirien et les textes vérifiés nécessitent encore une intégration.</p></>}
+          {currentModule.id === 'spiritualite' && <><AutomaticPrayerTimes entries={moduleEntries} onCreate={createFromTool} /><PrayerPlanner entries={moduleEntries} onCreate={createFromTool} /><p className="privacy-hint"><BookOpen size={16} /> Les horaires automatiques nécessitent une connexion et une ville choisie. Les calculs peuvent varier selon les sources locales.</p></>}
           {currentModule.id === 'sante' && <p className="privacy-hint"><Heart size={16} /> Le suivi est informatif. Il ne constitue pas un diagnostic et ne remplace pas un professionnel de santé.</p>}
           <div className="section-row"><h2>Mes entrées <span className="count">{moduleEntries.length}</span></h2></div>
           <label className="search-label">Rechercher dans cet espace<input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher par titre…" /></label>
