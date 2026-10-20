@@ -1,3 +1,5 @@
+import { circuit } from './exercises';
+
 export type ChallengeCategory = 'Sport' | 'Bien-être' | 'Habitudes';
 export const CATEGORIES: ChallengeCategory[] = ['Sport', 'Bien-être', 'Habitudes'];
 
@@ -21,6 +23,10 @@ const YOGA = ['Salutation au soleil', 'Chien tête en bas', 'Guerrier II', 'Arbr
 
 export const TEMPLATES: ChallengeTemplate[] = [
   {
+    id: 'squats-30', category: 'Sport', discipline: 'Squats', title: 'Défi 30 jours Squats', tagline: 'Jambes · Fessiers · Posture', tone: 'chocolat',
+    day: (n) => restEvery(n, 4) ? null : `3 séries de ${Math.min(40, 10 + 2 * Math.floor(activeBefore(n, 4) / 2))} squats, 1 min de pause entre les séries. Genoux dans l’axe des pieds.`,
+  },
+  {
     id: 'pilates-30', category: 'Sport', discipline: 'Pilates', title: 'Défi 30 jours Pilates', tagline: 'Renforcer · Équilibrer · Respirer', tone: 'caramel',
     day: (n) => {
       if (restEvery(n, 4)) return null;
@@ -31,12 +37,20 @@ export const TEMPLATES: ChallengeTemplate[] = [
     },
   },
   {
-    id: 'squats-30', category: 'Sport', discipline: 'Mobilité', title: 'Défi 30 jours Squats', tagline: 'Jambes · Fessiers · Posture', tone: 'chocolat',
-    day: (n) => restEvery(n, 4) ? null : `3 séries de ${Math.min(40, 10 + 2 * Math.floor(activeBefore(n, 4) / 2))} squats, 1 min de pause entre les séries. Genoux dans l’axe des pieds.`,
+    id: 'gainage-30', category: 'Sport', discipline: 'Gainage', title: 'Défi 30 jours Gainage', tagline: 'Centre · Stabilité · Dos', tone: 'sable',
+    day: (n) => restEvery(n, 4) ? null : `3 planches de ${Math.min(75, 20 + 5 * Math.floor(activeBefore(n, 4) / 2))} secondes sur les avant-bras. Bassin aligné, respiration fluide.`,
   },
   {
-    id: 'gainage-30', category: 'Sport', discipline: 'Pilates', title: 'Défi 30 jours Gainage', tagline: 'Centre · Stabilité · Dos', tone: 'sable',
-    day: (n) => restEvery(n, 4) ? null : `3 planches de ${Math.min(75, 20 + 5 * Math.floor(activeBefore(n, 4) / 2))} secondes sur les avant-bras. Bassin aligné, respiration fluide.`,
+    id: 'abdos-30', category: 'Sport', discipline: 'Abdos', title: 'Défi 30 jours Abdos', tagline: 'Ventre · Centre · Posture', tone: 'sable',
+    day: (n) => restEvery(n, 4) ? null : `2 tours : ${circuit('Abdos', activeBefore(n, 4), { reps: 10, sec: 20 }, { reps: 24, sec: 45 }).join(' · ')}. 45 s de pause entre les tours.`,
+  },
+  {
+    id: 'bras-30', category: 'Sport', discipline: 'Bras', title: 'Défi 30 jours Bras', tagline: 'Tonifier · Renforcer · Sculpter', tone: 'chocolat',
+    day: (n) => restEvery(n, 3) ? null : `2 tours : ${circuit('Bras', activeBefore(n, 3), { reps: 8, sec: 20 }, { reps: 20, sec: 40 }).join(' · ')}. Bouteilles d’eau ou haltères légers.`,
+  },
+  {
+    id: 'fessiers-30', category: 'Sport', discipline: 'Fessiers', title: 'Défi 30 jours Fessiers', tagline: 'Galber · Stabiliser · Tonifier', tone: 'caramel',
+    day: (n) => restEvery(n, 4) ? null : `2 tours : ${circuit('Jambes & fessiers', activeBefore(n, 4), { reps: 12, sec: 20 }, { reps: 30, sec: 60 }).join(' · ')}. Par jambe pour les fentes et les kicks.`,
   },
   {
     id: 'yoga-30', category: 'Sport', discipline: 'Yoga', title: 'Défi 30 jours Yoga', tagline: 'Souplesse · Souffle · Présence', tone: 'sauge',

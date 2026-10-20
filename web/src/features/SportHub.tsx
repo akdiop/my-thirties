@@ -130,7 +130,8 @@ export function SportHub({ entries, challengeEntries, onCreate, onGoChallenges }
 }
 
 function ProgramList({ discipline, challengeEntries, onCreate, onGo }: { discipline: Discipline; challengeEntries: Entry[]; onCreate: (input: EntryInput) => Promise<void>; onGo: () => void }) {
-  const programs = TEMPLATES.filter((t) => t.category === 'Sport' && (t.discipline === discipline || (discipline === 'Pilates' && t.id === 'squats-30')));
+  const ids: Record<Discipline, string[]> = { Pilates: ['pilates-30', 'gainage-30', 'abdos-30', 'fessiers-30'], Yoga: ['yoga-30'], Tennis: ['squats-30', 'bras-30', 'gainage-30'] };
+  const programs = TEMPLATES.filter((t) => ids[discipline].includes(t.id));
   const started = new Set(challengeEntries.map((e) => e.data.template));
   const [busy, setBusy] = useState('');
   if (!programs.length) return <p className="muted">Pas encore de programme {discipline.toLowerCase()} : crée ton propre défi dans Mes challenges.</p>;

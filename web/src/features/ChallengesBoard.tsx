@@ -3,6 +3,7 @@ import { Check, ChevronRight } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { CATEGORIES, dayNumber, templateById, templateLength, TEMPLATES, type ChallengeCategory } from '../lib/challenges';
 import { HeroPhoto } from './HeroPhoto';
+import { EXERCISES, GROUPS, type ExerciseGroup } from '../lib/exercises';
 
 type Progress = Record<string, { status: string; notes?: string }>;
 const today = () => new Date().toLocaleDateString('en-CA');
@@ -46,7 +47,19 @@ export function ChallengesBoard({ entries, onCreate, onUpdate }: { entries: Entr
           <button className="button ghost" disabled={Boolean(busy) || startedIds.has(t.id)} onClick={() => void start(t.id)}>
             {startedIds.has(t.id) ? 'En cours' : busy === t.id ? '…' : 'Commencer'}</button></div>
       </article>)}</div>
+    {tab === 'Sport' && <ExerciseLibrary />}
   </section>;
+}
+
+function ExerciseLibrary() {
+  const [group, setGroup] = useState<ExerciseGroup>('Abdos');
+  return <div className="exercise-library">
+    <h3 className="board-subtitle">Bibliothèque d’exercices</h3>
+    <div className="challenge-switch">{GROUPS.map((g) => <button key={g} className={g === group ? 'active' : ''} onClick={() => setGroup(g)}>{g}</button>)}</div>
+    <div className="lesson-grid">{EXERCISES[group].map((ex) => <article className="lesson-card exercise-card" key={ex.name}>
+      <h3>{ex.name}</h3><p>{ex.how}</p><p className="exercise-tip">{ex.tip}</p></article>)}</div>
+    <p className="fineprint">Au poids du corps ou avec des bouteilles d’eau. Échauffe-toi, respire et arrête un exercice douloureux ; en cas de doute, demande conseil à un professionnel.</p>
+  </div>;
 }
 
 function ActiveChallenge({ entry, onUpdate }: { entry: Entry; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void> }) {

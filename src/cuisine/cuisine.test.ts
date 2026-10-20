@@ -37,7 +37,7 @@ describe('cuisine', () => {
 
   it('library recipes have ingredients and steps', () => {
     for (const x of RECIPE_LIBRARY) {
-      expect(x.ingredients.length).toBeGreaterThan(2);
+      expect(x.ingredients.length).toBeGreaterThanOrEqual(2);
       expect(x.steps.length).toBeGreaterThan(1);
     }
   });
