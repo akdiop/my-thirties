@@ -14,7 +14,7 @@ const LockView = (props: LockWidgetProps, environment: WidgetEnvironment) => {
   }
   return (
     <VStack spacing={3}>
-      <Text modifiers={[font({ weight: 'semibold', size: 14 }), foregroundStyle('#1A3C34')]}>My Thirties</Text>
+      <Text modifiers={[font({ weight: 'semibold', size: 14 }), foregroundStyle('#5A392B')]}>My Thirties</Text>
       <Text modifiers={[font({ size: 12 })]}>{props.showCount ? props.countLabel : 'Mon espace personnel'}</Text>
     </VStack>
   );
