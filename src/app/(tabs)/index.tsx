@@ -8,6 +8,7 @@ import { CalmButton } from '@/components/CalmButton';
 import { PlannedCard } from '@/components/PlannedCard';
 import { AppText, Card, Checkbox, ProgressBar, Screen } from '@/components/ui';
 import { AgendaItemRow } from '@/features/agenda/AgendaItemRow';
+import { challengeView, formatAmount } from '@/features/challengeView';
 import { useAgenda } from '@/features/agenda/useAgenda';
 import { useData, useMutate } from '@/hooks/useData';
 import { useToday } from '@/hooks/useToday';
@@ -47,6 +48,16 @@ export default function Accueil() {
         .listRoutines()
         .filter((r) => isScheduledOn(r.weekdays, today))
         .map((r) => ({ ...r, progress: routineProgress(org.listRoutineItems(r.id).map((i) => i.id), org.checksFor(r.id, today)) })),
+    [today],
+  );
+
+  const challenges = useData(
+    ({ well }) =>
+      well
+        .listChallenges('active')
+        .map((ch) => ({ ch, view: challengeView(ch, well.recordedStatuses(ch.id), today) }))
+        .filter(({ view }) => view.todayState === 'today')
+        .map(({ ch, view }) => `${ch.title} · ${ch.sets} × ${formatAmount(view.todayValue ?? 0, ch.unit)}`),
     [today],
   );
 
@@ -107,14 +118,15 @@ export default function Accueil() {
         </Pressable>
       ))}
 
-      <View style={{ flexDirection: 'row', gap: 12 }}>
-        <View style={{ flex: 1 }}>
-          <PlannedCard title="Challenges" phase={3}>Vos calendriers de 30 jours.</PlannedCard>
-        </View>
-        <View style={{ flex: 1 }}>
-          <PlannedCard title="Budget" phase={4}>Ce qu’il reste ce mois-ci.</PlannedCard>
-        </View>
-      </View>
+      {challenges.length ? (
+        <Pressable accessibilityRole="button" onPress={() => router.navigate('/bien-etre')}>
+          <Card tone="sage" style={{ gap: 4 }}>
+            <AppText style={{ fontFamily: 'Inter_600SemiBold' }}>Challenges du jour</AppText>
+            <AppText variant="caption">{challenges.join(' · ')}</AppText>
+          </Card>
+        </Pressable>
+      ) : null}
+      <PlannedCard title="Budget" phase={4}>Ce qu’il reste ce mois-ci.</PlannedCard>
     </Screen>
   );
 }

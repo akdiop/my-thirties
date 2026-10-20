@@ -5,10 +5,11 @@ import * as Sharing from 'expo-sharing';
 import { buildExport, exportFileName } from './exportData';
 import type { OrganisationRepository } from './organisation';
 import type { Repository } from './repository';
+import type { WellbeingRepository } from './wellbeing';
 
-export async function shareExport(repo: Repository, org: OrganisationRepository) {
+export async function shareExport(repo: Repository, org: OrganisationRepository, well: WellbeingRepository) {
   const now = new Date();
-  const payload = buildExport({ ...repo.dumpAll(), ...org.dumpAll() }, now, Constants.expoConfig?.version ?? '0.0.0');
+  const payload = buildExport({ ...repo.dumpAll(), ...org.dumpAll(), ...well.dumpAll() }, now, Constants.expoConfig?.version ?? '0.0.0');
   const file = new File(Paths.cache, exportFileName(now));
   if (file.exists) file.delete();
   file.create();

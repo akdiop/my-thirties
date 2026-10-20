@@ -20,7 +20,7 @@ export type ExternalEvent = { id: string; title: string; date: ISODate; startTim
 
 export type AgendaItem = {
   key: string;
-  kind: 'event' | 'task' | 'routine' | 'external';
+  kind: 'event' | 'task' | 'routine' | 'external' | 'prayer' | 'workout';
   id: string;
   date: ISODate;
   title: string;
@@ -41,7 +41,14 @@ const order = (a: AgendaItem, b: AgendaItem) => {
 export function buildAgenda(
   from: ISODate,
   to: ISODate,
-  sources: { events: AgendaEventSource[]; tasks: AgendaTaskSource[]; routines: AgendaRoutineSource[]; external?: ExternalEvent[] },
+  sources: {
+    events: AgendaEventSource[];
+    tasks: AgendaTaskSource[];
+    routines: AgendaRoutineSource[];
+    external?: ExternalEvent[];
+    prayers?: { date: ISODate; name: string; label: string; time: string }[];
+    workouts?: { id: string; date: ISODate; title: string }[];
+  },
 ): AgendaItem[] {
   const items: AgendaItem[] = [];
 
@@ -65,6 +72,16 @@ export function buildAgenda(
   for (const x of sources.external ?? []) {
     if (x.date < from || x.date > to) continue;
     items.push({ key: `external:${x.id}:${x.date}`, kind: 'external', id: x.id, date: x.date, title: x.title, startTime: x.startTime, endTime: x.endTime, category: 'externe', subtitle: x.calendar });
+  }
+
+  for (const p of sources.prayers ?? []) {
+    if (p.date < from || p.date > to) continue;
+    items.push({ key: `prayer:${p.name}:${p.date}`, kind: 'prayer', id: p.name, date: p.date, title: p.label, startTime: p.time, endTime: null, category: 'spiritualite' });
+  }
+
+  for (const w of sources.workouts ?? []) {
+    if (w.date < from || w.date > to) continue;
+    items.push({ key: `workout:${w.id}`, kind: 'workout', id: w.id, date: w.date, title: w.title, startTime: null, endTime: null, category: 'sport', done: true });
   }
 
   return items.sort(order);

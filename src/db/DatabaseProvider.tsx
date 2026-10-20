@@ -4,12 +4,13 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 
 import { createOrganisationRepository, type OrganisationRepository } from '@/data/organisation';
 import { createRepository, type Repository } from '@/data/repository';
+import { createWellbeingRepository, type WellbeingRepository } from '@/data/wellbeing';
 import { getOrCreateDeviceId } from '@/security/keys';
 import { useSettings } from '@/state/settings';
 import { openEncryptedDatabase, type Database } from './client';
 import migrations from './migrations/migrations';
 
-type Session = { db: Database; sqlite: SQLiteDatabase; repo: Repository; org: OrganisationRepository };
+type Session = { db: Database; sqlite: SQLiteDatabase; repo: Repository; org: OrganisationRepository; well: WellbeingRepository };
 
 const SessionContext = createContext<Session | null>(null);
 
@@ -60,6 +61,7 @@ function Migrated({ opened, children, fallback, onError }: { opened: Opened; chi
       sqlite: opened.sqlite,
       repo: createRepository(opened.db, opened.deviceId),
       org: createOrganisationRepository(opened.db, opened.deviceId),
+      well: createWellbeingRepository(opened.db, opened.deviceId),
     }),
     [opened],
   );

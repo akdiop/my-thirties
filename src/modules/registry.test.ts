@@ -6,9 +6,9 @@ describe('module registry', () => {
     expect(new Set(MODULES.map((m) => m.id)).size).toBe(11);
   });
 
-  it('only marks the phase 2 spaces as partly built', () => {
+  it('routes exactly the spaces that are built', () => {
     const built = MODULES.filter((m) => m.status !== 'not-developed').map((m) => m.id);
-    expect(built).toEqual(['quotidien', 'listes']);
+    expect(built).toEqual(['quotidien', 'sante', 'sport', 'challenges', 'equilibre', 'spiritualite', 'listes']);
     expect(MODULES.filter((m) => m.route).map((m) => m.id)).toEqual(built);
   });
 
