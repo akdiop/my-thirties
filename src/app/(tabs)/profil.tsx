@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Switch, TextInput, View } from 'react-native';
+import { Alert, Pressable, Switch, TextInput, View } from 'react-native';
 
 import { AppText, Button, Card, ListRow, Screen } from '@/components/ui';
 import { Segmented } from '@/components/ui/Segmented';
@@ -10,7 +10,9 @@ import { useSession } from '@/db/DatabaseProvider';
 import { shareExport } from '@/data/shareExport';
 import { useRefresh } from '@/data/useRefresh';
 import { wipeEverything } from '@/data/wipe';
+import { Avatar } from '@/features/profile/Avatar';
 import { ensurePermission } from '@/notifications/scheduler';
+import { birthdayLine } from '@/profile/profile';
 import { orderedModules } from '@/modules/registry';
 import { biometricsAvailable } from '@/security/biometrics';
 import { readLockConfig, writeLockConfig } from '@/security/lockState';
@@ -45,7 +47,6 @@ export default function Profil() {
   const { profile, modules } = useAppData();
   const settings = useSettings();
   const { c } = useTheme();
-  const [name, setName] = useState(profile?.firstName ?? '');
   const [faceId, setFaceId] = useState<boolean | null>(null);
   const [exporting, setExporting] = useState(false);
   const [exportPassword, setExportPassword] = useState('');
@@ -60,12 +61,6 @@ export default function Profil() {
     repo.saveSetting(key, value);
   };
 
-  const saveName = () => {
-    const trimmed = name.trim();
-    if (!profile || !trimmed || trimmed === profile.firstName) return setName(profile?.firstName ?? '');
-    repo.updateProfile(profile.id, { firstName: trimmed });
-    refresh();
-  };
 
   const toggleFaceId = async (enabled: boolean) => {
     const cfg = await readLockConfig();
@@ -126,17 +121,14 @@ export default function Profil() {
   return (
     <Screen title="Profil">
       <Section title="Moi">
-        <View style={{ paddingVertical: 10, gap: 6 }}>
-          <AppText variant="label" nativeID="profileName">Prénom</AppText>
-          <TextInput
-            accessibilityLabelledBy="profileName"
-            value={name}
-            onChangeText={setName}
-            onEndEditing={saveName}
-            maxLength={40}
-            style={{ height: 46, borderRadius: radius.md, borderWidth: 1, borderColor: c.border, paddingHorizontal: 14, fontFamily: 'Inter_400Regular', fontSize: 15, color: c.text }}
-          />
-        </View>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/mon-profil')} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 12 }}>
+          <Avatar photo={profile?.photoUri} name={profile?.firstName} size={56} />
+          <View style={{ flex: 1 }}>
+            <AppText style={{ fontFamily: 'Inter_600SemiBold' }}>{[profile?.firstName, profile?.lastName].filter(Boolean).join(' ')}</AppText>
+            <AppText variant="caption" color={c.textMuted}>{birthdayLine(profile?.birthDate ?? null, new Date()) || 'Photo, date de naissance, hobbies…'}</AppText>
+          </View>
+          <AppText variant="label" color={c.accent}>Modifier</AppText>
+        </Pressable>
         <View style={{ paddingVertical: 10, gap: 6 }}>
           <AppText variant="label">Devise principale</AppText>
           <Segmented
