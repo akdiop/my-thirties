@@ -171,3 +171,33 @@ textarea{resize:vertical;min-height:90px}
 }
 @media(max-width:390px){.module-grid{grid-template-columns:1fr 1fr}.module-card{min-height:155px}.topbar-date{display:none}.challenge-grid{gap:4px}.challenge-day{min-height:39px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+.calendar-panel{background:#fffdfa;border:1px solid #eee5dc;border-radius:19px;padding:20px;margin:20px 0 26px}
+.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.calendar-head h3{font-family:'Cormorant Garamond',serif;font-size:1.7rem;text-transform:capitalize;margin:0}
+.calendar-head>div{display:flex}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin:14px 0 18px}
+.weekday{text-align:center;color:#97887b;font-size:.73rem;font-weight:700;padding:6px}
+.calendar-cell{position:relative;min-height:51px;border:1px solid transparent;border-radius:10px;background:#faf7f2;color:#65483a}
+.calendar-cell.other-month{opacity:.4}
+.calendar-cell.selected{border-color:#6b3f2e;background:#f0e2d5}
+.calendar-cell.today{font-weight:700}
+.calendar-dot{position:absolute;bottom:6px;left:calc(50% - 3px);width:6px;height:6px;background:#5e7a5f;border-radius:50%}
+.calendar-agenda{border-top:1px solid #eee5dc;padding-top:16px}
+.calendar-agenda h4{text-transform:capitalize;font-size:.85rem;color:#6b3f2e}
+.calendar-agenda-item{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #f0e8df;padding:7px 0;font-size:.83rem}
+.calendar-agenda-item:first-of-type{border-top:0}
+.calendar-agenda-item small{color:#81746b}
+.booster-panel{margin-top:16px;border-top:1px solid #eae0d6;padding-top:15px}
+.booster-grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;margin:15px 0}
+.booster-day{border:1px solid #e3d8ca;border-radius:8px;background:#faf7f2;color:#6b3f2e;min-height:32px;font-size:.74rem}
+.booster-day.done{background:#dfe6d7;color:#426244;font-weight:700}
+.sport-library{margin:20px 0}
+.sport-tabs{display:flex;gap:7px;margin:14px 0}
+.sport-tabs button{border:1px solid #e2d5c8;background:#fffdfa;border-radius:30px;padding:10px 17px;color:#6b3f2e;font-size:.8rem}
+.sport-tabs button.active{background:#6b3f2e;color:#fffaf5}
+.lesson-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.lesson-card{background:#f0f1e9;border-radius:15px;padding:18px}
+.lesson-card h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem}
+.lesson-card p{font-size:.83rem;color:#5e6b58;margin:0}
+@media(max-width:760px){.calendar-panel{padding:14px}.calendar-cell{min-height:41px}.booster-grid{grid-template-columns:repeat(7,minmax(0,1fr))}.lesson-grid{grid-template-columns:1fr}}
