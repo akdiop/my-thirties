@@ -8,7 +8,7 @@ describe('module registry', () => {
 
   it('routes exactly the spaces that are built', () => {
     const built = MODULES.filter((m) => m.status !== 'not-developed').map((m) => m.id);
-    expect(built).toEqual(['quotidien', 'sante', 'sport', 'challenges', 'equilibre', 'spiritualite', 'listes']);
+    expect(built).toEqual(['quotidien', 'sante', 'sport', 'challenges', 'equilibre', 'spiritualite', 'finances', 'cuisine', 'decouvertes', 'passions', 'listes']);
     expect(MODULES.filter((m) => m.route).map((m) => m.id)).toEqual(built);
   });
 

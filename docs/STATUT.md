@@ -25,7 +25,7 @@ Mis à jour à chaque phase. Statuts : Opérationnel · Partiellement opération
 | Trois priorités du jour | 2 | Opérationnel | Tests unitaires |
 | Routines (matin, soir, travail, week-end, personnalisées) cochables par jour | 2 | Opérationnel | Tests unitaires + tests SQLite |
 | Mes listes : créer, cocher, quantités, notes, réordonner, dupliquer, archiver, modèles | 2 | Opérationnel | Tests unitaires + tests SQLite |
-| Génération automatique de listes (courses, valise, matériel) | 3-4 | Non développé | Dépend de Cuisine, Voyages, Passions |
+| Génération automatique de listes (courses, préparatifs et valise, matériel) | 4 | Opérationnel | Tests SQLite (articles cochés ou modifiés préservés) |
 | Rappels : événements, tâches, routines, briefing du matin, bilan du soir | 2 | Opérationnel | Tests unitaires ; envoi à tester sur iPhone |
 | Accueil : journée, priorités, routines, bilan du soir | 2 | Opérationnel | À tester sur iPhone |
 | Widgets déplaçables et masquables | 2 | Non développé | Prévu avec les widgets des phases 3-4 |
@@ -43,5 +43,12 @@ Mis à jour à chaque phase. Statuts : Opérationnel · Partiellement opération
 | Journal spirituel, rappels de prière, prières dans l'agenda | 3 | Opérationnel | Tests unitaires |
 | Santé → Sport (suggestion d'intensité, sur autorisation) | 3 | Opérationnel | Tests unitaires ; désactivé par défaut |
 | Onglet Bien-être | 3 | Opérationnel | À tester sur iPhone |
-| Finances, cuisine, voyages, passions | 4 | Non développé | — |
+| Mes finances : opérations, XOF/EUR/USD, catégories, budgets mensuels, abonnements, épargne, tableau du mois | 4 | Partiellement opérationnel | Tests unitaires + SQLite ; pas d'import bancaire |
+| Taux USD (BCE via Frankfurter, daté, mise à jour manuelle) ; EUR↔XOF parité fixe | 4 | Partiellement opérationnel | Format testé ; appel réseau à tester sur iPhone (bloqué depuis l'environnement de dev) |
+| Rappels d'abonnements et de départ en voyage | 4 | Opérationnel | Tests unitaires ; envoi à tester sur iPhone |
+| Ma cuisine : recettes (9 idées de base sénégalaises, africaines, internationales), portions, planning de la semaine, placard, courses, ordre de préparation, conservation, session dans l'agenda | 4 | Opérationnel | Tests unitaires + SQLite ; quantités indicatives à ajuster |
+| Mes découvertes : envies / prévus / vécus, dates, itinéraire, réservations, à voir, budget relié aux dépenses, préparatifs, valise, agenda | 4 | Opérationnel | Tests SQLite ; aucun prix ni condition d'entrée inventé |
+| Mes passions : parcours 6 ou 12 mois, jalons, journal, statistiques, matériel, séances dans l'agenda | 4 | Opérationnel | Tests unitaires + SQLite |
+| Accueil : carte Budget | 4 | Opérationnel | À tester sur iPhone |
+| Version web | — | Non développé | En attente de votre accord (voir réponse sur le web) |
 | Assistant IA, analyse vidéo | 5 | Non développé | — |

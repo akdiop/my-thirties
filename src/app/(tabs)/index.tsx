@@ -5,10 +5,10 @@ import { Pressable, View } from 'react-native';
 import { isScheduledOn, routineProgress } from '@/agenda/routines';
 import { dailyPriorities } from '@/agenda/tasks';
 import { CalmButton } from '@/components/CalmButton';
-import { PlannedCard } from '@/components/PlannedCard';
 import { AppText, Card, Checkbox, ProgressBar, Screen } from '@/components/ui';
 import { AgendaItemRow } from '@/features/agenda/AgendaItemRow';
 import { challengeView, formatAmount } from '@/features/challengeView';
+import { BudgetCard } from '@/features/finances/BudgetCard';
 import { useAgenda } from '@/features/agenda/useAgenda';
 import { useData, useMutate } from '@/hooks/useData';
 import { useToday } from '@/hooks/useToday';
@@ -32,6 +32,7 @@ function SectionTitle({ title, action, onAction }: { title: string; action?: str
 
 export default function Accueil() {
   const profile = useAppData((s) => s.profile);
+  const financesOn = useAppData((s) => s.modules.find((m) => m.moduleId === 'finances')?.enabled ?? true);
   const today = useToday();
   const { c } = useTheme();
   const mutate = useMutate();
@@ -126,7 +127,7 @@ export default function Accueil() {
           </Card>
         </Pressable>
       ) : null}
-      <PlannedCard title="Budget" phase={4}>Ce qu’il reste ce mois-ci.</PlannedCard>
+      {financesOn ? <BudgetCard today={today} /> : null}
     </Screen>
   );
 }

@@ -39,7 +39,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default function Profil() {
-  const { repo, org, well, sqlite } = useSession();
+  const { repo, org, well, life, sqlite } = useSession();
   const refresh = useRefresh();
   const { profile, modules } = useAppData();
   const settings = useSettings();
@@ -81,7 +81,7 @@ export default function Profil() {
   const exportData = async () => {
     setExporting(true);
     try {
-      await shareExport(repo, org, well);
+      await shareExport(repo, org, well, life);
     } catch (e) {
       Alert.alert('Export impossible', e instanceof Error ? e.message : String(e));
     } finally {

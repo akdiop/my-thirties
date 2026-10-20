@@ -1,4 +1,4 @@
-import { index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { index, integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 import type { RecurrenceRule } from '../agenda/recurrence';
 
@@ -341,3 +341,178 @@ export type Challenge = typeof challenge.$inferSelect;
 export type ChallengeDay = typeof challengeDay.$inferSelect;
 export type EmotionEntry = typeof emotionEntry.$inferSelect;
 export type GratitudeEntry = typeof gratitudeEntry.$inferSelect;
+
+export const moneyTx = sqliteTable(
+  'money_tx',
+  {
+    id: text('id').primaryKey(),
+    date: text('date').notNull(),
+    kind: text('kind', { enum: ['income', 'expense'] }).notNull(),
+    amountMinor: integer('amount_minor').notNull(),
+    currency: text('currency', { enum: ['XOF', 'EUR', 'USD'] }).notNull(),
+    category: text('category').notNull(),
+    label: text('label'),
+    notes: text('notes'),
+    subscriptionId: text('subscription_id'),
+    tripId: text('trip_id'),
+    ...timestamps,
+  },
+  (t) => [index('money_tx_date_idx').on(t.date)],
+);
+
+export const subscription = sqliteTable('subscription', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  amountMinor: integer('amount_minor').notNull(),
+  currency: text('currency', { enum: ['XOF', 'EUR', 'USD'] }).notNull(),
+  frequency: text('frequency', { enum: ['weekly', 'monthly', 'yearly'] }).notNull(),
+  nextDate: text('next_date').notNull(),
+  category: text('category').notNull().default('Abonnements'),
+  remindDays: integer('remind_days'),
+  endedAt: text('ended_at'),
+  ...timestamps,
+});
+
+export const budget = sqliteTable('budget', {
+  id: text('id').primaryKey(),
+  category: text('category').notNull().unique(),
+  amountMinor: integer('amount_minor').notNull(),
+  currency: text('currency', { enum: ['XOF', 'EUR', 'USD'] }).notNull(),
+  ...timestamps,
+});
+
+export const savingsGoal = sqliteTable('savings_goal', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  targetMinor: integer('target_minor').notNull(),
+  savedMinor: integer('saved_minor').notNull().default(0),
+  currency: text('currency', { enum: ['XOF', 'EUR', 'USD'] }).notNull(),
+  deadline: text('deadline'),
+  ...timestamps,
+});
+
+export const fxRate = sqliteTable('fx_rate', {
+  date: text('date').primaryKey(),
+  usdPerEur: real('usd_per_eur').notNull(),
+  source: text('source').notNull(),
+  ...timestamps,
+});
+
+export const recipe = sqliteTable('recipe', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  origin: text('origin').notNull().default('maison'),
+  category: text('category').notNull().default('plat'),
+  servings: integer('servings').notNull(),
+  prepMin: integer('prep_min'),
+  cookMin: integer('cook_min'),
+  ingredients: text('ingredients', { mode: 'json' }).$type<{ name: string; qty: number | null; unit: string }[]>().notNull().default([]),
+  steps: text('steps', { mode: 'json' }).$type<string[]>().notNull().default([]),
+  storage: text('storage'),
+  batchFriendly: integer('batch_friendly', { mode: 'boolean' }).notNull().default(true),
+  libraryId: text('library_id'),
+  notes: text('notes'),
+  ...timestamps,
+});
+
+export const mealPlan = sqliteTable(
+  'meal_plan',
+  {
+    id: text('id').primaryKey(),
+    date: text('date').notNull(),
+    slot: text('slot', { enum: ['dejeuner', 'diner'] }).notNull(),
+    recipeId: text('recipe_id'),
+    title: text('title').notNull(),
+    portions: integer('portions').notNull(),
+    ...timestamps,
+  },
+  (t) => [index('meal_plan_date_idx').on(t.date)],
+);
+
+export const pantryItem = sqliteTable('pantry_item', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  qty: real('qty'),
+  unit: text('unit').notNull().default(''),
+  ...timestamps,
+});
+
+export const trip = sqliteTable('trip', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  destination: text('destination').notNull(),
+  startDate: text('start_date'),
+  endDate: text('end_date'),
+  status: text('status', { enum: ['idea', 'planned', 'done'] }).notNull().default('idea'),
+  budgetMinor: integer('budget_minor'),
+  currency: text('currency', { enum: ['XOF', 'EUR', 'USD'] }).notNull(),
+  checklistId: text('checklist_id'),
+  packingListId: text('packing_list_id'),
+  notes: text('notes'),
+  ...timestamps,
+});
+
+export const tripItem = sqliteTable(
+  'trip_item',
+  {
+    id: text('id').primaryKey(),
+    tripId: text('trip_id')
+      .notNull()
+      .references(() => trip.id, { onDelete: 'cascade' }),
+    kind: text('kind', { enum: ['step', 'booking', 'idea'] }).notNull(),
+    date: text('date'),
+    time: text('time'),
+    title: text('title').notNull(),
+    notes: text('notes'),
+    done: integer('done', { mode: 'boolean' }).notNull().default(false),
+    ...timestamps,
+  },
+  (t) => [index('trip_item_trip_idx').on(t.tripId)],
+);
+
+export const passion = sqliteTable('passion', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  why: text('why'),
+  horizonMonths: integer('horizon_months').notNull(),
+  startDate: text('start_date').notNull(),
+  status: text('status', { enum: ['active', 'paused', 'done'] }).notNull().default('active'),
+  materialsListId: text('materials_list_id'),
+  ...timestamps,
+});
+
+export const passionStep = sqliteTable('passion_step', {
+  id: text('id').primaryKey(),
+  passionId: text('passion_id')
+    .notNull()
+    .references(() => passion.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  targetDate: text('target_date'),
+  doneAt: text('done_at'),
+  position: integer('position').notNull(),
+  ...timestamps,
+});
+
+export const passionLog = sqliteTable('passion_log', {
+  id: text('id').primaryKey(),
+  passionId: text('passion_id')
+    .notNull()
+    .references(() => passion.id, { onDelete: 'cascade' }),
+  date: text('date').notNull(),
+  minutes: integer('minutes'),
+  text: text('text').notNull(),
+  ...timestamps,
+});
+
+export type MoneyTx = typeof moneyTx.$inferSelect;
+export type Subscription = typeof subscription.$inferSelect;
+export type Budget = typeof budget.$inferSelect;
+export type SavingsGoal = typeof savingsGoal.$inferSelect;
+export type Recipe = typeof recipe.$inferSelect;
+export type MealPlan = typeof mealPlan.$inferSelect;
+export type PantryItem = typeof pantryItem.$inferSelect;
+export type Trip = typeof trip.$inferSelect;
+export type TripItem = typeof tripItem.$inferSelect;
+export type Passion = typeof passion.$inferSelect;
+export type PassionStep = typeof passionStep.$inferSelect;
+export type PassionLog = typeof passionLog.$inferSelect;
