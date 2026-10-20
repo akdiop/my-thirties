@@ -279,3 +279,8 @@ textarea{resize:vertical;min-height:90px}
 .lesson-card details{margin:12px 0}
 .lesson-card summary{cursor:pointer;color:#5e7a5f;font-size:.8rem;font-weight:700}
 .lesson-card .button{margin-top:13px}
+
+.sport-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+.sport-stats .stat-card{background:#f0f1e9}
+.sport-stats strong{font-size:1rem}
+@media(max-width:760px){.sport-stats{grid-template-columns:1fr}}
