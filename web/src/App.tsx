@@ -82,8 +82,8 @@ function Login({ onSignedIn }: { onSignedIn: () => void }) {
   );
 }
 
-function Editor({ module, initial, onSave, onCancel, busy }: {
-  module: Module; initial?: Entry; onSave: (input: EntryInput, id?: string) => Promise<void>; onCancel: () => void; busy: boolean;
+function Editor({ module, initial, entries, onSave, onCancel, busy }: {
+  module: Module; initial?: Entry; entries: Entry[]; onSave: (input: EntryInput, id?: string) => Promise<void>; onCancel: () => void; busy: boolean;
 }) {
   const [kindId, setKindId] = useState(initial?.kind ?? module.kinds[0]!.id);
   const [title, setTitle] = useState(initial?.title ?? '');
@@ -120,7 +120,15 @@ function Editor({ module, initial, onSave, onCancel, busy }: {
             </select>
           </label>
           <label>Titre<input autoFocus maxLength={180} required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Donner un nom…" /></label>
-          {kind.fields.map((field) => <FieldInput key={field.id} field={field} current={String(form[field.id] ?? '')} onChange={(v) => update(field.id, v)} />)}
+          {kind.fields.map((field) => {
+            const dynamicOptions = field.id === 'recipe' && kind.id === 'meal'
+              ? entries.filter((e) => e.module === 'cuisine' && e.kind === 'recipe').map((e) => e.title)
+              : field.id === 'hobby' && kind.id === 'practice'
+                ? entries.filter((e) => e.module === 'passions' && e.kind === 'hobby').map((e) => e.title)
+                : [];
+            return <FieldInput key={kind.id + ':' + field.id} field={field} options={[...new Set([...(field.options ?? []).filter((o) => o !== 'Autre'), ...dynamicOptions])]}
+              current={String(form[field.id] ?? '')} onChange={(v) => update(field.id, v)} />;
+          })}
           {error && <p role="alert" className="error">{error}</p>}
           <div className="editor-actions"><button type="button" className="button ghost" onClick={onCancel}>Annuler</button><button className="button primary" type="submit" disabled={busy}><Save size={16} /> {busy ? 'Enregistrement…' : 'Enregistrer'}</button></div>
         </form>
@@ -129,9 +137,21 @@ function Editor({ module, initial, onSave, onCancel, busy }: {
   );
 }
 
-function FieldInput({ field, current, onChange }: { field: Field; current: string; onChange: (value: string) => void }) {
+function FieldInput({ field, current, onChange, options = field.options ?? [] }: { field: Field; current: string; onChange: (value: string) => void; options?: string[] }) {
+  const [manual, setManual] = useState(() => field.type === 'suggest' && (options.length === 0 || (current !== '' && !options.includes(current))));
+  const custom = manual || (current !== '' && !options.includes(current));
   return <label>{field.label}
-    {field.type === 'textarea' ? <textarea rows={4} value={current} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder ?? ''} /> :
+    {field.type === 'suggest' ? <>
+      <select value={custom ? '__other__' : current} onChange={(e) => {
+        if (e.target.value === '__other__') { setManual(true); onChange(''); }
+        else { setManual(false); onChange(e.target.value); }
+      }}>
+        <option value="">Choisir dans la liste…</option>
+        {options.map((x) => <option key={x} value={x}>{x}</option>)}
+        <option value="__other__">Autre (préciser)</option>
+      </select>
+      {custom && <input type="text" maxLength={180} value={current} onChange={(e) => onChange(e.target.value)} placeholder="Préciser ton choix…" aria-label={'Autre : ' + field.label} />}
+    </> : field.type === 'textarea' ? <textarea rows={4} value={current} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder ?? ''} /> :
       field.type === 'select' ? <select value={current} onChange={(e) => onChange(e.target.value)}>
         <option value="">Choisir…</option>{field.options?.map((x) => <option key={x} value={x}>{x}</option>)}
       </select> :
