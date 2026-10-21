@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { dishOf } from '../lib/editorialPhotos';
+import { exactDishOf } from '../lib/editorialPhotos';
 import { EditorialPhoto, useDishPhotos } from './EditorialPhoto';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { PERSONALIZED_RECIPES } from '../recipes/recipeIndex';
@@ -96,10 +96,12 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
     <p className="muted">{filtered.length} recette(s) dans cette sélection</p>
     <div className="lesson-grid">{visible.map((recipe) => {
       const isAdded = existing.has(recipe.id);
-      const dish = dishOf(recipe.title);
+      const dish = exactDishOf(recipe.title);
       const photo = dish ? dishPhotos[dish] : undefined;
       return <article className="lesson-card recipe-photo-card" key={recipe.id}>
-        <EditorialPhoto src={photo?.src || '/visuels/cuisine.webp'} fallback="/visuels/cuisine.webp" alt={recipe.title} className="editorial-card-photo" />
+        <EditorialPhoto src={photo?.src} alt={'Photographie du plat ' + recipe.title} className="editorial-card-photo"
+          unavailableLabel={'Photo de ' + recipe.title + ' non disponible'} />
+        {photo && <a className="editorial-photo-credit" href={photo.creditUrl} target="_blank" rel="noopener noreferrer">Crédit photo et licence · Wikimedia Commons ↗</a>}
         <h3>{recipe.title}</h3>
         <p>{recipe.prepMin + recipe.cookMin} min environ · {recipe.servings} portions · {culinaryStyleLabel(recipeStyle(recipe))}</p>
         <details><summary>Ingrédients et préparation</summary>
