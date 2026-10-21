@@ -23,7 +23,7 @@ const TONES: Record<string, string> = {
   chocolat: 'linear-gradient(135deg,#c09072 0%,#6b3f2e 55%,#3c2116 100%)',
 };
 
-export function HeroPhoto({ slot, tone = 'caramel', label, children, compact }: { slot: string; tone?: keyof typeof TONES; label: string; children?: ReactNode; compact?: boolean }) {
+export function HeroPhoto({ slot, tone = 'caramel', label, children, compact, curatedPhoto }: { slot: string; tone?: keyof typeof TONES; label: string; children?: ReactNode; compact?: boolean; curatedPhoto?: DestinationPhoto }) {
   const { photos, save } = useContext(PhotoContext);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -45,13 +45,18 @@ export function HeroPhoto({ slot, tone = 'caramel', label, children, compact }: 
   };
   const style = image ? { backgroundImage: `url(${image})` }
     : useLocal && visual ? { backgroundImage: `${visualBackground(visual)}, ${TONES[tone]}`, backgroundPosition: `${visual.position}, center` }
+    : curatedPhoto ? { backgroundImage: `url("${curatedPhoto.src}"), ${TONES[tone]}`, backgroundPosition: 'center' }
     : illustration ? { backgroundImage: `url("${illustration.src}"), ${TONES[tone]}`, backgroundPosition: 'center' }
     : visual ? { backgroundImage: `${visualBackground(visual)}, ${TONES[tone]}`, backgroundPosition: `${visual.position}, center` }
     : { backgroundImage: TONES[tone] };
   return <div className={'hero-photo' + (compact ? ' compact' : '')} style={style}>
-    {!image && !visual && !illustration && <span className="hero-watermark" aria-hidden="true">{label}</span>}
+    {!image && !visual && !illustration && !curatedPhoto && <span className="hero-watermark" aria-hidden="true">{label}</span>}
     <div className="hero-shade">{children}</div>
-    {!image && !useLocal && illustration && <a className="hero-theme-credit" href={illustration.creditUrl}
+    {!image && curatedPhoto && <a className="hero-theme-credit" href={curatedPhoto.creditUrl}
+      target="_blank" rel="noopener noreferrer" title="Photographie de référence, pas une photo personnelle">
+      Source photo · Wikimedia Commons ↗
+    </a>}
+    {!image && !curatedPhoto && !useLocal && illustration && <a className="hero-theme-credit" href={illustration.creditUrl}
       target="_blank" rel="noopener noreferrer" title="Photographie d'ambiance liée au thème, pas à ton activité personnelle">
       Photo d'ambiance · Wikimedia Commons ↗
     </a>}
