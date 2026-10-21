@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { recipePhoto } from '../lib/editorialPhotos';
+import { EditorialPhoto } from './EditorialPhoto';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { PERSONALIZED_RECIPES } from '../recipes/recipeIndex';
 import type { CuratedCategory } from '../recipes/types';
@@ -93,7 +95,9 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
     <p className="muted">{filtered.length} recette(s) dans cette sélection</p>
     <div className="lesson-grid">{visible.map((recipe) => {
       const isAdded = existing.has(recipe.id);
-      return <article className="lesson-card" key={recipe.id}>
+      return <article className="lesson-card recipe-photo-card" key={recipe.id}>
+        <EditorialPhoto src={recipePhoto(recipe.title, recipe.category)} fallback="/visuels/cuisine.webp"
+          alt={'Photographie illustrative pour ' + recipe.title + ' (présentation non contractuelle)'} className="editorial-card-photo" />
         <h3>{recipe.title}</h3>
         <p>{recipe.prepMin + recipe.cookMin} min environ · {recipe.servings} portions · {culinaryStyleLabel(recipeStyle(recipe))}</p>
         <details><summary>Ingrédients et préparation</summary>
