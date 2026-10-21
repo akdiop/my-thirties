@@ -917,3 +917,18 @@ table{display:block;max-width:100%;overflow-x:auto}
 /* Crédit Unsplash sur les grandes photos (en haut à gauche, hors du titre) */
 .hero-credit{position:absolute;top:12px;left:12px;max-width:55%;padding:3px 8px;border-radius:999px;background:rgba(43,26,18,.55);color:#fff;font-size:.62rem;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hero-credit a{color:#fff}
+
+/* Recherche de séries (base TVmaze) */
+.series-search{margin:10px 0 16px}
+.search-field-icon{display:flex;align-items:center;gap:8px;background:#fffdfa;border:1px solid #e3d8cc;border-radius:12px;padding:0 12px;color:#8b7b6c}
+.search-field-icon input{border:0;background:transparent;flex:1;min-height:44px;padding:0;outline:none}
+.series-hits{list-style:none;margin:6px 0 0;padding:4px;background:#fffdfa;border:1px solid #e3d8cc;border-radius:12px;max-height:340px;overflow:auto;box-shadow:0 8px 24px rgba(60,33,22,.08)}
+.series-hits button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;padding:6px;border-radius:10px;text-align:left;cursor:pointer}
+.series-hits button:hover{background:#F4ECE3}
+.series-hits img{width:34px;height:48px;object-fit:cover;border-radius:6px;flex:none}
+.series-hits .series-badge{width:34px;height:48px;font-size:1rem}
+.series-hits span{display:flex;flex-direction:column}
+.series-hits small{color:#8b7b6c}
+.series-hits.inline{margin-top:8px}
+.series-poster{width:42px;height:60px;object-fit:cover;border-radius:8px;flex:none}
+.series-picked{background:#fffdfa;border:1px solid #e3d8cc;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
