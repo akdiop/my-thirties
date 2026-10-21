@@ -4,14 +4,14 @@
 
 | Module | Couverture éditoriale | Politique en absence d'image valide |
 |---|---|---|
-| Recettes (315) | Toutes les fiches ont une entrée dans `recipePhotoLibrary.ts`. Les 7 premières photographies sont vérifiées et créditées. | Vignette neutre ; aucun plat générique de remplacement. |
+| Recettes (315) | Toutes les fiches ont une entrée dans `recipePhotoLibrary.ts`. Les 10 premières photographies sont vérifiées et créditées. | Vignette neutre ; aucun plat générique de remplacement. |
 | Destinations (30) | Les 30 identifiants ont une page Wikipédia FR et une page EN explicite pour augmenter les chances de récupérer une photographie du **même lieu**. | Vignette beige ; jamais une plage tropicale pour Lisbonne/Porto/autre ville. |
 | Défis (37 programmes + 59 suggestions, dont plusieurs archivées) | Règles déterministes à partir des disciplines et intitulés vers 48 thèmes documentaires ; 16 photographies Pexels choisies manuellement en priorité, dont des femmes noires pour les portraits d'activité. | Photo locale d'ambiance du **même** thème lorsque disponible, sinon dégradé du thème. |
 | Sport (Pilates, Yoga, Tennis) | Visuels WebP locaux sélectionnés dans la maquette et prioritaires sur Wikipédia. | Dégradé tant qu'aucune photo personnelle n'est fournie. |
 | Recettes/destinations enregistrées | Photographie vérifiée reprise de la fiche référencée par `libraryId` / `suggestionId` ; pas de plage ou cuisine générique. | Dégradé / « Ma photo ». |
 | Photos personnelles | Toujours prioritaires, inchangées. | Aucun chargement extérieur de photo personnelle. |
 
-**Attention : couverture des fiches ≠ disponibilité des photos.** Les pages encyclopédiques peuvent ne proposer aucune photographie, leur API peut échouer ou l'image peut ne pas passer les filtres anti-cartes / logos. Les 308 recettes encore `pending` ne disposent pas de photo certifiée. Toute affirmation « 315 photos validées » est incorrecte.
+**Attention : couverture des fiches ≠ disponibilité des photos.** Les pages encyclopédiques peuvent ne proposer aucune photographie, leur API peut échouer ou l'image peut ne pas passer les filtres anti-cartes / logos. Les 305 recettes encore `pending` ne disposent pas de photo certifiée. Toute affirmation « 315 photos validées » est incorrecte.
 
 ## Photographies d'activités ajoutées
 
@@ -38,4 +38,4 @@ Les requêtes d'images externes divulguent l'adresse IP du navigateur aux héber
 
 ## Reste à faire
 
-Sélectionner et contrôler **308 photos de recettes une à une** si une couverture photographique complète est souhaitée, puis renseigner source, photographe, licence et concordance d'ingrédients dans `recipePhotoLibrary.ts`. Cela ne peut pas être automatisé de façon fiable par de simples correspondances de mots sans reproduire les erreurs signalées.
+Sélectionner et contrôler **305 photos de recettes une à une** si une couverture photographique complète est souhaitée, puis renseigner source, photographe, licence et concordance d'ingrédients dans `recipePhotoLibrary.ts`. Cela ne peut pas être automatisé de façon fiable par de simples correspondances de mots sans reproduire les erreurs signalées.
