@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Alert, View } from 'react-native';
 
 import { Chips } from '@/components/form/Chips';
+import { SelectField } from '@/components/form/SelectField';
 import { Field, TextField } from '@/components/form/Field';
 import { Scale } from '@/components/form/Scale';
 import { Button, Screen } from '@/components/ui';
@@ -79,9 +80,7 @@ export default function Emotion() {
         </View>
       }
     >
-      <Field label="Émotion">
-        <Chips label="Émotion" options={EMOTIONS.map((e) => ({ value: e as string, label: e }))} value={emotion} onChange={setEmotion} />
-      </Field>
+      <SelectField label="Émotion" options={EMOTIONS.map((e) => ({ value: e as string, label: e }))} value={emotion} onChange={setEmotion} />
       <Field label="Intensité ressentie">
         <Scale label="Intensité" value={intensity} onChange={setIntensity} min={1} max={10} low="Légère" high="Très forte" />
       </Field>
@@ -89,12 +88,8 @@ export default function Emotion() {
       <TextField label="Déclencheur" value={fields.trigger} onChangeText={set('trigger')} maxLength={120} />
       <TextField label="Pensées" value={fields.thoughts} onChangeText={set('thoughts')} multiline maxLength={1000} />
       <TextField label="Ma réaction" value={fields.reaction} onChangeText={set('reaction')} multiline maxLength={1000} />
-      <Field label="Stratégie utilisée">
-        <Chips label="Stratégie" options={[{ value: null, label: 'Aucune' }, ...STRATEGIES.map((s) => ({ value: s as string | null, label: s }))]} value={strategy} onChange={setStrategy} />
-      </Field>
-      <Field label="Résultat ressenti">
-        <Chips label="Résultat" options={[{ value: null, label: '—' }, ...OUTCOMES.map((o) => ({ value: o.value as string | null, label: o.label }))]} value={outcome} onChange={setOutcome} />
-      </Field>
+      <SelectField label="Stratégie utilisée" options={[{ value: null, label: 'Aucune' }, ...STRATEGIES.map((s) => ({ value: s as string | null, label: s }))]} value={strategy} onChange={setStrategy} />
+      <SelectField label="Résultat ressenti" options={[{ value: null, label: '—' }, ...OUTCOMES.map((o) => ({ value: o.value as string | null, label: o.label }))]} value={outcome} onChange={setOutcome} />
       <TextField label="Notes libres" value={fields.notes} onChangeText={set('notes')} multiline maxLength={2000} />
     </Screen>
   );
