@@ -31,9 +31,11 @@ function pick(slot: string): Visual | undefined {
   if (slot === 'sport-pilates') return VISUALS.pilates;
   if (slot === 'sport-yoga') return VISUALS.yoga;
   if (slot === 'sport-tennis') return VISUALS.tennis;
-  if (slot.startsWith('recipe-')) return VISUALS.cuisine;
-  if (slot.startsWith('destination-') || slot.startsWith('trip-')) return VISUALS.voyage;
-  if (slot.startsWith('path-')) return VISUALS.passions;
+  // Les fiches de recettes, destinations et voyages ne doivent pas afficher
+  // une photo générique comme s'il s'agissait du plat ou du lieu exact.
+  if (slot.startsWith('recipe-') || slot.startsWith('destination-') || slot.startsWith('trip-')) return undefined;
+  // Pas de portrait de lecture pour un parcours de langue ou d'écriture.
+  if (slot.startsWith('path-')) return undefined;
   if (slot.startsWith('challenge-')) {
     const t = templateById(slot.slice('challenge-'.length));
     if (!t) return undefined;
