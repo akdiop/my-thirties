@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { dayLabel } from '@/agenda/dates';
 import { Chips } from '@/components/form/Chips';
+import { SelectField } from '@/components/form/SelectField';
 import { Field, TextField } from '@/components/form/Field';
 import { Stepper } from '@/components/form/Scale';
 import { AppText, Button, Screen } from '@/components/ui';
@@ -39,9 +40,7 @@ export default function Repas() {
       }
     >
       {recipes.length ? (
-        <Field label="Recette">
-          <Chips label="Recette" options={[{ value: null, label: 'Autre' }, ...recipes.map((r) => ({ value: r.id as string | null, label: r.title }))]} value={recipeId} onChange={setRecipeId} />
-        </Field>
+        <SelectField label="Recette" options={[{ value: null, label: 'Autre' }, ...recipes.map((r) => ({ value: r.id as string | null, label: r.title }))]} value={recipeId} onChange={setRecipeId} />
       ) : (
         <AppText color={c.textMuted}>Ajoutez des recettes dans « Mes recettes » pour calculer automatiquement les courses.</AppText>
       )}
