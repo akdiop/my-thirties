@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { Entry, EntryInput } from '../lib/cloud';
-import { consolidateIngredients } from '../lib/groceries';
+import { X } from 'lucide-react';
 
 const iso = (date: Date) => [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
 const startOfWeek = (date: Date) => {
@@ -11,10 +11,10 @@ const startOfWeek = (date: Date) => {
 const add = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 const read = (e: Entry, key: string) => typeof e.data[key] === 'string' ? e.data[key] as string : '';
 
-export function KitchenPlanner({ entries, onCreate, onGenerate }: {
+export function KitchenPlanner({ entries, onCreate, onRemove }: {
   entries: Entry[];
   onCreate: (input: EntryInput) => Promise<void>;
-  onGenerate: (title: string, items: string[]) => Promise<void>;
+  onRemove: (entry: Entry) => Promise<void>;
 }) {
   const recipes = entries.filter((e) => e.kind === 'recipe');
   const meals = entries.filter((e) => e.kind === 'meal');
@@ -32,19 +32,9 @@ export function KitchenPlanner({ entries, onCreate, onGenerate }: {
     setBusy(true); setMessage('');
     try {
       await onCreate({ module: 'cuisine', kind: 'meal', title: slot + ' · ' + recipe.title,
-        entry_date: day, data: { date: day, recipe: recipe.title, recipeId, slot } });
-      setMessage('Repas ajouté au calendrier.');
+        entry_date: day, data: { date: day, recipe: recipe.title, recipeId, slot, ingredients: read(recipe, 'ingredients') } });
+      setMessage('Repas planifié : la liste de courses de la semaine est à jour.');
     } catch { setMessage('Impossible de planifier ce repas.'); } finally { setBusy(false); }
-  };
-  const shopping = async () => {
-    const ids = [...new Set(weekMeals.map((m) => read(m, 'recipeId')).filter(Boolean))];
-    const sources = ids.map((id) => recipes.find((r) => r.id === id)).filter((r): r is Entry => Boolean(r))
-      .map((r) => ({ lines: read(r, 'ingredients'), multiplier: weekMeals.filter((m) => read(m, 'recipeId') === r.id).length }));
-    const items = consolidateIngredients(sources);
-    if (!items.length) { setMessage('Ajoute des recettes avec des ingrédients quantifiés pour préparer les courses.'); return; }
-    setBusy(true); setMessage('');
-    try { await onGenerate('Courses · semaine du ' + week, items); }
-    catch { setMessage('Impossible de créer la liste.'); } finally { setBusy(false); }
   };
   return <section className="tool-card">
     <div className="section-row"><h3>Mes repas de la semaine</h3>
@@ -56,7 +46,7 @@ export function KitchenPlanner({ entries, onCreate, onGenerate }: {
       const date = iso(d);
       const scheduled = weekMeals.filter((m) => m.entry_date === date);
       return <div key={date} className="meal-day"><strong>{d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' })}</strong>
-        {scheduled.map((m) => <p key={m.id}>{m.title}</p>)}{!scheduled.length && <small>Libre</small>}</div>;
+        {scheduled.map((m) => <p key={m.id} className="meal-line">{m.title}<button className="icon-btn" aria-label={'Retirer ' + m.title} onClick={() => void onRemove(m)}><X size={14} /></button></p>)}{!scheduled.length && <small>Libre</small>}</div>;
     })}</div>
     {recipes.length ? <div className="planner-form">
       <label>Jour<input type="date" value={day} onChange={(e) => setDay(e.target.value)} /></label>
@@ -64,9 +54,8 @@ export function KitchenPlanner({ entries, onCreate, onGenerate }: {
       <label>Recette<select value={recipeId} onChange={(e) => setRecipeId(e.target.value)}>
         <option value="">Choisir une recette</option>{recipes.map((r) => <option value={r.id} key={r.id}>{r.title}</option>)}</select></label>
       <button className="button secondary" disabled={busy || !recipeId} onClick={() => void create()}>Planifier</button>
-    </div> : <p className="muted">Crée d'abord une recette pour planifier tes repas.</p>}
-    <button className="button ghost" disabled={busy || !weekMeals.length} onClick={() => void shopping()}>Courses pour cette semaine</button>
-    <p className="fineprint">La liste regroupe les ingrédients des recettes planifiées. Les quantités sont multipliées par le nombre de repas, sans supposer le nombre de portions consommées : ajuste-les avant les courses.</p>
+    </div> : <p className="muted">Planifie une recette depuis l’onglet Recettes, ou enregistre tes propres recettes.</p>}
+    <p className="muted">La liste « Courses » de la semaine se crée et se met à jour toute seule à chaque repas planifié ou retiré.</p>
     {message && <p role="status">{message}</p>}
   </section>;
 }

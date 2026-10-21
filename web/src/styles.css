@@ -719,8 +719,9 @@ input,select,textarea{border-radius:12px}
 
 /* Mobile : pas de zoom automatique ni de défilement horizontal */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-html,body{max-width:100%;overflow-x:hidden}
-body{min-width:0;overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent}
+/* overflow-x sur html ET body bloque le défilement vertical sur iPhone : seulement sur body */
+body{max-width:100%;overflow-x:hidden;min-width:0;-webkit-tap-highlight-color:transparent}
+@supports (overflow:clip){body{overflow-x:clip}}
 input,select,textarea{font-size:16px !important;max-width:100%}
 button,a,label,select{touch-action:manipulation}
 .phone,.screen,.module-top,.profile-screen{min-width:0;max-width:100%}
@@ -802,3 +803,29 @@ table{display:block;max-width:100%;overflow-x:auto}
 .ep-label{font-size:.82rem;font-weight:600;color:#6B3F2E}
 .stars{display:flex;gap:2px}.stars button{border:0;background:transparent;padding:4px}
 .pill-tabs{overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}.pill-tabs::-webkit-scrollbar{display:none}.pill-tabs button{flex:0 0 auto;padding:9px 16px;white-space:nowrap}
+/* Défis : fiche du jour détaillée */
+.day-topic{font-weight:600;color:#2B1A12}
+.how-list{margin:6px 0 12px;padding-left:20px;font-size:.88rem;color:#4a3a30;line-height:1.5}
+.how-list li{margin-bottom:4px}
+.path-in-challenge{background:#F3EFE6;border-radius:14px;padding:12px 14px;margin:8px 0 12px}
+.path-in-challenge .phrases{margin-top:8px}
+.challenge-more{background:#FFFDF9;border:1px solid #EFE5DA;border-radius:14px;padding:12px 14px;margin-top:10px}
+.challenge-more summary{cursor:pointer;font-weight:700;color:#5E7A5F}
+.program-list{margin:10px 0 0;padding-left:0;list-style:none;font-size:.85rem;max-height:340px;overflow-y:auto}
+.program-list li{padding:6px 0;border-bottom:1px solid #F0E8DF}
+.program-list li strong{display:inline-block;min-width:62px;color:#8a6a57}
+.program-list li.done{color:#8a8a8a;text-decoration:line-through}
+.quit-btn{margin-top:14px;color:#9b4a3a}
+.plan-inline{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;background:#F3EFE6;border-radius:12px;padding:10px}
+.plan-inline .button{grid-column:1/-1}
+.meal-line{display:flex;align-items:center;justify-content:space-between;gap:4px}
+.meal-line .icon-btn{padding:2px;min-width:0;background:none;border:0;color:#9b7a66}
+.iphone-cal{margin-top:22px;display:flex;flex-direction:column;gap:10px}
+.iphone-cal h3{display:flex;align-items:center;gap:8px;margin:0}
+.iphone-cal a.button{text-align:center;text-decoration:none}
+.dest-guide h4{margin:14px 0 4px;font-size:.85rem;color:#6B3F2E}
+.dest-facts{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:.84rem;margin:10px 0}
+.dest-facts dt{font-weight:700;color:#8a6a57}
+.dest-facts dd{margin:0;color:#3b2c23}
+@media (max-width:480px){.dest-facts{grid-template-columns:1fr}.dest-facts dd{margin-bottom:6px}}
+.text-link{display:inline-block;margin-top:10px;color:#5E7A5F;font-weight:600;font-size:.85rem}

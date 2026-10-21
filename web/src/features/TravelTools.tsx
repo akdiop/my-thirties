@@ -14,6 +14,5 @@ export function TravelTools({ entries, onGenerate }: {
       <button className="button secondary" onClick={() => void onGenerate('Valise · ' + trip.title,
         String(trip.data.packing).split('\n').map((x) => x.trim()).filter(Boolean))}>Créer ma liste</button>
     </div>)}
-    <p className="fineprint">Vérifie les documents et les formalités d'entrée auprès de sources officielles avant le départ.</p>
   </section>;
 }

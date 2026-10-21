@@ -28,14 +28,6 @@ const LANG_STEPS: { title: string; goal: string; tasks: string[]; minutes: numbe
 ];
 
 const PHRASES: Record<string, ([string, string][] | undefined)[]> = {
-  anglais: [
-    [['Hello / Good morning', 'Bonjour'], ['Thank you', 'Merci'], ['Goodbye', 'Au revoir']],
-    [['My name is Aida.', 'Je m’appelle Aida.'], ['I’m from Senegal.', 'Je viens du Sénégal.'], ['I live in Dakar.', 'J’habite à Dakar.'], ['Nice to meet you.', 'Enchantée.']],
-    [['How much is it?', 'Combien ça coûte ?'], ['It’s ten o’clock.', 'Il est dix heures.'], ['Twenty, thirty, forty…', 'Vingt, trente, quarante…']],
-    [['This is my sister.', 'Voici ma sœur.'], ['She is tall and funny.', 'Elle est grande et drôle.']],
-    [['I wake up at seven.', 'Je me réveille à sept heures.'], ['I go to work.', 'Je vais au travail.']],
-    [['I would like a coffee, please.', 'Je voudrais un café, s’il vous plaît.'], ['The bill, please.', 'L’addition, s’il vous plaît.']],
-  ],
   espagnol: [
     [['Hola / Buenos días', 'Bonjour'], ['Gracias', 'Merci'], ['Adiós', 'Au revoir']],
     [['Me llamo Aida.', 'Je m’appelle Aida.'], ['Soy de Senegal.', 'Je viens du Sénégal.'], ['Vivo en Dakar.', 'J’habite à Dakar.'], ['Mucho gusto.', 'Enchantée.']],
@@ -76,7 +68,6 @@ const lang = (id: string, title: string, tone: LearningPath['tone']): LearningPa
 });
 
 export const PATHS: LearningPath[] = [
-  lang('anglais', 'Anglais', 'chocolat'),
   lang('espagnol', 'Espagnol', 'caramel'),
   lang('portugais', 'Portugais', 'sauge'),
   lang('arabe', 'Arabe', 'sable'),

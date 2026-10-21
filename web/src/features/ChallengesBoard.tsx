@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Check, ChevronRight } from 'lucide-react';
+import { BookOpen, Check, ChevronRight, LogOut } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
-import { CATEGORIES, dayNumber, templateById, templateLength, TEMPLATES, type ChallengeCategory } from '../lib/challenges';
+import { CATEGORIES, dayNumber, templateById, templateLength, TEMPLATES, type ChallengeCategory, type ChallengeTemplate } from '../lib/challenges';
+import { STAY_ON_TRACK } from '../lib/challengePrograms';
+import { pathById } from '../lib/learning';
 import { HeroPhoto } from './HeroPhoto';
 import { EXERCISES, GROUPS, type ExerciseGroup } from '../lib/exercises';
 
@@ -13,7 +15,17 @@ const categoryOf = (e: Entry): ChallengeCategory => {
   return CATEGORIES.includes(c as ChallengeCategory) ? c as ChallengeCategory : templateById(e.data.template)?.category ?? 'Sport';
 };
 
-export function ChallengesBoard({ entries, onCreate, onUpdate }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void>; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void> }) {
+/** Méthode quotidienne : celle du programme, sinon une méthode type selon la catégorie. */
+function howFor(t: ChallengeTemplate | undefined): string[] {
+  if (t?.how) return t.how;
+  switch (t?.category) {
+    case 'Sport': return ['Échauffe-toi 3 minutes : rotations des bras, des hanches, montées de genoux.', 'Fais la séance du jour ci-dessus, en gardant une respiration régulière.', 'Si c’est trop dur, fais la moitié des répétitions : la régularité compte plus que le volume.', 'Termine par 2 minutes d’étirements et coche le jour.'];
+    case 'Cuisine': return ['La veille, choisis la recette et vérifie ta liste de courses.', 'Prépare tous les ingrédients avant d’allumer le feu.', 'Cuisine, goûte, ajuste.', 'Note ce que tu changerais la prochaine fois et coche le jour.'];
+    default: return ['Bloque un créneau fixe dans ta journée.', 'Fais l’action du jour ci-dessus.', 'Note en une phrase comment ça s’est passé.', 'Coche le jour.'];
+  }
+}
+
+export function ChallengesBoard({ entries, onCreate, onUpdate, onQuit }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void>; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>; onQuit: (entry: Entry) => Promise<void> }) {
   const [tab, setTab] = useState<ChallengeCategory>('Sport');
   const [focus, setFocus] = useState<string | null>(null);
   const [busy, setBusy] = useState('');
@@ -22,7 +34,7 @@ export function ChallengesBoard({ entries, onCreate, onUpdate }: { entries: Entr
   const active = inTab.find((e) => e.id === focus) ?? inTab[0];
   const startedIds = new Set(challenges.map((e) => e.data.template));
   const [search, setSearch] = useState('');
-  const suggestions = TEMPLATES.filter((t) => t.category === tab && (t.title + ' ' + t.discipline + ' ' + t.tagline).toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr')));
+  const suggestions = TEMPLATES.filter((t) => t.category === tab && !t.retired && (t.title + ' ' + t.discipline + ' ' + t.tagline).toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr')));
 
   const start = async (id: string) => {
     const t = templateById(id);
@@ -38,7 +50,7 @@ export function ChallengesBoard({ entries, onCreate, onUpdate }: { entries: Entr
   return <section className="challenges-board">
     <div className="pill-tabs" role="tablist">{CATEGORIES.map((c) =>
       <button key={c} role="tab" aria-selected={tab === c} className={tab === c ? 'active' : ''} onClick={() => { setTab(c); setFocus(null); setSearch(''); }}>{c}</button>)}</div>
-    {active ? <ActiveChallenge key={active.id} entry={active} onUpdate={onUpdate} /> : <p className="muted">Aucun défi en cours dans cette catégorie. Choisis-en un ci-dessous.</p>}
+    {active ? <ActiveChallenge key={active.id} entry={active} onUpdate={onUpdate} onQuit={async (e) => { await onQuit(e); setFocus(null); }} /> : <p className="muted">Aucun défi en cours dans cette catégorie. Choisis-en un ci-dessous.</p>}
     {inTab.length > 1 && <div className="challenge-switch">{inTab.map((e) =>
       <button key={e.id} className={e.id === active?.id ? 'active' : ''} onClick={() => setFocus(e.id)}>{e.title}</button>)}</div>}
     <h3 className="board-subtitle">Découvrir les suggestions ({suggestions.length})</h3>
@@ -61,11 +73,10 @@ function ExerciseLibrary() {
     <div className="challenge-switch">{GROUPS.map((g) => <button key={g} className={g === group ? 'active' : ''} onClick={() => setGroup(g)}>{g}</button>)}</div>
     <div className="lesson-grid">{EXERCISES[group].map((ex) => <article className="lesson-card exercise-card" key={ex.name}>
       <h3>{ex.name}</h3><p>{ex.how}</p><p className="exercise-tip">{ex.tip}</p></article>)}</div>
-    <p className="fineprint">Au poids du corps ou avec des bouteilles d’eau. Échauffe-toi, respire et arrête un exercice douloureux ; en cas de doute, demande conseil à un professionnel.</p>
   </div>;
 }
 
-function ActiveChallenge({ entry, onUpdate }: { entry: Entry; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void> }) {
+function ActiveChallenge({ entry, onUpdate, onQuit }: { entry: Entry; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>; onQuit: (entry: Entry) => Promise<void> }) {
   const t = templateById(entry.data.template);
   const days = Math.min(30, Math.max(7, Number(entry.data.days) || 30));
   const startDate = typeof entry.data.start === 'string' ? entry.data.start : entry.entry_date ?? today();
@@ -81,6 +92,8 @@ function ActiveChallenge({ entry, onUpdate }: { entry: Entry; onUpdate: (entry: 
   const shown = selected ?? (current || 1);
   const shownPlan = plan(shown);
   const state = progress[String(shown)]?.status ?? 'not_done';
+  const path = t?.pathId ? pathById(t.pathId) : undefined;
+  const pathStep = path ? (() => { const index = Math.min(path.steps.length - 1, Math.floor((shown - 1) * path.steps.length / days)); return { index, step: path.steps[index] }; })() : null;
 
   return <article className="active-challenge">
     <HeroPhoto slot={'challenge-' + (t?.id ?? 'custom')} tone={t?.tone ?? 'caramel'} label={String(entry.data.discipline || 'Défi')}>
@@ -97,14 +110,26 @@ function ActiveChallenge({ entry, onUpdate }: { entry: Entry; onUpdate: (entry: 
     <div className="dot-legend"><span><i className="day-dot done" /> Réalisé</span><span><i className="day-dot rest" /> Repos</span><span><i className="day-dot todo" /> Non réalisé</span></div>
     <div className="day-session">
       <span className="eyebrow">{shown === current ? 'SÉANCE DU JOUR' : 'JOUR ' + shown}</span>
-      <p>{shownPlan ?? 'Jour de repos prévu : récupère, étire-toi doucement si tu en as envie.'}</p>
+      <p className="day-topic">{shownPlan ?? 'Jour de repos prévu : récupère, étire-toi doucement si tu en as envie.'}</p>
+      {shownPlan && <><span className="eyebrow-s">COMMENT FAIRE</span>
+        <ol className="how-list">{howFor(t).map((h) => <li key={h}>{h}</li>)}</ol></>}
+      {pathStep && <div className="path-in-challenge"><span className="eyebrow-s"><BookOpen size={14} /> PARCOURS · ÉTAPE {pathStep.index + 1} : {pathStep.step.title}</span>
+        <p className="muted">{pathStep.step.goal}</p>
+        <ul className="step-tasks">{pathStep.step.tasks.map((x) => <li key={x}>{x}</li>)}</ul>
+        {pathStep.step.phrases && <div className="phrases">{pathStep.step.phrases.map(([o, fr]) => <div key={o} className="phrase"><div><strong>{o}</strong><small>{fr}</small></div></div>)}</div>}
+      </div>}
       <div className="button-group">
         <button className={state === 'done' ? 'button primary' : 'button ghost'} onClick={() => void mark(shown, 'done')}>Réalisé</button>
         <button className={state === 'rest' ? 'button secondary' : 'button ghost'} onClick={() => void mark(shown, 'rest')}>Repos</button>
         <button className={state === 'not_done' ? 'button secondary' : 'button ghost'} onClick={() => void mark(shown, 'not_done')}>Non réalisé</button>
       </div>
-      <p className="fineprint">Un jour manqué n’efface rien : reprends simplement où tu en es. Écoute tes sensations et adapte l’intensité.</p>
     </div>
+    <details className="challenge-more"><summary>Tenir sur la durée</summary>
+      <ul className="how-list">{STAY_ON_TRACK.map((x) => <li key={x}>{x}</li>)}</ul></details>
+    <details className="challenge-more"><summary>Le programme complet ({days} jours)</summary>
+      <ol className="program-list">{Array.from({ length: days }, (_, i) => <li key={i} className={progress[String(i + 1)]?.status === 'done' ? 'done' : ''}>
+        <strong>Jour {i + 1}</strong> {plan(i + 1) ?? 'Repos'}</li>)}</ol></details>
+    <button className="button ghost wide quit-btn" onClick={() => { if (window.confirm('Quitter « ' + entry.title + ' » ? Ta progression sur ce défi sera effacée.')) void onQuit(entry); }}><LogOut size={16} /> Quitter ce défi</button>
     {selected !== null && selected !== current && current > 0 &&
       <button className="button primary wide" onClick={() => setSelected(null)}>Voir la séance du jour <ChevronRight size={16} /></button>}
   </article>;

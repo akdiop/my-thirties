@@ -85,6 +85,5 @@ export function AutomaticPrayerTimes({ entries, onCreate }: {
       <button className="button primary" disabled={busy} onClick={() => void save()}>Enregistrer ces horaires</button>
     </div>}
     {message && <p role="status">{message}</p>}
-    <p className="fineprint">Les horaires peuvent varier selon la méthode, l'école juridique et la pratique locale. Ce service ne déclenche pas de rappel en arrière-plan.</p>
   </section>;
 }

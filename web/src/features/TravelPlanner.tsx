@@ -52,6 +52,5 @@ export function TravelPlanner({ entries, onUpdate }: {
     <div className="planner-form"><label>Ajouter un préparatif<input maxLength={180} value={newStep} onChange={(e) => setNewStep(e.target.value)} placeholder="Ex. vérifier les formalités officielles" /></label>
       <button className="button secondary" disabled={!newStep.trim()} onClick={() => void addStep()}>Ajouter</button></div>
     {error && <p className="error" role="alert">{error}</p>}
-    <p className="fineprint">Les exigences de visa, d'entrée et de santé changent. Vérifie les informations auprès des autorités officielles de destination et de départ avant de réserver.</p>
   </section>;
 }

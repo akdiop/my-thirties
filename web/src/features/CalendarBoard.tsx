@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { Entry } from '../lib/cloud';
 import { downloadCalendar } from '../lib/calendar';
-import { useIntegrationPrefs } from '../lib/integrations';
 
 type Props = { entries: Entry[]; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void> };
 const iso = (d: Date) => [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
@@ -42,7 +41,6 @@ function CalendarRow({ entry, day, onUpdate }: { entry: Entry; day: Date; onUpda
 }
 
 export function CalendarBoard({ entries, onUpdate }: Props) {
-  const { prefs } = useIntegrationPrefs();
   const [mode, setMode] = useState<'day' | 'week' | 'month'>('month');
   const [selected, setSelected] = useState(() => iso(new Date()));
   const selectedDate = parse(selected);
@@ -67,7 +65,7 @@ export function CalendarBoard({ entries, onUpdate }: Props) {
         <button className="icon-button" onClick={() => setSelected(iso(new Date()))}>Aujourd'hui</button>
         <button className="icon-button" onClick={() => shift(1)} aria-label="Période suivante">›</button></div>
     </div>
-    <div className="calendar-export">{!prefs.calendar && <p className="fineprint">Active l'export calendrier dans Profil.</p>}<button className="button secondary" onClick={() => downloadCalendar(entries)} disabled={!prefs.calendar || !entries.some((e) => e.entry_date)}>Exporter mon agenda (.ics)</button><p className="fineprint">Téléchargement volontaire à importer dans Apple Calendrier, Google Agenda ou Outlook. Aucune synchronisation automatique ; ce fichier peut contenir des informations personnelles.</p></div>
+    <div className="calendar-export"><button className="button secondary" onClick={() => downloadCalendar(entries)} disabled={!entries.some((e) => e.entry_date)}>Exporter mon agenda (.ics)</button></div>
     <div className="calendar-modes" role="group" aria-label="Affichage de l'agenda">
       {([['day', 'Jour'], ['week', 'Semaine'], ['month', 'Mois']] as const).map(([id, label]) =>
         <button key={id} className={mode === id ? 'active' : ''} onClick={() => setMode(id)} aria-pressed={mode === id}>{label}</button>)}

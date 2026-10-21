@@ -22,7 +22,7 @@ export function HealthOverview({ entries }: { entries: Entry[] }) {
     <div className="health-stats">
       <div className="stat-card"><span className="eyebrow">DERNIER CYCLE NOTÉ</span>
         <strong>{summary.cycles[0]?.entry_date ? formatDate(summary.cycles[0].entry_date) : 'Non renseigné'}</strong>
-        <span className="fineprint">Dates déclarées, sans prédiction de fertilité ni diagnostic.</span></div>
+        <span className="fineprint">Dates déclarées.</span></div>
       <div className="stat-card"><span className="eyebrow">SOMMEIL MOYEN SAISI</span>
         <strong>{summary.avgSleep === null ? 'Non renseigné' : summary.avgSleep.toLocaleString('fr-FR', { maximumFractionDigits: 1 }) + ' h'}</strong>
         <span className="fineprint">Moyenne des entrées enregistrées, pas un objectif à atteindre.</span></div>
@@ -37,6 +37,5 @@ export function HealthOverview({ entries }: { entries: Entry[] }) {
       {timeline.length ? timeline.map((e) => <div className="health-timeline" key={e.id}>
         <span>{formatDate(e.entry_date!)}</span><strong>{e.title}</strong><small>{e.kind === 'sleep' ? String(e.data.hours || '') + ' h' : e.kind}</small>
       </div>) : <p className="muted">Aucune donnée pour ce filtre.</p>}</div>
-    <p className="fineprint">Ce journal est informatif et personnel. Il ne fournit ni interprétation clinique, ni prédiction de grossesse.</p>
   </section>;
 }
