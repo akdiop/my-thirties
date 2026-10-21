@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { BookOpen, Check, ChevronRight, LogOut } from 'lucide-react';
+import { BookOpen, Check, ChevronRight, Eye, LogOut, X } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { CATEGORIES, dayNumber, templateById, templateLength, TEMPLATES, type ChallengeCategory, type ChallengeTemplate } from '../lib/challenges';
 import { STAY_ON_TRACK } from '../lib/challengePrograms';
@@ -34,6 +34,8 @@ export function ChallengesBoard({ entries, onCreate, onUpdate, onQuit }: { entri
   const active = inTab.find((e) => e.id === focus) ?? inTab[0];
   const startedIds = new Set(challenges.map((e) => e.data.template));
   const [search, setSearch] = useState('');
+  const [preview, setPreview] = useState<string | null>(null);
+  const previewed = preview ? templateById(preview) : undefined;
   const suggestions = TEMPLATES.filter((t) => t.category === tab && !t.retired && (t.title + ' ' + t.discipline + ' ' + t.tagline).toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr')));
 
   const start = async (id: string) => {
@@ -59,11 +61,41 @@ export function ChallengesBoard({ entries, onCreate, onUpdate, onQuit }: { entri
       <article key={t.id} className="template-card">
         <HeroPhoto slot={'challenge-' + t.id} tone={t.tone} label={t.discipline === 'Autre' ? t.category : t.discipline} compact />
         <div className="template-body"><strong>{t.title}</strong><span className="muted">{t.tagline}</span>
-          <button className="button ghost" disabled={Boolean(busy) || startedIds.has(t.id)} onClick={() => void start(t.id)}>
-            {startedIds.has(t.id) ? 'En cours' : busy === t.id ? '…' : 'Commencer'}</button></div>
+          <div className="template-actions">
+            <button className="button ghost" onClick={() => setPreview(t.id)}><Eye size={15} /> Voir</button>
+            <button className="button ghost" disabled={Boolean(busy) || startedIds.has(t.id)} onClick={() => void start(t.id)}>
+              {startedIds.has(t.id) ? 'En cours' : busy === t.id ? '…' : 'Commencer'}</button>
+          </div></div>
       </article>)}</div>
     {tab === 'Sport' && <ExerciseLibrary />}
+    {previewed && <ChallengePreview t={previewed} started={startedIds.has(previewed.id)} busy={busy === previewed.id}
+      onClose={() => setPreview(null)} onStart={async () => { await start(previewed.id); setPreview(null); setFocus(null); }} />}
   </section>;
+}
+
+/** Aperçu complet d'un défi avant de le rejoindre : méthode, parcours associé et programme jour par jour. */
+function ChallengePreview({ t, started, busy, onClose, onStart }: { t: ChallengeTemplate; started: boolean; busy: boolean; onClose: () => void; onStart: () => Promise<void> }) {
+  const days = templateLength(t.id);
+  const path = t.pathId ? pathById(t.pathId) : undefined;
+  return <div className="modal-overlay" role="dialog" aria-modal="true" aria-label={'Aperçu : ' + t.title} onClick={onClose}>
+    <div className="editor challenge-preview" onClick={(e) => e.stopPropagation()}>
+      <button className="icon-btn preview-close" aria-label="Fermer" onClick={onClose}><X size={20} /></button>
+      <HeroPhoto slot={'challenge-' + t.id} tone={t.tone} label={t.discipline === 'Autre' ? t.category : t.discipline}>
+        <div className="hero-title"><h2>{t.title}</h2><span>{t.tagline}</span></div>
+      </HeroPhoto>
+      <p className="muted">{t.category} · {days} jours{path ? ' · avec le parcours « ' + path.title + ' »' : ''}</p>
+      <span className="eyebrow-s">CHAQUE JOUR</span>
+      <ol className="how-list">{howFor(t).map((h) => <li key={h}>{h}</li>)}</ol>
+      <details className="challenge-more" open><summary>Le programme ({days} jours)</summary>
+        <ol className="program-list">{Array.from({ length: days }, (_, i) => <li key={i}><strong>Jour {i + 1}</strong> {t.day(i + 1) ?? 'Repos'}</li>)}</ol></details>
+      <details className="challenge-more"><summary>Tenir sur la durée</summary>
+        <ul className="how-list">{STAY_ON_TRACK.map((x) => <li key={x}>{x}</li>)}</ul></details>
+      <div className="button-group preview-actions">
+        <button className="button ghost" onClick={onClose}>Plus tard</button>
+        <button className="button primary" disabled={started || busy} onClick={() => void onStart()}>{started ? 'Déjà en cours' : busy ? '…' : 'Rejoindre ce défi'}</button>
+      </div>
+    </div>
+  </div>;
 }
 
 function ExerciseLibrary() {

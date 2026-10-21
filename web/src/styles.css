@@ -830,3 +830,11 @@ table{display:block;max-width:100%;overflow-x:auto}
 @media (max-width:480px){.dest-facts{grid-template-columns:1fr}.dest-facts dd{margin-bottom:6px}}
 .text-link{display:inline-block;margin-top:10px;color:#5E7A5F;font-weight:600;font-size:.85rem}
 .iphone-cal-sub{display:flex;align-items:center;gap:6px;margin:14px 0 0;padding-top:14px;border-top:1px solid #EFE5DA;font-size:.95rem}
+/* Aperçu d'un défi avant de le rejoindre */
+.template-actions{display:flex;gap:6px;flex-wrap:wrap}
+.template-actions .button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+.challenge-preview{position:relative;padding-top:54px}
+.challenge-preview .hero-photo{margin-bottom:10px}
+.preview-close{position:absolute;top:10px;right:10px;z-index:3;background:rgba(255,250,245,.9);border-radius:50%}
+.preview-actions{position:sticky;bottom:-20px;background:#faf7f2;padding:12px 0 4px;margin-top:12px}
+.preview-actions .button{flex:1}
