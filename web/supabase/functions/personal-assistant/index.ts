@@ -1,6 +1,7 @@
 // Deploy only to the dedicated My Thirties Supabase project.
+// Origines : APP_ORIGIN facultatif (sinon sites Vercel my-thirties / chubby.thirties).
 // Secrets : GEMINI_API_KEY (gratuit, clé Google AI Studio) — ou AI_API_KEY + AI_BASE_URL pour une autre API
-// compatible OpenAI (Groq, Mistral…), ou OPENAI_API_KEY —, SUPABASE_URL, SUPABASE_ANON_KEY, APP_ORIGIN.
+// compatible OpenAI (Groq, Mistral…), ou OPENAI_API_KEY —, SUPABASE_URL, SUPABASE_ANON_KEY.
 // Optionnels : AI_MODEL, AI_FALLBACK_MODEL (liste séparée par des virgules).
 // JWT verification must stay enabled. No service-role key is needed.
 import { createClient } from 'npm:@supabase/supabase-js@2';
@@ -23,15 +24,21 @@ function aiConfig() {
   return { key, baseUrl, model, fallbacks };
 }
 
+/** APP_ORIGIN (liste séparée par des virgules) si défini, sinon les sites Vercel de l'app (my-thirties, chubby.thirties). */
+function allowedOrigin(origin: string) {
+  const list = (Deno.env.get('APP_ORIGIN') ?? '').split(',').map((o) => o.trim()).filter(Boolean);
+  if (list.length) return list.includes(origin);
+  return /^https:\/\/(my-thirties|chubbythirties|chubby-thirties)[a-z0-9-]*\.vercel\.app$/.test(origin);
+}
+
 const json = (data: unknown, status = 200, origin = '') => new Response(JSON.stringify(data), {
   status, headers: { 'Content-Type': 'application/json; charset=utf-8',
     'Cache-Control': 'no-store', 'Vary': 'Origin', ...(origin ? { 'Access-Control-Allow-Origin': origin } : {}) },
 });
 
 Deno.serve(async (request) => {
-  const allowedOrigin = Deno.env.get('APP_ORIGIN') ?? '';
   const origin = request.headers.get('origin') ?? '';
-  const cors = Boolean(allowedOrigin && origin === allowedOrigin) ? origin : '';
+  const cors = allowedOrigin(origin) ? origin : '';
   if (request.method === 'OPTIONS') return new Response(null, {
     status: cors ? 204 : 403,
     headers: { ...(cors ? { 'Access-Control-Allow-Origin': cors } : {}), 'Access-Control-Allow-Methods': 'POST, OPTIONS',

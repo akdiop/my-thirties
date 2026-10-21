@@ -829,3 +829,4 @@ table{display:block;max-width:100%;overflow-x:auto}
 .dest-facts dd{margin:0;color:#3b2c23}
 @media (max-width:480px){.dest-facts{grid-template-columns:1fr}.dest-facts dd{margin-bottom:6px}}
 .text-link{display:inline-block;margin-top:10px;color:#5E7A5F;font-weight:600;font-size:.85rem}
+.iphone-cal-sub{display:flex;align-items:center;gap:6px;margin:14px 0 0;padding-top:14px;border-top:1px solid #EFE5DA;font-size:.95rem}
