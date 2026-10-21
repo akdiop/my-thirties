@@ -2,7 +2,6 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Alert, View } from 'react-native';
 
-import { Chips } from '@/components/form/Chips';
 import { SelectField } from '@/components/form/SelectField';
 import { Field, TextField } from '@/components/form/Field';
 import { Scale } from '@/components/form/Scale';
