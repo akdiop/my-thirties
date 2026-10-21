@@ -73,7 +73,7 @@ export const modules: Module[] = [
     id: 'finances', name: 'Mes finances', symbol: '¤', description: 'Dépenses, revenus, abonnements et épargne', sensitive: true,
     kinds: [
       { id: 'income', label: 'Revenu', fields: [date, amount, currency, { id: 'category', label: 'Catégorie', type: 'suggest', options: incomeCategories }, note] },
-      { id: 'expense', label: 'Dépense', fields: [date, amount, currency, { id: 'category', label: 'Catégorie', type: 'text' }, note] },
+      { id: 'expense', label: 'Dépense', fields: [date, amount, currency, { id: 'category', label: 'Catégorie', type: 'suggest', options: expenseCategories }, note] },
       { id: 'subscription', label: 'Abonnement', fields: [amount, currency, { id: 'frequency', label: 'Fréquence', type: 'select', options: ['Mensuelle', 'Annuelle', 'Autre'] }, { id: 'nextDate', label: 'Prochaine échéance', type: 'date' }, note] },
       { id: 'goal', label: 'Objectif d’épargne', fields: [amount, currency, { id: 'saved', label: 'Déjà épargné', type: 'number' }, { id: 'deadline', label: 'Échéance', type: 'date' }, note] },
       { id: 'budget', label: 'Budget mensuel', fields: [amount, currency, { id: 'category', label: 'Catégorie (facultatif)', type: 'suggest', options: expenseCategories }, { id: 'month', label: 'Mois (AAAA-MM)', type: 'text' }, note] },
