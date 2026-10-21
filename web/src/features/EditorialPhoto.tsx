@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { cloud } from '../lib/cloud';
-import { UNSPLASH_QUERIES, WIKI_DESTINATIONS, WIKI_DISHES } from '../lib/editorialPhotos';
+import { WIKI_DESTINATIONS, WIKI_DISHES } from '../lib/editorialPhotos';
+import { RECIPE_PHOTO_LIBRARY } from '../recipes/recipePhotoLibrary';
 
 /** Évite les cartes, logos, drapeaux et illustrations présentés comme photos de lieux. */
 const isPlacePhoto = (filename: string) =>
@@ -47,22 +47,41 @@ export const useDestinationPhotos = () => useWikiPhotos(WIKI_DESTINATIONS);
 /** Photos des plats (clé = titre de page du plat), pour illustrer chaque recette par une vraie photo du plat. */
 export const useDishPhotos = () => useWikiPhotos(WIKI_DISHES);
 
-export type UnsplashPhoto = { src: string; author: string; authorUrl: string; photoUrl: string };
-const UNSPLASH_CACHE = 'mt-unsplash-dishes-v1';
-/** Photos Unsplash des plats (via la fonction dish-photos, qui garde les résultats en cache) : { plat: photo }. */
-export function useUnsplashDishes(): Record<string, UnsplashPhoto> {
-  const [photos, setPhotos] = useState<Record<string, UnsplashPhoto>>(() => {
-    try { const c = JSON.parse(localStorage.getItem(UNSPLASH_CACHE) ?? 'null'); return c && Date.now() - c.at < 7 * 86_400_000 ? c.photos : {}; } catch { return {}; }
-  });
+/** Photographies sélectionnées individuellement et validées dans recipePhotoLibrary.ts.
+ * Wikimedia Commons ne sert ici que les miniatures des fichiers préapprouvés.
+ */
+export function useVerifiedRecipePhotos(): Record<string, DestinationPhoto> {
+  const [photos, setPhotos] = useState<Record<string, DestinationPhoto>>({});
   useEffect(() => {
-    if (!cloud || Object.keys(photos).length) return;
-    let active = true;
-    cloud.functions.invoke('dish-photos', { body: { queries: UNSPLASH_QUERIES } }).then(({ data, error }) => {
-      if (!active || error || !data?.photos) return;
-      setPhotos(data.photos);
-      try { localStorage.setItem(UNSPLASH_CACHE, JSON.stringify({ at: Date.now(), photos: data.photos })); } catch { /* stockage indisponible */ }
-    }).catch(() => { /* Wikipédia puis visuel local en secours */ });
-    return () => { active = false; };
+    const controller = new AbortController();
+    const verified = Object.entries(RECIPE_PHOTO_LIBRARY).filter(([, item]) => item.status === 'verified' && item.file);
+    if (!verified.length) return;
+    const params = new URLSearchParams({
+      action: 'query', format: 'json', origin: '*', prop: 'imageinfo',
+      iiprop: 'url|mime', iiurlwidth: '850',
+      titles: verified.map(([, item]) => 'File:' + item.file).join('|'),
+    });
+    fetch('https://commons.wikimedia.org/w/api.php?' + params, { signal: controller.signal })
+      .then((res) => { if (!res.ok) throw new Error('Miniatures indisponibles'); return res.json(); })
+      .then((payload: { query?: { pages?: Record<string, { title: string; imageinfo?: { thumburl?: string; url?: string; mime?: string }[] }> } }) => {
+        if (controller.signal.aborted) return;
+        const pages = Object.values(payload.query?.pages ?? {});
+        const approved: Record<string, DestinationPhoto> = {};
+        for (const [id, item] of verified) {
+          const page = pages.find((p) => simplify(p.title.replace(/^File:/i, '')) === simplify(item.file!));
+          const info = page?.imageinfo?.[0];
+          const src = info?.thumburl ?? info?.url;
+          if (info?.mime?.startsWith('image/') && src?.startsWith('https://upload.wikimedia.org/')) {
+            approved[id] = {
+              src,
+              creditUrl: 'https://commons.wikimedia.org/wiki/File:' + encodeURIComponent(item.file!.replace(/ /g, '_')),
+            };
+          }
+        }
+        setPhotos(approved);
+      })
+      .catch(() => { /* Aucun substitut : fond neutre. */ });
+    return () => controller.abort();
   }, []);
   return photos;
 }
