@@ -4,7 +4,7 @@ import { shrinkHero } from '../lib/photos';
 import { defaultVisual, visualBackground } from '../lib/visuals';
 import type { DestinationPhoto } from './EditorialPhoto';
 import { templateById } from '../lib/challenges';
-import { challengePhotoTheme } from '../lib/imageThemes';
+import { challengePhotoTheme, CURATED_CHALLENGE_PHOTOS, SAFE_WIKI_CHALLENGE_THEMES } from '../lib/imageThemes';
 
 type Photos = { photos: Record<string, string>; save: (slot: string, image: string | null) => Promise<void> };
 
@@ -31,7 +31,8 @@ export function HeroPhoto({ slot, tone = 'caramel', label, children, compact, cu
   const challengeImages = useContext(ChallengeImageContext);
   const challenge = slot.startsWith('challenge-') ? templateById(slot.slice('challenge-'.length)) : undefined;
   const themeId = challenge ? challengePhotoTheme(challenge.category, challenge.discipline, challenge.title) : undefined;
-  const illustration = !image && themeId ? challengeImages[themeId] : undefined;
+  const illustration = !image && themeId ? (CURATED_CHALLENGE_PHOTOS[themeId]
+    ?? (SAFE_WIKI_CHALLENGE_THEMES.has(themeId) ? challengeImages[themeId] : undefined)) : undefined;
   // Une vraie photo sportive locale prime sur l'illustration encyclopédique du thème.
   const exactSport = challenge && ['Pilates', 'Yoga', 'Tennis'].includes(challenge.discipline);
   const visual = image ? undefined : defaultVisual(slot);
@@ -58,7 +59,7 @@ export function HeroPhoto({ slot, tone = 'caramel', label, children, compact, cu
     </a>}
     {!image && !curatedPhoto && !useLocal && illustration && <a className="hero-theme-credit" href={illustration.creditUrl}
       target="_blank" rel="noopener noreferrer" title="Photographie d'ambiance liée au thème, pas à ton activité personnelle">
-      Photo d'ambiance · Wikimedia Commons ↗
+      Photo d'ambiance · {illustration.creditLabel ?? 'Wikimedia Commons'} ↗
     </a>}
     <label className="hero-change" title={'Changer la photo : ' + label}>
       <Camera size={15} /> <span>{busy ? '…' : image ? 'Changer' : 'Ma photo'}</span>
