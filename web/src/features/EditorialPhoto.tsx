@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { WIKI_DESTINATIONS, WIKI_DISHES } from '../lib/editorialPhotos';
+import { cloud } from '../lib/cloud';
+import { UNSPLASH_QUERIES, WIKI_DESTINATIONS, WIKI_DISHES } from '../lib/editorialPhotos';
 
 const simplify = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/_/g, ' ').trim();
 
@@ -40,6 +41,26 @@ function useWikiPhotos(titlesById: Record<string, string>): Record<string, Desti
 export const useDestinationPhotos = () => useWikiPhotos(WIKI_DESTINATIONS);
 /** Photos des plats (clé = titre de page du plat), pour illustrer chaque recette par une vraie photo du plat. */
 export const useDishPhotos = () => useWikiPhotos(WIKI_DISHES);
+
+export type UnsplashPhoto = { src: string; author: string; authorUrl: string; photoUrl: string };
+const UNSPLASH_CACHE = 'mt-unsplash-dishes-v1';
+/** Photos Unsplash des plats (via la fonction dish-photos, qui garde les résultats en cache) : { plat: photo }. */
+export function useUnsplashDishes(): Record<string, UnsplashPhoto> {
+  const [photos, setPhotos] = useState<Record<string, UnsplashPhoto>>(() => {
+    try { const c = JSON.parse(localStorage.getItem(UNSPLASH_CACHE) ?? 'null'); return c && Date.now() - c.at < 7 * 86_400_000 ? c.photos : {}; } catch { return {}; }
+  });
+  useEffect(() => {
+    if (!cloud || Object.keys(photos).length) return;
+    let active = true;
+    cloud.functions.invoke('dish-photos', { body: { queries: UNSPLASH_QUERIES } }).then(({ data, error }) => {
+      if (!active || error || !data?.photos) return;
+      setPhotos(data.photos);
+      try { localStorage.setItem(UNSPLASH_CACHE, JSON.stringify({ at: Date.now(), photos: data.photos })); } catch { /* stockage indisponible */ }
+    }).catch(() => { /* Wikipédia puis visuel local en secours */ });
+    return () => { active = false; };
+  }, []);
+  return photos;
+}
 
 export function EditorialPhoto({ src, fallback, alt, className }: { src: string; fallback: string; alt: string; className: string }) {
   const [failed, setFailed] = useState(false);

@@ -14,6 +14,21 @@ export const WIKI_DESTINATIONS: Record<string,string> = {
   'new-york':'New York',rio:'Rio de Janeiro'
 };
 
+/** Recherche Unsplash (en anglais, plus de résultats) pour chaque plat ; à défaut, le titre Wikipédia est utilisé. */
+export const UNSPLASH_QUERIES: Record<string, string> = {
+  Smoothie: 'fruit smoothie glass', 'Jus de fruits': 'fresh juice shot', Porridge: 'oatmeal porridge bowl', Bouillie: 'millet porridge',
+  'Pain perdu': 'french toast', Yassa: 'chicken yassa onion lemon', 'Mafé': 'peanut stew african', 'Thiéboudienne': 'thieboudienne senegal fish rice',
+  'Poulet rôti': 'grilled chicken plate', 'Riz frit': 'fried rice', 'Nouilles sautées': 'stir fried noodles', Lasagnes: 'lasagna',
+  Risotto: 'risotto', 'Pâtes alimentaires': 'pasta tomato sauce', Quiche: 'quiche', Omelette: 'omelette', Gratin: 'gratin dish',
+  Couscous: 'couscous vegetables', Curry: 'curry bowl', 'Velouté': 'creamy vegetable soup', Brochette: 'skewers grilled',
+  'Patate douce': 'roasted sweet potato', 'Salade composée': 'salad bowl', Pancake: 'pancakes', 'Crêpe': 'crepes',
+  Muffin: 'muffins', Cookie: 'cookies', 'Pop-corn': 'popcorn bowl', Pizza: 'mini pizza', Focaccia: 'focaccia',
+  'Pain pita': 'pita bread', Naan: 'naan bread', 'Wrap (cuisine)': 'tortilla wrap', Sandwich: 'sandwich', Tartine: 'open sandwich toast',
+  Yaourt: 'yogurt bowl fruit', 'Flan pâtissier': 'custard flan', Clafoutis: 'clafoutis', 'Cake (pâtisserie)': 'lemon loaf cake',
+  Compote: 'apple compote', 'Sauce tomate': 'tomato sauce', 'Sauce béchamel': 'bechamel sauce', 'Pâte brisée': 'pie dough',
+  Pain: 'homemade bread loaf', 'Bowl (cuisine)': 'buddha bowl', 'Sauté (cuisine)': 'stir fry pan', 'Amuse-bouche': 'appetizer bites',
+};
+
 /** Plats : mot-clé du titre de la recette → page Wikipédia (fr) du plat. Le premier qui correspond l'emporte. */
 const DISH_RULES: [RegExp, string][] = [
   [/smoothie/i, 'Smoothie'], [/^shot/i, 'Jus de fruits'], [/porridge/i, 'Porridge'], [/bouillie/i, 'Bouillie'],

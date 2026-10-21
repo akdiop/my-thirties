@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { dishOf } from '../lib/editorialPhotos';
-import { EditorialPhoto, useDishPhotos } from './EditorialPhoto';
+import { EditorialPhoto, useDishPhotos, useUnsplashDishes } from './EditorialPhoto';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { PERSONALIZED_RECIPES } from '../recipes/recipeIndex';
 import type { CuratedCategory } from '../recipes/types';
@@ -25,6 +25,7 @@ const defaultSlot = (c: CuratedCategory) => c === 'petit-dejeuner' || c === 'smo
 export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void> }) {
   const [category, setCategory] = useState<CuratedCategory>('petit-dejeuner');
   const dishPhotos = useDishPhotos();
+  const unsplash = useUnsplashDishes();
   const [search, setSearch] = useState('');
   const [style, setStyle] = useState<CulinaryStyle>('toutes');
   const [maxMinutes, setMaxMinutes] = useState('toutes');
@@ -97,9 +98,11 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
     <div className="lesson-grid">{visible.map((recipe) => {
       const isAdded = existing.has(recipe.id);
       const dish = dishOf(recipe.title);
+      const shot = dish ? unsplash[dish] : undefined;
       const photo = dish ? dishPhotos[dish] : undefined;
       return <article className="lesson-card recipe-photo-card" key={recipe.id}>
-        <EditorialPhoto src={photo?.src || '/visuels/cuisine.webp'} fallback="/visuels/cuisine.webp" alt={recipe.title} className="editorial-card-photo" />
+        <EditorialPhoto src={shot?.src || photo?.src || '/visuels/cuisine.webp'} fallback="/visuels/cuisine.webp" alt={recipe.title} className="editorial-card-photo" />
+        {shot && <span className="editorial-photo-credit">Photo <a href={shot.photoUrl} target="_blank" rel="noopener noreferrer">{shot.author}</a> · <a href="https://unsplash.com/?utm_source=my_thirties&utm_medium=referral" target="_blank" rel="noopener noreferrer">Unsplash</a></span>}
         <h3>{recipe.title}</h3>
         <p>{recipe.prepMin + recipe.cookMin} min environ · {recipe.servings} portions · {culinaryStyleLabel(recipeStyle(recipe))}</p>
         <details><summary>Ingrédients et préparation</summary>
