@@ -880,3 +880,12 @@ table{display:block;max-width:100%;overflow-x:auto}
 
 .editorial-photo-credit{display:inline-block;font-size:.7rem;color:#76523e;margin:-6px 0 10px;
   text-decoration:underline;text-underline-offset:2px}
+
+/* Pas de paysage générique si la photo d'une destination manque. */
+.editorial-photo-placeholder {
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#e8dfd3,#f5efe6);
+  color:#755f51;text-align:center;padding:18px;
+  border:1px solid #e0d5c8;
+}
+.editorial-photo-placeholder span{font-size:.82rem;line-height:1.45;max-width:240px}
