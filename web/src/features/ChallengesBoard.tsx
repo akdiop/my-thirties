@@ -4,7 +4,8 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { CATEGORIES, dayNumber, templateById, templateLength, TEMPLATES, type ChallengeCategory, type ChallengeTemplate } from '../lib/challenges';
 import { STAY_ON_TRACK } from '../lib/challengePrograms';
 import { pathById } from '../lib/learning';
-import { HeroPhoto } from './HeroPhoto';
+import { HeroPhoto, ChallengeImageContext } from './HeroPhoto';
+import { useChallengeThemePhotos } from './EditorialPhoto';
 import { EXERCISES, GROUPS, type ExerciseGroup } from '../lib/exercises';
 
 type Progress = Record<string, { status: string; notes?: string }>;
@@ -26,6 +27,7 @@ function howFor(t: ChallengeTemplate | undefined): string[] {
 }
 
 export function ChallengesBoard({ entries, onCreate, onUpdate, onQuit }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void>; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>; onQuit: (entry: Entry) => Promise<void> }) {
+  const themePhotos = useChallengeThemePhotos();
   const [tab, setTab] = useState<ChallengeCategory>('Sport');
   const [focus, setFocus] = useState<string | null>(null);
   const [busy, setBusy] = useState('');
@@ -49,7 +51,7 @@ export function ChallengesBoard({ entries, onCreate, onUpdate, onQuit }: { entri
     } finally { setBusy(''); }
   };
 
-  return <section className="challenges-board">
+  return <ChallengeImageContext.Provider value={themePhotos}><section className="challenges-board">
     <div className="pill-tabs" role="tablist">{CATEGORIES.map((c) =>
       <button key={c} role="tab" aria-selected={tab === c} className={tab === c ? 'active' : ''} onClick={() => { setTab(c); setFocus(null); setSearch(''); }}>{c}</button>)}</div>
     {active ? <ActiveChallenge key={active.id} entry={active} onUpdate={onUpdate} onQuit={async (e) => { await onQuit(e); setFocus(null); }} /> : <p className="muted">Aucun défi en cours dans cette catégorie. Choisis-en un ci-dessous.</p>}
@@ -70,7 +72,7 @@ export function ChallengesBoard({ entries, onCreate, onUpdate, onQuit }: { entri
     {tab === 'Sport' && <ExerciseLibrary />}
     {previewed && <ChallengePreview t={previewed} started={startedIds.has(previewed.id)} busy={busy === previewed.id}
       onClose={() => setPreview(null)} onStart={async () => { await start(previewed.id); setPreview(null); setFocus(null); }} />}
-  </section>;
+  </section></ChallengeImageContext.Provider>;
 }
 
 /** Aperçu complet d'un défi avant de le rejoindre : méthode, parcours associé et programme jour par jour. */
