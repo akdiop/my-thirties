@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { DESTINATION_IDEAS } from '../lib/destinationIdeas';
+import { destinationVisual, VISUALS } from '../lib/visuals';
 
 export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void> }) {
   const [style, setStyle] = useState('Toutes');
@@ -22,7 +23,7 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
     finally { setBusy(''); }
   };
   return <section className="tool-card">
-    <h3>Inspirations de voyage</h3>
+    <div className="editorial-cover"><img src={VISUALS.travel} alt="Rue colorée et animée à Lisbonne, photographie d'ambiance" loading="lazy" /><div><span className="eyebrow">ÉVASIONS ET DÉCOUVERTES</span><h3>Inspirations de voyage</h3><p>Des lieux à découvrir, des envies à garder.</p></div></div>
     <p className="muted">30 destinations pour imaginer tes prochains voyages. Enregistre celles qui t’attirent ; les durées sont des suggestions, pas des réservations.</p>
     <div className="recipe-filters">
       <label>Envie du moment<select value={style} onChange={(e) => setStyle(e.target.value)}>
@@ -32,6 +33,7 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
     </div>
     <p className="muted">{ideas.length} destination(s)</p>
     <div className="lesson-grid">{ideas.map((d) => <article className="lesson-card" key={d.id}>
+      {destinationVisual(d.name) && <img className="editorial-card-image" src={destinationVisual(d.name)} alt={'Vue de ' + d.name} loading="lazy" />}
       <h3>{d.name}</h3><p>{d.country} · {d.style} · {d.duration}</p>
       <p>{d.description}</p>
       <details><summary>À découvrir</summary><p>{d.highlights.join(' · ')}</p></details>
