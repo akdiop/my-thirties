@@ -67,15 +67,17 @@ export function useUnsplashDishes(): Record<string, UnsplashPhoto> {
   return photos;
 }
 
-export function EditorialPhoto({ src, fallback, alt, className }: { src: string; fallback: string; alt: string; className: string }) {
-  const [failed, setFailed] = useState(false);
-  useEffect(() => setFailed(false), [src]);
-  if (!src || failed) {
+export function EditorialPhoto({ src, fallback, alt, className }: { src?: string; fallback?: string; alt: string; className: string }) {
+  const [failed, setFailed] = useState(0);
+  useEffect(() => setFailed(0), [src]);
+  // Photo indisponible : visuel local s'il y en a un, sinon fond neutre (jamais une photo d'un autre lieu).
+  const shown = failed === 0 && src ? src : failed <= 1 && fallback ? fallback : '';
+  if (!shown) {
     return <div className={className + ' editorial-photo-placeholder'} role="img"
-      aria-label="Photographie de cette destination non disponible">
-      <span>Photo de la destination non disponible</span>
+      aria-label="Photographie non disponible">
+      <span>Photo non disponible</span>
     </div>;
   }
-  return <img className={className} src={src} alt={alt} loading="lazy"
-    onError={() => setFailed(true)} referrerPolicy="no-referrer" />;
+  return <img className={className} src={shown} alt={alt} loading="lazy"
+    onError={() => setFailed(shown === src ? 1 : 2)} referrerPolicy="no-referrer" />;
 }
