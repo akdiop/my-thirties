@@ -5,11 +5,13 @@ import { str, todayIso } from '../lib/day';
 import { amountOf, currencyOf, fmt } from '../lib/money';
 import { PRAYERS, prayerDay } from '../lib/wellbeing';
 import { HeroPhoto } from '../features/HeroPhoto';
+import { useDestinationPhotos, useVerifiedRecipePhotos } from '../features/EditorialPhoto';
 import { Check22, RowLink, Segmented, SectionTitle, type Tone } from '../ui/kit';
 
 /* ---------- Ma cuisine ---------- */
 export type CuisineTab = 'recettes' | 'semaine' | 'courses';
 export function CuisineTop({ tab, onTab, entries }: { tab: CuisineTab; onTab: (t: CuisineTab) => void; entries: Entry[] }) {
+  const recipePhotos = useVerifiedRecipePhotos();
   const recipes = entries.filter((e) => e.kind === 'recipe');
   return <div className="module-top">
     <HeroPhoto slot="module-cuisine" tone="caramel" label="Cuisine">
@@ -19,7 +21,7 @@ export function CuisineTop({ tab, onTab, entries }: { tab: CuisineTab; onTab: (t
     {tab === 'recettes' && recipes.length > 0 && <>
       <SectionTitle>Mes recettes</SectionTitle>
       <div className="recipe-grid">{recipes.slice(0, 6).map((r, i) => <article key={r.id} className="recipe-card">
-        <HeroPhoto slot={'recipe-' + r.id} tone={(['caramel', 'sauge', 'sable', 'chocolat'] as const)[i % 4]} label={r.title.split(' ')[0] ?? 'Recette'} compact />
+        <HeroPhoto slot={'recipe-' + r.id} tone={(['caramel', 'sauge', 'sable', 'chocolat'] as const)[i % 4]} label={r.title.split(' ')[0] ?? 'Recette'} curatedPhoto={recipePhotos[String(r.data.libraryId ?? '')]} compact />
         <div className="recipe-body"><strong>{r.title}</strong><small>{str(r, 'duration') ? str(r, 'duration') + ' min' : ''}{str(r, 'portions') ? ' · ' + str(r, 'portions') + ' portions' : ''}</small></div>
       </article>)}</div>
     </>}
@@ -28,6 +30,7 @@ export function CuisineTop({ tab, onTab, entries }: { tab: CuisineTab; onTab: (t
 
 /* ---------- Mes découvertes ---------- */
 export function TravelTop({ tab, onTab, entries, onCreate, onAdd }: { tab: 'destinations' | 'voyage'; onTab: (t: 'destinations' | 'voyage') => void; entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onAdd: (kind: string) => void }) {
+  const destinationPhotos = useDestinationPhotos();
   const destinations = entries.filter((e) => e.kind === 'destination');
   const [pick, setPick] = useState<string | null>(null);
   const d = destinations.find((x) => x.id === pick) ?? destinations[0];
@@ -36,7 +39,7 @@ export function TravelTop({ tab, onTab, entries, onCreate, onAdd }: { tab: 'dest
   return <div className="module-top">
     <Segmented label="Découvertes" value={tab} onChange={onTab} options={[{ value: 'destinations', label: 'Destinations' }, { value: 'voyage', label: 'Prochain voyage' }]} />
     {tab === 'destinations' && (d ? <>
-      <HeroPhoto slot={'destination-' + d.id} tone="sauge" label={d.title}>
+      <HeroPhoto slot={'destination-' + d.id} tone="sauge" label={d.title} curatedPhoto={destinationPhotos[String(d.data.suggestionId ?? '')]}>
         <div className="hero-title"><h2>{d.title}</h2><span>{[str(d, 'country'), str(d, 'notes').split('\n')[0]].filter(Boolean).join(' · ')}</span></div>
       </HeroPhoto>
       <div className="icon-row">
@@ -55,12 +58,12 @@ export function TravelTop({ tab, onTab, entries, onCreate, onAdd }: { tab: 'dest
       }}>{trips.some((t) => t.title === d.title) ? 'Déjà dans mes voyages' : 'En faire mon prochain voyage'}</button>
       {destinations.length > 1 && <><SectionTitle>Autres inspirations</SectionTitle>
         <div className="insp-row">{destinations.filter((x) => x.id !== d.id).map((x, i) => <button key={x.id} className="insp-card" onClick={() => setPick(x.id)}>
-          <HeroPhoto slot={'destination-' + x.id} tone={(['caramel', 'sable', 'sauge'] as const)[i % 3]} label={x.title} compact />
+          <HeroPhoto slot={'destination-' + x.id} tone={(['caramel', 'sable', 'sauge'] as const)[i % 3]} label={x.title} curatedPhoto={destinationPhotos[String(x.data.suggestionId ?? '')]} compact />
           <strong>{x.title}</strong><small>{str(x, 'country')}</small></button>)}</div></>}
     </> : <><HeroPhoto slot="module-decouvertes" tone="sauge" label="Voyages">
         <div className="hero-title"><h2>Mes découvertes</h2><span>Îles · Plages · Lagons</span></div>
       </HeroPhoto><div className="empty-soft"><MapPin size={28} /><p>Note une première destination de rêve.</p><button className="button ghost" onClick={() => onAdd('destination')}>Ajouter une destination</button></div></>)}
-    {tab === 'voyage' && trips[0] && <HeroPhoto slot={'trip-' + trips[0].id} tone="caramel" label={trips[0].title}>
+    {tab === 'voyage' && trips[0] && <HeroPhoto slot={'trip-' + trips[0].id} tone="caramel" label={trips[0].title} curatedPhoto={destinationPhotos[String(destinations.find((x) => x.title === trips[0].title)?.data.suggestionId ?? '')]}>
       <div className="hero-title"><h2>{trips[0].title}</h2><span>{trips[0].entry_date ? 'Départ le ' + new Date(trips[0].entry_date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }) : 'Dates à choisir'}{amountOf(trips[0]) ? ' · budget ' + fmt(amountOf(trips[0]), currencyOf(trips[0])) : ''}</span></div>
     </HeroPhoto>}
   </div>;
