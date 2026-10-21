@@ -2,9 +2,11 @@ import { useMemo, useState } from 'react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { DESTINATION_IDEAS } from '../lib/destinationIdeas';
 import { adviceUrl, DESTINATION_GUIDES } from '../lib/destinationGuides';
+import { EditorialPhoto, useDestinationPhotos } from './EditorialPhoto';
 
 export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void> }) {
   const [style, setStyle] = useState('Toutes');
+  const destinationPhotos = useDestinationPhotos();
   const [search, setSearch] = useState('');
   const [busy, setBusy] = useState('');
   const [feedback, setFeedback] = useState('');
@@ -25,7 +27,7 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
   };
   return <section className="tool-card">
     <h3>Inspirations de voyage</h3>
-    <p className="muted">30 destinations avec leur fiche complète : quand partir, comment y aller, où dormir, programme jour par jour, quoi goûter.</p>
+    <p className="muted">Photos des lieux issues de Wikipédia lorsqu’elles sont disponibles ; sinon, paysage d’inspiration. 30 destinations avec leur fiche complète : quand partir, comment y aller, où dormir, programme jour par jour, quoi goûter.</p>
     <div className="recipe-filters">
       <label>Envie du moment<select value={style} onChange={(e) => setStyle(e.target.value)}>
         {['Toutes', 'Culture', 'Nature', 'Détente', 'Ville', 'Aventure'].map((x) => <option key={x}>{x}</option>)}
@@ -34,6 +36,9 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
     </div>
     <p className="muted">{ideas.length} destination(s)</p>
     <div className="lesson-grid">{ideas.map((d) => <article className="lesson-card" key={d.id}>
+      <EditorialPhoto src={destinationPhotos[d.id] || '/visuels/voyage.webp'} fallback="/visuels/voyage.webp"
+        alt={destinationPhotos[d.id] ? 'Vue de ' + d.name + ' (Wikimedia Commons)' : 'Paysage tropical d’inspiration, non représentatif de ' + d.name}
+        className="editorial-card-photo" />
       <h3>{d.name}</h3><p>{d.country} · {d.style} · {d.duration}</p>
       <p>{d.description}</p>
       <Guide id={d.id} highlights={d.highlights} />
