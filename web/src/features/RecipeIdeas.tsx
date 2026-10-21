@@ -3,6 +3,7 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { PERSONALIZED_RECIPES } from '../recipes/recipeIndex';
 import type { CuratedCategory } from '../recipes/types';
 import { CULINARY_STYLES, culinaryStyleLabel, recipeStyle, type CulinaryStyle } from '../recipes/recipeStyles';
+import { recipeVisual, VISUALS } from '../lib/visuals';
 
 const categories: { id: CuratedCategory; label: string }[] = [
   { id: 'petit-dejeuner', label: 'Petit-déjeuner' },
@@ -48,7 +49,7 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
     finally { setBusy(''); }
   };
   return <section className="tool-card">
-    <h3>Ma bibliothèque de {PERSONALIZED_RECIPES.length} recettes</h3>
+    <div className="editorial-cover"><img src={VISUALS.cooking} alt="Cuisine maison : préparation d'un repas, photo d'ambiance" loading="lazy" /><div><span className="eyebrow">CUISINER ET DÉCOUVRIR</span><h3>Ma bibliothèque de {PERSONALIZED_RECIPES.length} recettes</h3><p>Des idées pour chaque moment de la journée.</p></div></div>
     <p className="muted">300 idées de repas et boissons, plus 15 recettes originales de boulangerie, desserts et bases maison. Pois chiches et lait de coco inclus. Les shots sont des boissons plaisir, sans promesse de détox.</p>
     <div className="recipe-filters">
       <label>Catégorie
@@ -77,6 +78,7 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
     <div className="lesson-grid">{visible.map((recipe) => {
       const isAdded = existing.has(recipe.id);
       return <article className="lesson-card" key={recipe.id}>
+        {recipeVisual(recipe.title) && <img className="editorial-card-image" src={recipeVisual(recipe.title)} alt="Illustration du type de plat (photo d’ambiance, non contractuelle)" loading="lazy" />}
         <h3>{recipe.title}</h3>
         <p>{recipe.prepMin + recipe.cookMin} min environ · {recipe.servings} portions · {culinaryStyleLabel(recipeStyle(recipe))}</p>
         <details><summary>Ingrédients et préparation</summary>
