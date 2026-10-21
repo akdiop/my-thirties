@@ -39,11 +39,14 @@ Deno.serve(async (request) => {
 
   // Recherches manquantes ou périmées, au plus 40 par appel pour rester sous la limite horaire.
   const stale = queries.filter((q) => { const r = byQuery.get(q); return !r || Date.now() - Date.parse(r.fetched_at) > MONTH; }).slice(0, 40);
+  let unsplashStatus = 0;
   if (key) for (const q of stale) {
     try {
       const res = await fetch('https://api.unsplash.com/search/photos?' + new URLSearchParams({ query: q, per_page: '1', orientation: 'landscape', content_filter: 'high' }),
         { headers: { Authorization: 'Client-ID ' + key, 'Accept-Version': 'v1' }, signal: AbortSignal.timeout(8000) });
-      if (res.status === 403 || res.status === 429) break; // quota atteint : on réessaiera plus tard
+      unsplashStatus = res.status;
+      if (!res.ok) console.error('Unsplash a répondu ' + res.status + ' pour « ' + q + ' »');
+      if ([401, 403, 429].includes(res.status)) break; // clé refusée ou quota atteint : on réessaiera plus tard
       if (!res.ok) continue;
       const hit = (await res.json())?.results?.[0];
       const photo: Photo | null = hit ? {
@@ -59,5 +62,6 @@ Deno.serve(async (request) => {
 
   const photos: Record<string, Photo> = {};
   for (const [dish, q] of Object.entries(wanted)) { const p = byQuery.get(q)?.photo; if (p) photos[dish] = p as Photo; }
-  return json({ photos, missingKey: !key });
+  if (!key) console.error('Secret UNSPLASH_ACCESS_KEY absent.');
+  return json({ photos, missingKey: !key, unsplashStatus });
 });

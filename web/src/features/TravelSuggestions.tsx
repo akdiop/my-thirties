@@ -3,6 +3,7 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { DESTINATION_IDEAS } from '../lib/destinationIdeas';
 import { adviceUrl, DESTINATION_GUIDES } from '../lib/destinationGuides';
 import { EditorialPhoto, useDestinationPhotos } from './EditorialPhoto';
+import { HiddenNote, useHidden } from '../lib/hidden';
 
 export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void> }) {
   const [style, setStyle] = useState('Toutes');
@@ -11,10 +12,11 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
   const [busy, setBusy] = useState('');
   const [feedback, setFeedback] = useState('');
   const saved = new Set(entries.filter((e) => e.kind === 'destination').map((e) => String(e.data.suggestionId ?? '')));
-  const ideas = useMemo(() => DESTINATION_IDEAS.filter((d) =>
+  const { ids: hidden, hide } = useHidden();
+  const ideas = useMemo(() => DESTINATION_IDEAS.filter((d) => !hidden.has('destination:' + d.id) &&
     (style === 'Toutes' || d.style === style) &&
     [d.name, d.country, d.region, d.description].join(' ').toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr'))
-  ), [style, search]);
+  ), [style, search, hidden]);
   const save = async (d: (typeof DESTINATION_IDEAS)[number]) => {
     setBusy(d.id); setFeedback('');
     try {
@@ -44,7 +46,9 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
       <button className="button secondary" disabled={Boolean(busy) || saved.has(d.id)} onClick={() => void save(d)}>
         {saved.has(d.id) ? 'Dans mes envies' : busy === d.id ? 'Ajout…' : 'Ajouter à mes envies'}
       </button>
+      <button className="button ghost" onClick={() => void hide('destination:' + d.id, d.name)}>Ne plus me proposer</button>
     </article>)}</div>
+    <HiddenNote prefix="destination:" />
     {feedback && <p role="status">{feedback}</p>}
   </section>;
 }

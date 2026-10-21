@@ -8,14 +8,14 @@ import { HeroPhoto } from '../features/HeroPhoto';
 import { Check22, RowLink, Segmented, SectionTitle, type Tone } from '../ui/kit';
 
 /* ---------- Ma cuisine ---------- */
-export type CuisineTab = 'recettes' | 'semaine' | 'courses';
+export type CuisineTab = 'recettes' | 'semaine' | 'courses' | 'astuces';
 export function CuisineTop({ tab, onTab, entries }: { tab: CuisineTab; onTab: (t: CuisineTab) => void; entries: Entry[] }) {
   const recipes = entries.filter((e) => e.kind === 'recipe');
   return <div className="module-top">
     <HeroPhoto slot="module-cuisine" tone="caramel" label="Cuisine">
-      <div className="hero-title"><h2>Ma cuisine</h2><span>Recettes · Ma semaine · Courses</span></div>
+      <div className="hero-title"><h2>Ma cuisine</h2><span>Recettes · Ma semaine · Courses · Astuces</span></div>
     </HeroPhoto>
-    <Segmented label="Cuisine" value={tab} onChange={onTab} options={[{ value: 'recettes', label: 'Recettes' }, { value: 'semaine', label: 'Ma semaine' }, { value: 'courses', label: 'Courses' }]} />
+    <Segmented label="Cuisine" value={tab} onChange={onTab} options={[{ value: 'recettes', label: 'Recettes' }, { value: 'semaine', label: 'Ma semaine' }, { value: 'courses', label: 'Courses' }, { value: 'astuces', label: 'Astuces' }]} />
     {tab === 'recettes' && recipes.length > 0 && <>
       <SectionTitle>Mes recettes</SectionTitle>
       <div className="recipe-grid">{recipes.slice(0, 6).map((r, i) => <article key={r.id} className="recipe-card">

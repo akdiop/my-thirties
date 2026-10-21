@@ -155,6 +155,8 @@ export const modules: Module[] = [
         { id: 'storage', label: 'Conservation', type: 'chips', options: ['2 jours au frais', '3-4 jours au frais', 'Se congèle', 'À consommer tout de suite'] }] },
       { id: 'meal', label: 'Repas planifié', title: (d) => `${first(d, 'slot', 'Repas')} · ${first(d, 'recipe', '')}`, fields: [date, { id: 'slot', label: 'Repas', type: 'chips', options: ['Petit-déjeuner', 'Déjeuner', 'Dîner'] },
         { id: 'recipe', label: 'Recette choisie', type: 'select', options: [], other: true }] },
+      { id: 'video', label: 'Vidéo astuce', fields: [{ id: 'url', label: 'Lien de la vidéo', type: 'text', placeholder: 'https://…' },
+        { id: 'theme', label: 'Thème', type: 'chips', options: ['Couteau', 'Cuissons', 'Sauces', 'Pâtisserie', 'Organisation', 'Recette'] }, note] },
     ],
   },
   {

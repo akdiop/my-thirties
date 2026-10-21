@@ -44,6 +44,8 @@ import { GuidedField } from './ui/fields';
 import { LearningPaths } from './features/LearningPaths';
 import { SeriesTracker } from './features/SeriesTracker';
 import { TravelSuggestions } from './features/TravelSuggestions';
+import { CookingTips } from './features/CookingTips';
+import { HIDDEN_KIND, HiddenProvider, readHidden, useHidden, type Hidden } from './lib/hidden';
 
 type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
@@ -262,6 +264,19 @@ function EntryCard({ entry, module, onEdit, onDelete, onUpdate }: {
   </article>;
 }
 
+/** Suggestions masquées dans les espaces, à rétablir une par une. */
+function HiddenSuggestions() {
+  const { items, restore } = useHidden();
+  if (!items.length) return null;
+  const label: Record<string, string> = { path: 'Parcours', challenge: 'Défi', destination: 'Destination', recipe: 'Recette' };
+  return <><p className="sec">Suggestions masquées</p>
+    <section className="panel form-stack">
+      <p className="muted">Elles n’apparaissent plus dans les espaces. Rétablis celles qui t’intéressent de nouveau.</p>
+      {items.map((x) => <div key={x.id} className="path-item"><span className="row-text"><strong>{x.label}</strong><small>{label[x.id.split(':')[0]] ?? 'Suggestion'}</small></span>
+        <button className="button ghost" onClick={() => void restore([x.id])}>Rétablir</button></div>)}
+    </section></>;
+}
+
 function Profile({ email, entries, profileEntry, onSaveProfile, onLogout, onRestored }: { email: string; entries: Entry[]; profileEntry: Entry | undefined; onSaveProfile: (input: EntryInput, id?: string) => Promise<void>; onLogout: () => Promise<void>; onRestored: () => Promise<void> }) {
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
@@ -307,6 +322,7 @@ function Profile({ email, entries, profileEntry, onSaveProfile, onLogout, onRest
       <summary>Modifier mon profil</summary>
       <PersonalProfile key={profileEntry?.id ?? 'new'} entry={profileEntry} onSave={onSaveProfile} />
     </details>
+    <HiddenSuggestions />
     <p className="sec">Compte</p>
     <section className="panel form-stack">
       <h2>Compte personnel</h2><p>{email}</p>
@@ -339,7 +355,7 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('home');
   const [allEntries, setEntries] = useState<Entry[]>([]);
   const profileEntry = allEntries.find((e) => e.kind === PROFILE_KIND);
-  const entries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND), [allEntries]);
+  const entries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND && e.kind !== HIDDEN_KIND), [allEntries]);
   const photoEntries = useMemo(() => allEntries.filter((e) => e.kind === PHOTO_KIND), [allEntries]);
   const photos = useMemo(() => Object.fromEntries(photoEntries.flatMap((e) =>
     typeof e.data.image === 'string' && /^data:image\/jpeg;base64,/.test(e.data.image) ? [[e.title, e.data.image]] : [])), [photoEntries]);
@@ -423,6 +439,21 @@ export default function App() {
     if (isMeal(input)) await syncGroceries([input.entry_date]);
     await refresh();
   };
+  const hiddenEntry = allEntries.find((e) => e.kind === HIDDEN_KIND);
+  const hidden = useMemo<Hidden>(() => {
+    const items = readHidden(hiddenEntry);
+    const write = async (next: typeof items) => {
+      const input = { title: 'Suggestions masquées', data: { items: next } };
+      try {
+        if (hiddenEntry) await editEntry(hiddenEntry.id, input);
+        else await createEntry({ module: 'quotidien', kind: HIDDEN_KIND, entry_date: null, ...input });
+        await refresh();
+      } catch { setError('Impossible d’enregistrer ce choix.'); }
+    };
+    return { items, ids: new Set(items.map((x) => x.id)),
+      hide: (id, label) => write([...items.filter((x) => x.id !== id), { id, label }]),
+      restore: (ids) => write(items.filter((x) => !ids.includes(x.id))) };
+  }, [hiddenEntry, refresh]);
   const updateData = async (entry: Entry, data: Record<string, unknown>) => {
     try { await editEntry(entry.id, { data }); await refresh(); }
     catch (e) { setError(e instanceof Error ? e.message : 'Mise à jour impossible.'); }
@@ -476,7 +507,7 @@ export default function App() {
 
   const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings'] as Screen[]).includes(screen);
 
-  return <PhotoProvider value={{ photos, save: savePhoto }}><div className={'app' + (screen === 'calme' ? ' calm-mode' : '')}>
+  return <HiddenProvider value={hidden}><PhotoProvider value={{ photos, save: savePhoto }}><div className={'app' + (screen === 'calme' ? ' calm-mode' : '')}>
     <main className="phone">
       {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
       {loading && <div className="sync-status" role="status">Synchronisation…</div>}
@@ -498,6 +529,7 @@ export default function App() {
         {currentModule.id === 'cuisine' && <><CuisineTop tab={cuisineTab} onTab={setCuisineTab} entries={allModuleEntries} />
           {cuisineTab === 'recettes' && <RecipeIdeas entries={allModuleEntries} onCreate={createFromTool} />}
           {cuisineTab === 'semaine' && <><KitchenPlanner entries={allModuleEntries} onCreate={createFromTool} onRemove={removeQuiet} /><KitchenTools entries={allModuleEntries} onGenerate={createGroceries} /></>}
+          {cuisineTab === 'astuces' && <CookingTips entries={allModuleEntries} onAdd={() => addIn('cuisine', 'video', { theme: 'Cuissons' })} onRemove={removeQuiet} />}
           {cuisineTab === 'courses' && <div className="entries">{entries.filter((e) => e.module === 'listes' && String(e.data.category) === 'Courses').map((e) =>
             <EntryCard key={e.id} entry={e} module={moduleById('listes')} onEdit={openEntry} onDelete={(x) => void remove(x)} onUpdate={updateData} />)}
             {!entries.some((e) => e.module === 'listes' && String(e.data.category) === 'Courses') && <p className="muted">Planifie ta semaine puis génère tes courses.</p>}</div>}
@@ -528,5 +560,5 @@ export default function App() {
       return <button key={id} className={on ? 'on' : ''} aria-current={on ? 'page' : undefined} onClick={() => go(id)}><Icon size={24} strokeWidth={on ? 2.2 : 1.6} /><span>{label}</span></button>;
     })}</nav>}
     {editor && <Editor key={(editor.initial?.id ?? editor.module.id) + (editor.preset?.kind ?? '')} module={editor.module} initial={editor.initial} preset={editor.preset} entries={entries} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
-  </div></PhotoProvider>;
+  </div></PhotoProvider></HiddenProvider>;
 }

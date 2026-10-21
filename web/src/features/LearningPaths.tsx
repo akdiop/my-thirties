@@ -4,6 +4,7 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { PATH_CATEGORIES, PATHS, pathById, type PathCategory } from '../lib/learning';
 import { HeroPhoto } from './HeroPhoto';
 import { Bar, Segmented } from '../ui/kit';
+import { HiddenNote, HideButton, useHidden } from '../lib/hidden';
 
 const ICON: Record<PathCategory, typeof Languages> = { Langues: Languages, 'Peinture & dessin': Brush, Écriture: PenLine };
 const doneOf = (e: Entry) => (e.data.done && typeof e.data.done === 'object' ? e.data.done as Record<string, boolean> : {});
@@ -23,6 +24,7 @@ export function LearningPaths({ entries, onCreate, onUpdate }: { entries: Entry[
   const [focus, setFocus] = useState<string | null>(null);
   const [cat, setCat] = useState<PathCategory>('Langues');
   const [busy, setBusy] = useState('');
+  const hidden = useHidden().ids;
   const active = mine.find((e) => e.id === focus) ?? mine[0];
 
   const start = async (id: string) => {
@@ -39,15 +41,17 @@ export function LearningPaths({ entries, onCreate, onUpdate }: { entries: Entry[
     </>}
     <h3 className="board-subtitle">{mine.length ? 'Commencer un autre parcours' : 'Choisir un parcours'}</h3>
     <Segmented label="Catégorie" value={cat} onChange={setCat} options={PATH_CATEGORIES.map((c) => ({ value: c, label: c === 'Peinture & dessin' ? 'Art' : c }))} />
-    <div className="path-list">{PATHS.filter((p) => p.category === cat).map((p) => {
+    <div className="path-list">{PATHS.filter((p) => p.category === cat && !hidden.has('path:' + p.id)).map((p) => {
       const Icon = ICON[p.category];
       const started = mine.some((e) => e.data.pathId === p.id);
       return <div key={p.id} className="path-item">
         <span className="row-icon"><Icon size={19} /></span>
         <span className="row-text"><strong>{p.title}</strong><small>{p.tagline} · {p.steps.length} étapes</small></span>
         <button className="button ghost" disabled={Boolean(busy) || started} onClick={() => void start(p.id)}>{started ? 'En cours' : busy === p.id ? '…' : 'Commencer'}</button>
+        {!started && <HideButton id={'path:' + p.id} label={p.title} />}
       </div>;
     })}</div>
+    <HiddenNote prefix="path:" />
   </section>;
 }
 

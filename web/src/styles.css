@@ -889,3 +889,27 @@ table{display:block;max-width:100%;overflow-x:auto}
   border:1px solid #e0d5c8;
 }
 .editorial-photo-placeholder span{font-size:.82rem;line-height:1.45;max-width:240px}
+
+/* Suggestions masquées */
+.hide-btn{width:38px;height:38px;flex:none;color:#8b7b6c;margin-left:auto}
+.hide-btn:hover{color:#6B3F2E;background:#F4ECE3}
+.hidden-note{font-size:.8rem;margin-top:10px}
+
+/* Astuces vidéo cuisine */
+.cooking-tips .video-list{display:grid;gap:14px;margin:14px 0 22px}
+@media (min-width:700px){.cooking-tips .video-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.video-card{background:#fffdfa;border:1px solid #eee5dc;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.video-thumb{position:relative;border:0;padding:0;background:#2B1A12;aspect-ratio:16/9;cursor:pointer;display:block;width:100%}
+.video-thumb img{width:100%;height:100%;object-fit:cover;display:block;opacity:.88}
+.video-thumb span{position:absolute;inset:0;display:grid;place-items:center;color:#fff}
+.video-thumb span svg{background:rgba(43,26,18,.65);border-radius:50%;padding:14px;box-sizing:content-box}
+.video-frame{width:100%;aspect-ratio:16/9;border:0;display:block;background:#000}
+.video-meta{padding:12px 14px 4px;display:flex;flex-direction:column;gap:3px}
+.video-meta small{color:#8b7b6c}
+.video-meta p{margin:4px 0 0;font-size:.85rem}
+.video-card .button-group{padding:0 14px 12px}
+.tip-list{display:grid;gap:10px;margin-top:12px}
+@media (min-width:700px){.tip-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tip-card{background:#fffdfa;border:1px solid #eee5dc;border-radius:14px;padding:12px 14px}
+.tip-card p{margin:6px 0;font-size:.88rem}
+.tip-card .link-btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none}
