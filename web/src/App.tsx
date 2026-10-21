@@ -497,6 +497,6 @@ export default function App() {
       const on = screen === id || (id === 'spaces' && Boolean(currentModule));
       return <button key={id} className={on ? 'on' : ''} aria-current={on ? 'page' : undefined} onClick={() => go(id)}><Icon size={24} strokeWidth={on ? 2.2 : 1.6} /><span>{label}</span></button>;
     })}</nav>}
-    {editor && <Editor key={(editor.initial?.id ?? editor.module.id) + (editor.preset?.kind ?? '')} module={editor.module} initial={editor.initial} preset={editor.preset} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
+    {editor && <Editor key={(editor.initial?.id ?? editor.module.id) + (editor.preset?.kind ?? '')} module={editor.module} initial={editor.initial} preset={editor.preset} entries={entries} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
   </div></PhotoProvider>;
 }
