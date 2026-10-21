@@ -138,3 +138,43 @@ export function challengePhotoTheme(category: string, discipline: string, title:
   if (category === "Bien-être") return "meditation";
   return "nature";
 }
+
+/** Photographies Pexels dont le sujet a été contrôlé sur la page source.
+ * Personnes : femmes noires uniquement. Sujets non humains : objets thématiques.
+ * Chaque photo est une illustration de l'activité, non de l'utilisateur.
+ */
+const pexels = (id: number) => ({
+  src: 'https://images.pexels.com/photos/' + id + '/pexels-photo-' + id + '.jpeg?auto=compress&cs=tinysrgb&w=960',
+  creditUrl: 'https://www.pexels.com/photo/' + id + '/',
+  creditLabel: 'Pexels',
+});
+export const CURATED_CHALLENGE_PHOTOS: Record<string, ReturnType<typeof pexels>> = {
+  squat: pexels(8846530),
+  plank: pexels(6303481),
+  pushup: pexels(8770392),
+  run: pexels(4760570),
+  walk: pexels(6280553),
+  stretch: pexels(7746176),
+  dance: pexels(7194397),
+  strength: pexels(5149159),
+  book: pexels(9051417),
+  language: pexels(7683726),
+  notes: pexels(3059749),
+  write: pexels(8091202),
+  code: pexels(5905839),
+  computer: pexels(5905839),
+  calendar: pexels(8532928),
+  project: pexels(8532928),
+  meditation: pexels(6957977),
+  breathing: pexels(7113566),
+};
+
+/** Les autres articles Wikipédia ne sont utilisés que pour des sujets principalement
+ * documentaires (objets, paysages ou créations), pas pour inventer des portraits.
+ */
+export const SAFE_WIKI_CHALLENGE_THEMES = new Set([
+  'history', 'geography', 'museum', 'science', 'economics', 'research', 'photo',
+  'drawing', 'painting', 'vegetables', 'spice', 'mealprep', 'foodwaste',
+  'breakfast', 'smoothie', 'cooking', 'calendar', 'tidying', 'finance',
+  'sleep', 'gratitude', 'nature', 'water',
+]);
