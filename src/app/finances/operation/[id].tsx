@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Alert } from 'react-native';
 
 import { Chips } from '@/components/form/Chips';
+import { SelectField } from '@/components/form/SelectField';
 import { DateField } from '@/components/form/DateTimeField';
 import { Field, TextField } from '@/components/form/Field';
 import { Button, Screen } from '@/components/ui';
@@ -31,7 +32,7 @@ export default function Operation() {
   const categories = kind === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
 
   const save = () => {
-    if (minor === null) return;
+    if (minor === null || !category.trim()) return;
     mutate(({ life }) =>
       life.saveTx({ date, kind, amountMinor: minor, currency, category, label: label.trim() || null, notes: notes.trim() || null, tripId: kind === 'expense' ? trip : null }, existing?.id),
     );
@@ -42,7 +43,7 @@ export default function Operation() {
     <Screen
       title={existing ? 'Opération' : 'Nouvelle opération'}
       back
-      footer={<Button label="Enregistrer" disabled={minor === null} onPress={save} />}
+      footer={<Button label="Enregistrer" disabled={minor === null || !category.trim()} onPress={save} />}
     >
       <Segmented
         label="Type"
@@ -57,17 +58,13 @@ export default function Operation() {
       <Field label="Devise">
         <Chips label="Devise" options={CURRENCIES.map((x) => ({ value: x, label: x }))} value={currency} onChange={setCurrency} />
       </Field>
-      <Field label="Catégorie">
-        <Chips label="Catégorie" options={categories.map((x) => ({ value: x as string, label: x }))} value={category} onChange={setCategory} />
-      </Field>
+      <SelectField label="Catégorie" options={categories.map((x) => ({ value: x as string, label: x }))} value={category} onChange={setCategory} allowCustom />
       <TextField label="Libellé" value={label} onChangeText={setLabel} maxLength={80} placeholder="Marché, loyer…" />
       <Field label="Date">
         <DateField label="Date" value={date} onChange={(d) => d && setDate(d)} />
       </Field>
       {kind === 'expense' && trips.length ? (
-        <Field label="Voyage lié">
-          <Chips label="Voyage lié" options={[{ value: null, label: 'Aucun' }, ...trips.map((t) => ({ value: t.id as string | null, label: t.title }))]} value={trip} onChange={setTrip} />
-        </Field>
+        <SelectField label="Voyage lié" options={[{ value: null, label: 'Aucun' }, ...trips.map((t) => ({ value: t.id as string | null, label: t.title }))]} value={trip} onChange={setTrip} />
       ) : null}
       <TextField label="Notes" value={notes} onChangeText={setNotes} multiline maxLength={500} />
       {existing ? (
