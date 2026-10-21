@@ -1,4 +1,4 @@
-// Flux iCalendar privé pour l'abonnement « Calendrier » de l'iPhone.
+// Flux iCalendar privé pour l'abonnement « Calendrier » de l'iPhone (sens My Thirties → iPhone).
 // Déployer avec la vérification JWT désactivée (l'app Calendrier n'envoie pas de jeton) :
 //   supabase functions deploy calendar-feed --no-verify-jwt
 // L'accès est protégé par le jeton secret du lien (64 caractères hexadécimaux, table calendar_feeds).
@@ -6,7 +6,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const KINDS = ['task', 'routine', 'event', 'appointment', 'meal'];
-const escape = (s: string) => s.replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\;');
+const escape = (s: string) => s.replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
 const pad = (n: number) => String(n).padStart(2, '0');
 const day = (d: string) => d.replace(/-/g, '');
 const nextDay = (d: string) => { const x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + 1); return x.toISOString().slice(0, 10); };
@@ -55,7 +55,9 @@ Deno.serve(async (request) => {
   const { data, error } = await db.from('entries').select('id,kind,title,entry_date,data')
     .eq('user_id', feed.user_id).in('kind', KINDS).not('entry_date', 'is', null).limit(2000);
   if (error) return new Response('Erreur temporaire.', { status: 502 });
-  return new Response(ics((data ?? []) as Row[]), { headers: {
+  // Les événements venus de l'iPhone n'y sont pas renvoyés (sinon ils apparaîtraient en double).
+  const rows = ((data ?? []) as Row[]).filter((e) => e.data?.source !== 'iphone');
+  return new Response(ics(rows), { headers: {
     'Content-Type': 'text/calendar; charset=utf-8', 'Cache-Control': 'private, max-age=900',
     'Content-Disposition': 'inline; filename="my-thirties.ics"' } });
 });
