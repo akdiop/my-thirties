@@ -5,6 +5,7 @@ import { CATEGORIES, dayNumber, templateById, templateLength, TEMPLATES, type Ch
 import { STAY_ON_TRACK } from '../lib/challengePrograms';
 import { pathById } from '../lib/learning';
 import { HeroPhoto } from './HeroPhoto';
+import { HiddenNote, HideButton, useHidden } from '../lib/hidden';
 import { EXERCISES, GROUPS, type ExerciseGroup } from '../lib/exercises';
 
 type Progress = Record<string, { status: string; notes?: string }>;
@@ -35,8 +36,9 @@ export function ChallengesBoard({ entries, onCreate, onUpdate, onQuit }: { entri
   const startedIds = new Set(challenges.map((e) => e.data.template));
   const [search, setSearch] = useState('');
   const [preview, setPreview] = useState<string | null>(null);
+  const hidden = useHidden().ids;
   const previewed = preview ? templateById(preview) : undefined;
-  const suggestions = TEMPLATES.filter((t) => t.category === tab && !t.retired && (t.title + ' ' + t.discipline + ' ' + t.tagline).toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr')));
+  const suggestions = TEMPLATES.filter((t) => t.category === tab && !t.retired && !hidden.has('challenge:' + t.id) && (t.title + ' ' + t.discipline + ' ' + t.tagline).toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr')));
 
   const start = async (id: string) => {
     const t = templateById(id);
@@ -65,8 +67,10 @@ export function ChallengesBoard({ entries, onCreate, onUpdate, onQuit }: { entri
             <button className="button ghost" onClick={() => setPreview(t.id)}><Eye size={15} /> Voir</button>
             <button className="button ghost" disabled={Boolean(busy) || startedIds.has(t.id)} onClick={() => void start(t.id)}>
               {startedIds.has(t.id) ? 'En cours' : busy === t.id ? '…' : 'Commencer'}</button>
+            <HideButton id={'challenge:' + t.id} label={t.title} />
           </div></div>
       </article>)}</div>
+    <HiddenNote prefix="challenge:" />
     {tab === 'Sport' && <ExerciseLibrary />}
     {previewed && <ChallengePreview t={previewed} started={startedIds.has(previewed.id)} busy={busy === previewed.id}
       onClose={() => setPreview(null)} onStart={async () => { await start(previewed.id); setPreview(null); setFocus(null); }} />}

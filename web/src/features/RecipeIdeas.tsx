@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { dishOf } from '../lib/editorialPhotos';
 import { EditorialPhoto, useDishPhotos, useUnsplashDishes } from './EditorialPhoto';
 import type { Entry, EntryInput } from '../lib/cloud';
+import { HiddenNote, HideButton, useHidden } from '../lib/hidden';
 import { PERSONALIZED_RECIPES } from '../recipes/recipeIndex';
 import type { CuratedCategory } from '../recipes/types';
 import { CULINARY_STYLES, culinaryStyleLabel, recipeStyle, type CulinaryStyle } from '../recipes/recipeStyles';
@@ -32,11 +33,12 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
   const [page, setPage] = useState(1);
   const [busy, setBusy] = useState('');
   const [message, setMessage] = useState('');
-  const filtered = useMemo(() => PERSONALIZED_RECIPES.filter((r) =>
+  const hidden = useHidden().ids;
+  const filtered = useMemo(() => PERSONALIZED_RECIPES.filter((r) => !hidden.has('recipe:' + r.id) &&
     r.category === category && (style === 'toutes' || recipeStyle(r) === style) &&
     (maxMinutes === 'toutes' || r.prepMin + r.cookMin <= Number(maxMinutes)) &&
     (r.title + ' ' + r.ingredients).toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr'))
-  ), [category, search, style, maxMinutes]);
+  ), [category, search, style, maxMinutes, hidden]);
   const visible = filtered.slice(0, page * PAGE_SIZE);
   const existing = new Set(entries.filter((e) => e.kind === 'recipe').map((e) => String(e.data.libraryId ?? '')));
   const [planning, setPlanning] = useState('');
@@ -114,6 +116,7 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
           <button className="button ghost" disabled={Boolean(busy) || isAdded} onClick={() => void create(recipe)}>
             {isAdded ? 'Dans mes recettes' : busy === recipe.id ? 'Ajout…' : 'Ajouter à mes recettes'}
           </button>
+          <HideButton id={'recipe:' + recipe.id} label={recipe.title} />
         </div>
         {planning === recipe.id && <div className="plan-inline">
           <label>Jour<input type="date" value={planDay} onChange={(e) => setPlanDay(e.target.value)} /></label>
@@ -122,6 +125,7 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
         </div>}
       </article>;
     })}</div>
+    <HiddenNote prefix="recipe:" />
     {visible.length < filtered.length && <button className="button secondary" onClick={() => setPage((p) => p + 1)}>Afficher 12 recettes de plus</button>}
     {message && <p role="status">{message}</p>}
   </section>;
