@@ -10,7 +10,7 @@ const isPlacePhoto = (filename: string) =>
 
 const simplify = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/_/g, ' ').trim();
 
-export type DestinationPhoto = { src: string; creditUrl: string };
+export type DestinationPhoto = { src: string; creditUrl: string; creditLabel?: string };
 /** Photo principale de pages Wikipédia (fr), chargées en une seule requête : { id: titre de page } → { id: photo }. */
 function useWikiPhotos(titlesById: Record<string, string>, lang: 'fr' | 'en' = 'fr'): Record<string, DestinationPhoto> {
   const [images, setImages] = useState<Record<string, DestinationPhoto>>({});
