@@ -913,3 +913,7 @@ table{display:block;max-width:100%;overflow-x:auto}
 .tip-card{background:#fffdfa;border:1px solid #eee5dc;border-radius:14px;padding:12px 14px}
 .tip-card p{margin:6px 0;font-size:.88rem}
 .tip-card .link-btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+
+/* Crédit Unsplash sur les grandes photos (en haut à gauche, hors du titre) */
+.hero-credit{position:absolute;top:12px;left:12px;max-width:55%;padding:3px 8px;border-radius:999px;background:rgba(43,26,18,.55);color:#fff;font-size:.62rem;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-credit a{color:#fff}
