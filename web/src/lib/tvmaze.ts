@@ -43,3 +43,31 @@ export function platformOf(network: string, platforms: string[]) {
   if (n.includes('youtube')) return 'YouTube';
   return platforms.includes(network) ? network : '';
 }
+
+export type Episode = { id: number; season: number; number: number; name: string; airdate: string; runtime: number; image: string };
+export type ShowData = { episodes: Episode[]; summary: string; status: string; runtime: number };
+
+const stripHtml = (s: unknown) => typeof s === 'string' ? s.replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, '’').trim().slice(0, 900) : '';
+const CACHE = 'mt-tvmaze-';
+
+/** Fiche et liste complète des épisodes (hors épisodes spéciaux), gardées 12 h sur l'appareil. */
+export async function showData(id: number): Promise<ShowData> {
+  try {
+    const c = JSON.parse(localStorage.getItem(CACHE + id) ?? 'null') as { at: number; data: ShowData } | null;
+    if (c && Date.now() - c.at < 12 * 3_600_000) return c.data;
+  } catch { /* cache indisponible */ }
+  const res = await fetch(API + '/shows/' + id + '?embed=episodes');
+  if (!res.ok) throw new Error('Série indisponible.');
+  const show = await res.json() as any;
+  const data: ShowData = {
+    summary: stripHtml(show.summary), status: String(show.status ?? ''), runtime: Number(show.averageRuntime ?? show.runtime ?? 0) || 0,
+    episodes: ((show._embedded?.episodes ?? []) as any[]).filter((e) => Number(e.season) > 0 && Number(e.number) > 0).map((e) => ({
+      id: Number(e.id), season: Number(e.season), number: Number(e.number), name: String(e.name ?? '').slice(0, 140),
+      airdate: /^\d{4}-\d{2}-\d{2}$/.test(String(e.airdate)) ? String(e.airdate) : '', runtime: Number(e.runtime) || 0, image: safeImg(e.image?.medium),
+    })),
+  };
+  try { localStorage.setItem(CACHE + id, JSON.stringify({ at: Date.now(), data })); } catch { /* stockage plein */ }
+  return data;
+}
+
+export const epCode = (e: Pick<Episode, 'season' | 'number'>) => 'S' + String(e.season).padStart(2, '0') + 'E' + String(e.number).padStart(2, '0');
