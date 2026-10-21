@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { WIKI_DESTINATIONS, WIKI_DISHES } from '../lib/editorialPhotos';
 import { RECIPE_PHOTO_LIBRARY } from '../recipes/recipePhotoLibrary';
+import { CHALLENGE_THEME_PAGES, ENGLISH_DESTINATIONS } from '../lib/imageThemes';
 
 /** Évite les cartes, logos, drapeaux et illustrations présentés comme photos de lieux. */
 const isPlacePhoto = (filename: string) =>
@@ -11,7 +12,7 @@ const simplify = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '
 
 export type DestinationPhoto = { src: string; creditUrl: string };
 /** Photo principale de pages Wikipédia (fr), chargées en une seule requête : { id: titre de page } → { id: photo }. */
-function useWikiPhotos(titlesById: Record<string, string>): Record<string, DestinationPhoto> {
+function useWikiPhotos(titlesById: Record<string, string>, lang: 'fr' | 'en' = 'fr'): Record<string, DestinationPhoto> {
   const [images, setImages] = useState<Record<string, DestinationPhoto>>({});
   useEffect(() => {
     const controller = new AbortController();
@@ -20,7 +21,7 @@ function useWikiPhotos(titlesById: Record<string, string>): Record<string, Desti
       redirects: '1', format: 'json', origin: '*',
       titles: [...new Set(Object.values(titlesById))].join('|'),
     });
-    fetch('https://fr.wikipedia.org/w/api.php?' + params, { signal: controller.signal })
+    fetch('https://' + lang + '.wikipedia.org/w/api.php?' + params, { signal: controller.signal })
       .then((response) => { if (!response.ok) throw new Error('Images indisponibles'); return response.json(); })
       .then((payload: { query?: { pages?: Record<string, { title: string; pageimage?: string; thumbnail?: { source: string } }>; redirects?: { from: string; to: string }[] } }) => {
         if (controller.signal.aborted) return;
@@ -39,11 +40,19 @@ function useWikiPhotos(titlesById: Record<string, string>): Record<string, Desti
       })
       .catch(() => { /* Laisser le fond neutre si les photos sont indisponibles. */ });
     return () => controller.abort();
-  }, [titlesById]);
+  }, [titlesById, lang]);
   return images;
 }
 
-export const useDestinationPhotos = () => useWikiPhotos(WIKI_DESTINATIONS);
+/** Chaque destination est cherchée sur son article français puis anglais (même lieu identifié). */
+export function useDestinationPhotos(): Record<string, DestinationPhoto> {
+  const english = useWikiPhotos(ENGLISH_DESTINATIONS, 'en');
+  const french = useWikiPhotos(WIKI_DESTINATIONS, 'fr');
+  return { ...english, ...french };
+}
+
+/** Photos d'ambiance référencées par activité (sans recherche libre ou titre d'utilisateur). */
+export const useChallengeThemePhotos = () => useWikiPhotos(CHALLENGE_THEME_PAGES, 'en');
 /** Photos des plats (clé = titre de page du plat), pour illustrer chaque recette par une vraie photo du plat. */
 export const useDishPhotos = () => useWikiPhotos(WIKI_DISHES);
 
