@@ -92,8 +92,8 @@ function Login({ onSignedIn }: { onSignedIn: () => void }) {
 
 type Preset = { kind: string; data: Record<string, string>; title?: string };
 
-function Editor({ module, initial, preset, onSave, onCancel, busy }: {
-  module: Module; initial?: Entry; preset?: Preset; onSave: (input: EntryInput, id?: string) => Promise<void>; onCancel: () => void; busy: boolean;
+function Editor({ module, initial, preset, entries, onSave, onCancel, busy }: {
+  module: Module; initial?: Entry; preset?: Preset; entries: Entry[]; onSave: (input: EntryInput, id?: string) => Promise<void>; onCancel: () => void; busy: boolean;
 }) {
   const [kindId, setKindId] = useState(initial?.kind ?? (preset && module.kinds.some((k) => k.id === preset.kind) ? preset.kind : module.kinds.find((k) => !k.hidden)!.id));
   const [title, setTitle] = useState(initial?.title ?? preset?.title ?? '');
@@ -135,7 +135,15 @@ function Editor({ module, initial, preset, onSave, onCancel, busy }: {
           <label className="gfield">{kind.title ? 'Titre (facultatif)' : 'Titre'}
             <input maxLength={180} value={title} onChange={(e) => setTitle(e.target.value)}
               placeholder={kind.title ? (kind.title(Object.fromEntries(Object.entries(form).map(([k, v]) => [k, typeof v === 'string' ? v : '']))).replace(/\s·\s*$/, '') || 'Rempli automatiquement') : 'Donner un nom…'} /></label>
-          {kind.fields.map((field) => <GuidedField key={kind.id + field.id} field={field} value={String(form[field.id] ?? '')} onChange={(v) => update(field.id, v)} />)}
+          {kind.fields.map((field) => {
+            const linked = field.id === 'recipe' && kind.id === 'meal'
+              ? entries.filter((e) => e.module === 'cuisine' && e.kind === 'recipe').map((e) => e.title)
+              : field.id === 'hobby' && kind.id === 'practice'
+                ? entries.filter((e) => e.module === 'passions' && e.kind === 'hobby').map((e) => e.title)
+                : [];
+            const options = linked.length ? [...new Set([...(field.options ?? []), ...linked])] : field.options;
+            return <GuidedField key={kind.id + field.id} field={{ ...field, options }} value={String(form[field.id] ?? '')} onChange={(v) => update(field.id, v)} />;
+          })}
           {error && <p role="alert" className="error">{error}</p>}
           <div className="editor-actions"><button type="button" className="button ghost" onClick={onCancel}>Annuler</button><button className="button primary" type="submit" disabled={busy}><Save size={16} /> {busy ? 'Enregistrement…' : 'Enregistrer'}</button></div>
         </form>
@@ -489,6 +497,6 @@ export default function App() {
       const on = screen === id || (id === 'spaces' && Boolean(currentModule));
       return <button key={id} className={on ? 'on' : ''} aria-current={on ? 'page' : undefined} onClick={() => go(id)}><Icon size={24} strokeWidth={on ? 2.2 : 1.6} /><span>{label}</span></button>;
     })}</nav>}
-    {editor && <Editor key={(editor.initial?.id ?? editor.module.id) + (editor.preset?.kind ?? '')} module={editor.module} initial={editor.initial} preset={editor.preset} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
+    {editor && <Editor key={(editor.initial?.id ?? editor.module.id) + (editor.preset?.kind ?? '')} module={editor.module} initial={editor.initial} preset={editor.preset} entries={entries} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
   </div></PhotoProvider>;
 }

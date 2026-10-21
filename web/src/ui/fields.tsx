@@ -10,7 +10,28 @@ export function GuidedField({ field, value, onChange }: { field: Field; value: s
   const [custom, setCustom] = useState('');
   const options = field.options ?? [];
 
-  if (field.type === 'chips' || field.type === 'select') {
+  if (field.type === 'select' || (field.type === 'chips' && options.length >= 4)) {
+    const extra = value && !options.includes(value) ? [value] : [];
+    return <div className="gfield">
+      <label htmlFor={'select-' + field.id}>{field.label}{field.optional && <small> (facultatif)</small>}</label>
+      <select id={'select-' + field.id} value={customOpen ? '__other__' : value}
+        onChange={(e) => {
+          if (e.target.value === '__other__') { setCustom(value && !options.includes(value) ? value : ''); setCustomOpen(true); }
+          else { setCustomOpen(false); onChange(e.target.value); }
+        }}>
+        <option value="">Choisir dans la liste…</option>
+        {[...options, ...extra].map((o) => <option key={o} value={o}>{o}</option>)}
+        {field.other && <option value="__other__">Autre (préciser)</option>}
+      </select>
+      {customOpen && <div className="gcustom">
+        <input autoFocus value={custom} maxLength={120} onChange={(e) => setCustom(e.target.value)} placeholder="Préciser…" aria-label={'Préciser : ' + field.label} />
+        <button type="button" className="button ghost" disabled={!custom.trim()} onClick={() => { onChange(custom.trim()); setCustomOpen(false); }}>Valider</button>
+        <button type="button" className="button ghost" onClick={() => setCustomOpen(false)}>Annuler</button>
+      </div>}
+    </div>;
+  }
+
+  if (field.type === 'chips') {
     const extra = value && !options.includes(value) ? [value] : [];
     return <fieldset className="gfield"><legend>{field.label}</legend>
       <div className="gchips">
