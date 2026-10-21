@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react';
 import { cloud } from '../lib/cloud';
 import { UNSPLASH_QUERIES, WIKI_DESTINATIONS, WIKI_DISHES } from '../lib/editorialPhotos';
 
+/** Évite les cartes, logos, drapeaux et illustrations présentés comme photos de lieux. */
+const isPlacePhoto = (filename: string) =>
+  !/(?:^|[_. -])(flag|drapeau|coat|arms|blason|emblem|logo|map|carte|locator|location|seal|collage|montage|diagram|icon|svg)(?:[_. -]|$)/i.test(filename)
+  && !/\.(?:svg|png)$/i.test(filename);
+
 const simplify = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/_/g, ' ').trim();
 
 export type DestinationPhoto = { src: string; creditUrl: string };
@@ -25,14 +30,14 @@ function useWikiPhotos(titlesById: Record<string, string>): Record<string, Desti
         for (const [id, wikiTitle] of Object.entries(titlesById)) {
           const wanted = redirects.get(simplify(wikiTitle)) ?? simplify(wikiTitle);
           const page = pages.find((p) => simplify(p.title) === wanted);
-          if (page?.thumbnail?.source?.startsWith('https://upload.wikimedia.org/') && page.pageimage) {
+          if (page?.thumbnail?.source?.startsWith('https://upload.wikimedia.org/') && page.pageimage && isPlacePhoto(page.pageimage)) {
             photos[id] = { src: page.thumbnail.source,
               creditUrl: 'https://commons.wikimedia.org/wiki/Special:Redirect/file/' + encodeURIComponent(page.pageimage) };
           }
         }
         setImages(photos);
       })
-      .catch(() => { /* Image d'ambiance locale conservée en cas d'indisponibilité. */ });
+      .catch(() => { /* Laisser le fond neutre si les photos sont indisponibles. */ });
     return () => controller.abort();
   }, [titlesById]);
   return images;
@@ -65,6 +70,12 @@ export function useUnsplashDishes(): Record<string, UnsplashPhoto> {
 export function EditorialPhoto({ src, fallback, alt, className }: { src: string; fallback: string; alt: string; className: string }) {
   const [failed, setFailed] = useState(false);
   useEffect(() => setFailed(false), [src]);
-  return <img className={className} src={failed ? fallback : src} alt={alt} loading="lazy"
+  if (!src || failed) {
+    return <div className={className + ' editorial-photo-placeholder'} role="img"
+      aria-label="Photographie de cette destination non disponible">
+      <span>Photo de la destination non disponible</span>
+    </div>;
+  }
+  return <img className={className} src={src} alt={alt} loading="lazy"
     onError={() => setFailed(true)} referrerPolicy="no-referrer" />;
 }
