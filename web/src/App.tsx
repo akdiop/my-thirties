@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import {
   BookOpen, CalendarDays, ChevronRight, Coffee, Download,
@@ -353,13 +353,20 @@ export default function App() {
   const [spiritTab, setSpiritTab] = useState<SpiritTab>('home');
   const [passionTab, setPassionTab] = useState<'parcours' | 'series' | 'libre'>('parcours');
   const [search, setSearch] = useState('');
+  const userIdRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     let active = true;
-    getSession().then((s) => { if (active) setSession(s); })
+    getSession().then((s) => { if (active) { userIdRef.current = s?.user.id; setSession(s); } })
       .catch(() => { if (active) setSession(null); })
       .finally(() => { if (active) setAuthReady(true); });
-    const sub = cloud?.auth.onAuthStateChange((_event, s) => { if (active) { setSession(s); setOwner(null); } });
+    // Supabase renvoie un événement à chaque retour sur l'onglet : on ne revérifie l'accès que si le compte change.
+    const sub = cloud?.auth.onAuthStateChange((_event, s) => {
+      if (!active) return;
+      if (s?.user.id !== userIdRef.current) setOwner(null);
+      userIdRef.current = s?.user.id;
+      setSession(s);
+    });
     return () => { active = false; sub?.data.subscription.unsubscribe(); };
   }, []);
 
