@@ -10,7 +10,7 @@ const today = () => new Date().toLocaleDateString('en-CA');
 const progressOf = (e: Entry) => (e.data.progress && typeof e.data.progress === 'object' ? e.data.progress : {}) as Progress;
 const categoryOf = (e: Entry): ChallengeCategory => {
   const c = e.data.category;
-  return c === 'Bien-être' || c === 'Habitudes' ? c : templateById(e.data.template)?.category ?? 'Sport';
+  return CATEGORIES.includes(c as ChallengeCategory) ? c as ChallengeCategory : templateById(e.data.template)?.category ?? 'Sport';
 };
 
 export function ChallengesBoard({ entries, onCreate, onUpdate }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void>; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void> }) {
