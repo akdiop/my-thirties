@@ -36,8 +36,9 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
     </div>
     <p className="muted">{ideas.length} destination(s)</p>
     <div className="lesson-grid">{ideas.map((d) => <article className="lesson-card" key={d.id}>
-      <EditorialPhoto src={destinationPhotos[d.id]?.src || '/visuels/voyage.webp'} fallback="/visuels/voyage.webp"
-        alt={destinationPhotos[d.id] ? 'Vue de ' + d.name + ' (Wikimedia Commons)' : 'Plage turquoise, paysage d’inspiration'} className="editorial-card-photo" />
+      <EditorialPhoto src={destinationPhotos[d.id]?.src}
+        alt={'Photographie associée à ' + d.name + ' (Wikimedia Commons)'} className="editorial-card-photo"
+        unavailableLabel={'Photo de ' + d.name + ' non disponible'} />
       {destinationPhotos[d.id] && <a className="editorial-photo-credit" href={destinationPhotos[d.id].creditUrl} target="_blank" rel="noopener noreferrer">Crédit photo · Wikimedia Commons ↗</a>}
       <h3>{d.name}</h3><p>{d.country} · {d.style} · {d.duration}</p>
       <p>{d.description}</p>
