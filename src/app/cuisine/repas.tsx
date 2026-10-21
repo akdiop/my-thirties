@@ -2,7 +2,6 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 
 import { dayLabel } from '@/agenda/dates';
-import { Chips } from '@/components/form/Chips';
 import { SelectField } from '@/components/form/SelectField';
 import { Field, TextField } from '@/components/form/Field';
 import { Stepper } from '@/components/form/Scale';
