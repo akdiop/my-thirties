@@ -1,10 +1,13 @@
 import { useMemo, useState } from 'react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { DESTINATION_IDEAS } from '../lib/destinationIdeas';
+import { destinationVisual, VISUALS } from '../lib/visuals';
 import { adviceUrl, DESTINATION_GUIDES } from '../lib/destinationGuides';
+import { EditorialPhoto, useDestinationPhotos } from './EditorialPhoto';
 
 export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void> }) {
   const [style, setStyle] = useState('Toutes');
+  const destinationPhotos = useDestinationPhotos();
   const [search, setSearch] = useState('');
   const [busy, setBusy] = useState('');
   const [feedback, setFeedback] = useState('');
@@ -24,8 +27,10 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
     finally { setBusy(''); }
   };
   return <section className="tool-card">
+    <div className="editorial-cover"><img src={VISUALS.travel} alt="Rue colorée et animée à Lisbonne, photographie d'ambiance" loading="lazy" /><div><span className="eyebrow">ÉVASIONS ET DÉCOUVERTES</span><h3>Inspirations de voyage</h3><p>Des lieux à découvrir, des envies à garder.</p></div></div>
+    <p className="muted">30 destinations pour imaginer tes prochains voyages. Enregistre celles qui t’attirent ; les durées sont des suggestions, pas des réservations.</p>
     <h3>Inspirations de voyage</h3>
-    <p className="muted">30 destinations avec leur fiche complète : quand partir, comment y aller, où dormir, programme jour par jour, quoi goûter.</p>
+    <p className="muted">Photos des lieux issues de Wikipédia lorsqu’elles sont disponibles ; sinon, paysage d’inspiration. 30 destinations avec leur fiche complète : quand partir, comment y aller, où dormir, programme jour par jour, quoi goûter.</p>
     <div className="recipe-filters">
       <label>Envie du moment<select value={style} onChange={(e) => setStyle(e.target.value)}>
         {['Toutes', 'Culture', 'Nature', 'Détente', 'Ville', 'Aventure'].map((x) => <option key={x}>{x}</option>)}
@@ -34,6 +39,12 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
     </div>
     <p className="muted">{ideas.length} destination(s)</p>
     <div className="lesson-grid">{ideas.map((d) => <article className="lesson-card" key={d.id}>
+      <EditorialPhoto src={destinationPhotos[d.id]?.src || '/visuels/voyage.webp'} fallback="/visuels/voyage.webp"
+        alt={destinationPhotos[d.id] ? 'Vue de ' + d.name + ' (Wikimedia Commons)' : 'Paysage tropical d’inspiration, non représentatif de ' + d.name}
+        className="editorial-card-photo" />
+      {destinationPhotos[d.id] && <a className="editorial-photo-credit" href={destinationPhotos[d.id].creditUrl}
+        target="_blank" rel="noopener noreferrer">Crédit photo et licence · Wikimedia Commons ↗</a>}
+      {destinationVisual(d.name) && <img className="editorial-card-image" src={destinationVisual(d.name)} alt={'Vue de ' + d.name} loading="lazy" />}
       <h3>{d.name}</h3><p>{d.country} · {d.style} · {d.duration}</p>
       <p>{d.description}</p>
       <Guide id={d.id} highlights={d.highlights} />
