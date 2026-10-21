@@ -5,11 +5,14 @@ import { Alert } from 'react-native';
 import { Chips } from '@/components/form/Chips';
 import { DateField } from '@/components/form/DateTimeField';
 import { Field, TextField } from '@/components/form/Field';
+import { SelectField } from '@/components/form/SelectField';
 import { Button, Screen } from '@/components/ui';
 import { TRIP_STATUS_LABEL, type TripStatus } from '@/decouvertes/trips';
 import { useMoney } from '@/features/finances/useMoney';
 import { CURRENCIES, fromMinor, parseAmount, type Currency } from '@/finances/money';
 import { useData, useMutate } from '@/hooks/useData';
+
+const DESTINATIONS = ['Dakar, Sénégal', 'Saint-Louis, Sénégal', 'Sine-Saloum, Sénégal', 'Casamance, Sénégal', 'Marrakech, Maroc', 'Essaouira, Maroc', 'Chefchaouen, Maroc', 'Île de Sal, Cap-Vert', 'Lisbonne, Portugal', 'Porto, Portugal', 'Séville, Espagne', 'Grenade, Espagne', 'Rome, Italie', 'Florence, Italie', 'Copenhague, Danemark', 'Amsterdam, Pays-Bas', 'Istanbul, Turquie', 'Cappadoce, Turquie', 'Athènes, Grèce', 'Zanzibar, Tanzanie', 'Kigali, Rwanda', 'Le Cap, Afrique du Sud', 'Dubaï, Émirats arabes unis', 'Kyoto, Japon', 'Tokyo, Japon', 'Bali, Indonésie', 'Montréal, Canada', 'New York, États-Unis', 'Rio de Janeiro, Brésil'];
 
 export default function EditionVoyage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -37,7 +40,7 @@ export default function EditionVoyage() {
 
   return (
     <Screen title={t ? 'Modifier' : 'Nouvelle destination'} back footer={<Button label="Enregistrer" disabled={invalid} onPress={save} />}>
-      <TextField label="Destination" value={destination} onChangeText={setDestination} maxLength={80} placeholder="Ville, pays, région…" />
+      <SelectField label="Destination" options={DESTINATIONS.map((x) => ({ value: x, label: x }))} value={destination} onChange={setDestination} allowCustom />
       <TextField label="Nom du voyage (facultatif)" value={title} onChangeText={setTitle} maxLength={80} />
       <Field label="Statut">
         <Chips label="Statut" options={(Object.keys(TRIP_STATUS_LABEL) as TripStatus[]).map((s) => ({ value: s, label: TRIP_STATUS_LABEL[s] }))} value={status} onChange={setStatus} />
