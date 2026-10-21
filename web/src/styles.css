@@ -831,3 +831,17 @@ table{display:block;max-width:100%;overflow-x:auto}
 .text-link{display:inline-block;margin-top:10px;color:#5E7A5F;font-weight:600;font-size:.85rem}
 /* Visuels de la maquette : bannière plus haute sur grand écran pour garder le visage entier */
 @media (min-width:900px){.hero-photo:not(.compact){min-height:340px}}
+
+/* Cartes illustrées : les photos d'inspiration ne remplacent pas les titres et descriptions. */
+.editorial-card-photo{
+  display:block;width:100%;height:170px;object-fit:cover;object-position:center;
+  border-radius:12px;background:#e6d8c8;margin-bottom:14px;
+}
+.recipe-photo-card .editorial-card-photo{height:150px}
+@media(max-width:600px){
+  .editorial-card-photo{height:145px}
+  .recipe-photo-card .editorial-card-photo{height:135px}
+}
+
+.editorial-photo-credit{display:inline-block;font-size:.7rem;color:#76523e;margin:-6px 0 10px;
+  text-decoration:underline;text-underline-offset:2px}
