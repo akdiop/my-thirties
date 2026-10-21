@@ -29,6 +29,7 @@ const first = (d: Record<string, string>, k: string, fallback: string) => (d[k] 
 
 export const EXPENSE_CATEGORIES = ['Logement', 'Alimentation', 'Transport', 'Santé', 'Shopping', 'Loisirs', 'Voyages', 'Abonnements', 'Famille', 'Beauté', 'Sport', 'Autres'];
 export const INCOME_CATEGORIES = ['Salaire', 'Freelance', 'Prime', 'Cadeau', 'Remboursement', 'Autres'];
+export const COUNTRY_SUGGESTIONS = ['Sénégal', 'France', 'Maroc', 'Mauritanie', 'Cap-Vert', 'Gambie', 'Côte d’Ivoire', 'Ghana', 'Rwanda', 'Kenya', 'Tanzanie', 'Afrique du Sud', 'Portugal', 'Espagne', 'Italie', 'Grèce', 'Danemark', 'Pays-Bas', 'Suisse', 'Royaume-Uni', 'Turquie', 'Émirats arabes unis', 'Japon', 'Indonésie', 'Canada', 'États-Unis', 'Brésil'];
 export const SERIES_PLATFORMS = ['Netflix', 'Prime Video', 'Disney+', 'Canal+', 'Apple TV+', 'Max', 'YouTube', 'Autre'];
 export const SERIES_GENRES = ['Drame', 'Comédie', 'Thriller', 'Policier', 'Romance', 'Fantastique', 'Science-fiction', 'Documentaire', 'Animation', 'K-drama', 'Nollywood', 'Télénovela'];
 
@@ -132,15 +133,15 @@ export const modules: Module[] = [
   {
     id: 'finances', name: 'Mes finances', symbol: '¤', description: 'Dépenses, revenus, abonnements et épargne', sensitive: true,
     kinds: [
-      { id: 'expense', label: 'Dépense', title: (d) => first(d, 'category', 'Dépense'), fields: [date, amount, currency, { id: 'category', label: 'Catégorie', type: 'chips', options: EXPENSE_CATEGORIES },
+      { id: 'expense', label: 'Dépense', title: (d) => first(d, 'category', 'Dépense'), fields: [date, amount, currency, { id: 'category', label: 'Catégorie', type: 'chips', options: EXPENSE_CATEGORIES, other: true },
         { id: 'payment', label: 'Paiement', type: 'chips', options: ['Espèces', 'Carte', 'Wave', 'Orange Money', 'Virement'] }, note] },
-      { id: 'income', label: 'Revenu', title: (d) => first(d, 'category', 'Revenu'), fields: [date, amount, currency, { id: 'category', label: 'Catégorie', type: 'chips', options: INCOME_CATEGORIES }, note] },
+      { id: 'income', label: 'Revenu', title: (d) => first(d, 'category', 'Revenu'), fields: [date, amount, currency, { id: 'category', label: 'Catégorie', type: 'chips', options: INCOME_CATEGORIES, other: true }, note] },
       { id: 'subscription', label: 'Abonnement', fields: [amount, currency, { id: 'frequency', label: 'Fréquence', type: 'chips', options: ['Mensuelle', 'Trimestrielle', 'Annuelle'] },
         { id: 'nextDate', label: 'Prochaine échéance', type: 'date' }, { id: 'category', label: 'Type', type: 'chips', options: ['Téléphone', 'Internet', 'Streaming', 'Sport', 'Logiciel', 'Presse', 'Autre'] }] },
       { id: 'goal', label: 'Objectif d’épargne', fields: [{ ...amount, label: 'Montant visé', presets: [100000, 250000, 500000, 1000000] }, currency,
         { id: 'saved', label: 'Déjà épargné', type: 'stepper', min: 0, step: 5000, presets: [0, 50000, 100000] }, { id: 'deadline', label: 'Échéance', type: 'date', optional: true }] },
       { id: 'budget', label: 'Budget mensuel', title: (d) => `Budget · ${first(d, 'category', 'global')}`, fields: [{ ...amount, presets: [100000, 300000, 500000, 850000] }, currency,
-        { id: 'category', label: 'Catégorie', type: 'chips', options: ['Global', ...EXPENSE_CATEGORIES] }] },
+        { id: 'category', label: 'Catégorie', type: 'chips', options: ['Global', ...EXPENSE_CATEGORIES], other: true }] },
     ],
   },
   {
@@ -153,13 +154,13 @@ export const modules: Module[] = [
         { id: 'ingredients', label: 'Ingrédients (un par ligne)', type: 'textarea' }, { id: 'steps', label: 'Étapes', type: 'textarea' },
         { id: 'storage', label: 'Conservation', type: 'chips', options: ['2 jours au frais', '3-4 jours au frais', 'Se congèle', 'À consommer tout de suite'] }] },
       { id: 'meal', label: 'Repas planifié', title: (d) => `${first(d, 'slot', 'Repas')} · ${first(d, 'recipe', '')}`, fields: [date, { id: 'slot', label: 'Repas', type: 'chips', options: ['Petit-déjeuner', 'Déjeuner', 'Dîner'] },
-        { id: 'recipe', label: 'Recette choisie', type: 'text' }] },
+        { id: 'recipe', label: 'Recette choisie', type: 'select', options: [], other: true }] },
     ],
   },
   {
     id: 'decouvertes', name: 'Mes découvertes', symbol: '✧', description: 'Destinations, voyages et préparation',
     kinds: [
-      { id: 'destination', label: 'Destination', fields: [{ id: 'country', label: 'Pays', type: 'text' },
+      { id: 'destination', label: 'Destination', fields: [{ id: 'country', label: 'Pays', type: 'select', options: COUNTRY_SUGGESTIONS, other: true },
         { id: 'style', label: 'Envie', type: 'multi', options: ['Mer et soleil', 'Nature', 'Culture', 'Ville', 'Gastronomie', 'Aventure', 'Spirituel', 'Détente'] },
         { id: 'season', label: 'Période idéale (à vérifier)', type: 'chips', options: ['Hiver', 'Printemps', 'Été', 'Automne', 'Toute l’année'] },
         { id: 'with', label: 'Avec', type: 'chips', options: ['Seule', 'En couple', 'Entre amies', 'En famille'] }] },
@@ -173,7 +174,7 @@ export const modules: Module[] = [
       { id: 'path', label: 'Parcours guidé', hidden: true, fields: [] },
       { id: 'hobby', label: 'Hobby libre', fields: [{ id: 'duration', label: 'Parcours', type: 'chips', options: ['6 mois', '12 mois'] }, { id: 'goal', label: 'Objectif (facultatif)', type: 'textarea', optional: true }] },
       { id: 'practice', label: 'Séance de pratique', title: (d) => `${first(d, 'hobby', 'Pratique')} · ${first(d, 'duration', '?')} min`, fields: [date,
-        { id: 'hobby', label: 'Pour', type: 'chips', options: ['Langue', 'Peinture', 'Écriture', 'Musique', 'Photo', 'Couture', 'Céramique'], other: true }, minutes(),
+        { id: 'hobby', label: 'Pour', type: 'select', options: ['Langue', 'Peinture', 'Écriture', 'Musique', 'Photo', 'Couture', 'Céramique'], other: true }, minutes(),
         { id: 'mood', label: 'Plaisir', type: 'scale', low: 'bof', high: 'adoré' }, note] },
       { id: 'series', label: 'Série', fields: [{ id: 'platform', label: 'Plateforme', type: 'chips', options: SERIES_PLATFORMS },
         { id: 'genre', label: 'Genre', type: 'multi', options: SERIES_GENRES },
