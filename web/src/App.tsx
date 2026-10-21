@@ -518,7 +518,7 @@ export default function App() {
       </main>
     </div>
     <nav className="mobile-nav" aria-label="Navigation principale">{nav.map(({ id, label, icon: Icon }) => <button key={id} className={screen === id ? 'active' : ''} onClick={() => go(id)}><Icon size={20} /><span>{label}</span></button>)}</nav>
-    {editor && <Editor key={editor.initial?.id ?? editor.module.id} module={editor.module} initial={editor.initial} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
+    {editor && <Editor key={editor.initial?.id ?? editor.module.id} module={editor.module} initial={editor.initial} entries={entries} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
     <div className="screen-reader-note"><CircleHelp size={14} /> Les changements sont enregistrés dans ton espace cloud privé.</div>
   </div></PhotoProvider>;
 }
