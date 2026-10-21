@@ -1,3 +1,4 @@
+import { MODULE_VISUALS } from '../lib/visuals';
 import type { ReactNode } from 'react';
 import {
   ArrowLeft, Brush, CalendarCheck, Check, ChevronRight, Compass, CookingPot, Dumbbell, Flower2, Heart, List, Moon, Sparkles, Trophy, Wallet,
@@ -69,8 +70,11 @@ export function RowLink({ icon: Icon, title, sub, onClick, tone }: { icon: Lucid
 export function ModuleTile({ id, label, onClick }: { id: ModuleId | 'assistant'; label?: string; onClick: () => void }) {
   const look = MODULE_LOOK[id];
   const Icon = look.icon;
-  return <button className="module-tile" style={{ background: TILE[look.tone].bg }} onClick={onClick}>
-    <Icon size={26} color={TILE[look.tone].fg} strokeWidth={1.6} />
+  const photo = MODULE_VISUALS[id];
+  return <button className={'module-tile' + (photo ? ' has-photo' : '')}
+    style={photo ? { backgroundImage: `linear-gradient(180deg,rgba(45,30,22,.12),rgba(45,30,22,.65)),url("${photo}")` } : { background: TILE[look.tone].bg }}
+    onClick={onClick}>
+    <Icon size={26} color={photo ? '#fffaf5' : TILE[look.tone].fg} strokeWidth={1.6} />
     <span>{label ?? look.short}</span>
   </button>;
 }

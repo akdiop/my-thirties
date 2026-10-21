@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { DESTINATION_IDEAS } from '../lib/destinationIdeas';
+import { destinationVisual, VISUALS } from '../lib/visuals';
 import { adviceUrl, DESTINATION_GUIDES } from '../lib/destinationGuides';
 import { EditorialPhoto, useDestinationPhotos } from './EditorialPhoto';
 
@@ -26,6 +27,8 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
     finally { setBusy(''); }
   };
   return <section className="tool-card">
+    <div className="editorial-cover"><img src={VISUALS.travel} alt="Rue colorée et animée à Lisbonne, photographie d'ambiance" loading="lazy" /><div><span className="eyebrow">ÉVASIONS ET DÉCOUVERTES</span><h3>Inspirations de voyage</h3><p>Des lieux à découvrir, des envies à garder.</p></div></div>
+    <p className="muted">30 destinations pour imaginer tes prochains voyages. Enregistre celles qui t’attirent ; les durées sont des suggestions, pas des réservations.</p>
     <h3>Inspirations de voyage</h3>
     <p className="muted">Photos des lieux issues de Wikipédia lorsqu’elles sont disponibles ; sinon, paysage d’inspiration. 30 destinations avec leur fiche complète : quand partir, comment y aller, où dormir, programme jour par jour, quoi goûter.</p>
     <div className="recipe-filters">
@@ -41,6 +44,7 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
         className="editorial-card-photo" />
       {destinationPhotos[d.id] && <a className="editorial-photo-credit" href={destinationPhotos[d.id].creditUrl}
         target="_blank" rel="noopener noreferrer">Crédit photo et licence · Wikimedia Commons ↗</a>}
+      {destinationVisual(d.name) && <img className="editorial-card-image" src={destinationVisual(d.name)} alt={'Vue de ' + d.name} loading="lazy" />}
       <h3>{d.name}</h3><p>{d.country} · {d.style} · {d.duration}</p>
       <p>{d.description}</p>
       <Guide id={d.id} highlights={d.highlights} />
