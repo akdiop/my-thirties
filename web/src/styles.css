@@ -802,3 +802,29 @@ table{display:block;max-width:100%;overflow-x:auto}
 .ep-label{font-size:.82rem;font-weight:600;color:#6B3F2E}
 .stars{display:flex;gap:2px}.stars button{border:0;background:transparent;padding:4px}
 .pill-tabs{overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}.pill-tabs::-webkit-scrollbar{display:none}.pill-tabs button{flex:0 0 auto;padding:9px 16px;white-space:nowrap}
+
+/* Photographies éditoriales : présentes dans les espaces d'inspiration, pas dans les données privées. */
+.module-tile.has-photo{
+  background-size:cover;background-position:center;
+  color:#fffaf5;box-shadow:inset 0 0 0 1px rgba(255,250,245,.12);
+  text-shadow:0 1px 4px rgba(36,23,17,.6);
+  transition:transform .18s ease,filter .18s ease;
+}
+.module-tile.has-photo:hover{transform:translateY(-2px);filter:saturate(1.05)}
+.module-tile.has-photo:focus-visible{outline:3px solid #8b6148;outline-offset:3px}
+.editorial-cover{position:relative;isolation:isolate;overflow:hidden;border-radius:19px;
+  min-height:185px;margin-bottom:18px;background:#e5d8c7;color:#fffaf5;
+  display:flex;align-items:flex-end}
+.editorial-cover>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.editorial-cover:after{content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(90deg,rgba(42,27,20,.76),rgba(42,27,20,.08))}
+.editorial-cover>div{padding:24px 25px;max-width:540px}
+.editorial-cover h3{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(1.65rem,3vw,2.4rem);
+  color:#fffaf5;line-height:1.08;margin:5px 0}
+.editorial-cover p{color:#f6eae0;margin:4px 0;font-size:.83rem}
+.editorial-cover .eyebrow{color:#fff0df}
+.editorial-card-image{display:block;width:100%;height:145px;object-fit:cover;border-radius:12px;margin-bottom:13px;
+  background:#e5d8c7}
+.path-photo{height:50px;width:58px;object-fit:cover;border-radius:11px;flex:none}
+@media(max-width:600px){.editorial-cover{min-height:155px}.editorial-cover>div{padding:18px}.editorial-card-image{height:125px}}
+@media(prefers-reduced-motion:reduce){.module-tile.has-photo{transition:none}.module-tile.has-photo:hover{transform:none}}
