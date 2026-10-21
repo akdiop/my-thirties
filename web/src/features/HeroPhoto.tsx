@@ -2,9 +2,6 @@ import { createContext, useContext, useState, type ReactNode } from 'react';
 import { Camera } from 'lucide-react';
 import { shrinkHero } from '../lib/photos';
 import { defaultVisual, visualBackground } from '../lib/visuals';
-import { challengePhoto } from '../lib/editorialPhotos';
-import { templateById } from '../lib/challenges';
-import { defaultHeroVisual } from '../lib/visuals';
 
 type Photos = { photos: Record<string, string>; save: (slot: string, image: string | null) => Promise<void> };
 
@@ -28,10 +25,6 @@ export function HeroPhoto({ slot, tone = 'caramel', label, children, compact }: 
   const image = photos[slot];
   // Priorité : ma photo › visuel de la maquette › dégradé de la palette.
   const visual = image ? undefined : defaultVisual(slot);
-  const challenge = !image && slot.startsWith('challenge-') ? templateById(slot.slice('challenge-'.length)) : undefined;
-  const challengeImage = challenge ? challengePhoto(challenge.category, challenge.discipline, challenge.title) : undefined;
-  const stockImage = defaultHeroVisual(slot, label);
-  const backgroundImage = image || stockImage;
   const pick = async (file: File | undefined) => {
     if (!file) return;
     setBusy(true); setError('');
@@ -40,13 +33,10 @@ export function HeroPhoto({ slot, tone = 'caramel', label, children, compact }: 
     finally { setBusy(false); }
   };
   const style = image ? { backgroundImage: `url(${image})` }
-    : challengeImage ? { backgroundImage: `url("${challengeImage}"), ${TONES[tone]}`, backgroundPosition: 'center' }
     : visual ? { backgroundImage: `${visualBackground(visual)}, ${TONES[tone]}`, backgroundPosition: `${visual.position}, center` }
     : { backgroundImage: TONES[tone] };
   return <div className={'hero-photo' + (compact ? ' compact' : '')} style={style}>
-    {!image && !visual && !challengeImage && <span className="hero-watermark" aria-hidden="true">{label}</span>}
-  return <div className={'hero-photo' + (compact ? ' compact' : '')} style={{ backgroundImage: backgroundImage ? `linear-gradient(180deg,rgba(60,33,22,.03),rgba(60,33,22,.22)), url("${backgroundImage}")` : TONES[tone] }}>
-    {!backgroundImage && <span className="hero-watermark" aria-hidden="true">{label}</span>}
+    {!image && !visual && <span className="hero-watermark" aria-hidden="true">{label}</span>}
     <div className="hero-shade">{children}</div>
     <label className="hero-change" title={'Changer la photo : ' + label}>
       <Camera size={15} /> <span>{busy ? '…' : image ? 'Changer' : 'Ma photo'}</span>

@@ -3,7 +3,6 @@ import { BookOpen, Brush, Check, ChevronDown, Languages, PenLine, Volume2 } from
 import type { Entry, EntryInput } from '../lib/cloud';
 import { PATH_CATEGORIES, PATHS, pathById, type PathCategory } from '../lib/learning';
 import { HeroPhoto } from './HeroPhoto';
-import { VISUALS } from '../lib/visuals';
 import { Bar, Segmented } from '../ui/kit';
 
 const ICON: Record<PathCategory, typeof Languages> = { Langues: Languages, 'Peinture & dessin': Brush, Écriture: PenLine };
@@ -34,7 +33,6 @@ export function LearningPaths({ entries, onCreate, onUpdate }: { entries: Entry[
   };
 
   return <section className="learning">
-    {!active && <div className="editorial-cover"><img src={VISUALS.learning} alt="Étude et prise de notes dans un intérieur lumineux" loading="lazy" /><div><span className="eyebrow">APPRENDRE À SON RYTHME</span><h3>Une nouvelle compétence, une étape à la fois</h3></div></div>}
     {active && <>
       {mine.length > 1 && <div className="challenge-switch">{mine.map((e) => <button key={e.id} className={e.id === active.id ? 'active' : ''} onClick={() => setFocus(e.id)}>{e.title}</button>)}</div>}
       <ActivePath key={active.id} entry={active} onUpdate={onUpdate} />
@@ -45,7 +43,6 @@ export function LearningPaths({ entries, onCreate, onUpdate }: { entries: Entry[
       const Icon = ICON[p.category];
       const started = mine.some((e) => e.data.pathId === p.id);
       return <div key={p.id} className="path-item">
-        <img className="path-photo" src={p.category === 'Peinture & dessin' ? VISUALS.creativity : VISUALS.learning} alt="" loading="lazy" />
         <span className="row-icon"><Icon size={19} /></span>
         <span className="row-text"><strong>{p.title}</strong><small>{p.tagline} · {p.steps.length} étapes</small></span>
         <button className="button ghost" disabled={Boolean(busy) || started} onClick={() => void start(p.id)}>{started ? 'En cours' : busy === p.id ? '…' : 'Commencer'}</button>
