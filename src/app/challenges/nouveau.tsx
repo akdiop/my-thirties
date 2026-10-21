@@ -68,7 +68,7 @@ export default function NewChallenge() {
         <DateField label="Début" value={start} onChange={(d) => d && setStart(d)} />
       </Field>
       <Card tone="sand" style={{ gap: 6 }}>
-        <AppText style={{ fontFamily: 'Inter_600SemiBold' }}>Aperçu sur 30 jours</AppText>
+        <AppText style={{ fontFamily: 'Inter_600SemiBold' }}>Aperçu du programme</AppText>
         <AppText>
           {preview.filter((v) => v > 0).length} séances, {preview.filter((v) => v === 0).length} jours de repos, jusqu’à {max} {UNIT_LABEL[custom ? unit : (template?.unit ?? 'reps')]}
           {template && !custom && template.sets > 1 ? ` (${template.sets} séries)` : ''}.

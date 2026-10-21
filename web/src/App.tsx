@@ -1,19 +1,16 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import {
-  ArrowLeft, BookOpen, CalendarDays, ChevronRight, CircleHelp, Coffee, Download,
-  Heart, Home, LayoutGrid, Leaf, LogOut, Plus, Save, Settings, ShieldCheck, Trash2, X,
+  BookOpen, CalendarDays, ChevronRight, Coffee, Download,
+  Heart, Home, LayoutGrid, Leaf, LogOut, Plus, Save, Settings, ShieldCheck, Trash2, UserRound, X,
 } from 'lucide-react';
 import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
 import { downloadBackup, makeEncryptedBackup, parseEncryptedBackup } from './lib/backup';
-import { moduleById, modules, type Field, type Module } from './modules';
+import { moduleById, modules, type Module } from './modules';
 import { validateRestore } from './lib/restore';
 import { consolidateIngredients } from './lib/groceries';
-import { CalendarBoard } from './features/CalendarBoard';
 import { BoosterPlan } from './features/BoosterPlan';
 import { TravelTools } from './features/TravelTools';
-import { FinanceInsights } from './features/FinanceInsights';
-import { HealthOverview } from './features/HealthOverview';
 import { EquilibriumInsights } from './features/EquilibriumInsights';
 import { KitchenPlanner } from './features/KitchenPlanner';
 import { PassionPath } from './features/PassionPath';
@@ -30,27 +27,38 @@ import { PersonalAssistant } from './features/PersonalAssistant';
 import { PrivacyCenter } from './features/PrivacyCenter';
 import { MediaGallery } from './features/MediaGallery';
 import { deleteEntryMedia } from './lib/mediaLibrary';
-import { PersonalProfile, ProfileGreeting } from './features/PersonalProfile';
-import { PROFILE_KIND } from './lib/profile';
+import { PersonalProfile, ProfileAvatar } from './features/PersonalProfile';
+import { birthdayLine, PROFILE_KIND, readProfile } from './lib/profile';
 import { PHOTO_KIND } from './lib/photos';
 import { PhotoProvider } from './features/HeroPhoto';
 import { SportHub } from './features/SportHub';
 import { ChallengesBoard } from './features/ChallengesBoard';
+import { Home as HomeScreen } from './screens/Home';
+import { Agenda } from './screens/Agenda';
+import { Wellbeing } from './screens/Wellbeing';
+import { Spaces } from './screens/Spaces';
+import { Calm } from './screens/Calm';
+import { HealthTop } from './screens/HealthTop';
+import { FinanceTop } from './screens/FinanceTop';
+import { CuisineTop, EquilibreTop, SpiritTop, TravelTop, type CuisineTab, type EquilibreTab, type SpiritTab } from './screens/ModuleTops';
+import { ScreenHeader, SectionTitle, Segmented } from './ui/kit';
+import { GuidedField } from './ui/fields';
+import { LearningPaths } from './features/LearningPaths';
+import { SeriesTracker } from './features/SeriesTracker';
+import { TravelSuggestions } from './features/TravelSuggestions';
 
-type Screen = 'home' | 'spaces' | 'settings' | ModuleId;
+type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
 const today = () => new Date().toLocaleDateString('en-CA');
 const value = (obj: Record<string, unknown>, key: string) => typeof obj[key] === 'string' ? obj[key] as string : '';
 const humanDate = (date: string | null) => date ? new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
-const money = (amount: number, currency: string) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: currency === 'XOF' ? 0 : 2 }).format(amount) + ' ' + currency;
-const safeNumber = (v: unknown) => typeof v === 'string' || typeof v === 'number' ? Number(v) : NaN;
 const safeLink = (v: unknown) => { try { const url = new URL(String(v)); return url.protocol === 'https:' ? url.href : null; } catch { return null; } };
 const nav: { id: Screen; label: string; icon: typeof Home }[] = [
   { id: 'home', label: 'Accueil', icon: Home },
-  { id: 'quotidien', label: 'Agenda', icon: CalendarDays },
-  { id: 'equilibre', label: 'Bien-être', icon: Leaf },
+  { id: 'agenda', label: 'Agenda', icon: CalendarDays },
+  { id: 'bienetre', label: 'Bien-être', icon: Leaf },
   { id: 'spaces', label: 'Espaces', icon: LayoutGrid },
-  { id: 'settings', label: 'Profil', icon: Settings },
+  { id: 'settings', label: 'Profil', icon: UserRound },
 ];
 
 function Login({ onSignedIn }: { onSignedIn: () => void }) {
@@ -84,18 +92,24 @@ function Login({ onSignedIn }: { onSignedIn: () => void }) {
   );
 }
 
-function Editor({ module, initial, onSave, onCancel, busy }: {
-  module: Module; initial?: Entry; onSave: (input: EntryInput, id?: string) => Promise<void>; onCancel: () => void; busy: boolean;
+type Preset = { kind: string; data: Record<string, string>; title?: string };
+
+function Editor({ module, initial, preset, onSave, onCancel, busy }: {
+  module: Module; initial?: Entry; preset?: Preset; onSave: (input: EntryInput, id?: string) => Promise<void>; onCancel: () => void; busy: boolean;
 }) {
-  const [kindId, setKindId] = useState(initial?.kind ?? module.kinds[0]!.id);
-  const [title, setTitle] = useState(initial?.title ?? '');
-  const [form, setForm] = useState<Record<string, DataValue>>(initial?.data as Record<string, DataValue> ?? {});
+  const [kindId, setKindId] = useState(initial?.kind ?? (preset && module.kinds.some((k) => k.id === preset.kind) ? preset.kind : module.kinds.find((k) => !k.hidden)!.id));
+  const [title, setTitle] = useState(initial?.title ?? preset?.title ?? '');
+  const [form, setForm] = useState<Record<string, DataValue>>(initial?.data as Record<string, DataValue> ?? { date: today(), start: today(), ...(preset?.data ?? {}) });
   const [error, setError] = useState('');
   const kind = module.kinds.find((k) => k.id === kindId) ?? module.kinds[0]!;
   const update = (id: string, val: string) => setForm((f) => ({ ...f, [id]: val }));
   const submit = async (event: FormEvent) => {
     event.preventDefault(); setError('');
-    if (!title.trim()) return setError('Ajoute un titre.');
+    const flat = Object.fromEntries(Object.entries(form).map(([k, v]) => [k, typeof v === 'string' ? v : ''])) as Record<string, string>;
+    const finalTitle = title.trim() || kind.title?.(flat).trim().replace(/\s·\s*$/, '') || '';
+    if (!finalTitle) return setError('Ajoute un titre.');
+    const missing = kind.fields.find((f) => !f.optional && ['chips', 'select'].includes(f.type) && f.id !== 'frequency' && !flat[f.id] && ['mood', 'prayer', 'category', 'axis', 'status', 'emotion'].includes(f.id));
+    if (missing) return setError('Choisis : ' + missing.label.toLowerCase() + '.');
     const data: Record<string, unknown> = { ...form };
     if (module.id === 'listes') {
       const previous = Array.isArray(form.items) ? form.items as { id: string; text: string; checked: boolean }[] : [];
@@ -108,39 +122,28 @@ function Editor({ module, initial, onSave, onCancel, busy }: {
     if (module.id === 'challenges' && !initial) data.progress = {};
     const entryDate = typeof data.date === 'string' && data.date ? data.date
       : typeof data.start === 'string' && data.start ? data.start : null;
-    try { await onSave({ module: module.id, kind: kind.id, title: title.trim(), entry_date: entryDate, data }, initial?.id); }
+    try { await onSave({ module: module.id, kind: kind.id, title: finalTitle, entry_date: entryDate, data }, initial?.id); }
     catch (e) { setError(e instanceof Error ? e.message : 'Enregistrement impossible.'); }
   };
   return (
     <div className="modal-overlay" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel(); }}>
       <section className="editor" role="dialog" aria-modal="true" aria-label={initial ? 'Modifier une entrée' : 'Nouvelle entrée'}>
-        <div className="editor-head"><h2>{initial ? 'Modifier' : 'Nouvelle entrée'}</h2><button className="icon-button" onClick={onCancel} aria-label="Fermer"><X size={20} /></button></div>
+        <div className="editor-head"><h2>{initial ? 'Modifier' : module.name}</h2><button className="icon-button" onClick={onCancel} aria-label="Fermer"><X size={20} /></button></div>
         <form onSubmit={submit} className="form-stack">
-          <label>Type
-            <select value={kindId} disabled={Boolean(initial)} onChange={(e) => { setKindId(e.target.value); setForm({}); }}>
-              {module.kinds.map((k) => <option key={k.id} value={k.id}>{k.label}</option>)}
-            </select>
-          </label>
-          <label>Titre<input autoFocus maxLength={180} required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Donner un nom…" /></label>
-          {kind.fields.map((field) => <FieldInput key={field.id} field={field} current={String(form[field.id] ?? '')} onChange={(v) => update(field.id, v)} />)}
+          {module.kinds.filter((k) => !k.hidden).length > 1 && !initial && <div className="gchips kinds" role="radiogroup" aria-label="Type">
+            {module.kinds.filter((k) => !k.hidden).map((k) => <button type="button" key={k.id} role="radio" aria-checked={k.id === kindId} className={'gchip' + (k.id === kindId ? ' on' : '')}
+              onClick={() => { setKindId(k.id); setForm({ date: today(), start: today(), ...(preset?.kind === k.id ? preset.data : {}) }); }}>{k.label}</button>)}
+          </div>}
+          <label className="gfield">{kind.title ? 'Titre (facultatif)' : 'Titre'}
+            <input maxLength={180} value={title} onChange={(e) => setTitle(e.target.value)}
+              placeholder={kind.title ? (kind.title(Object.fromEntries(Object.entries(form).map(([k, v]) => [k, typeof v === 'string' ? v : '']))).replace(/\s·\s*$/, '') || 'Rempli automatiquement') : 'Donner un nom…'} /></label>
+          {kind.fields.map((field) => <GuidedField key={kind.id + field.id} field={field} value={String(form[field.id] ?? '')} onChange={(v) => update(field.id, v)} />)}
           {error && <p role="alert" className="error">{error}</p>}
           <div className="editor-actions"><button type="button" className="button ghost" onClick={onCancel}>Annuler</button><button className="button primary" type="submit" disabled={busy}><Save size={16} /> {busy ? 'Enregistrement…' : 'Enregistrer'}</button></div>
         </form>
       </section>
     </div>
   );
-}
-
-function FieldInput({ field, current, onChange }: { field: Field; current: string; onChange: (value: string) => void }) {
-  return <label>{field.label}
-    {field.type === 'textarea' ? <textarea rows={4} value={current} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder ?? ''} /> :
-      field.type === 'select' ? <select value={current} onChange={(e) => onChange(e.target.value)}>
-        <option value="">Choisir…</option>{field.options?.map((x) => <option key={x} value={x}>{x}</option>)}
-      </select> :
-      <input type={field.type} value={current} onChange={(e) => onChange(e.target.value)}
-        step={field.type === 'number' ? 'any' : undefined} min={field.type === 'number' ? '0' : undefined}
-        placeholder={field.placeholder ?? ''} />}
-  </label>;
 }
 
 function ChallengeCalendar({ entry, onUpdate }: { entry: Entry; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void> }) {
@@ -198,42 +201,6 @@ function Checklist({ entry, onUpdate }: { entry: Entry; onUpdate: (entry: Entry,
       <span className={item.checked ? 'checked' : ''}>{item.text}</span>
     </label>
   )}</div>;
-}
-
-function FinanceSummary({ entries }: { entries: Entry[] }) {
-  const totals = useMemo(() => {
-    const sums: Record<string, { income: number; expense: number }> = {};
-    for (const e of entries) {
-      if (e.kind !== 'income' && e.kind !== 'expense') continue;
-      const currency = value(e.data, 'currency') || 'XOF', n = safeNumber(e.data.amount);
-      if (!Number.isFinite(n) || n < 0) continue;
-      sums[currency] ??= { income: 0, expense: 0 };
-      sums[currency][e.kind] += n;
-    }
-    return sums;
-  }, [entries]);
-  return <div className="finance-grid">
-    {Object.entries(totals).map(([currency, totals]) =>
-      <div className="stat-card" key={currency}>
-        <span className="eyebrow">SOLDE · {currency}</span><strong>{money(totals.income - totals.expense, currency)}</strong>
-        <span className="muted">Revenus {money(totals.income, currency)} · Dépenses {money(totals.expense, currency)}</span>
-      </div>)}
-    {!Object.keys(totals).length && <p className="muted">Ajoute un revenu ou une dépense pour voir ton bilan.</p>}
-    <p className="fineprint">Chaque devise est calculée séparément, sans taux de change inventé.</p>
-  </div>;
-}
-
-function CalmSpace() {
-  const [open, setOpen] = useState(false);
-  return <section className="calm-card">
-    <div><span className="eyebrow">PAUSE DOUCE</span><h3>Besoin de te recentrer ?</h3><p>Un moment sans objectif ni performance.</p></div>
-    <button className="button secondary" onClick={() => setOpen(!open)}>{open ? 'Fermer' : 'J’ai besoin de me calmer'}</button>
-    {open && <div className="calm-guide">
-      <p>Observe les sensations de tes pieds au sol et regarde autour de toi.</p>
-      <p>Respire tranquillement, sans forcer. Tu peux prendre ton temps.</p>
-      <p>Note ce que tu ressens dans ton journal, uniquement si tu en as envie.</p>
-    </div>}
-  </section>;
 }
 
 function KitchenTools({ entries, onGenerate }: { entries: Entry[]; onGenerate: (title: string, items: string[]) => Promise<void> }) {
@@ -322,14 +289,25 @@ function Profile({ email, entries, profileEntry, onSaveProfile, onLogout, onRest
     } catch { setMessage('Restauration impossible : vérifie le fichier, la phrase secrète et le format.'); }
     finally { setBusy(false); }
   };
-  return <div className="content-width">
-    <span className="eyebrow">MON COMPTE</span><h1>Profil & confidentialité</h1>
-    <PersonalProfile key={profileEntry?.id ?? 'new'} entry={profileEntry} onSave={onSaveProfile} />
+  const me = readProfile(profileEntry);
+  const line = [me.city, birthdayLine(me.birthDate, new Date())].filter(Boolean).join(' · ');
+  return <div className="profile-screen">
+    <header className="profile-top">
+      <ProfileAvatar profile={me} size={64} />
+      <div><h1>{[me.firstName, me.lastName].filter(Boolean).join(' ') || 'Mon profil'}</h1><p>{line || email}</p></div>
+    </header>
+    {(me.hobbies.length > 0 || me.situation) && <div className="chip-row">{[me.situation, me.job, ...me.hobbies].filter(Boolean).slice(0, 8).map((t) => <span key={t} className="chip">{t}</span>)}</div>}
+    <details className="group" open={!profileEntry}>
+      <summary>Modifier mon profil</summary>
+      <PersonalProfile key={profileEntry?.id ?? 'new'} entry={profileEntry} onSave={onSaveProfile} />
+    </details>
+    <p className="sec">Compte</p>
     <section className="panel form-stack">
       <h2>Compte personnel</h2><p>{email}</p>
       <p className="muted">La session est conservée dans l'onglet de navigation, pas dans un stockage de données personnel permanent.</p>
       <button className="button secondary" onClick={() => void onLogout()}><LogOut size={16} /> Se déconnecter</button>
     </section>
+    <p className="sec">Mes données</p>
     <section className="panel form-stack">
       <h2>Sauvegarde chiffrée</h2><p>Un fichier AES-256-GCM, protégé par une phrase secrète, est généré sur ton appareil. Les données ne sont pas envoyées à un service d'export.</p>
       <label>Phrase secrète (12 caractères minimum)<input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
@@ -341,6 +319,7 @@ function Profile({ email, entries, profileEntry, onSaveProfile, onLogout, onRest
       <p className="fineprint">La restauration ajoute les entrées au compte. Elle ne supprime pas les données existantes et peut créer des doublons. Vérifie toujours ton fichier de sauvegarde.</p>
       {message && <p role="status">{message}</p>}
     </section>
+    <p className="sec">Confidentialité et rappels</p>
     <PrivacyCenter />
     <BrowserReminders entries={entries} />
     <section className="panel"><h2>À propos de cette version</h2><p className="muted">Application web privée en cours de développement. L'export d'agenda est manuel ; les notifications web ne fonctionnent qu'avec la page ouverte. L'assistant IA nécessite un déploiement sécurisé et l'analyse vidéo reste expérimentale. La synchronisation iOS native est encore à réaliser.</p></section>
@@ -361,7 +340,12 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState('');
-  const [editor, setEditor] = useState<{ module: Module; initial?: Entry } | null>(null);
+  const [editor, setEditor] = useState<{ module: Module; initial?: Entry; preset?: Preset } | null>(null);
+  const [cuisineTab, setCuisineTab] = useState<CuisineTab>('recettes');
+  const [travelTab, setTravelTab] = useState<'destinations' | 'voyage'>('destinations');
+  const [equilibreTab, setEquilibreTab] = useState<EquilibreTab>('axes');
+  const [spiritTab, setSpiritTab] = useState<SpiritTab>('home');
+  const [passionTab, setPassionTab] = useState<'parcours' | 'series' | 'libre'>('parcours');
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -428,9 +412,12 @@ export default function App() {
   if (!owner) return <main className="auth-layout"><section className="auth-card"><h1>Accès non autorisé</h1><p>Ce compte n'est pas enregistré comme propriétaire de l'application.</p><button className="button secondary" onClick={() => void signOut()}>Se déconnecter</button></section></main>;
 
   const currentModule = modules.find((m) => m.id === screen);
-  const moduleEntries = currentModule ? entries.filter((e) => e.module === currentModule.id && (e.title.toLowerCase().includes(search.toLowerCase()) || !search)) : [];
-  const upcoming = entries.filter((e) => e.entry_date && e.entry_date >= today()).sort((a, b) => (a.entry_date ?? '').localeCompare(b.entry_date ?? '')).slice(0, 5);
-  const go = (next: Screen) => { setScreen(next); setSearch(''); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const allModuleEntries = currentModule ? entries.filter((e) => e.module === currentModule.id) : [];
+  const moduleEntries = allModuleEntries.filter((e) => !search || e.title.toLowerCase().includes(search.toLowerCase()));
+  const go = (next: Screen) => { setScreen(next); setSearch(''); window.scrollTo({ top: 0 }); };
+  const openEntry = (e: Entry) => setEditor({ module: moduleById(e.module), initial: e });
+  const addIn = (module: ModuleId, kind?: string, data?: Record<string, string>, title?: string) => setEditor({ module: moduleById(module), preset: kind ? { kind, data: data ?? {}, title } : undefined });
+  const removeQuiet = async (entry: Entry) => { await removeEntry(entry.id); await refresh(); };
 
   const savePhoto = async (slot: string, image: string | null) => {
     const existing = photoEntries.find((e) => e.title === slot);
@@ -502,5 +489,68 @@ export default function App() {
     <nav className="mobile-nav" aria-label="Navigation principale">{nav.map(({ id, label, icon: Icon }) => <button key={id} className={screen === id ? 'active' : ''} onClick={() => go(id)}><Icon size={20} /><span>{label}</span></button>)}</nav>
     {editor && <Editor key={editor.initial?.id ?? editor.module.id} module={editor.module} initial={editor.initial} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
     <div className="screen-reader-note"><CircleHelp size={14} /> Les changements sont enregistrés dans ton espace cloud privé.</div>
+  const entryList = currentModule && <section className="entries-section">
+    <SectionTitle>Mes entrées <span className="count">{allModuleEntries.length}</span></SectionTitle>
+    {allModuleEntries.length > 4 && <input className="search-field" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher dans cet espace…" />}
+    <div className="entries">{moduleEntries.length ? moduleEntries.map((entry) =>
+      <EntryCard key={entry.id} entry={entry} module={currentModule} onEdit={openEntry} onDelete={(e) => void remove(e)} onUpdate={updateData} />
+    ) : <div className="empty-soft"><Coffee size={28} /><p>Un espace à remplir à ton rythme.</p><button className="button ghost" onClick={() => setEditor({ module: currentModule })}>Créer ma première entrée</button></div>}</div>
+  </section>;
+
+  const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings'] as Screen[]).includes(screen);
+
+  return <PhotoProvider value={{ photos, save: savePhoto }}><div className={'app' + (screen === 'calme' ? ' calm-mode' : '')}>
+    <main className="phone">
+      {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
+      {loading && <div className="sync-status" role="status">Synchronisation…</div>}
+      {screen === 'home' && <HomeScreen entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} />}
+      {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} />}
+      {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
+      {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}
+      {screen === 'calme' && <Calm onQuit={() => go('home')} onWrite={() => addIn('equilibre', 'emotion', { date: today() })} />}
+      {screen === 'assistant' && <div className="screen"><ScreenHeader title="Assistant" onBack={() => go('home')} /><PersonalBrief entries={entries} onGo={go} /><PersonalAssistant entries={entries} /></div>}
+      {screen === 'settings' && <div className="screen"><Profile email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { await signOut(); setEntries([]); }} /></div>}
+      {currentModule && <div className="screen">
+        <ScreenHeader title={currentModule.name} onBack={() => go('spaces')}
+          right={<button className="icon-btn" aria-label="Ajouter" onClick={() => setEditor({ module: currentModule })}><Plus size={24} /></button>} />
+        {currentModule.id === 'quotidien' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'task', { date: today() })} onOpen={openEntry} onUpdate={updateData} embedded />}
+        {currentModule.id === 'sante' && <HealthTop entries={allModuleEntries} onAdd={(kind) => addIn('sante', kind, { date: today() })} />}
+        {currentModule.id === 'sport' && <SportHub entries={allModuleEntries} challengeEntries={entries.filter((e) => e.module === 'challenges')} onCreate={createFromTool} onGoChallenges={() => go('challenges')} />}
+        {currentModule.id === 'challenges' && <ChallengesBoard entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} />}
+        {currentModule.id === 'finances' && <FinanceTop entries={allModuleEntries} onAdd={(kind) => addIn('finances', kind, { date: today() })} onOpen={openEntry} />}
+        {currentModule.id === 'cuisine' && <><CuisineTop tab={cuisineTab} onTab={setCuisineTab} entries={allModuleEntries} />
+          {cuisineTab === 'recettes' && <RecipeIdeas entries={allModuleEntries} onCreate={createFromTool} />}
+          {cuisineTab === 'semaine' && <><KitchenPlanner entries={allModuleEntries} onCreate={createFromTool} onGenerate={createGroceries} /><KitchenTools entries={allModuleEntries} onGenerate={createGroceries} /></>}
+          {cuisineTab === 'courses' && <div className="entries">{entries.filter((e) => e.module === 'listes' && String(e.data.category) === 'Courses').map((e) =>
+            <EntryCard key={e.id} entry={e} module={moduleById('listes')} onEdit={openEntry} onDelete={(x) => void remove(x)} onUpdate={updateData} />)}
+            {!entries.some((e) => e.module === 'listes' && String(e.data.category) === 'Courses') && <p className="muted">Planifie ta semaine puis génère tes courses.</p>}</div>}
+        </>}
+        {currentModule.id === 'decouvertes' && <><TravelTop tab={travelTab} onTab={setTravelTab} entries={allModuleEntries} onCreate={createFromTool} onAdd={(kind) => addIn('decouvertes', kind)} />
+          {travelTab === 'destinations' && <TravelSuggestions entries={allModuleEntries} onCreate={createFromTool} />}
+          {travelTab === 'voyage' && <><TravelPlanner entries={allModuleEntries} onUpdate={updateData} /><TravelTools entries={allModuleEntries} onGenerate={createGroceries} /></>}</>}
+        {currentModule.id === 'equilibre' && <><EquilibreTop tab={equilibreTab} onTab={setEquilibreTab} entries={allModuleEntries}
+            onAxis={(axis) => { const b = allModuleEntries.find((e) => e.kind === 'booster' && String(e.data.axis) === axis); if (b) { setEquilibreTab('booster'); } else addIn('equilibre', 'booster', { axis, days: '14' }, 'Booster · ' + axis); }}
+            booster={<div className="entries">{allModuleEntries.filter((e) => e.kind === 'booster').map((e) => <EntryCard key={e.id} entry={e} module={currentModule} onEdit={openEntry} onDelete={(x) => void remove(x)} onUpdate={updateData} />)}</div>} />
+          {equilibreTab === 'journal' && <><EquilibriumInsights entries={allModuleEntries} /><BalanceReview entries={allModuleEntries} onCreate={createFromTool} /></>}
+          <button className="calm-pill" onClick={() => go('calme')}>J’ai besoin de me calmer</button></>}
+        {currentModule.id === 'spiritualite' && <><SpiritTop tab={spiritTab} onTab={setSpiritTab} entries={allModuleEntries} onCreate={createFromTool} onRemove={removeQuiet} />
+          {spiritTab === 'horaires' && <><AutomaticPrayerTimes entries={allModuleEntries} onCreate={createFromTool} /><PrayerPlanner entries={allModuleEntries} onCreate={createFromTool} />
+            <p className="disclaimer"><BookOpen size={14} /> Les horaires automatiques nécessitent une connexion et une ville choisie. Les calculs peuvent varier selon les sources locales.</p></>}</>}
+        {currentModule.id === 'passions' && <>
+          <Segmented label="Passions" value={passionTab} onChange={setPassionTab} options={[{ value: 'parcours', label: 'Parcours' }, { value: 'series', label: 'Séries' }, { value: 'libre', label: 'Hobby libre' }]} />
+          {passionTab === 'parcours' && <LearningPaths entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} />}
+          {passionTab === 'series' && <SeriesTracker entries={allModuleEntries} onUpdate={updateData} onAdd={() => addIn('passions', 'series', { status: 'À voir', seasons: '1', episodes: '10' })} />}
+          {passionTab === 'libre' && <PassionPath entries={allModuleEntries} onUpdate={updateData} />}
+        </>}
+        {(['sport', 'cuisine', 'decouvertes', 'passions'] as const).includes(currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions') && <MediaGallery ownerId={session.user.id} module={currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions'} entries={allModuleEntries.map((e) => ({ id: e.id, title: e.title }))} />}
+        {currentModule.id === 'sante' && <p className="disclaimer"><Heart size={14} /> Le suivi est informatif. Il ne constitue pas un diagnostic et ne remplace pas un professionnel de santé.</p>}
+        {!(currentModule.id === 'spiritualite' && spiritTab === 'home') && currentModule.id !== 'challenges' && !(currentModule.id === 'passions' && passionTab !== 'libre') && entryList}
+      </div>}
+    </main>
+    {(tabScreen || currentModule) && screen !== 'calme' && <nav className="tabbar" aria-label="Navigation principale">{nav.map(({ id, label, icon: Icon }) => {
+      const on = screen === id || (id === 'spaces' && Boolean(currentModule));
+      return <button key={id} className={on ? 'on' : ''} aria-current={on ? 'page' : undefined} onClick={() => go(id)}><Icon size={24} strokeWidth={on ? 2.2 : 1.6} /><span>{label}</span></button>;
+    })}</nav>}
+    {editor && <Editor key={(editor.initial?.id ?? editor.module.id) + (editor.preset?.kind ?? '')} module={editor.module} initial={editor.initial} preset={editor.preset} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
   </div></PhotoProvider>;
 }
