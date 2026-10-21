@@ -5,6 +5,7 @@ import { str, todayIso } from '../lib/day';
 import { dayNumber, templateById } from '../lib/challenges';
 import { cycleInfo, prayerDay } from '../lib/wellbeing';
 import { PhotoContext } from '../features/HeroPhoto';
+import { VISUALS } from '../lib/visuals';
 import { SectionTitle } from '../ui/kit';
 
 const MOODS = [
@@ -43,7 +44,7 @@ export function Wellbeing({ entries, onGo, onCreate, onUpdate }: {
     </section>
 
     <button className="session-card" onClick={() => onGo('sport')}>
-      <span className="session-photo" style={{ backgroundImage: photos['sport-pilates'] ? `url(${photos['sport-pilates']})` : undefined }}>{!photos['sport-pilates'] && 'Pilates'}</span>
+      <span className="session-photo" style={{ backgroundImage: `linear-gradient(180deg,rgba(55,35,25,.04),rgba(55,35,25,.15)),url("${photos['sport-pilates'] || VISUALS.pilates}")` }}></span>
       <span className="session-body">
         {session ? <><small>Séance prévue · {session.entry_date === day ? (str(session, 'time') || 'aujourd’hui') : new Date(session.entry_date + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long' })}</small>
           <strong className="serif">{session.title}</strong><span>{[str(session, 'duration') && str(session, 'duration') + ' min', str(session, 'technique')].filter(Boolean).join(' · ')}</span></>
