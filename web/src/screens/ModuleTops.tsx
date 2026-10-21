@@ -12,6 +12,9 @@ export type CuisineTab = 'recettes' | 'semaine' | 'courses';
 export function CuisineTop({ tab, onTab, entries }: { tab: CuisineTab; onTab: (t: CuisineTab) => void; entries: Entry[] }) {
   const recipes = entries.filter((e) => e.kind === 'recipe');
   return <div className="module-top">
+    <HeroPhoto slot="module-cuisine" tone="caramel" label="Cuisine">
+      <div className="hero-title"><h2>Ma cuisine</h2><span>Recettes · Ma semaine · Courses</span></div>
+    </HeroPhoto>
     <Segmented label="Cuisine" value={tab} onChange={onTab} options={[{ value: 'recettes', label: 'Recettes' }, { value: 'semaine', label: 'Ma semaine' }, { value: 'courses', label: 'Courses' }]} />
     {tab === 'recettes' && recipes.length > 0 && <>
       <SectionTitle>Mes recettes</SectionTitle>
@@ -54,7 +57,9 @@ export function TravelTop({ tab, onTab, entries, onCreate, onAdd }: { tab: 'dest
         <div className="insp-row">{destinations.filter((x) => x.id !== d.id).map((x, i) => <button key={x.id} className="insp-card" onClick={() => setPick(x.id)}>
           <HeroPhoto slot={'destination-' + x.id} tone={(['caramel', 'sable', 'sauge'] as const)[i % 3]} label={x.title} compact />
           <strong>{x.title}</strong><small>{str(x, 'country')}</small></button>)}</div></>}
-    </> : <div className="empty-soft"><MapPin size={28} /><p>Note une première destination de rêve.</p><button className="button ghost" onClick={() => onAdd('destination')}>Ajouter une destination</button></div>)}
+    </> : <><HeroPhoto slot="module-decouvertes" tone="sauge" label="Voyages">
+        <div className="hero-title"><h2>Mes découvertes</h2><span>Îles · Plages · Lagons</span></div>
+      </HeroPhoto><div className="empty-soft"><MapPin size={28} /><p>Note une première destination de rêve.</p><button className="button ghost" onClick={() => onAdd('destination')}>Ajouter une destination</button></div></>)}
     {tab === 'voyage' && trips[0] && <HeroPhoto slot={'trip-' + trips[0].id} tone="caramel" label={trips[0].title}>
       <div className="hero-title"><h2>{trips[0].title}</h2><span>{trips[0].entry_date ? 'Départ le ' + new Date(trips[0].entry_date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }) : 'Dates à choisir'}{amountOf(trips[0]) ? ' · budget ' + fmt(amountOf(trips[0]), currencyOf(trips[0])) : ''}</span></div>
     </HeroPhoto>}

@@ -5,22 +5,29 @@ import { templateById } from './challenges';
  * Une photo personnelle choisie avec « Ma photo » passe toujours avant.
  * `position` garde le visage dans le cadre quel que soit le format (mobile, ordinateur, vignette).
  */
-export type Visual = { file: string; position: string };
+export type Visual = { file: string; position: string; missing?: boolean };
 
 export const VISUALS = {
-  cuisine: { file: 'cuisine', position: '58% 30%' },
-  pilates: { file: 'pilates', position: '78% 35%' },
-  yoga: { file: 'yoga', position: '50% 28%' },
-  tennis: { file: 'tennis', position: '44% 30%' },
-  passions: { file: 'passions', position: '42% 30%' },
-  voyage: { file: 'voyage', position: '35% 50%' },
-  bienetre: { file: 'bien-etre', position: '50% 50%' },
-  organisation: { file: 'organisation', position: '50% 50%' },
-  agenda: { file: 'agenda', position: '50% 50%' },
+  cuisine: { file: 'cuisine', position: '70% 15%' },
+  pilates: { file: 'pilates', position: '80% 20%' },
+  yoga: { file: 'yoga', position: '62% 8%' },
+  tennis: { file: 'tennis', position: '48% 15%' },
+  passions: { file: 'passions', position: '42% 30%', missing: true },
+  voyage: { file: 'voyage', position: '40% 60%' },
+  bienetre: { file: 'bien-etre', position: '50% 55%' },
+  organisation: { file: 'organisation', position: '45% 55%' },
+  apprentissage: { file: 'apprentissage', position: '50% 50%', missing: true },
 } satisfies Record<string, Visual>;
 
 /** Visuel par défaut d'un emplacement de photo, ou undefined (dégradé de la palette). */
 export function defaultVisual(slot: string): Visual | undefined {
+  const v = pick(slot);
+  return v && !v.missing ? v : undefined;
+}
+
+function pick(slot: string): Visual | undefined {
+  if (slot === 'module-cuisine') return VISUALS.cuisine;
+  if (slot === 'module-decouvertes') return VISUALS.voyage;
   if (slot === 'sport-pilates') return VISUALS.pilates;
   if (slot === 'sport-yoga') return VISUALS.yoga;
   if (slot === 'sport-tennis') return VISUALS.tennis;
@@ -36,8 +43,9 @@ export function defaultVisual(slot: string): Visual | undefined {
     if (t.category === 'Cuisine') return VISUALS.cuisine;
     if (t.category === 'Bien-être') return VISUALS.bienetre;
     if (t.category === 'Organisation') return VISUALS.organisation;
-    if (t.category === 'Habitudes') return VISUALS.agenda;
-    if (t.category === 'Apprentissage' || t.category === 'Créativité') return VISUALS.passions;
+    if (t.category === 'Habitudes') return VISUALS.organisation;
+    if (t.category === 'Apprentissage') return VISUALS.apprentissage;
+    if (t.category === 'Créativité') return VISUALS.passions;
   }
   return undefined;
 }
