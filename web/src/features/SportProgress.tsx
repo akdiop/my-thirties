@@ -26,6 +26,5 @@ export function SportProgress({ entries }: { entries: Entry[] }) {
     {stats.recent.length > 0 && <><h4>Dernières séances</h4>
       {stats.recent.map((e) => <div className="health-timeline" key={e.id}>
         <span>{e.entry_date || '—'}</span><strong>{e.title}</strong><small>{String(e.data.discipline || '')}</small></div>)}</>}
-    <p className="fineprint">Suivi descriptif uniquement. Le repos et l'adaptation aux sensations font partie de la pratique ; aucun volume d'entraînement n'est imposé.</p>
   </section>;
 }

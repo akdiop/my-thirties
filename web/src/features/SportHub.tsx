@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { BookOpen, ChevronRight, ClipboardList, NotebookPen, PlayCircle, ScanLine, Target } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { TEMPLATES } from '../lib/challenges';
+import { SPORT_SESSION_IDEAS } from '../lib/sportSessionIdeas';
 import { HeroPhoto } from './HeroPhoto';
 import { LocalVideoPose } from './LocalVideoPose';
 import { SportNotebook } from './SportNotebook';
@@ -106,10 +107,10 @@ export function SportHub({ entries, challengeEntries, onCreate, onGoChallenges }
   const panel: Record<Row, ReactNode> = {
     bases: <><ul className="benefits">{sport.benefits.map((b) => <li key={b}>{b}</li>)}</ul>
       <div className="lesson-grid">{sport.basics.map((l) => <article className="lesson-card" key={l.name}><h3>{l.name}</h3><p>{l.text}</p></article>)}</div></>,
-    exercices: <><div className="lesson-grid">{sport.exercises.map((l) => <article className="lesson-card" key={l.name}><h3>{l.name}</h3><p>{l.text}</p></article>)}</div>
+    exercices: <><SessionIdeas discipline={active} onCreate={onCreate} /><h4>Fiches techniques</h4><div className="lesson-grid">{sport.exercises.map((l) => <article className="lesson-card" key={l.name}><h3>{l.name}</h3><p>{l.text}</p></article>)}</div>
       <h4>Vidéos de démonstration</h4>
       <ul className="video-list">{sport.videos.map((v) => <li key={v.id}><a href={'https://www.youtube.com/watch?v=' + v.id} target="_blank" rel="noopener noreferrer"><PlayCircle size={16} /> {v.title} ↗</a></li>)}</ul>
-      <p className="fineprint">Les vidéos s’ouvrent sur YouTube. Arrête un exercice douloureux et demande conseil à un professionnel si besoin.</p></>,
+      <p className="fineprint">Les vidéos s’ouvrent sur YouTube.</p></>,
     programmes: <ProgramList discipline={active} challengeEntries={challengeEntries} onCreate={onCreate} onGo={onGoChallenges} />,
     technique: <LocalVideoPose />,
     journal: <><SportNotebook entries={entries} onCreate={onCreate} /><SportProgress entries={entries} /></>,
@@ -127,6 +128,38 @@ export function SportHub({ entries, challengeEntries, onCreate, onGoChallenges }
       {open === id && <div className="sport-panel">{panel[id]}</div>}
     </div>)}</div>
   </section>;
+}
+
+
+function SessionIdeas({ discipline, onCreate }: { discipline: Discipline; onCreate: (input: EntryInput) => Promise<void> }) {
+  const [busy, setBusy] = useState('');
+  const [message, setMessage] = useState('');
+  const ideas = SPORT_SESSION_IDEAS.filter((idea) => idea.discipline === discipline.toLowerCase());
+  const record = async (idea: (typeof SPORT_SESSION_IDEAS)[number]) => {
+    setBusy(idea.id); setMessage('');
+    try {
+      const date = new Date().toLocaleDateString('en-CA');
+      await onCreate({ module: 'sport', kind: 'session', title: idea.title, entry_date: date,
+        data: { date, discipline, duration: String(idea.minutes), technique: idea.focus,
+          feeling: 'Bien', note: 'Séance guidée : ' + idea.title } });
+      setMessage('Séance enregistrée dans ton journal.');
+    } catch { setMessage('Enregistrement impossible.'); }
+    finally { setBusy(''); }
+  };
+  return <div>
+    <h4>Idées de séances guidées</h4>
+    <p className="muted">Choisis selon ton temps et ton énergie.</p>
+    <div className="lesson-grid">{ideas.map((idea) => <article className="lesson-card" key={idea.id}>
+      <h3>{idea.title}</h3><p>{idea.minutes} min environ · {idea.focus}</p>
+      <details><summary>Déroulé de la séance</summary>
+        <ol>{idea.steps.map((step, index) => <li key={index}>{step}</li>)}</ol>
+      </details>
+      <button className="button secondary" disabled={Boolean(busy)} onClick={() => void record(idea)}>
+        {busy === idea.id ? 'Enregistrement…' : 'J’ai fait cette séance'}
+      </button>
+    </article>)}</div>
+    {message && <p role="status">{message}</p>}
+  </div>;
 }
 
 function ProgramList({ discipline, challengeEntries, onCreate, onGo }: { discipline: Discipline; challengeEntries: Entry[]; onCreate: (input: EntryInput) => Promise<void>; onGo: () => void }) {

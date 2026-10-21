@@ -1,12 +1,14 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, TextInput, View } from 'react-native';
+import { Pressable, TextInput, View } from 'react-native';
 
 import { HeaderAdd } from '@/components/HeaderAdd';
+import { SelectField } from '@/components/form/SelectField';
 import { AppText, Button, Card, Screen } from '@/components/ui';
 import { Segmented } from '@/components/ui/Segmented';
 import { categoryLabel, originLabel, RECIPE_LIBRARY } from '@/cuisine/cuisine';
 import { RECIPE_CATEGORIES } from '@/cuisine/recipeCategories';
+import { CULINARY_STYLES } from '@/cuisine/recipeStyles';
 import { useData, useMutate } from '@/hooks/useData';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -16,13 +18,18 @@ export default function Recettes() {
   const [tab, setTab] = useState<'mine' | 'library'>('mine');
   const [category, setCategory] = useState<string>('petit-dejeuner');
   const [search, setSearch] = useState('');
+  const [style, setStyle] = useState('toutes');
+  const [maxMinutes, setMaxMinutes] = useState('toutes');
   const recipes = useData(({ life }) => life.listRecipes());
-  const filteredLibrary = RECIPE_LIBRARY.filter((r) => r.category === category && r.title.toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr')));
+  const filteredLibrary = RECIPE_LIBRARY.filter((r) => r.category === category &&
+    (style === 'toutes' || r.origin === style) &&
+    (maxMinutes === 'toutes' || (r.prepMin ?? 0) + (r.cookMin ?? 0) <= Number(maxMinutes)) &&
+    (r.title + ' ' + r.ingredients.map((i) => i.name).join(' ')).toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr')));
   const imported = new Set(recipes.map((r) => r.libraryId).filter(Boolean));
 
   return (
     <Screen title="Mes recettes" back right={<HeaderAdd label="Nouvelle recette" onPress={() => router.push({ pathname: '/cuisine/edition/[id]', params: { id: 'new' } })} />}>
-      <Segmented label="Recettes" value={tab} onChange={setTab} options={[{ value: 'mine', label: `Les miennes (${recipes.length})` }, { value: 'library', label: 'Bibliothèque (300)' }]} />
+      <Segmented label="Recettes" value={tab} onChange={setTab} options={[{ value: 'mine', label: `Les miennes (${recipes.length})` }, { value: 'library', label: `Bibliothèque (${RECIPE_LIBRARY.length})` }]} />
       {tab === 'mine' ? (
         recipes.length ? (
           recipes.map((r) => (
@@ -40,15 +47,10 @@ export default function Recettes() {
         )
       ) : (
         <>
-          <AppText variant="caption" color={c.textMuted}>50 recettes par catégorie, avec ingrédients et étapes. Les quantités sont indicatives.</AppText>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingVertical: 4 }}>
-            {RECIPE_CATEGORIES.map((item) => (
-              <Pressable key={item.id} accessibilityRole="button" accessibilityState={{ selected: category === item.id }}
-                onPress={() => setCategory(item.id)} style={{ backgroundColor: category === item.id ? '#D8C5B5' : '#F5F1E6', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 16 }}>
-                <AppText style={{ color: '#6B4A38' }}>{item.label}</AppText>
-              </Pressable>
-            ))}
-          </ScrollView>
+          <AppText variant="caption" color={c.textMuted}>Recettes de repas et boissons, boulangerie, desserts et bases maison. Les quantités sont indicatives.</AppText>
+          <SelectField label="Catégorie" options={RECIPE_CATEGORIES.map((item) => ({ value: item.id as string, label: item.label + ' (' + RECIPE_LIBRARY.filter((r) => r.category === item.id).length + ')' }))} value={category} onChange={setCategory} />
+          <SelectField label="Inspiration culinaire" options={CULINARY_STYLES.map((item) => ({ value: item.id as string, label: item.label }))} value={style} onChange={setStyle} />
+          <SelectField label="Temps disponible" options={[{ value: 'toutes', label: 'Toutes les durées' }, { value: '15', label: '15 minutes maximum' }, { value: '30', label: '30 minutes maximum' }, { value: '60', label: '1 heure maximum' }]} value={maxMinutes} onChange={setMaxMinutes} />
           <TextInput accessibilityLabel="Rechercher une recette" placeholder="Rechercher dans cette catégorie…" placeholderTextColor={c.textMuted}
             value={search} onChangeText={setSearch} style={{ backgroundColor: '#F5F1E6', color: '#6B4A38', padding: 12, borderRadius: 12 }} />
           <AppText variant="caption" color={c.textMuted}>{filteredLibrary.length} recette(s)</AppText>

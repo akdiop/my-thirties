@@ -20,4 +20,3 @@ coverage/
 
 # Artefacts de build de la version web
 web/tsconfig.tsbuildinfo
-web/public/apple-touch-icon.png

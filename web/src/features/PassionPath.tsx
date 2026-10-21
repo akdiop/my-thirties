@@ -50,7 +50,6 @@ export function PassionPath({ entries, onUpdate }: {
       </div>;
     })}</div>
     {error && <p className="error" role="alert">{error}</p>}
-    <p className="fineprint">Suggestions générales : choisis tes propres ressources, adapte les objectifs et prends des pauses si nécessaire.</p>
   </section>;
 }
 

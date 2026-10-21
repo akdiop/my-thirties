@@ -8,6 +8,7 @@ import { AppText, Card, ListRow, Screen, StatusBadge } from '@/components/ui';
 import { Segmented } from '@/components/ui/Segmented';
 import { useData } from '@/hooks/useData';
 import { fichesBySection, SPORT_NOTICE, YOGA_SESSIONS, type Discipline } from '@/sport/content';
+import { SPORT_SESSION_IDEAS } from '@/sport/sessionIdeas';
 import { useTheme } from '@/theme/ThemeProvider';
 import { MIN_TOUCH } from '@/theme/tokens';
 
@@ -40,6 +41,7 @@ function Journal() {
 export default function Sport() {
   const { c } = useTheme();
   const [tab, setTab] = useState<Tab>('pilates');
+  const [expandedIdea, setExpandedIdea] = useState<string | null>(null);
   return (
     <Screen
       title="Mon sport"
@@ -84,6 +86,24 @@ export default function Sport() {
               </View>
             </View>
           ) : null}
+          <View style={{ gap: 8 }}>
+            <AppText variant="cardTitle">Idées de séances guidées</AppText>
+            <AppText variant="caption" color={c.textMuted}>Séances modulables, sans objectif de calories ou de performance imposée.</AppText>
+            {SPORT_SESSION_IDEAS.filter((idea) => idea.discipline === tab).map((idea) => (
+              <Card key={idea.id} style={{ gap: 8 }}>
+                <Pressable accessibilityRole="button" accessibilityState={{ expanded: expandedIdea === idea.id }}
+                  onPress={() => setExpandedIdea(expandedIdea === idea.id ? null : idea.id)}
+                  style={{ minHeight: 44, justifyContent: 'center', gap: 3 }}>
+                  <AppText style={{ fontFamily: 'Inter_600SemiBold' }}>{idea.title}</AppText>
+                  <AppText variant="caption" color={c.textMuted}>{idea.minutes} min environ · {idea.focus} · {expandedIdea === idea.id ? 'Masquer' : 'Voir le déroulé'}</AppText>
+                </Pressable>
+                {expandedIdea === idea.id ? <View style={{ gap: 6 }}>
+                  {idea.steps.map((step, index) => <AppText key={index} variant="caption">{index + 1}. {step}</AppText>)}
+                  <AppText variant="caption" color={c.textMuted}>{idea.caution}</AppText>
+                </View> : null}
+              </Card>
+            ))}
+          </View>
           {fichesBySection(tab).map(([section, fiches]) => (
             <View key={section} style={{ gap: 6 }}>
               <AppText variant="cardTitle">{section}</AppText>

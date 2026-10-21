@@ -1,4 +1,5 @@
 import { PERSONALIZED_RECIPES } from './recipeIndex';
+import { recipeStyle } from './recipeStyles';
 import { parseCuratedIngredient } from './recipeParser';
 export type Ingredient = { name: string; qty: number | null; unit: string };
 
@@ -19,10 +20,16 @@ export const ORIGINS = [
   { id: 'africaine', label: 'Africaine' },
   { id: 'internationale', label: 'Internationale' },
   { id: 'maison', label: 'Maison' },
+  { id: 'francaise', label: 'Française' },
+  { id: 'italienne', label: 'Italienne' },
+  { id: 'mediterraneenne', label: 'Méditerranéenne' },
+  { id: 'asiatique', label: 'Asiatique' },
 ] as const;
 
 export const CATEGORIES = [
   { id: 'plat', label: 'Plat' },
+  { id: 'boulangerie', label: 'Boulangerie maison' },
+  { id: 'base-maison', label: 'Bases et sauces' },
   { id: 'accompagnement', label: 'Accompagnement' },
   { id: 'petit-dejeuner', label: 'Petit-déjeuner' },
   { id: 'dessert', label: 'Dessert' },
@@ -122,7 +129,7 @@ export type LibraryRecipe = Omit<RecipeLike, 'id'> & { libraryId: string; origin
 /** Recettes de base à adapter : quantités indicatives, à ajuster à vos goûts et à votre matériel. */
 export const RECIPE_LIBRARY: LibraryRecipe[] = [
   ...PERSONALIZED_RECIPES.map((r) => ({
-    libraryId: r.id, title: r.title, origin: 'maison', category: r.category,
+    libraryId: r.id, title: r.title, origin: recipeStyle(r), category: r.category,
     servings: r.servings, prepMin: r.prepMin, cookMin: r.cookMin,
     ingredients: r.ingredients.split(';').map(parseCuratedIngredient),
     steps: r.steps, storage: r.storage,
