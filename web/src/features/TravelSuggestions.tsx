@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { DESTINATION_IDEAS } from '../lib/destinationIdeas';
 import { adviceUrl, DESTINATION_GUIDES } from '../lib/destinationGuides';
-import { EditorialPhoto, useDestinationPhotos } from './EditorialPhoto';
+import { EditorialPhoto, UnsplashCredit, useDestinationPhotos, useUnsplash } from './EditorialPhoto';
+import { destinationItem } from '../lib/unsplashItems';
 import { HiddenNote, useHidden } from '../lib/hidden';
 
 export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void> }) {
@@ -17,6 +18,7 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
     (style === 'Toutes' || d.style === style) &&
     [d.name, d.country, d.region, d.description].join(' ').toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr'))
   ), [style, search, hidden]);
+  const unsplash = useUnsplash(useMemo(() => Object.fromEntries(ideas.map((d) => ['destination:' + d.id, destinationItem(d.id, d.name, d.country)])), [ideas]));
   const save = async (d: (typeof DESTINATION_IDEAS)[number]) => {
     setBusy(d.id); setFeedback('');
     try {
@@ -38,8 +40,8 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
     </div>
     <p className="muted">{ideas.length} destination(s)</p>
     <div className="lesson-grid">{ideas.map((d) => <article className="lesson-card" key={d.id}>
-      <EditorialPhoto src={destinationPhotos[d.id]?.src} alt={'Vue de ' + d.name + ' (Wikimedia Commons)'} className="editorial-card-photo" />
-      {destinationPhotos[d.id] && <a className="editorial-photo-credit" href={destinationPhotos[d.id].creditUrl} target="_blank" rel="noopener noreferrer">Crédit photo · Wikimedia Commons ↗</a>}
+      <EditorialPhoto src={unsplash['destination:' + d.id]?.src || destinationPhotos[d.id]?.src} alt={'Vue de ' + d.name} className="editorial-card-photo" />
+      {unsplash['destination:' + d.id] ? <UnsplashCredit photo={unsplash['destination:' + d.id]!} /> : destinationPhotos[d.id] && <a className="editorial-photo-credit" href={destinationPhotos[d.id].creditUrl} target="_blank" rel="noopener noreferrer">Crédit photo · Wikimedia Commons ↗</a>}
       <h3>{d.name}</h3><p>{d.country} · {d.style} · {d.duration}</p>
       <p>{d.description}</p>
       <Guide id={d.id} highlights={d.highlights} />
