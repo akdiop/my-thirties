@@ -23,7 +23,6 @@ import { AutomaticPrayerTimes } from './features/AutomaticPrayerTimes';
 import { BrowserReminders } from './features/BrowserReminders';
 import { PersonalAssistant } from './features/PersonalAssistant';
 import { PrivacyCenter } from './features/PrivacyCenter';
-import { MediaGallery } from './features/MediaGallery';
 import { deleteEntryMedia } from './lib/mediaLibrary';
 import { PersonalProfile, ProfileAvatar } from './features/PersonalProfile';
 import { birthdayLine, PROFILE_KIND, readProfile } from './lib/profile';
@@ -551,7 +550,6 @@ export default function App() {
           {passionTab === 'series' && <SeriesTracker entries={allModuleEntries} onUpdate={updateData} onCreate={createFromTool} onAdd={() => addIn('passions', 'series', { status: 'À voir', seasons: '1', episodes: '10' })} />}
           {passionTab === 'libre' && <PassionPath entries={allModuleEntries} onUpdate={updateData} />}
         </>}
-        {(['sport', 'cuisine', 'decouvertes', 'passions'] as const).includes(currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions') && <MediaGallery ownerId={session.user.id} module={currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions'} entries={allModuleEntries.map((e) => ({ id: e.id, title: e.title }))} />}
         {!(currentModule.id === 'spiritualite' && spiritTab === 'home') && currentModule.id !== 'challenges' && !(currentModule.id === 'passions' && passionTab !== 'libre') && entryList}
       </div>}
     </main>
