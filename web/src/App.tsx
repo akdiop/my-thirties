@@ -15,8 +15,6 @@ import { EquilibriumInsights } from './features/EquilibriumInsights';
 import { KitchenPlanner } from './features/KitchenPlanner';
 import { PassionPath } from './features/PassionPath';
 import { TravelPlanner } from './features/TravelPlanner';
-import { TravelSuggestions } from './features/TravelSuggestions';
-import { SeriesTracker } from './features/SeriesTracker';
 import { PrayerPlanner } from './features/PrayerPlanner';
 import { PersonalBrief } from './features/PersonalBrief';
 import { RecipeIdeas } from './features/RecipeIdeas';
@@ -437,66 +435,6 @@ export default function App() {
     } catch (e) { setError(e instanceof Error ? e.message : 'Photo impossible à enregistrer.'); throw e; }
   };
 
-  return <PhotoProvider value={{ photos, save: savePhoto }}><div className="app-shell">
-    <aside className="sidebar">
-      <div className="brand"><span className="logo-mark">M<span>·</span></span><div><strong>my thirties</strong><small>MY PERSONAL SPACE</small></div></div>
-      <p className="sidebar-label">NAVIGATION</p>
-      {nav.map(({ id, label, icon: Icon }) => <button key={id} className={'nav-link ' + (screen === id ? 'active' : '')} onClick={() => go(id)}><Icon size={19} />{label}</button>)}
-      <p className="sidebar-label spaces-label">MES ESPACES</p>
-      {modules.filter((m) => !['quotidien', 'equilibre'].includes(m.id)).map((m) => <button key={m.id} className={'nav-link small ' + (screen === m.id ? 'active' : '')} onClick={() => go(m.id)}><span className="nav-symbol">{m.symbol}</span>{m.name}</button>)}
-      <div className="sidebar-bottom"><ShieldCheck size={17} /> Espace personnel privé</div>
-    </aside>
-    <div className="main-area">
-      <header className="topbar"><span className="topbar-name">MY THIRTIES <span>·</span> MON ESPACE</span><span className="topbar-date">{new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</span></header>
-      <main className="page">
-        {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
-        {loading && <div className="sync-status" role="status">Synchronisation…</div>}
-        {screen === 'home' && <div className="content-width">
-          <ProfileGreeting entry={profileEntry} onEdit={() => go('settings')} />
-          <span className="eyebrow">TON ESPACE, TON RYTHME</span><h1>Une journée à la fois<span className="heading-dot">.</span></h1>
-          <p className="lead">Organisation, bien-être et petits projets : tout ce qui compte, au même endroit.</p>
-          <div className="home-hero">
-            <div><span className="eyebrow">AUJOURD'HUI</span><h2>{new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</h2>
-              <p>{upcoming.length ? upcoming.length + ' éléments à venir dans ton espace.' : 'Ton espace est prêt à accueillir tes projets.'}</p></div>
-            <button className="button light" onClick={() => setEditor({ module: moduleById('quotidien') })}><Plus size={17} /> Ajouter une tâche</button>
-          </div>
-          <PersonalBrief entries={entries} onGo={go} />
-          <PersonalAssistant entries={entries} />
-          <div className="section-row"><h2>Mes prochains rendez-vous</h2><button className="text-button" onClick={() => go('quotidien')}>Voir l'agenda <ChevronRight size={15} /></button></div>
-          <div className="upcoming">{upcoming.length ? upcoming.map((e) => <div className="upcoming-item" key={e.id}><span className="date-chip">{humanDate(e.entry_date)}</span><strong>{e.title}</strong><span className="muted">{moduleById(e.module).name}</span></div>) : <p className="muted">Aucun événement à venir.</p>}</div>
-          <div className="section-row"><h2>Mes espaces</h2><button className="text-button" onClick={() => go('spaces')}>Tout voir <ChevronRight size={15} /></button></div>
-          <div className="module-grid">{modules.map((m) => <button className="module-card" key={m.id} onClick={() => go(m.id)}><span className="module-symbol">{m.symbol}</span><strong>{m.name}</strong><small>{m.description}</small><ChevronRight className="module-arrow" size={16} /></button>)}</div>
-        </div>}
-        {screen === 'spaces' && <div className="content-width"><span className="eyebrow">MES UNIVERS</span><h1>Tous mes espaces</h1><p className="lead">Onze espaces pour accompagner tes projets et tes habitudes.</p><div className="module-grid">{modules.map((m) => <button className="module-card" key={m.id} onClick={() => go(m.id)}><span className="module-symbol">{m.symbol}</span><strong>{m.name}</strong><small>{m.description}</small><ChevronRight className="module-arrow" size={16} /></button>)}</div></div>}
-        {screen === 'settings' && <Profile email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { await signOut(); setEntries([]); }} />}
-        {currentModule && <div className="content-width">
-          <button className="back-link" onClick={() => go('spaces')}><ArrowLeft size={16} /> Mes espaces</button>
-          <span className="eyebrow">MON ESPACE PERSONNEL</span>
-          <div className="module-title-row"><div><h1>{currentModule.name}</h1><p className="lead">{currentModule.description}</p></div><button className="button primary" onClick={() => setEditor({ module: currentModule })}><Plus size={17} /> Ajouter</button></div>
-          {currentModule.sensitive && <p className="privacy-hint"><ShieldCheck size={16} /> Espace personnel sensible : données accessibles uniquement au compte autorisé. Ne saisis pas d'informations réelles avant validation de la sécurité.</p>}
-          {currentModule.id === 'equilibre' && <><CalmSpace /><EquilibriumInsights entries={moduleEntries} /><BalanceReview entries={moduleEntries} onCreate={createFromTool} /></>}
-          {currentModule.id === 'sante' && <HealthOverview entries={moduleEntries} />}
-          {currentModule.id === 'quotidien' && <CalendarBoard entries={moduleEntries} onUpdate={updateData} />}
-          {currentModule.id === 'finances' && <><FinanceSummary entries={moduleEntries} /><FinanceInsights entries={moduleEntries} /></>}
-          {currentModule.id === 'cuisine' && <><KitchenPlanner entries={moduleEntries} onCreate={createFromTool} onGenerate={createGroceries} /><KitchenTools entries={moduleEntries} onGenerate={createGroceries} /><RecipeIdeas entries={moduleEntries} onCreate={createFromTool} /></>}
-          {currentModule.id === 'decouvertes' && <><TravelSuggestions entries={moduleEntries} onCreate={createFromTool} /><TravelPlanner entries={moduleEntries} onUpdate={updateData} /><TravelTools entries={moduleEntries} onGenerate={createGroceries} /></>}
-          {currentModule.id === 'sport' && <SportHub entries={moduleEntries} challengeEntries={entries.filter((e) => e.module === 'challenges')} onCreate={createFromTool} onGoChallenges={() => go('challenges')} />}
-          {currentModule.id === 'challenges' && <ChallengesBoard entries={moduleEntries} onCreate={createFromTool} onUpdate={updateData} />}
-          {currentModule.id === 'passions' && <><SeriesTracker entries={moduleEntries} onCreate={createFromTool} onUpdate={updateData} /><PassionPath entries={moduleEntries} onUpdate={updateData} /></>}
-          {(['sport', 'cuisine', 'decouvertes', 'passions'] as const).includes(currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions') && <MediaGallery ownerId={session.user.id} module={currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions'} entries={moduleEntries.map((e) => ({ id: e.id, title: e.title }))} />}
-          {currentModule.id === 'spiritualite' && <><AutomaticPrayerTimes entries={moduleEntries} onCreate={createFromTool} /><PrayerPlanner entries={moduleEntries} onCreate={createFromTool} /><p className="privacy-hint"><BookOpen size={16} /> Les horaires automatiques nécessitent une connexion et une ville choisie. Les calculs peuvent varier selon les sources locales.</p></>}
-          {currentModule.id === 'sante' && <p className="privacy-hint"><Heart size={16} /> Le suivi est informatif. Il ne constitue pas un diagnostic et ne remplace pas un professionnel de santé.</p>}
-          <div className="section-row"><h2>Mes entrées <span className="count">{moduleEntries.length}</span></h2></div>
-          <label className="search-label">Rechercher dans cet espace<input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher par titre…" /></label>
-          <div className="entries">{moduleEntries.length ? moduleEntries.map((entry) =>
-            <EntryCard key={entry.id} entry={entry} module={currentModule} onEdit={(e) => setEditor({ module: currentModule, initial: e })} onDelete={(e) => void remove(e)} onUpdate={updateData} />
-          ) : <div className="empty-state"><Coffee size={32} /><h3>Un espace à remplir à ton rythme</h3><p>Aucune entrée pour le moment.</p><button className="button secondary" onClick={() => setEditor({ module: currentModule })}>Créer ma première entrée</button></div>}</div>
-        </div>}
-      </main>
-    </div>
-    <nav className="mobile-nav" aria-label="Navigation principale">{nav.map(({ id, label, icon: Icon }) => <button key={id} className={screen === id ? 'active' : ''} onClick={() => go(id)}><Icon size={20} /><span>{label}</span></button>)}</nav>
-    {editor && <Editor key={editor.initial?.id ?? editor.module.id} module={editor.module} initial={editor.initial} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
-    <div className="screen-reader-note"><CircleHelp size={14} /> Les changements sont enregistrés dans ton espace cloud privé.</div>
   const entryList = currentModule && <section className="entries-section">
     <SectionTitle>Mes entrées <span className="count">{allModuleEntries.length}</span></SectionTitle>
     {allModuleEntries.length > 4 && <input className="search-field" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher dans cet espace…" />}
