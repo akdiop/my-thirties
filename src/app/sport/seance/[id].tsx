@@ -6,6 +6,7 @@ import { toISODate } from '@/agenda/dates';
 import { Chips } from '@/components/form/Chips';
 import { DateField } from '@/components/form/DateTimeField';
 import { Field, TextField } from '@/components/form/Field';
+import { SelectField } from '@/components/form/SelectField';
 import { Scale, Stepper } from '@/components/form/Scale';
 import { Button, Screen } from '@/components/ui';
 import { useData, useMutate } from '@/hooks/useData';
@@ -17,6 +18,12 @@ const DISCIPLINES = [
   { value: 'autre', label: 'Autre' },
 ];
 
+const SESSION_SUGGESTIONS: Record<string, string[]> = {
+  tennis: ['Entraînement tennis', 'Match en simple', 'Match en double', 'Service', 'Jeu de jambes', 'Échanges et régularité'],
+  pilates: ['Pilates au sol', 'Pilates doux', 'Pilates Reformer', 'Mobilité et respiration', 'Pilates débutant'],
+  yoga: ['Yoga doux', 'Hatha yoga', 'Vinyasa', 'Yoga restauratif', 'Étirements et mobilité'],
+  autre: ['Marche', 'Natation', 'Vélo', 'Danse', 'Renforcement léger', 'Étirements'],
+};
 const FEELINGS = ['Facile', 'Juste bien', 'Difficile', 'Fatiguée', 'Fière'];
 
 export default function Seance() {
@@ -78,7 +85,7 @@ export default function Seance() {
           <Chips label="Discipline" options={DISCIPLINES} value={discipline} onChange={setDiscipline} />
         </Field>
       ) : null}
-      <TextField label="Titre" value={title} onChangeText={setTitle} placeholder="Cours de Pilates, match en double…" maxLength={120} />
+      <SelectField label="Type de séance" options={(SESSION_SUGGESTIONS[discipline] ?? SESSION_SUGGESTIONS.autre!).map((x) => ({ value: x, label: x }))} value={title} onChange={setTitle} allowCustom />
       <Field label="Date">
         <DateField label="Date" value={date} onChange={(d) => d && setDate(d)} />
       </Field>
