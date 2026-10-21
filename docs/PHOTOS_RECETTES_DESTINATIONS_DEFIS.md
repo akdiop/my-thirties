@@ -1,21 +1,13 @@
-# Photos des recettes, destinations et défis (web/PWA)
+# Photos de l'app web
 
-Cette évolution complète la branche des visuels validés (`claude/visuels-maquette`) sans modifier les données utilisateur.
+- **Visuels de la maquette (hébergés dans `web/public/visuels`)** : Pilates, Yoga, Tennis, Cuisine, Voyages,
+  Bien-être, Organisation. Utilisés pour le sport, les défis, les bannières de module et en secours partout.
+  Cadrage par image dans `web/src/lib/visuals.ts` pour garder le visage entier.
+- **Recettes** : chaque recette est rattachée à son plat (porridge, omelette, yassa, mafé, smoothie…) dans
+  `web/src/lib/editorialPhotos.ts` ; la carte affiche la photo principale de la page Wikipédia du plat.
+  Sans photo disponible, le visuel Cuisine local est affiché.
+- **Destinations** : photo principale de la page Wikipédia du lieu, avec lien de crédit Wikimedia Commons ;
+  sinon la plage turquoise locale.
+- **« Ma photo »** reste toujours prioritaire sur les bannières.
 
-- **315 recettes :** une photo illustrative par carte. Le choix est basé sur le nom du plat (quiche, pâtes, salade, gâteau, pain, etc.), puis sur sa catégorie. Si aucune correspondance n'est fiable, la photo générale de cuisine est utilisée. **Il ne s'agit pas d'une photographie de la recette exacte.**
-- **30 destinations :** chargement groupé des miniatures de pages Wikipédia françaises correspondant à des titres de lieux explicitement configurés. Le titre de la page est contrôlé avant de l'associer à une destination ; si aucune photo n'est disponible ou si l'appel échoue, une photo d'inspiration de plage est affichée avec une description explicite. Chaque photo Wikimedia possède un lien vers sa page de crédit/licence.
-- **Défis existants :** photographies selon la discipline et le thème, y compris les parcours de lecture, créativité et apprentissage. La priorité est toujours donnée à « Ma photo ».
-
-## Limites et confidentialité
-
-Les images d'ambiance de recettes et de certains défis sont chargées depuis **images.pexels.com**. Les images de destinations et leur métadonnées sont chargées depuis **fr.wikipedia.org** et **upload.wikimedia.org**. Ces services tiers reçoivent des requêtes de navigateur ; aucune donnée privée du journal, du compte, du budget ou de la santé n'est transmise dans ces requêtes, mais l'adresse IP du navigateur peut être visible.
-
-Les images locales de la maquette (web/public/visuels) servent de repli. La version iPhone native n'est pas modifiée ici. Les visuels peuvent être hébergés localement après sélection et revue des droits pour éliminer les appels à des tiers.
-
-## Contrôles avant fusion
-
-- Vérifier le rendu et les droits/licences des photos Wikimedia, en particulier les obligations d'attribution propres à chaque fichier.
-- Vérifier le chargement des images Pexels et le contraste des cartes sur mobile.
-- Vérifier qu'une photo de destination ne présente jamais un lieu différent comme la ville annoncée.
-- Tester le chargement sans réseau, la priorité « Ma photo » et la compilation.
-- Aucun déploiement ou fusion automatique.
+Seuls `fr.wikipedia.org` et `upload.wikimedia.org` sont contactés (recettes et destinations), sans aucune donnée personnelle.
