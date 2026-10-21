@@ -32,3 +32,16 @@ const DISH_RULES: [RegExp, string][] = [
 export const WIKI_DISHES: Record<string, string> = Object.fromEntries(DISH_RULES.map(([, title]) => [title, title]));
 /** Page Wikipédia du plat d'une recette, ou undefined si aucun plat reconnu. */
 export const dishOf = (recipeTitle: string) => DISH_RULES.find(([re]) => re.test(recipeTitle))?.[1];
+
+/**
+ * N'affiche pas la même photo pour toutes les variantes d'une recette.
+ * Seuls les titres correspondant exactement à un plat nommé sur Wikipédia
+ * peuvent utiliser sa photographie ; les variantes restent sans photo.
+ */
+const normalizeDish = (text: string) => text.toLocaleLowerCase('fr')
+  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]+/g, ' ').trim();
+export function exactDishOf(recipeTitle: string): string | undefined {
+  const title = normalizeDish(recipeTitle);
+  return Object.values(WIKI_DISHES).find((dish) => normalizeDish(dish) === title);
+}
