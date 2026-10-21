@@ -842,3 +842,6 @@ table{display:block;max-width:100%;overflow-x:auto}
   .editorial-card-photo{height:145px}
   .recipe-photo-card .editorial-card-photo{height:135px}
 }
+
+.editorial-photo-credit{display:inline-block;font-size:.7rem;color:#76523e;margin:-6px 0 10px;
+  text-decoration:underline;text-underline-offset:2px}
