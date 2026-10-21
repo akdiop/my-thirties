@@ -43,3 +43,44 @@ export function consolidateIngredients(sources: IngredientSource[]) {
   }
   return [...Array.from(quantities.values(), label), ...freeText.values()];
 }
+
+/* ---------- Liste de courses automatique de la semaine ---------- */
+type MealLike = { id: string; kind: string; module: string; entry_date: string | null; data: Record<string, unknown> };
+export type ListItem = { id: string; text: string; checked: boolean };
+const str = (v: unknown) => (typeof v === 'string' ? v : '');
+const isoDay = (d: Date) => [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
+
+/** Lundi de la semaine d'une date AAAA-MM-JJ. */
+export function weekStart(date: string) {
+  const d = new Date(date + 'T12:00:00');
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return isoDay(d);
+}
+export const weekEnd = (start: string) => { const d = new Date(start + 'T12:00:00'); d.setDate(d.getDate() + 6); return isoDay(d); };
+export const groceryTitle = (start: string) => 'Courses · semaine du ' + new Date(start + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+
+/** Ingrédients regroupés de tous les repas planifiés de la semaine (recette enregistrée ou ingrédients copiés dans le repas). */
+export function weekGroceryItems(entries: MealLike[], start: string) {
+  const end = weekEnd(start);
+  const meals = entries.filter((e) => e.module === 'cuisine' && e.kind === 'meal' && e.entry_date && e.entry_date >= start && e.entry_date <= end);
+  const bySource = new Map<string, IngredientSource>();
+  for (const meal of meals) {
+    const recipe = entries.find((r) => r.kind === 'recipe' && r.id === str(meal.data.recipeId));
+    const lines = str(meal.data.ingredients) || (recipe ? str(recipe.data.ingredients) : '');
+    if (!lines) continue;
+    const key = str(meal.data.recipeId) || str(meal.data.libraryId) || lines;
+    const current = bySource.get(key);
+    if (current) current.multiplier += 1; else bySource.set(key, { lines, multiplier: 1 });
+  }
+  return consolidateIngredients([...bySource.values()]);
+}
+
+/** Remplace les articles générés automatiquement, garde les articles ajoutés à la main et ce qui est déjà coché. */
+export function mergeGroceryItems(existing: ListItem[], previousAuto: string[], fresh: string[], newId: () => string): ListItem[] {
+  const manual = existing.filter((i) => !previousAuto.includes(i.text) && !fresh.includes(i.text));
+  const auto = fresh.map((text) => {
+    const old = existing.find((i) => i.text === text);
+    return { id: old?.id ?? newId(), text, checked: old?.checked ?? false };
+  });
+  return [...auto, ...manual];
+}

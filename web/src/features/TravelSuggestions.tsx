@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { DESTINATION_IDEAS } from '../lib/destinationIdeas';
 import { destinationVisual, VISUALS } from '../lib/visuals';
+import { adviceUrl, DESTINATION_GUIDES } from '../lib/destinationGuides';
 
 export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void> }) {
   const [style, setStyle] = useState('Toutes');
@@ -17,7 +18,8 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
     setBusy(d.id); setFeedback('');
     try {
       await onCreate({ module: 'decouvertes', kind: 'destination', title: d.name, entry_date: null,
-        data: { suggestionId: d.id, country: d.country, style: d.style, season: 'À vérifier selon la période choisie', notes: d.description + '\nÀ découvrir : ' + d.highlights.join(', ') } });
+        data: { suggestionId: d.id, country: d.country, style: d.style, season: DESTINATION_GUIDES[d.id]?.bestTime ?? '',
+          notes: [d.description, 'À découvrir : ' + d.highlights.join(', '), ...(DESTINATION_GUIDES[d.id]?.itinerary ?? [])].join('\n') } });
       setFeedback(d.name + ' ajouté à tes envies de voyage.');
     } catch { setFeedback('Impossible d’enregistrer la destination.'); }
     finally { setBusy(''); }
@@ -25,6 +27,8 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
   return <section className="tool-card">
     <div className="editorial-cover"><img src={VISUALS.travel} alt="Rue colorée et animée à Lisbonne, photographie d'ambiance" loading="lazy" /><div><span className="eyebrow">ÉVASIONS ET DÉCOUVERTES</span><h3>Inspirations de voyage</h3><p>Des lieux à découvrir, des envies à garder.</p></div></div>
     <p className="muted">30 destinations pour imaginer tes prochains voyages. Enregistre celles qui t’attirent ; les durées sont des suggestions, pas des réservations.</p>
+    <h3>Inspirations de voyage</h3>
+    <p className="muted">30 destinations avec leur fiche complète : quand partir, comment y aller, où dormir, programme jour par jour, quoi goûter.</p>
     <div className="recipe-filters">
       <label>Envie du moment<select value={style} onChange={(e) => setStyle(e.target.value)}>
         {['Toutes', 'Culture', 'Nature', 'Détente', 'Ville', 'Aventure'].map((x) => <option key={x}>{x}</option>)}
@@ -36,12 +40,32 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
       {destinationVisual(d.name) && <img className="editorial-card-image" src={destinationVisual(d.name)} alt={'Vue de ' + d.name} loading="lazy" />}
       <h3>{d.name}</h3><p>{d.country} · {d.style} · {d.duration}</p>
       <p>{d.description}</p>
-      <details><summary>À découvrir</summary><p>{d.highlights.join(' · ')}</p></details>
+      <Guide id={d.id} highlights={d.highlights} />
       <button className="button secondary" disabled={Boolean(busy) || saved.has(d.id)} onClick={() => void save(d)}>
         {saved.has(d.id) ? 'Dans mes envies' : busy === d.id ? 'Ajout…' : 'Ajouter à mes envies'}
       </button>
     </article>)}</div>
     {feedback && <p role="status">{feedback}</p>}
-    <p className="fineprint">Avant de partir, vérifie les formalités d’entrée, la sécurité et les conseils sanitaires auprès des sources officielles. Aucun prix ni visa n’est supposé.</p>
   </section>;
+}
+
+function Guide({ id, highlights }: { id: string; highlights: string[] }) {
+  const g = DESTINATION_GUIDES[id];
+  if (!g) return <details><summary>À découvrir</summary><p>{highlights.join(' · ')}</p></details>;
+  return <details className="dest-guide"><summary>Voir la fiche complète</summary>
+    <dl className="dest-facts">
+      <dt>Quand partir</dt><dd>{g.bestTime}</dd>
+      <dt>Climat</dt><dd>{g.climate}</dd>
+      <dt>Y aller</dt><dd>{g.getThere}</dd>
+      <dt>Langue</dt><dd>{g.language}</dd>
+      <dt>Monnaie</dt><dd>{g.currency}</dd>
+      <dt>Budget sur place</dt><dd>{g.budget}</dd>
+      <dt>Où dormir</dt><dd>{g.stay}</dd>
+    </dl>
+    <h4>À ne pas manquer</h4><p>{highlights.join(' · ')}</p>
+    <h4>Programme jour par jour</h4><ol className="how-list">{g.itinerary.map((x) => <li key={x}>{x}</li>)}</ol>
+    <h4>À goûter</h4><ul className="how-list">{g.food.map((x) => <li key={x}>{x}</li>)}</ul>
+    <h4>Bons plans</h4><ul className="how-list">{g.tips.map((x) => <li key={x}>{x}</li>)}</ul>
+    <a className="text-link" href={adviceUrl(g.advice)} target="_blank" rel="noreferrer">Formalités, visa et santé à jour (France Diplomatie) ↗</a>
+  </details>;
 }

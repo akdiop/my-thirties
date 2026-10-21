@@ -2,8 +2,8 @@ import { CHALLENGE_TEMPLATES, buildPlan } from './challenges';
 import { LEARNING_CHALLENGE_TEMPLATES } from './learningTemplates';
 
 describe('suggestions de challenges et apprentissage', () => {
-  it('propose 20 programmes non sportifs et des durées adaptées', () => {
-    expect(LEARNING_CHALLENGE_TEMPLATES).toHaveLength(20);
+  it('propose 19 programmes non sportifs et des durées adaptées', () => {
+    expect(LEARNING_CHALLENGE_TEMPLATES).toHaveLength(19);
     expect(new Set(CHALLENGE_TEMPLATES.map((t) => t.id)).size).toBe(CHALLENGE_TEMPLATES.length);
     expect(LEARNING_CHALLENGE_TEMPLATES.some((t) => t.days === 14)).toBe(true);
     expect(LEARNING_CHALLENGE_TEMPLATES.some((t) => t.days === 21)).toBe(true);

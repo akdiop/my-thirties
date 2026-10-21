@@ -1,4 +1,5 @@
 import type { ChallengeTemplate } from './challenges';
+import { PROGRAMS } from './challengePrograms';
 type Suggestion = { category: ChallengeTemplate['category']; discipline: string; title: string; days: 7 | 14 | 21 | 30; activity: string };
 const SUGGESTIONS: Suggestion[] = [
   {
@@ -415,10 +416,19 @@ const SUGGESTIONS: Suggestion[] = [
     "activity": "Réserve dix minutes à une activité reposante que tu apprécies."
   }
 ];
-export const SUGGESTED_TEMPLATES: ChallengeTemplate[] = SUGGESTIONS.map((s, i) => ({
-  id: 'suggestion-' + String(i + 1).padStart(2, '0') + '-' + s.days,
-  category: s.category, discipline: s.discipline, title: s.title,
-  tagline: s.discipline + ' · ' + s.days + ' jours',
-  tone: s.category === 'Apprentissage' ? 'chocolat' : s.category === 'Créativité' ? 'caramel' : 'sable',
-  day: () => s.activity,
-}));
+/** L'anglais n'est plus proposé (déjà bilingue) ; les ids restent stables pour les défis déjà commencés. */
+const RETIRED = (s: Suggestion) => s.title.startsWith('Anglais');
+
+export const SUGGESTED_TEMPLATES: ChallengeTemplate[] = SUGGESTIONS.map((s, i) => {
+  const program = PROGRAMS[s.title];
+  return {
+    id: 'suggestion-' + String(i + 1).padStart(2, '0') + '-' + s.days,
+    category: s.category, discipline: s.discipline, title: s.title,
+    tagline: s.discipline + ' · ' + s.days + ' jours',
+    tone: s.category === 'Apprentissage' ? 'chocolat' : s.category === 'Créativité' ? 'caramel' : 'sable',
+    day: (n: number) => program ? program.topics[(n - 1) % program.topics.length] : s.activity,
+    how: program?.how ?? [s.activity],
+    pathId: program?.pathId,
+    retired: RETIRED(s),
+  };
+});

@@ -110,7 +110,7 @@ export function SportHub({ entries, challengeEntries, onCreate, onGoChallenges }
     exercices: <><SessionIdeas discipline={active} onCreate={onCreate} /><h4>Fiches techniques</h4><div className="lesson-grid">{sport.exercises.map((l) => <article className="lesson-card" key={l.name}><h3>{l.name}</h3><p>{l.text}</p></article>)}</div>
       <h4>Vidéos de démonstration</h4>
       <ul className="video-list">{sport.videos.map((v) => <li key={v.id}><a href={'https://www.youtube.com/watch?v=' + v.id} target="_blank" rel="noopener noreferrer"><PlayCircle size={16} /> {v.title} ↗</a></li>)}</ul>
-      <p className="fineprint">Les vidéos s’ouvrent sur YouTube. Arrête un exercice douloureux et demande conseil à un professionnel si besoin.</p></>,
+      <p className="fineprint">Les vidéos s’ouvrent sur YouTube.</p></>,
     programmes: <ProgramList discipline={active} challengeEntries={challengeEntries} onCreate={onCreate} onGo={onGoChallenges} />,
     technique: <LocalVideoPose />,
     journal: <><SportNotebook entries={entries} onCreate={onCreate} /><SportProgress entries={entries} /></>,
@@ -148,12 +148,11 @@ function SessionIdeas({ discipline, onCreate }: { discipline: Discipline; onCrea
   };
   return <div>
     <h4>Idées de séances guidées</h4>
-    <p className="muted">Choisis selon ton temps et ton énergie. Les durées sont indicatives ; aucun exercice ne doit provoquer de douleur.</p>
+    <p className="muted">Choisis selon ton temps et ton énergie.</p>
     <div className="lesson-grid">{ideas.map((idea) => <article className="lesson-card" key={idea.id}>
       <h3>{idea.title}</h3><p>{idea.minutes} min environ · {idea.focus}</p>
       <details><summary>Déroulé de la séance</summary>
         <ol>{idea.steps.map((step, index) => <li key={index}>{step}</li>)}</ol>
-        <p className="fineprint">{idea.caution}</p>
       </details>
       <button className="button secondary" disabled={Boolean(busy)} onClick={() => void record(idea)}>
         {busy === idea.id ? 'Enregistrement…' : 'J’ai fait cette séance'}

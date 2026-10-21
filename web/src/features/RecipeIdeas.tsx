@@ -18,6 +18,9 @@ const categories: { id: CuratedCategory; label: string }[] = [
 ];
 const PAGE_SIZE = 12;
 
+const SLOTS = ['Petit-déjeuner', 'Déjeuner', 'Dîner', 'Collation'];
+const defaultSlot = (c: CuratedCategory) => c === 'petit-dejeuner' || c === 'smoothie' ? 'Petit-déjeuner' : c === 'diner' ? 'Dîner' : c === 'dejeuner' ? 'Déjeuner' : 'Collation';
+
 export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void> }) {
   const [category, setCategory] = useState<CuratedCategory>('petit-dejeuner');
   const [search, setSearch] = useState('');
@@ -33,6 +36,20 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
   ), [category, search, style, maxMinutes]);
   const visible = filtered.slice(0, page * PAGE_SIZE);
   const existing = new Set(entries.filter((e) => e.kind === 'recipe').map((e) => String(e.data.libraryId ?? '')));
+  const [planning, setPlanning] = useState('');
+  const [planDay, setPlanDay] = useState(() => new Date().toLocaleDateString('en-CA'));
+  const [planSlot, setPlanSlot] = useState(defaultSlot(category));
+  /** Planifie la recette : le repas garde ses ingrédients, la liste de courses de la semaine se met à jour. */
+  const plan = async (recipe: (typeof PERSONALIZED_RECIPES)[number]) => {
+    setBusy(recipe.id); setMessage('');
+    try {
+      await onCreate({ module: 'cuisine', kind: 'meal', title: planSlot + ' · ' + recipe.title, entry_date: planDay,
+        data: { date: planDay, slot: planSlot, recipe: recipe.title, libraryId: recipe.id, ingredients: recipe.ingredients.split(';').join('\n') } });
+      setPlanning('');
+      setMessage(recipe.title + ' planifié le ' + new Date(planDay + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }) + '. Liste de courses mise à jour.');
+    } catch { setMessage('Impossible de planifier cette recette.'); }
+    finally { setBusy(''); }
+  };
   const create = async (recipe: (typeof PERSONALIZED_RECIPES)[number]) => {
     setBusy(recipe.id); setMessage('');
     try {
@@ -51,6 +68,8 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
   return <section className="tool-card">
     <div className="editorial-cover"><img src={VISUALS.cooking} alt="Cuisine maison : préparation d'un repas, photo d'ambiance" loading="lazy" /><div><span className="eyebrow">CUISINER ET DÉCOUVRIR</span><h3>Ma bibliothèque de {PERSONALIZED_RECIPES.length} recettes</h3><p>Des idées pour chaque moment de la journée.</p></div></div>
     <p className="muted">300 idées de repas et boissons, plus 15 recettes originales de boulangerie, desserts et bases maison. Pois chiches et lait de coco inclus. Les shots sont des boissons plaisir, sans promesse de détox.</p>
+    <h3>Ma bibliothèque de {PERSONALIZED_RECIPES.length} recettes</h3>
+    <p className="muted">300 idées de repas et boissons, plus 15 recettes originales de boulangerie, desserts et bases maison. Pois chiches et lait de coco inclus.</p>
     <div className="recipe-filters">
       <label>Catégorie
         <select value={category} onChange={(e) => { setCategory(e.target.value as CuratedCategory); setPage(1); }}>
@@ -85,13 +104,20 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
           <p className="recipe-steps">{recipe.ingredients.split(';').join('\n')}</p>
           <p className="recipe-steps">{recipe.steps.map((step, i) => String(i + 1) + '. ' + step).join('\n')}</p>
         </details>
-        <button className="button secondary" disabled={Boolean(busy) || isAdded} onClick={() => void create(recipe)}>
-          {isAdded ? 'Dans mes recettes' : busy === recipe.id ? 'Ajout…' : 'Ajouter à mes recettes'}
-        </button>
+        <div className="button-group">
+          <button className="button secondary" disabled={Boolean(busy)} onClick={() => setPlanning(planning === recipe.id ? '' : recipe.id)}>Planifier</button>
+          <button className="button ghost" disabled={Boolean(busy) || isAdded} onClick={() => void create(recipe)}>
+            {isAdded ? 'Dans mes recettes' : busy === recipe.id ? 'Ajout…' : 'Ajouter à mes recettes'}
+          </button>
+        </div>
+        {planning === recipe.id && <div className="plan-inline">
+          <label>Jour<input type="date" value={planDay} onChange={(e) => setPlanDay(e.target.value)} /></label>
+          <label>Moment<select value={planSlot} onChange={(e) => setPlanSlot(e.target.value)}>{SLOTS.map((x) => <option key={x}>{x}</option>)}</select></label>
+          <button className="button primary" disabled={Boolean(busy) || !planDay} onClick={() => void plan(recipe)}>Ajouter au planning</button>
+        </div>}
       </article>;
     })}</div>
     {visible.length < filtered.length && <button className="button secondary" onClick={() => setPage((p) => p + 1)}>Afficher 12 recettes de plus</button>}
     {message && <p role="status">{message}</p>}
-    <p className="fineprint">Les origines indiquent des inspirations culinaires, pas une authenticité certifiée. Quantités indicatives à adapter au nombre de personnes. Vérifier allergènes, conservation et cuisson des ingrédients.</p>
   </section>;
 }

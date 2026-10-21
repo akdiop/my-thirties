@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 export type IntegrationId = 'assistant' | 'calendar' | 'notifications' | 'prayer' | 'video' | 'sync';
 export type IntegrationPrefs = Record<IntegrationId, boolean>;
 export const INTEGRATIONS: { id: IntegrationId; label: string; details: string; external: string }[] = [
-  { id: 'assistant', label: 'Assistant IA', details: 'Autorise les questions vers une fonction serveur, avec accord pour chaque envoi.', external: 'Fournisseur IA externe, uniquement après confirmation' },
+  { id: 'assistant', label: 'Assistant IA', details: 'Tes questions sont envoyées à l’IA gratuite Google Gemini (palier gratuit : Google peut s’en servir pour améliorer ses modèles).', external: 'Google Gemini, uniquement quand tu poses une question' },
   { id: 'calendar', label: 'Calendriers externes', details: 'Autorise la création volontaire d’un fichier .ics à importer ailleurs. Pas de liaison automatique.', external: 'Aucun service contacté par My Thirties' },
   { id: 'notifications', label: 'Notifications', details: 'Autorise les rappels de la page ouverte, sous réserve de la permission du navigateur.', external: 'Aucun service de notification distant' },
   { id: 'prayer', label: 'Horaires de prière', details: 'Autorise une recherche par ville et méthode à ta demande.', external: 'AlAdhan reçoit ville, pays, date et méthode' },
