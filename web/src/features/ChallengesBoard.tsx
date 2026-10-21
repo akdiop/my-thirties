@@ -21,6 +21,8 @@ export function ChallengesBoard({ entries, onCreate, onUpdate }: { entries: Entr
   const inTab = challenges.filter((e) => categoryOf(e) === tab);
   const active = inTab.find((e) => e.id === focus) ?? inTab[0];
   const startedIds = new Set(challenges.map((e) => e.data.template));
+  const [search, setSearch] = useState('');
+  const suggestions = TEMPLATES.filter((t) => t.category === tab && (t.title + ' ' + t.discipline + ' ' + t.tagline).toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr')));
 
   const start = async (id: string) => {
     const t = templateById(id);
@@ -35,12 +37,13 @@ export function ChallengesBoard({ entries, onCreate, onUpdate }: { entries: Entr
 
   return <section className="challenges-board">
     <div className="pill-tabs" role="tablist">{CATEGORIES.map((c) =>
-      <button key={c} role="tab" aria-selected={tab === c} className={tab === c ? 'active' : ''} onClick={() => { setTab(c); setFocus(null); }}>{c}</button>)}</div>
+      <button key={c} role="tab" aria-selected={tab === c} className={tab === c ? 'active' : ''} onClick={() => { setTab(c); setFocus(null); setSearch(''); }}>{c}</button>)}</div>
     {active ? <ActiveChallenge key={active.id} entry={active} onUpdate={onUpdate} /> : <p className="muted">Aucun défi en cours dans cette catégorie. Choisis-en un ci-dessous.</p>}
     {inTab.length > 1 && <div className="challenge-switch">{inTab.map((e) =>
       <button key={e.id} className={e.id === active?.id ? 'active' : ''} onClick={() => setFocus(e.id)}>{e.title}</button>)}</div>}
-    <h3 className="board-subtitle">Commencer un défi</h3>
-    <div className="template-grid">{TEMPLATES.filter((t) => t.category === tab).map((t) =>
+    <h3 className="board-subtitle">Découvrir les suggestions ({suggestions.length})</h3>
+    <label>Rechercher une suggestion <input type="search" value={search} placeholder="Langues, écriture, organisation…" onChange={(e) => setSearch(e.target.value)} /></label>
+    <div className="template-grid">{suggestions.map((t) =>
       <article key={t.id} className="template-card">
         <HeroPhoto slot={'challenge-' + t.id} tone={t.tone} label={t.discipline === 'Autre' ? t.category : t.discipline} compact />
         <div className="template-body"><strong>{t.title}</strong><span className="muted">{t.tagline}</span>

@@ -1,6 +1,8 @@
 import { SUGGESTED_TEMPLATES } from './challengeSuggestions';
 import { circuit } from './exercises';
 
+export type ChallengeCategory = 'Sport' | 'Bien-être' | 'Habitudes' | 'Apprentissage' | 'Créativité' | 'Organisation';
+export const CATEGORIES: ChallengeCategory[] = ['Sport', 'Bien-être', 'Habitudes', 'Apprentissage', 'Créativité', 'Organisation'];
 export type ChallengeCategory = 'Sport' | 'Cuisine' | 'Bien-être' | 'Habitudes' | 'Apprentissage' | 'Créativité' | 'Organisation';
 export const CATEGORIES: ChallengeCategory[] = ['Sport', 'Cuisine', 'Bien-être', 'Habitudes', 'Apprentissage', 'Créativité', 'Organisation'];
 
@@ -23,6 +25,7 @@ const PILATES = ['The Hundred', 'Roll-up', 'Cercles de jambe', 'Pont (shoulder b
 const YOGA = ['Salutation au soleil', 'Chien tête en bas', 'Guerrier II', 'Arbre', 'Posture de l’enfant', 'Torsion assise', 'Pigeon', 'Relaxation finale'];
 
 export const TEMPLATES: ChallengeTemplate[] = [
+  ...SUGGESTED_TEMPLATES,
   {
     id: 'squats-30', category: 'Sport', discipline: 'Squats', title: 'Défi 30 jours Squats', tagline: 'Jambes · Fessiers · Posture', tone: 'chocolat',
     day: (n) => restEvery(n, 4) ? null : `3 séries de ${Math.min(40, 10 + 2 * Math.floor(activeBefore(n, 4) / 2))} squats, 1 min de pause entre les séries. Genoux dans l’axe des pieds.`,
@@ -212,6 +215,7 @@ TEMPLATES.push(...SUGGESTED_TEMPLATES);
 
 export const templateById = (id: unknown) => TEMPLATES.find((t) => t.id === id);
 
+export const templateLength = (id: string) => { const match = id.match(/-(7|14|21|30)$/); return match ? Number(match[1]) : 30; };
 export const templateLength = (id: string) => { const m = /-(\d+)$/.exec(id); return m ? Math.min(30, Number(m[1])) : 30; };
 
 /** Jour du défi (1 = premier jour) pour une date donnée, ou 0 s'il n'a pas commencé. */
