@@ -4,11 +4,15 @@
 
 Le catalogue `web/src/recipes/recipePhotoLibrary.ts` couvre **315 recettes sur 315**, par identifiant stable, avec titre et statut éditorial.
 
-- **3 recettes avec photo documentée** (source, auteur, licence et concordance des ingrédients principaux) :
+- **7 recettes avec photo documentée** (source, auteur, licence et concordance des ingrédients principaux) :
   - `mt-lunch-3` — **Yassa de poulet aux olives** : [Poulet Yassa.JPG](https://commons.wikimedia.org/wiki/File:Poulet_Yassa.JPG), Kinesira, CC BY-SA 4.0. La légende Commons indique poulet, olives, oignons, moutarde, citron et riz.
   - `mt-guide-focaccia` — **Focaccia aux herbes** : [Pain Focaccia au romarin.jpg](https://commons.wikimedia.org/wiki/File:Pain_Focaccia_au_romarin.jpg), Jeangagnon, CC BY-SA 4.0. Le descriptif indique romarin et huile d'olive.
   - `mt-guide-crepes` — **Crêpes maison** : [Crepes.jpg](https://commons.wikimedia.org/wiki/File:Crepes.jpg), Nicolas Delerue, CC BY-SA 2.5.
-- **312 recettes en attente de photo fiable**. Leur vignette est volontairement neutre.
+  - `mt-breakfast-11` — **Pancakes banane avoine** : [Banana Pancakes Pk021.jpg](https://commons.wikimedia.org/wiki/File:Banana_Pancakes_Pk021.jpg), PallaviKhale, CC BY-SA 4.0 ; description explicite avoine et bananes.
+  - `mt-lunch-41` — **Lasagnes bœuf** : [Beef Lasagna - The Mad Hatter.jpg](https://commons.wikimedia.org/wiki/File:Beef_Lasagna_-_The_Mad_Hatter.jpg), Andy Li, CC0 1.0.
+  - `mt-dinner-46` — **Risotto champignons** : [Mushroom risotto (3990739885).jpg](https://commons.wikimedia.org/wiki/File:Mushroom_risotto_(3990739885).jpg), Karen and Brad Emerson, CC BY 2.0.
+  - `mt-snack-36` — **Cookies maison chocolat noir** : [Chocolate chip cookies.jpg](https://commons.wikimedia.org/wiki/File:Chocolate_chip_cookies.jpg), Rdsmith4, CC BY-SA 2.5. Le type exact de chocolat n’est pas attesté.
+- **308 recettes en attente de photo fiable**. Leur vignette est volontairement neutre.
 
 Ces photos sont des **illustrations représentatives du type de plat**, pas des photographies de la recette préparée selon les instructions de My Thirties. Aucune photo n'est reprise automatiquement pour toutes les variantes d'un même plat.
 
@@ -29,4 +33,4 @@ Les miniatures sont fournies par Wikimedia Commons et non stockées dans la base
 
 ## À faire avant d'atteindre une couverture complète
 
-**312 recherches et validations éditoriales individuelles restent nécessaires**. Ne pas déclarer « toutes les recettes illustrées » avant cette revue. Les photos d'utilisatrice et les galeries personnelles restent indépendantes de cette bibliothèque.
+**308 recherches et validations éditoriales individuelles restent nécessaires**. Ne pas déclarer « toutes les recettes illustrées » avant cette revue. Les photos d'utilisatrice et les galeries personnelles restent indépendantes de cette bibliothèque.
