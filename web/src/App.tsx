@@ -2,13 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } fro
 import type { Session } from '@supabase/supabase-js';
 import {
   BookOpen, CalendarDays, ChevronRight, Coffee, Download,
-  Heart, Home, LayoutGrid, Leaf, LogOut, Plus, Save, Settings, ShieldCheck, Trash2, UserRound, X,
+  Home, LayoutGrid, Leaf, LogOut, Plus, Save, Settings, ShieldCheck, Trash2, UserRound, X,
 } from 'lucide-react';
 import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
 import { downloadBackup, makeEncryptedBackup, parseEncryptedBackup } from './lib/backup';
 import { moduleById, modules, type Module } from './modules';
 import { validateRestore } from './lib/restore';
-import { consolidateIngredients } from './lib/groceries';
+import { consolidateIngredients, groceryTitle, mergeGroceryItems, weekGroceryItems, weekStart, type ListItem } from './lib/groceries';
 import { BoosterPlan } from './features/BoosterPlan';
 import { TravelTools } from './features/TravelTools';
 import { EquilibriumInsights } from './features/EquilibriumInsights';
@@ -387,16 +387,40 @@ export default function App() {
 
   useEffect(() => { if (owner) void refresh(); }, [owner, refresh]);
 
+  /** Met à jour la liste « Courses · semaine du … » des semaines touchées par un repas planifié. */
+  const syncGroceries = async (dates: (string | null | undefined)[]) => {
+    const weeks = [...new Set(dates.filter((d): d is string => Boolean(d)).map(weekStart))];
+    if (!weeks.length) return;
+    try {
+      const all = await readEntries();
+      for (const week of weeks) {
+        const fresh = weekGroceryItems(all, week);
+        const list = all.find((e) => e.module === 'listes' && e.data.autoWeek === week);
+        if (!list && !fresh.length) continue;
+        const existing = Array.isArray(list?.data.items) ? list.data.items as ListItem[] : [];
+        const previousAuto = Array.isArray(list?.data.autoTexts) ? list.data.autoTexts as string[] : [];
+        const items = mergeGroceryItems(existing, previousAuto, fresh, () => crypto.randomUUID());
+        const data = { ...(list?.data ?? {}), category: 'Courses', autoWeek: week, autoTexts: fresh, items, itemsText: items.map((i) => i.text).join('\n') };
+        if (list) await editEntry(list.id, { data });
+        else await createEntry({ module: 'listes', kind: 'list', title: groceryTitle(week), entry_date: null, data });
+      }
+    } catch (e) { setError(e instanceof Error ? e.message : 'Liste de courses non mise à jour.'); }
+  };
+  const isMeal = (x: { module: string; kind: string }) => x.module === 'cuisine' && x.kind === 'meal';
+
   const save = async (input: EntryInput, id?: string) => {
     setWorking(true);
     try {
+      const before = id ? entries.find((e) => e.id === id) : undefined;
       if (id) await editEntry(id, { title: input.title, entry_date: input.entry_date, data: input.data });
       else await createEntry(input);
+      if (isMeal(input)) await syncGroceries([input.entry_date, before?.entry_date]);
       setEditor(null); await refresh();
     } finally { setWorking(false); }
   };
   const createFromTool = async (input: EntryInput) => {
     await createEntry(input);
+    if (isMeal(input)) await syncGroceries([input.entry_date]);
     await refresh();
   };
   const updateData = async (entry: Entry, data: Record<string, unknown>) => {
@@ -405,7 +429,7 @@ export default function App() {
   };
   const remove = async (entry: Entry) => {
     if (!window.confirm('Supprimer définitivement « ' + entry.title + ' » ?')) return;
-    try { await removeEntry(entry.id); await deleteEntryMedia(session!.user.id, entry.id).catch(() => setError('Entrée supprimée, mais ses médias locaux n’ont pas pu être nettoyés.')); await refresh(); }
+    try { await removeEntry(entry.id); await deleteEntryMedia(session!.user.id, entry.id).catch(() => setError('Entrée supprimée, mais ses médias locaux n’ont pas pu être nettoyés.')); if (isMeal(entry)) await syncGroceries([entry.entry_date]); await refresh(); }
     catch (e) { setError(e instanceof Error ? e.message : 'Suppression impossible.'); }
   };
   const createGroceries = async (title: string, items: string[]) => {
@@ -430,7 +454,7 @@ export default function App() {
   const go = (next: Screen) => { setScreen(next); setSearch(''); window.scrollTo({ top: 0 }); };
   const openEntry = (e: Entry) => setEditor({ module: moduleById(e.module), initial: e });
   const addIn = (module: ModuleId, kind?: string, data?: Record<string, string>, title?: string) => setEditor({ module: moduleById(module), preset: kind ? { kind, data: data ?? {}, title } : undefined });
-  const removeQuiet = async (entry: Entry) => { await removeEntry(entry.id); await refresh(); };
+  const removeQuiet = async (entry: Entry) => { await removeEntry(entry.id); if (isMeal(entry)) await syncGroceries([entry.entry_date]); await refresh(); };
 
   const savePhoto = async (slot: string, image: string | null) => {
     const existing = photoEntries.find((e) => e.title === slot);
@@ -469,11 +493,11 @@ export default function App() {
         {currentModule.id === 'quotidien' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'task', { date: today() })} onOpen={openEntry} onUpdate={updateData} embedded />}
         {currentModule.id === 'sante' && <HealthTop entries={allModuleEntries} onAdd={(kind) => addIn('sante', kind, { date: today() })} />}
         {currentModule.id === 'sport' && <SportHub entries={allModuleEntries} challengeEntries={entries.filter((e) => e.module === 'challenges')} onCreate={createFromTool} onGoChallenges={() => go('challenges')} />}
-        {currentModule.id === 'challenges' && <ChallengesBoard entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} />}
+        {currentModule.id === 'challenges' && <ChallengesBoard entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onQuit={removeQuiet} />}
         {currentModule.id === 'finances' && <FinanceTop entries={allModuleEntries} onAdd={(kind) => addIn('finances', kind, { date: today() })} onOpen={openEntry} />}
         {currentModule.id === 'cuisine' && <><CuisineTop tab={cuisineTab} onTab={setCuisineTab} entries={allModuleEntries} />
           {cuisineTab === 'recettes' && <RecipeIdeas entries={allModuleEntries} onCreate={createFromTool} />}
-          {cuisineTab === 'semaine' && <><KitchenPlanner entries={allModuleEntries} onCreate={createFromTool} onGenerate={createGroceries} /><KitchenTools entries={allModuleEntries} onGenerate={createGroceries} /></>}
+          {cuisineTab === 'semaine' && <><KitchenPlanner entries={allModuleEntries} onCreate={createFromTool} onRemove={removeQuiet} /><KitchenTools entries={allModuleEntries} onGenerate={createGroceries} /></>}
           {cuisineTab === 'courses' && <div className="entries">{entries.filter((e) => e.module === 'listes' && String(e.data.category) === 'Courses').map((e) =>
             <EntryCard key={e.id} entry={e} module={moduleById('listes')} onEdit={openEntry} onDelete={(x) => void remove(x)} onUpdate={updateData} />)}
             {!entries.some((e) => e.module === 'listes' && String(e.data.category) === 'Courses') && <p className="muted">Planifie ta semaine puis génère tes courses.</p>}</div>}
@@ -496,7 +520,6 @@ export default function App() {
           {passionTab === 'libre' && <PassionPath entries={allModuleEntries} onUpdate={updateData} />}
         </>}
         {(['sport', 'cuisine', 'decouvertes', 'passions'] as const).includes(currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions') && <MediaGallery ownerId={session.user.id} module={currentModule.id as 'sport' | 'cuisine' | 'decouvertes' | 'passions'} entries={allModuleEntries.map((e) => ({ id: e.id, title: e.title }))} />}
-        {currentModule.id === 'sante' && <p className="disclaimer"><Heart size={14} /> Le suivi est informatif. Il ne constitue pas un diagnostic et ne remplace pas un professionnel de santé.</p>}
         {!(currentModule.id === 'spiritualite' && spiritTab === 'home') && currentModule.id !== 'challenges' && !(currentModule.id === 'passions' && passionTab !== 'libre') && entryList}
       </div>}
     </main>

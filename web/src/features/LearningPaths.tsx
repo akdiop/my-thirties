@@ -16,7 +16,7 @@ function speak(text: string, lang: string) {
     window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
   } catch { /* synthèse vocale indisponible */ }
 }
-const LANG_CODE: Record<string, string> = { 'lang-anglais': 'en-GB', 'lang-espagnol': 'es-ES', 'lang-portugais': 'pt-PT', 'lang-arabe': 'ar-SA' };
+const LANG_CODE: Record<string, string> = { 'lang-espagnol': 'es-ES', 'lang-portugais': 'pt-PT', 'lang-arabe': 'ar-SA' };
 
 export function LearningPaths({ entries, onCreate, onUpdate }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void> }) {
   const mine = entries.filter((e) => e.kind === 'path' && pathById(e.data.pathId));

@@ -27,6 +27,5 @@ export function PersonalBrief({ entries, onGo }: {
     <div className="brief-grid">{brief.map((item) => <button className="brief-card" key={item.title} onClick={() => onGo(item.screen)}>
       <strong>{item.title}</strong><p>{item.body}</p><span>Ouvrir l’espace ›</span>
     </button>)}</div>
-    <p className="fineprint">Résumé automatique calculé uniquement à partir des entrées affichées. Aucune analyse externe de tes données.</p>
   </section>;
 }

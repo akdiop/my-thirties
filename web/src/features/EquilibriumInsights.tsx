@@ -29,7 +29,7 @@ export function EquilibriumInsights({ entries }: { entries: Entry[] }) {
       {show && <>{patterns.length ? <div className="emotion-tags">{patterns.map(([emotion, count]) =>
         <span className="pill sage" key={emotion}>{emotion} · {count} note(s)</span>)}</div>
         : <p className="muted">Tu pourras voir ici les émotions que tu as choisi de noter.</p>}
-        <p className="fineprint">Ce résumé décrit uniquement les mots de ton journal. Il ne juge pas tes réactions et ne pose aucun diagnostic.</p></>}</div>
+        </>}</div>
     <div className="tool-card"><h3>Mes pistes de développement personnel</h3>
       <p className="muted">Des exercices facultatifs à adapter selon ton humeur et tes besoins.</p>
       <div className="lesson-grid">{Object.entries(exercises).map(([axis, item]) =>

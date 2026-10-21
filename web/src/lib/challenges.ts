@@ -13,6 +13,12 @@ export type ChallengeTemplate = {
   tone: 'caramel' | 'sauge' | 'sable' | 'chocolat';
   /** Programme du jour ; null = jour de repos prévu. */
   day: (n: number) => string | null;
+  /** Méthode à suivre chaque jour. */
+  how?: string[];
+  /** Parcours d'apprentissage associé (étape du jour affichée dans le défi). */
+  pathId?: string;
+  /** Plus proposé au démarrage, mais gardé pour les défis déjà commencés. */
+  retired?: boolean;
 };
 
 const restEvery = (n: number, every: number) => n % every === 0;

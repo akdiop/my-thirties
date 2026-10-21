@@ -52,6 +52,5 @@ export function SportNotebook({ entries, onCreate }: { entries: Entry[]; onCreat
           <p>{String(n.data.observation ?? '')}</p><p className="muted">{String(n.data.next ?? '')}</p></article>;
       })}</div>}
     </div>}
-    <p className="fineprint">Ce carnet ne remplace pas l'observation d'un professionnel du sport.</p>
   </section>;
 }

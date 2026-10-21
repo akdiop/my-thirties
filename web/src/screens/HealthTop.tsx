@@ -59,7 +59,6 @@ export function HealthTop({ entries, onAdd }: { entries: Entry[]; onAdd: (kind: 
       <SectionTitle action="+ Ajouter" onAction={() => onAdd('mood')}>Aujourd’hui</SectionTitle>
       <div className="soft-card bars-card">{bars.map((b) => <div className="sym-row" key={b.k}><span>{b.k}</span>
         <span className="sym-bar"><span style={{ width: Math.round(b.w * 100) + '%' }} /></span><small>{b.v}</small></div>)}</div>
-      <p className="disclaimer">Les prévisions sont indicatives, calculées sur vos cycles passés. Elles ne sont ni un diagnostic ni une méthode de contraception.</p>
     </>}
     {tab === 'sleep' && <>
       <SectionTitle action="+ Ajouter" onAction={() => onAdd('sleep')}>Mes nuits</SectionTitle>

@@ -2,17 +2,6 @@ import type { ChallengeTemplate } from './challenges';
 type Idea = { id: string; title: string; exercise: string; days: number; instructions: string[] };
 const IDEAS: Idea[] = [
   {
-    "id": "anglais-conversation",
-    "title": "Anglais au quotidien",
-    "exercise": "Pratique d’anglais : écouter, parler et noter du vocabulaire",
-    "days": 21,
-    "instructions": [
-      "Écoute un extrait de cinq minutes en anglais.",
-      "Note trois expressions nouvelles.",
-      "Formule deux phrases à voix haute."
-    ]
-  },
-  {
     "id": "wolof-quotidien",
     "title": "Wolof du quotidien",
     "exercise": "Vocabulaire et expressions utiles en wolof",

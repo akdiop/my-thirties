@@ -54,6 +54,5 @@ export function FinanceInsights({ entries }: { entries: Entry[] }) {
     })}</div>}
     {summary.subscriptions.length > 0 && <div className="tool-card"><h3>Abonnements</h3>{summary.subscriptions.map((e) =>
       <p key={e.id} className="subscription-row"><span>{e.title}</span><strong>{format(num(e.data.amount), selectedCurrency)} · {String(e.data.frequency || 'Période non définie')}</strong></p>)}</div>}
-    <p className="fineprint">Les montants sont indicatifs et séparés par devise. Aucun taux de change ou conseil financier n'est généré automatiquement.</p>
   </section>;
 }
