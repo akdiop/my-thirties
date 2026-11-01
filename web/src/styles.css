@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Homemade+Apple&display=swap');
 :root{font-family:Inter,system-ui,-apple-system,sans-serif;color:#3c3029;background:#faf7f2;font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
 *{box-sizing:border-box}
 body{margin:0;min-width:320px}
@@ -23,8 +23,6 @@ small,.fineprint{font-size:.77rem}
 .brand{display:flex;align-items:center;gap:12px;margin:3px 6px 35px}
 .brand strong{font-family:'Cormorant Garamond',serif;font-size:1.65rem;color:#6b3f2e;display:block;line-height:1}
 .brand small{display:block;color:#9b897b;font-size:.56rem;letter-spacing:.15em;margin-top:6px}
-.logo-mark{height:43px;width:43px;display:grid;place-items:center;border-radius:13px;background:#6b3f2e;color:#fff9f2;font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700}
-.logo-mark span{color:#8f9f7a}
 .sidebar-label{margin:12px 13px 9px;font-size:.62rem;letter-spacing:.16em;font-weight:700;color:#9a8a7f}
 .spaces-label{margin-top:28px}
 .nav-link{display:flex;align-items:center;gap:13px;width:100%;min-height:43px;padding:9px 13px;border:0;border-radius:12px;background:transparent;text-align:left;color:#74685e;font-weight:500;font-size:.84rem}
@@ -1176,3 +1174,7 @@ textarea.soft-input,.ritual-card textarea{resize:vertical;min-height:64px}
 .phase-tips p{margin:4px 0}
 .batch-plan ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:.9rem}
 .batch-plan small{color:#7A6355}
+
+/* Logo */
+.brand-lockup{display:flex;align-items:center;gap:12px}
+.brand-word{font-family:'Homemade Apple',cursive;font-size:1.45rem;line-height:1.4;color:#5A3A2A;letter-spacing:0}
