@@ -43,6 +43,7 @@ import { LearningPaths } from './features/LearningPaths';
 import { SeriesTracker } from './features/SeriesTracker';
 import { TravelSuggestions } from './features/TravelSuggestions';
 import { CookingTips } from './features/CookingTips';
+import { WeekLunches } from './features/WeekLunches';
 import { HIDDEN_KIND, HiddenProvider, readHidden, useHidden, type Hidden } from './lib/hidden';
 import { RITUAL_KINDS } from './lib/rituals';
 import { MyDay } from './screens/MyDay';
@@ -568,6 +569,7 @@ export default function App() {
         {currentModule.id === 'cuisine' && <><CuisineTop tab={cuisineTab} onTab={setCuisineTab} entries={allModuleEntries} />
           {cuisineTab === 'recettes' && <RecipeIdeas entries={allModuleEntries} onCreate={createFromTool} />}
           {cuisineTab === 'semaine' && <><KitchenPlanner entries={allModuleEntries} onCreate={createFromTool} onRemove={removeQuiet} /><KitchenTools entries={allModuleEntries} onGenerate={createGroceries} /></>}
+          {cuisineTab === 'midis' && <WeekLunches entries={entries} onCreate={createFromTool} />}
           {cuisineTab === 'astuces' && <CookingTips entries={allModuleEntries} onAdd={() => addIn('cuisine', 'video', { theme: 'Cuissons' })} onRemove={removeQuiet} />}
           {cuisineTab === 'courses' && <div className="entries">{entries.filter((e) => e.module === 'listes' && String(e.data.category) === 'Courses').map((e) =>
             <EntryCard key={e.id} entry={e} module={moduleById('listes')} onEdit={openEntry} onDelete={(x) => void remove(x)} onUpdate={updateData} />)}

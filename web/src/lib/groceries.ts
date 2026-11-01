@@ -70,7 +70,9 @@ export function weekGroceryItems(entries: MealLike[], start: string) {
     if (!lines) continue;
     const key = str(meal.data.recipeId) || str(meal.data.libraryId) || lines;
     const current = bySource.get(key);
-    if (current) current.multiplier += 1; else bySource.set(key, { lines, multiplier: 1 });
+    // Midis en batch : chaque repas ne compte que pour sa part de la recette cuisinée (portionShare).
+    const share = Number(str(meal.data.portionShare)) > 0 ? Number(str(meal.data.portionShare)) : 1;
+    if (current) current.multiplier += share; else bySource.set(key, { lines, multiplier: share });
   }
   return consolidateIngredients([...bySource.values()]);
 }

@@ -1152,3 +1152,27 @@ textarea.soft-input,.ritual-card textarea{resize:vertical;min-height:64px}
 .mood5 button{gap:6px}
 .mood5 button.on .glyph-badge{box-shadow:0 0 0 2px currentColor}
 .note-type{display:inline-flex;align-items:center;gap:6px}
+
+/* Midis & batch cooking */
+.lunches{display:flex;flex-direction:column;gap:14px}
+.lunch-actions{display:flex;gap:8px;flex-wrap:wrap}
+.lunch-actions .button{flex:1}
+.cycle-toggle{background:#fff;border:1px solid #EFE2D8;border-radius:18px;padding:12px 14px}
+.lunch-days{display:flex;flex-direction:column;gap:10px}
+.lunch-day{background:#fff;border:1px solid #EFE2D8;border-radius:18px;padding:12px;display:grid;grid-template-columns:1fr auto;gap:8px}
+.lunch-day.locked{border-color:#C9D6C1;background:#F7FAF4}
+.lunch-head{grid-column:span 2;display:flex;align-items:center;gap:8px}
+.lunch-head small{color:#9C8676}
+.phase-pill{margin-left:auto;font-size:.68rem;font-weight:600;padding:3px 9px;border-radius:999px}
+.phase-pill.menstruelle{background:#F1E4E0;color:#B07A6E}.phase-pill.folliculaire{background:#E3E8DB;color:#5E7A5F}
+.phase-pill.ovulatoire{background:#EFE7D2;color:#A88A4C}.phase-pill.luteale{background:#EADFEA;color:#86688A}
+.lunch-recipe{display:grid;grid-template-columns:96px 1fr;gap:10px;align-items:center;border:0;background:transparent;text-align:left;padding:0;cursor:pointer}
+.lunch-recipe .color-tile{aspect-ratio:4/3;margin:0}.lunch-recipe .color-tile-icon{width:44px;height:44px}.lunch-recipe .color-tile-icon svg{width:24px;height:24px}
+.lunch-recipe span{display:flex;flex-direction:column;gap:3px}.lunch-recipe small{color:#7A6355;font-size:.76rem}
+.lunch-empty{border:1.5px dashed #E3C3B5;background:#FBF7F3;border-radius:14px;padding:18px;color:#6B3F2E;font-weight:600;cursor:pointer}
+.lunch-tools{display:flex;flex-direction:column;justify-content:center}
+.lunch-picker{grid-column:span 2;display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto}
+.phase-tips{background:#F6EEE7;border-radius:16px;padding:12px 14px;font-size:.85rem}
+.phase-tips p{margin:4px 0}
+.batch-plan ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:.9rem}
+.batch-plan small{color:#7A6355}

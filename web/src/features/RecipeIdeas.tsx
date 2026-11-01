@@ -17,11 +17,14 @@ const categories: { id: CuratedCategory; label: string }[] = [
   { id: 'boulangerie', label: 'Boulangerie maison' },
   { id: 'dessert', label: 'Desserts' },
   { id: 'base-maison', label: 'Bases et sauces' },
+  { id: 'quiches', label: 'Quiches et mini-quiches' },
+  { id: 'poulet', label: 'Cuisses de poulet' },
+  { id: 'automne', label: 'Recettes d’automne' },
 ];
 const PAGE_SIZE = 12;
 
 const SLOTS = ['Petit-déjeuner', 'Déjeuner', 'Dîner', 'Collation'];
-const defaultSlot = (c: CuratedCategory) => c === 'petit-dejeuner' || c === 'smoothie' ? 'Petit-déjeuner' : c === 'diner' ? 'Dîner' : c === 'dejeuner' ? 'Déjeuner' : 'Collation';
+const defaultSlot = (c: CuratedCategory) => c === 'petit-dejeuner' || c === 'smoothie' ? 'Petit-déjeuner' : c === 'diner' ? 'Dîner' : ['dejeuner', 'quiches', 'poulet', 'automne'].includes(c) ? 'Déjeuner' : 'Collation';
 
 export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void> }) {
   const [category, setCategory] = useState<CuratedCategory>('petit-dejeuner');
@@ -70,7 +73,7 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
   };
   return <section className="tool-card">
     <h3>Ma bibliothèque de {PERSONALIZED_RECIPES.length} recettes</h3>
-    <p className="muted">300 idées de repas et boissons, plus 15 recettes originales de boulangerie, desserts et bases maison. Pois chiches et lait de coco inclus.</p>
+    <p className="muted">Repas, boissons, quiches et mini-quiches, cuisses de poulet, recettes d’automne : chaque recette avec ses quantités et ses étapes.</p>
     <div className="recipe-filters">
       <label>Catégorie
         <select value={category} onChange={(e) => { setCategory(e.target.value as CuratedCategory); setPage(1); }}>

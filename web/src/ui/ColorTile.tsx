@@ -15,7 +15,7 @@ export function ColorTile({ seed, icon, label, badge }: { seed: string; icon: Gl
 
 const RECIPE_ICON: Record<string, GlyphName> = {
   'petit-dejeuner': 'coffee', dejeuner: 'salad', diner: 'soup', 'casse-croute': 'sandwich', smoothie: 'drink', shot: 'citrus',
-  boulangerie: 'croissant', dessert: 'cake', 'base-maison': 'pot',
+  boulangerie: 'croissant', dessert: 'cake', 'base-maison': 'pot', quiches: 'eggFried', poulet: 'drumstick', automne: 'soup',
 };
 /** Icône du plat d'après le titre (sinon celle de la catégorie). */
 export function dishIcon(title: string, category: string): GlyphName {
