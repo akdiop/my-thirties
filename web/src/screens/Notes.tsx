@@ -3,6 +3,10 @@ import { ArrowLeft, Flame, Plus, Search, Trash2 } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { DAILY_KIND, moodEmoji, MOODS, NOTE_FOLDERS, NOTE_KIND, NOTE_TYPES, noteType, type NoteType } from '../lib/rituals';
 import { saveLabel, useAutosave } from '../lib/autosave';
+import { OneYearAgo } from './Review';
+import { yearAgoOn } from '../features/JournalSettings';
+import { PrintJournal } from '../features/PrintJournal';
+import { FileDown } from 'lucide-react';
 
 type Edit = (id: string, patch: { title: string; data: Record<string, unknown> }) => Promise<void>;
 const when = (iso: string) => new Date(iso).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
@@ -20,6 +24,8 @@ export function Notes({ entries, onCreate, onEdit, onRemove, onOpenDay }: {
   const [q, setQ] = useState('');
   const [picker, setPicker] = useState(false);
   const [editing, setEditing] = useState<{ noteId: string; type: NoteType } | null>(null);
+  const [printMonth, setPrintMonth] = useState('');
+  const [pdfMonth, setPdfMonth] = useState(new Date().toLocaleDateString('en-CA').slice(0, 7));
 
   const found = useMemo(() => {
     const s = q.trim().toLocaleLowerCase('fr');
@@ -55,12 +61,18 @@ export function Notes({ entries, onCreate, onEdit, onRemove, onOpenDay }: {
           {NOTE_FOLDERS.map((f) => <button key={f.id} className="folder" onClick={() => setFolder(f.id)}><span>{f.emoji}</span><strong>{f.label}</strong><small>{notes.filter((n) => (n.data.folder ?? 'journal') === f.id).length} note(s)</small></button>)}
           <button className="folder" onClick={() => setFolder('daily')}><span>📅</span><strong>Mes journées</strong><small>{days.length} jour(s)</small></button>
         </div>
+        {yearAgoOn() && <OneYearAgo entries={entries} onOpenDay={(d) => onOpenDay(d)} onOpenNote={open} />}
         {notes.length > 0 && <><p className="eyebrow-s">Récentes</p>{list(notes.slice(0, 5))}</>}
+        <section className="pdf-export"><p className="ritual-label"><FileDown size={16} /> Exporter un mois en PDF</p>
+          <div className="todo-add"><input type="month" className="soft-input" value={pdfMonth} max={new Date().toLocaleDateString('en-CA').slice(0, 7)} onChange={(e) => setPdfMonth(e.target.value)} />
+            <button className="button soft" disabled={!pdfMonth} onClick={() => setPrintMonth(pdfMonth)}>Exporter</button></div>
+          <p className="fineprint">Choisis « Enregistrer en PDF » dans la fenêtre d’impression. Le fichier est créé sur ton appareil.</p></section>
       </>}
     </>}
     {folder === 'daily' && (days.length ? list(days) : <p className="muted">Tes journées remplies dans « Mon jour » apparaîtront ici.</p>)}
     {current && (() => { const items = notes.filter((n) => (n.data.folder ?? 'journal') === current.id); return items.length ? list(items) : <p className="muted">Aucune note dans ce dossier pour l’instant.</p>; })()}
 
+    {printMonth && <PrintJournal entries={entries} month={printMonth} onDone={() => setPrintMonth('')} />}
     {picker && <div className="modal-overlay sheet" role="dialog" aria-modal="true" aria-label="Nouvelle note" onClick={() => setPicker(false)}>
       <div className="sheet-body" onClick={(e) => e.stopPropagation()}>
         <span className="sheet-grip" /><h2>Quel type de note ?</h2>

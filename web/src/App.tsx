@@ -20,7 +20,6 @@ import { PersonalBrief } from './features/PersonalBrief';
 import { RecipeIdeas } from './features/RecipeIdeas';
 import { BalanceReview } from './features/BalanceReview';
 import { AutomaticPrayerTimes } from './features/AutomaticPrayerTimes';
-import { BrowserReminders } from './features/BrowserReminders';
 import { PersonalAssistant } from './features/PersonalAssistant';
 import { PrivacyCenter } from './features/PrivacyCenter';
 import { deleteEntryMedia } from './lib/mediaLibrary';
@@ -50,10 +49,14 @@ import { MyDay } from './screens/MyDay';
 import { Habits } from './screens/Habits';
 import { Notes } from './screens/Notes';
 import { HomeRituals } from './screens/HomeRituals';
-import { EveningReminderRunner, EveningReminderSettings } from './features/EveningReminder';
+import { Review } from './screens/Review';
+import { LockGate } from './features/LockGate';
+import { NotificationSettings } from './features/Notifications';
+import { JournalSettings } from './features/JournalSettings';
+import { removeLock } from './lib/journalLock';
 import { Sparkles } from 'lucide-react';
 
-type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | ModuleId;
+type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
 const today = () => new Date().toLocaleDateString('en-CA');
 const value = (obj: Record<string, unknown>, key: string) => typeof obj[key] === 'string' ? obj[key] as string : '';
@@ -283,7 +286,7 @@ function HiddenSuggestions() {
     </section></>;
 }
 
-function Profile({ email, entries, profileEntry, onSaveProfile, onLogout, onRestored }: { email: string; entries: Entry[]; profileEntry: Entry | undefined; onSaveProfile: (input: EntryInput, id?: string) => Promise<void>; onLogout: () => Promise<void>; onRestored: () => Promise<void> }) {
+function Profile({ view, onSettings, email, entries, profileEntry, onSaveProfile, onLogout, onRestored }: { view: 'profile' | 'settings'; onSettings: () => void; email: string; entries: Entry[]; profileEntry: Entry | undefined; onSaveProfile: (input: EntryInput, id?: string) => Promise<void>; onLogout: () => Promise<void>; onRestored: () => Promise<void> }) {
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [busy, setBusy] = useState(false);
@@ -318,7 +321,7 @@ function Profile({ email, entries, profileEntry, onSaveProfile, onLogout, onRest
   };
   const me = readProfile(profileEntry);
   const line = [me.city, birthdayLine(me.birthDate, new Date())].filter(Boolean).join(' · ');
-  return <div className="profile-screen">
+  if (view === 'profile') return <div className="profile-screen">
     <header className="profile-top">
       <ProfileAvatar profile={me} size={64} />
       <div><h1>{[me.firstName, me.lastName].filter(Boolean).join(' ') || 'Mon profil'}</h1><p>{line || email}</p></div>
@@ -328,6 +331,18 @@ function Profile({ email, entries, profileEntry, onSaveProfile, onLogout, onRest
       <summary>Modifier mon profil</summary>
       <PersonalProfile key={profileEntry?.id ?? 'new'} entry={profileEntry} onSave={onSaveProfile} />
     </details>
+    <button className="settings-link" onClick={onSettings}><Settings size={20} /><span><strong>Paramètres</strong><small>Notifications, journal, calendriers, données, intégrations</small></span><ChevronRight size={18} /></button>
+    <section className="panel form-stack">
+      <h2>Compte personnel</h2><p>{email}</p>
+      <button className="button secondary" onClick={() => void onLogout()}><LogOut size={16} /> Se déconnecter</button>
+    </section>
+  </div>;
+  return <div className="profile-screen settings-screen">
+    <ScreenHeader title="Paramètres" onBack={onSettings} />
+    <p className="sec">Notifications</p>
+    <NotificationSettings />
+    <p className="sec">Journal</p>
+    <JournalSettings />
     <HiddenSuggestions />
     <p className="sec">Compte</p>
     <section className="panel form-stack">
@@ -347,10 +362,8 @@ function Profile({ email, entries, profileEntry, onSaveProfile, onLogout, onRest
       <p className="fineprint">La restauration ajoute les entrées au compte. Elle ne supprime pas les données existantes et peut créer des doublons. Vérifie toujours ton fichier de sauvegarde.</p>
       {message && <p role="status">{message}</p>}
     </section>
-    <p className="sec">Confidentialité et rappels</p>
-    <EveningReminderSettings />
+    <p className="sec">Intégrations et confidentialité</p>
     <PrivacyCenter />
-    <BrowserReminders entries={entries} />
     <section className="panel"><h2>À propos de cette version</h2><p className="muted">Application web privée en cours de développement. L'export d'agenda est manuel ; les notifications web ne fonctionnent qu'avec la page ouverte. L'assistant IA nécessite un déploiement sécurisé et l'analyse vidéo reste expérimentale. La synchronisation iOS native est encore à réaliser.</p></section>
   </div>;
 }
@@ -365,6 +378,16 @@ export default function App() {
   const entries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND && e.kind !== HIDDEN_KIND && !RITUAL_KINDS.includes(e.kind)), [allEntries]);
   const ritualEntries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND && e.kind !== HIDDEN_KIND), [allEntries]);
   const [dayTarget, setDayTarget] = useState<{ date?: string; part?: 'matin' | 'soir'; n: number }>({ n: 0 });
+  // Lien ouvert depuis une notification : ?ecran=myday&moment=soir, ?ecran=habits…
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search), target = q.get('ecran');
+    if (!target) return;
+    if (['myday', 'habits', 'bilan', 'agenda', 'notes'].includes(target)) {
+      if (target === 'myday') setDayTarget((t) => ({ part: q.get('moment') === 'soir' ? 'soir' : 'matin', n: t.n + 1 }));
+      setScreen(target as Screen);
+    }
+    window.history.replaceState(null, '', window.location.pathname);
+  }, []);
   const photoEntries = useMemo(() => allEntries.filter((e) => e.kind === PHOTO_KIND), [allEntries]);
   const photos = useMemo(() => Object.fromEntries(photoEntries.flatMap((e) =>
     typeof e.data.image === 'string' && /^data:image\/jpeg;base64,/.test(e.data.image) ? [[e.title, e.data.image]] : [])), [photoEntries]);
@@ -514,25 +537,26 @@ export default function App() {
     ) : <div className="empty-soft"><Coffee size={28} /><p>Un espace à remplir à ton rythme.</p><button className="button ghost" onClick={() => setEditor({ module: currentModule })}>Créer ma première entrée</button></div>}</div>
   </section>;
 
-  const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings', 'myday', 'habits', 'notes'] as Screen[]).includes(screen);
+  const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings', 'myday', 'habits', 'notes', 'bilan', 'parametres'] as Screen[]).includes(screen);
   const openDay = (date?: string, part?: 'matin' | 'soir') => { setDayTarget((t) => ({ date, part, n: t.n + 1 })); go('myday'); };
   const editFull = async (id: string, patch: { title: string; data: Record<string, unknown> }) => { await editEntry(id, patch); await refresh(); };
 
   return <HiddenProvider value={hidden}><PhotoProvider value={{ photos, save: savePhoto }}><div className={'app' + (screen === 'calme' ? ' calm-mode' : '')}>
     <main className="phone">
-      <EveningReminderRunner entries={ritualEntries} />
       {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
       {loading && <div className="sync-status" role="status">Synchronisation…</div>}
       {screen === 'home' && <HomeScreen rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} />}
-      {screen === 'myday' && <MyDay key={dayTarget.n} entries={ritualEntries} initialDate={dayTarget.date} initialPart={dayTarget.part} onCreate={createFromTool} onUpdate={updateData} />}
+      {screen === 'myday' && <LockGate><MyDay key={dayTarget.n} entries={ritualEntries} initialDate={dayTarget.date} initialPart={dayTarget.part} onCreate={createFromTool} onUpdate={updateData} /></LockGate>}
       {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}
-      {screen === 'notes' && <Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={removeQuiet} onOpenDay={openDay} />}
+      {screen === 'notes' && <LockGate><Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={removeQuiet} onOpenDay={openDay} /></LockGate>}
+      {screen === 'bilan' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><Review entries={ritualEntries} /></LockGate>}
       {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onImported={() => void refresh()} />}
       {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
       {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}
       {screen === 'calme' && <Calm onQuit={() => go('home')} onWrite={() => addIn('equilibre', 'emotion', { date: today() })} />}
       {screen === 'assistant' && <div className="screen"><ScreenHeader title="Assistant" onBack={() => go('home')} /><PersonalBrief entries={entries} onGo={go} /><PersonalAssistant entries={entries} /></div>}
-      {screen === 'settings' && <div className="screen"><Profile email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { await signOut(); setEntries([]); }} /></div>}
+      {screen === 'settings' && <div className="screen"><Profile view="profile" onSettings={() => go('parametres')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); await signOut(); setEntries([]); }} /></div>}
+      {screen === 'parametres' && <div className="screen"><Profile view="settings" onSettings={() => go('settings')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); await signOut(); setEntries([]); }} /></div>}
       {currentModule && <div className="screen">
         <ScreenHeader title={currentModule.name} onBack={() => go('spaces')}
           right={<button className="icon-btn" aria-label="Ajouter" onClick={() => setEditor({ module: currentModule })}><Plus size={24} /></button>} />

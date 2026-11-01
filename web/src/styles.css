@@ -1097,3 +1097,48 @@ textarea.soft-input,.ritual-card textarea{resize:vertical;min-height:64px}
 .color-tile-emoji{font-size:2.6rem;filter:saturate(.9);z-index:1}
 .color-tile-badge{position:absolute;top:10px;right:12px;font-size:1.3rem;z-index:1}
 .color-tile-ring{position:absolute;width:150px;height:150px;border-radius:50%;border:18px solid;right:-40px;bottom:-70px}
+
+/* Paramètres, notifications, verrou, bilan, impression */
+.settings-link{display:flex;align-items:center;gap:12px;width:100%;background:#fff;border:1px solid #EFE2D8;border-radius:18px;padding:14px 16px;text-align:left;cursor:pointer;color:#2B1A12}
+.settings-link span{flex:1;display:flex;flex-direction:column;gap:2px}.settings-link small{color:#7A6355}
+.notif-settings h2,.panel h2{display:flex;align-items:center;gap:8px}
+.notif-row{display:flex;flex-direction:column;gap:8px;padding:10px 0;border-top:1px solid #F1E7DE}
+.notif-row select,.time-input{border:1px solid #EAD9CE;border-radius:12px;padding:8px 10px;background:#fff;font:inherit;width:max-content}
+.inline-pick{display:flex;gap:8px;flex-wrap:wrap}
+.pill-ok{background:#E3EDDF;color:#3D5443;border-radius:999px;padding:6px 12px;font-size:.78rem;font-weight:600}
+.lock-screen{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding-top:60px}
+.lock-badge{width:72px;height:72px;border-radius:50%;background:#F1E4DC;display:grid;place-items:center;color:#6B3F2E}
+.pin-input{font-size:1.8rem;letter-spacing:.6em;text-align:center;width:220px;border:1px solid #EAD9CE;border-radius:16px;padding:12px;background:#fff}
+.review{display:flex;flex-direction:column;gap:14px}
+.review-week,.mood-cal{display:flex;flex-direction:column;gap:14px}
+.week-nav{display:flex;align-items:center;justify-content:space-between}
+.mood-week{display:flex;justify-content:space-between}
+.mood-week div{display:flex;flex-direction:column;align-items:center;gap:4px}
+.mood-pill{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:1.2rem}
+.mood-week small{font-size:.68rem;color:#9C8676}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat-row div{background:#fff;border:1px solid #EFE2D8;border-radius:16px;padding:12px;text-align:center;display:flex;flex-direction:column}
+.stat-row strong{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#6B3F2E}.stat-row small{font-size:.7rem;color:#8b7b6c}
+.habit-stat{display:grid;grid-template-columns:1fr auto;gap:4px;font-size:.88rem}.habit-stat .bar{grid-column:span 2}
+.win-list{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:.9rem}.win-list small{color:#9C8676}
+.ai-card .ritual-label{display:flex;align-items:center;gap:6px}
+.ai-answer{white-space:pre-wrap;font-size:.9rem;line-height:1.55;margin:0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-h{text-align:center;font-size:.7rem;color:#9C8676;font-weight:600}
+.cal-day{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1rem;position:relative}
+.cal-day small{position:absolute;top:3px;left:6px;font-size:.6rem;color:#7A6355}
+.cal-day.today{box-shadow:0 0 0 2px #6B3F2E inset}
+.cal-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.76rem;color:#7A6355}
+.cal-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+.year-ago{background:#F6EEE7;border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.pdf-export{background:#fff;border:1px solid #EFE2D8;border-radius:18px;padding:14px}
+.print-area{display:none}
+@media print{
+  body>*:not(.print-area){display:none!important}
+  .print-area{display:block!important;font-family:Georgia,serif;color:#000;padding:0 8mm}
+  .print-area h1{font-size:22pt;margin:0 0 12pt}
+  .print-area article{break-inside:avoid;margin:0 0 12pt;padding-bottom:8pt;border-bottom:1px solid #ccc}
+  .print-area h2{font-size:13pt;margin:0 0 4pt;text-transform:capitalize}
+  .print-area p{margin:2pt 0;font-size:10.5pt;line-height:1.45}
+  .print-body{white-space:pre-wrap}
+}

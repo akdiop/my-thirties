@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { isDoneOn, toggledData } from '../lib/day';
-import { addDays, affirmationOf, DAILY_KIND, isoOf, MOODS } from '../lib/rituals';
+import { addDays, affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, isoOf, MOODS } from '../lib/rituals';
 import { saveLabel, useAutosave } from '../lib/autosave';
 import { Check22, Segmented } from '../ui/kit';
 
@@ -84,6 +84,7 @@ function DayForm({ date, part, entry, entries, onCreate, onUpdate }: { date: str
         <textarea className="soft-input" rows={3} value={different} placeholder="Sans jugement, juste une leçon…" onChange={(e) => t(setDifferent)(e.target.value)} /></section>
       <section><p className="ritual-label">Ce que je dépose ce soir</p>
         <textarea className="soft-input" rows={3} value={letgo} placeholder="Je le pose ici pour ne plus y penser…" onChange={(e) => t(setLetgo)(e.target.value)} /></section>
+      <HabitsOfDay date={date} entries={entries} onUpdate={onUpdate} />
       <section><p className="ritual-label">Mon intention pour demain</p>
         <textarea className="soft-input" rows={2} value={tomorrow} placeholder="Demain, je veux avant tout…" onChange={(e) => t(setTomorrow)(e.target.value)} /></section>
       <TomorrowTodos date={date} entries={entries} onCreate={onCreate} />
@@ -140,3 +141,15 @@ function TomorrowTodos({ date, entries, onCreate }: { date: string; entries: Ent
   </section>;
 }
 
+
+/** Débriefing : les habitudes du jour, à cocher sans quitter le soir. */
+function HabitsOfDay({ date, entries, onUpdate }: { date: string; entries: Entry[]; onUpdate: Save }) {
+  const habits = entries.filter((e) => e.kind === HABIT_KIND);
+  if (!habits.length) return null;
+  const done = habits.filter((e) => habitDone(e)[date]).length;
+  return <section className="ritual-card"><p className="ritual-label">🌿 Mes habitudes du jour · {done}/{habits.length}</p>
+    {habits.map((e) => { const d = habitDone(e), on = Boolean(d[date]); return <div key={e.id} className="todo-row">
+      <Check22 checked={on} label={e.title} onChange={(v) => void onUpdate(e, { ...e.data, done: { ...d, [date]: v } })} />
+      <span className={on ? 'done' : ''}>{String(e.data.emoji ?? '')} {e.title}</span></div>; })}
+  </section>;
+}

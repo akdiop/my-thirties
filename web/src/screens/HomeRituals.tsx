@@ -3,7 +3,7 @@ import { BookHeart, CalendarCheck, Heart, Leaf, Sparkles } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, isoOf, NOTE_KIND } from '../lib/rituals';
 
-type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'equilibre';
+type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan';
 
 /** Accueil : carte « Mon jour », micro-rituels (respiration, affirmation) et raccourcis. */
 export function HomeRituals({ entries, onGo, onOpenDay, onCreate }: {
@@ -38,7 +38,7 @@ export function HomeRituals({ entries, onGo, onOpenDay, onCreate }: {
       <button className="shortcut" onClick={() => onGo('habits')}><span><Heart size={20} /></span><strong>Habitudes</strong><small>{habits.length ? habitsDone + '/' + habits.length + ' aujourd’hui' : 'Suivi quotidien'}</small></button>
       <button className="shortcut" onClick={() => onGo('notes')}><span><BookHeart size={20} /></span><strong>Mon journal</strong><small>Notes et historique</small></button>
       <button className="shortcut" onClick={() => onGo('bienetre')}><span><Leaf size={20} /></span><strong>Bien-être</strong><small>Humeur, cycle, prière</small></button>
-      <button className="shortcut" onClick={() => onGo('equilibre')}><span><CalendarCheck size={20} /></span><strong>Bilan de la semaine</strong><small>Mon équilibre</small></button>
+      <button className="shortcut" onClick={() => onGo('bilan')}><span><CalendarCheck size={20} /></span><strong>Bilan de la semaine</strong><small>Humeurs, habitudes, victoires</small></button>
     </div>
   </>;
 }
