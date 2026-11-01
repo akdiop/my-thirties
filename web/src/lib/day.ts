@@ -72,8 +72,13 @@ export function timeline(entries: Entry[], date: Date): TimelineItem[] {
       const extra = [str(e, 'discipline'), str(e, 'duration') && `${str(e, 'duration')} min`, str(e, 'location')].filter(Boolean).join(' · ');
       return { id: e.id, time: str(e, 'time'), title: e.title, sub: extra ? `${MODULE_LABEL[e.module]} · ${extra}` : MODULE_LABEL[e.module] ?? '', tone, entry: e };
     })
-  ].sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+  ].sort((a, b) => (a.time || '99').localeCompare(b.time || '99'))
+    // Pas de doublon : même titre, même heure et même lieu le même jour (ex. un événement créé ici et importé du calendrier iPhone).
+    .filter((item, i, all) => all.findIndex((x) => sameItem(x, item)) === i);
 }
+
+const norm = (s: string) => s.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
+const sameItem = (a: TimelineItem, b: TimelineItem) => norm(a.title) === norm(b.title) && a.time === b.time && norm(a.sub) === norm(b.sub);
 
 export const longDate = (d = new Date()) => {
   const s = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });

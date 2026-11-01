@@ -17,6 +17,9 @@ export function Habits({ entries, onCreate, onUpdate, onRemove }: { entries: Ent
   const days = Array.from({ length: 7 }, (_, i) => addDays(week, i));
   const doneToday = mine.filter((e) => habitDone(e)[today]).length;
   const dueToday = mine.filter((e) => habitFreq(e) === 'daily').length;
+  // Rangées par catégorie de la bibliothèque ; celles que j'ai créées vont dans « Mes habitudes ».
+  const groupOf = (e: Entry) => HABIT_LIBRARY.find((t) => t.id === String(e.data.templateId))?.group ?? 'Mes habitudes';
+  const groups = [...HABIT_GROUPS, 'Mes habitudes'].map((name) => ({ name, items: mine.filter((e) => groupOf(e) === name) })).filter((g) => g.items.length);
 
   const add = (t: Omit<HabitTemplate, 'id' | 'group'> & { id?: string }) => onCreate({ module: 'quotidien', kind: HABIT_KIND, title: t.title, entry_date: null,
     data: { templateId: t.id ?? '', icon: t.icon, tint: t.tint, why: t.why, level: t.level, freq: t.freq, done: {} } });
@@ -34,7 +37,9 @@ export function Habits({ entries, onCreate, onUpdate, onRemove }: { entries: Ent
     </div> : <>
       <header className="tab-head"><h1>Habitudes</h1><p>{dueToday ? doneToday + ' sur ' + mine.length + ' aujourd’hui' : 'Ton suivi de la semaine'}</p></header>
       <Bar value={mine.length ? doneToday / mine.length : 0} />
-      <div className="habit-list">{mine.map((e) => {
+      {groups.map(({ name, items }) => <section key={name} className="habit-section">
+        <h2 className="habit-group">{name}</h2>
+        <div className="habit-list">{items.map((e) => {
         const done = habitDone(e), f = habitFreq(e), on = Boolean(done[today]);
         const weekCount = days.filter((d) => done[d]).length, streak = habitStreak(e, today);
         return <article key={e.id} className={'habit-card' + (on ? ' on' : '')}>
@@ -47,7 +52,8 @@ export function Habits({ entries, onCreate, onUpdate, onRemove }: { entries: Ent
           </div>
           <button className="icon-btn" aria-label={'Supprimer ' + e.title} onClick={() => { if (confirm('Arrêter l’habitude « ' + e.title + ' » ? Son historique sera supprimé.')) void onRemove(e); }}><Trash2 size={16} /></button>
         </article>;
-      })}</div>
+        })}</div>
+      </section>)}
       <div className="button-group">
         <button className="button secondary" onClick={() => setView('library')}><Plus size={16} /> Bibliothèque</button>
         <button className="button ghost" onClick={() => setView('create')}><Pencil size={16} /> Créer la mienne</button>
