@@ -1,0 +1,117 @@
+// Rappels push de My Thirties (même app fermée). Appelée toutes les 5 minutes par pg_cron ({ action: 'run' }).
+// Autres actions : 'key' (clé publique VAPID pour abonner un appareil) et 'test' (notification de test, session requise).
+// Les clés VAPID sont générées au premier appel et gardées dans la table push_keys (accessible seulement à la clé de service).
+// Chaque rappel n'est envoyé qu'une fois (table push_log). Le contenu envoyé se limite à un titre et une phrase.
+// Déployer avec la vérification JWT désactivée : le minuteur pg_cron n'a pas de session ; 'test' vérifie lui-même la session.
+// Secrets : SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY (fournis par Supabase). Facultatif : PUSH_SUBJECT.
+import { createClient } from 'npm:@supabase/supabase-js@2';
+import webpush from 'npm:web-push@3.6.7';
+
+type Prefs = { morning?: { on?: boolean; time?: string }; evening?: { on?: boolean; time?: string }; habits?: { on?: boolean; time?: string };
+  agenda?: { on?: boolean; minutes?: number }; weekly?: { on?: boolean; day?: number; time?: string } };
+type Row = { id: string; module: string; kind: string; title: string; entry_date: string | null; data: Record<string, unknown> };
+const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
+const json = (d: unknown, status = 200) => new Response(JSON.stringify(d), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
+const WINDOW = 10; // minutes : un rappel part s'il est dû depuis moins de 10 min (le minuteur passe toutes les 5 min)
+const mins = (t: string) => { const m = /^(\d{2}):(\d{2})$/.exec(t); return m ? Number(m[1]) * 60 + Number(m[2]) : -1; };
+const due = (now: number, at: number) => at >= 0 && now >= at && now < at + WINDOW;
+
+/** Date, minutes depuis minuit et jour de la semaine (0 = dimanche) dans le fuseau de l'utilisatrice. */
+function localNow(tz: string) {
+  let zone = 'Africa/Dakar';
+  try { new Intl.DateTimeFormat('fr', { timeZone: tz }); zone = tz; } catch { /* fuseau par défaut */ }
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', weekday: 'short', hourCycle: 'h23' })
+    .formatToParts(new Date()).map((x) => [x.type, x.value]));
+  return { date: `${p.year}-${p.month}-${p.day}`, minutes: Number(p.hour) * 60 + Number(p.minute), weekday: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(p.weekday) };
+}
+const recurring = (e: Row) => e.kind === 'routine' || ['Quotidienne', 'Hebdomadaire'].includes(String(e.data.frequency));
+const doneOn = (e: Row, d: string) => recurring(e) ? Boolean((e.data.completions as Record<string, boolean> | undefined)?.[d]) : e.data.completed === true;
+function occursOn(e: Row, d: string, weekday: number) {
+  const origin = e.entry_date ?? String(e.data.date ?? '');
+  if (!origin) return false;
+  if (e.data.frequency === 'Quotidienne' && d >= origin) return true;
+  if (e.data.frequency === 'Hebdomadaire' && d >= origin && new Date(origin + 'T12:00:00Z').getUTCDay() === weekday) return true;
+  const end = typeof e.data.endDate === 'string' ? e.data.endDate : '';
+  return origin === d || Boolean(end && d >= origin && d <= end);
+}
+
+Deno.serve(async (request) => {
+  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+  if (request.method !== 'POST') return json({ error: 'Méthode interdite.' }, 405);
+  const url = Deno.env.get('SUPABASE_URL'), anon = Deno.env.get('SUPABASE_ANON_KEY'), service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!url || !anon || !service) return json({ error: 'Configuration manquante.' }, 503);
+  const db = createClient(url, service, { auth: { persistSession: false, autoRefreshToken: false } });
+  let action = 'run';
+  try { const b = await request.json(); if (['key', 'test', 'run'].includes(b?.action)) action = b.action; } catch { /* run */ }
+
+  // Clés VAPID : créées une seule fois, la clé privée ne quitte jamais le serveur.
+  let { data: keys } = await db.from('push_keys').select('public_key,private_key').eq('id', 1).maybeSingle();
+  if (!keys) {
+    const k = webpush.generateVAPIDKeys();
+    await db.from('push_keys').insert({ id: 1, public_key: k.publicKey, private_key: k.privateKey });
+    ({ data: keys } = await db.from('push_keys').select('public_key,private_key').eq('id', 1).maybeSingle());
+  }
+  if (!keys) return json({ error: 'Clés indisponibles.' }, 503);
+  if (action === 'key') return json({ publicKey: keys.public_key });
+  webpush.setVapidDetails(Deno.env.get('PUSH_SUBJECT') ?? 'mailto:rappels@my-thirties.app', keys.public_key, keys.private_key);
+
+  const send = async (userId: string, payload: { title: string; body: string; url: string; tag: string }) => {
+    const { data: subs } = await db.from('push_subscriptions').select('endpoint,subscription').eq('user_id', userId);
+    let sent = 0;
+    for (const s of subs ?? []) {
+      try { await webpush.sendNotification(s.subscription, JSON.stringify(payload), { TTL: 3600 }); sent++; }
+      catch (e) { const code = (e as { statusCode?: number }).statusCode; if (code === 404 || code === 410) await db.from('push_subscriptions').delete().eq('endpoint', s.endpoint); }
+    }
+    return sent;
+  };
+
+  if (action === 'test') {
+    const user = createClient(url, anon, { global: { headers: { Authorization: request.headers.get('authorization') ?? '' } }, auth: { persistSession: false } });
+    const { data: me } = await user.auth.getUser((request.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, ''));
+    if (!me?.user) return json({ error: 'Session invalide.' }, 401);
+    const { data: owner } = await user.rpc('is_app_owner');
+    if (owner !== true) return json({ error: 'Accès refusé.' }, 403);
+    return json({ sent: await send(me.user.id, { title: 'My Thirties', body: 'Les notifications fonctionnent sur cet appareil.', url: '/', tag: 'test' }) });
+  }
+
+  // Tournée du minuteur : chaque utilisatrice avec au moins un appareil abonné.
+  const { data: users } = await db.from('notification_prefs').select('user_id,prefs,tz');
+  let total = 0;
+  for (const u of users ?? []) {
+    const { count } = await db.from('push_subscriptions').select('endpoint', { count: 'exact', head: true }).eq('user_id', u.user_id);
+    if (!count) continue;
+    const p = (u.prefs ?? {}) as Prefs, now = localNow(u.tz);
+    const queue: { key: string; title: string; body: string; url: string }[] = [];
+    const { data: rows } = await db.from('entries').select('id,module,kind,title,entry_date,data').eq('user_id', u.user_id)
+      .in('kind', ['daily', 'habit', 'task', 'event', 'appointment', 'routine']);
+    const list = (rows ?? []) as Row[];
+    const today = list.find((e) => e.kind === 'daily' && e.entry_date === now.date);
+
+    if (p.morning?.on !== false && due(now.minutes, mins(p.morning?.time ?? '08:00')) && !(today?.data.intention || today?.data.mood))
+      queue.push({ key: 'morning:' + now.date, title: 'Mon Daily Reset', body: '3 minutes pour poser ton intention du jour.', url: '/?ecran=myday&moment=matin' });
+    if (p.evening?.on !== false && due(now.minutes, mins(p.evening?.time ?? '21:00')) && !(today?.data.win || today?.data.tomorrow))
+      queue.push({ key: 'evening:' + now.date, title: 'Mon débriefing du soir', body: 'Ta victoire du jour, ce que tu déposes, ton intention pour demain.', url: '/?ecran=myday&moment=soir' });
+    if (p.habits?.on !== false && due(now.minutes, mins(p.habits?.time ?? '19:00'))) {
+      const left = list.filter((e) => e.kind === 'habit' && (e.data.freq ?? 'daily') === 'daily' && !(e.data.done as Record<string, boolean> | undefined)?.[now.date]);
+      if (left.length) queue.push({ key: 'habits:' + now.date, title: 'Mes habitudes', body: left.length === 1 ? 'Il te reste « ' + left[0]!.title + ' » aujourd’hui.' : 'Il te reste ' + left.length + ' habitudes aujourd’hui : ' + left.slice(0, 3).map((e) => e.title).join(', ') + '.', url: '/?ecran=habits' });
+    }
+    if (p.weekly?.on !== false && now.weekday === (p.weekly?.day ?? 0) && due(now.minutes, mins(p.weekly?.time ?? '18:00')))
+      queue.push({ key: 'weekly:' + now.date, title: 'Mon bilan de la semaine', body: 'Humeurs, habitudes, victoires : ta semaine t’attend.', url: '/?ecran=bilan' });
+    if (p.agenda?.on !== false) {
+      const before = Math.max(0, Math.min(120, Number(p.agenda?.minutes ?? 15)));
+      for (const e of list) {
+        const t = typeof e.data.time === 'string' ? mins(e.data.time) : -1;
+        if (t < 0 || !['task', 'event', 'appointment', 'routine'].includes(e.kind) || !occursOn(e, now.date, now.weekday) || doneOn(e, now.date)) continue;
+        if (due(now.minutes, t - before)) queue.push({ key: 'agenda:' + e.id + ':' + now.date, title: (before ? 'Dans ' + before + ' min · ' : 'Maintenant · ') + String(e.data.time),
+          body: e.title.slice(0, 120), url: '/?ecran=agenda' });
+      }
+    }
+    for (const n of queue) {
+      const { error } = await db.from('push_log').insert({ user_id: u.user_id, key: n.key });
+      if (error) continue; // déjà envoyé
+      total += await send(u.user_id, { title: n.title, body: n.body, url: n.url, tag: n.key });
+    }
+  }
+  await db.from('push_log').delete().lt('sent_at', new Date(Date.now() - 14 * 86_400_000).toISOString());
+  return json({ sent: total });
+});

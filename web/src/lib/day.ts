@@ -13,6 +13,8 @@ export function occursOn(entry: Entry, date: Date): boolean {
   const frequency = str(entry, 'frequency');
   const origin = entry.entry_date || str(entry, 'date');
   if (!origin) return entry.kind === 'routine' && frequency === 'Quotidienne';
+  const end = str(entry, 'endDate');
+  if (end && key >= origin && key <= end) return true;
   if (frequency === 'Quotidienne' && key >= origin) return true;
   if (frequency === 'Hebdomadaire' && key >= origin && weekday(parseDay(origin)) === weekday(date)) return true;
   return origin === key;

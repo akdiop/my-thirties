@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { dishOf } from '../lib/editorialPhotos';
-import { EditorialPhoto, UnsplashCredit, useDishPhotos, useUnsplash } from './EditorialPhoto';
-import { recipeItem } from '../lib/unsplashItems';
+import { ColorTile, dishIcon } from '../ui/ColorTile';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { HiddenNote, HideButton, useHidden } from '../lib/hidden';
 import { PERSONALIZED_RECIPES } from '../recipes/recipeIndex';
@@ -18,15 +17,17 @@ const categories: { id: CuratedCategory; label: string }[] = [
   { id: 'boulangerie', label: 'Boulangerie maison' },
   { id: 'dessert', label: 'Desserts' },
   { id: 'base-maison', label: 'Bases et sauces' },
+  { id: 'quiches', label: 'Quiches et mini-quiches' },
+  { id: 'poulet', label: 'Cuisses de poulet' },
+  { id: 'automne', label: 'Recettes d’automne' },
 ];
 const PAGE_SIZE = 12;
 
 const SLOTS = ['Petit-déjeuner', 'Déjeuner', 'Dîner', 'Collation'];
-const defaultSlot = (c: CuratedCategory) => c === 'petit-dejeuner' || c === 'smoothie' ? 'Petit-déjeuner' : c === 'diner' ? 'Dîner' : c === 'dejeuner' ? 'Déjeuner' : 'Collation';
+const defaultSlot = (c: CuratedCategory) => c === 'petit-dejeuner' || c === 'smoothie' ? 'Petit-déjeuner' : c === 'diner' ? 'Dîner' : ['dejeuner', 'quiches', 'poulet', 'automne'].includes(c) ? 'Déjeuner' : 'Collation';
 
 export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void> }) {
   const [category, setCategory] = useState<CuratedCategory>('petit-dejeuner');
-  const dishPhotos = useDishPhotos();
   const [search, setSearch] = useState('');
   const [style, setStyle] = useState<CulinaryStyle>('toutes');
   const [maxMinutes, setMaxMinutes] = useState('toutes');
@@ -40,7 +41,6 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
     (r.title + ' ' + r.ingredients).toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr'))
   ), [category, search, style, maxMinutes, hidden]);
   const visible = filtered.slice(0, page * PAGE_SIZE);
-  const unsplash = useUnsplash(useMemo(() => Object.fromEntries(visible.map((r) => ['recipe:' + r.id, recipeItem(r.title)])), [visible]));
   const existing = new Set(entries.filter((e) => e.kind === 'recipe').map((e) => String(e.data.libraryId ?? '')));
   const [planning, setPlanning] = useState('');
   const [planDay, setPlanDay] = useState(() => new Date().toLocaleDateString('en-CA'));
@@ -73,7 +73,7 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
   };
   return <section className="tool-card">
     <h3>Ma bibliothèque de {PERSONALIZED_RECIPES.length} recettes</h3>
-    <p className="muted">300 idées de repas et boissons, plus 15 recettes originales de boulangerie, desserts et bases maison. Pois chiches et lait de coco inclus.</p>
+    <p className="muted">Repas, boissons, quiches et mini-quiches, cuisses de poulet, recettes d’automne : chaque recette avec ses quantités et ses étapes.</p>
     <div className="recipe-filters">
       <label>Catégorie
         <select value={category} onChange={(e) => { setCategory(e.target.value as CuratedCategory); setPage(1); }}>
@@ -101,11 +101,8 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
     <div className="lesson-grid">{visible.map((recipe) => {
       const isAdded = existing.has(recipe.id);
       const dish = dishOf(recipe.title);
-      const shot = unsplash['recipe:' + recipe.id];
-      const photo = dish ? dishPhotos[dish] : undefined;
       return <article className="lesson-card recipe-photo-card" key={recipe.id}>
-        <EditorialPhoto src={shot?.src || photo?.src || '/visuels/cuisine.webp'} fallback="/visuels/cuisine.webp" alt={recipe.title} className="editorial-card-photo" />
-        {shot && <UnsplashCredit photo={shot} />}
+        <ColorTile seed={dish ?? recipe.category} icon={dishIcon(recipe.title, recipe.category)} label={recipe.title} />
         <h3>{recipe.title}</h3>
         <p>{recipe.prepMin + recipe.cookMin} min environ · {recipe.servings} portions · {culinaryStyleLabel(recipeStyle(recipe))}</p>
         <details><summary>Ingrédients et préparation</summary>

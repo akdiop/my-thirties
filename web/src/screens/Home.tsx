@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Lightbulb, Sparkles, Waves } from 'lucide-react';
 import type { Entry, ModuleId } from '../lib/cloud';
 import { isDoneOn, longDate, priorities, str, timeline, todayIso, toggledData } from '../lib/day';
@@ -10,8 +11,8 @@ import { modules } from '../modules';
 
 type Go = (screen: ModuleId | 'calme' | 'assistant' | 'settings' | 'agenda' | 'spaces') => void;
 
-export function Home({ entries, profileEntry, onGo, onUpdate, onAdd }: {
-  entries: Entry[]; profileEntry: Entry | undefined; onGo: Go;
+export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, rituals }: {
+  rituals?: ReactNode; entries: Entry[]; profileEntry: Entry | undefined; onGo: Go;
   onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>; onAdd: () => void;
 }) {
   const day = todayIso();
@@ -35,6 +36,8 @@ export function Home({ entries, profileEntry, onGo, onUpdate, onAdd }: {
       <div className="home-hello"><h1>Bonjour{profile.firstName ? ', ' + profile.firstName : ''}</h1><p>{longDate()}</p></div>
       <button className="round-btn" onClick={() => onGo('assistant')} aria-label="Assistant"><Sparkles size={20} /></button>
     </header>
+
+    {rituals}
 
     <button className="calm-pill" onClick={() => onGo('calme')}><Waves size={20} /> J’ai besoin de me calmer</button>
 

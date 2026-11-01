@@ -5,4 +5,6 @@ import { DINNER_RECIPES } from './dinnerRecipes';
 import { SNACK_RECIPES } from './snackRecipes';
 import { SMOOTHIE_RECIPES } from './smoothieRecipes';
 import { SHOT_RECIPES } from './shotRecipes';
-export const PERSONALIZED_RECIPES = [...BREAKFAST_RECIPES, ...LUNCH_RECIPES, ...DINNER_RECIPES, ...SNACK_RECIPES, ...SMOOTHIE_RECIPES, ...SHOT_RECIPES, ...GUIDE_INSPIRED_RECIPES];
+import { QUICHE_RECIPES } from './quicheRecipes';
+import { AUTUMN_RECIPES, POULET_RECIPES } from './seasonRecipes';
+export const PERSONALIZED_RECIPES = [...BREAKFAST_RECIPES, ...LUNCH_RECIPES, ...DINNER_RECIPES, ...SNACK_RECIPES, ...SMOOTHIE_RECIPES, ...SHOT_RECIPES, ...GUIDE_INSPIRED_RECIPES, ...QUICHE_RECIPES, ...POULET_RECIPES, ...AUTUMN_RECIPES];
