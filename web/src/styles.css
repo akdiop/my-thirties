@@ -1250,3 +1250,23 @@ h2{font-size:1.55rem;line-height:1.2}
 .chip-other .button{flex:none}
 .chip-picker select{border:1px solid #e3d8ca;border-radius:12px;padding:12px;font-size:16px;background:#fffdfa;color:#5A3A2A;width:100%}
 .chip-picker .chip.on{display:inline-flex;align-items:center;gap:6px}
+
+/* Fiche recette */
+.recipe-view{display:flex;flex-direction:column;gap:14px;margin-top:12px;border-top:1px solid #eae0d6;padding-top:14px}
+.recipe-view h4{margin:0 0 8px;color:#6b3f2e;font-size:1rem}
+.recipe-video{position:relative;width:100%;max-width:340px;margin:0 auto;border-radius:16px;overflow:hidden;background:#f1e6d8}
+.recipe-video iframe{display:block;width:100%;border:0}
+.recipe-video.tiktok iframe{height:740px}
+.recipe-video.instagram iframe{height:620px}
+.recipe-video.youtube{max-width:none}
+.recipe-video.youtube iframe{aspect-ratio:16/9;height:auto}
+.recipe-link{display:inline-flex;align-items:center;gap:6px;text-decoration:none;align-self:flex-start}
+.recipe-ingredients{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.recipe-ingredients button{width:100%;display:flex;align-items:center;gap:10px;border:0;background:#faf4ec;border-radius:12px;padding:10px 12px;text-align:left;font-size:.95rem;color:#3c3029}
+.recipe-ingredients button.on span:last-child{text-decoration:line-through;color:#9a8a7e}
+.recipe-ingredients .tick{width:22px;height:22px;border-radius:7px;border:1.5px solid #c9b8a6;display:grid;place-items:center;flex:none}
+.recipe-ingredients button.on .tick{background:#B5603F;border-color:#B5603F;color:#fff}
+.recipe-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.recipe-steps li{display:flex;gap:12px;align-items:flex-start}
+.recipe-steps .num{width:28px;height:28px;border-radius:50%;background:#5A3A2A;color:#fffaf5;display:grid;place-items:center;font-weight:700;font-size:.85rem;flex:none}
+.recipe-steps p{margin:3px 0 0;font-size:.95rem;line-height:1.55}

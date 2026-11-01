@@ -11,6 +11,7 @@ import { moduleById, modules, type Module } from './modules';
 import { validateRestore } from './lib/restore';
 import { consolidateIngredients, groceryTitle, mergeGroceryItems, weekGroceryItems, weekStart, type ListItem } from './lib/groceries';
 import { BoosterPlan } from './features/BoosterPlan';
+import { RecipeView } from './features/RecipeView';
 import { TravelTools } from './features/TravelTools';
 import { EquilibriumInsights } from './features/EquilibriumInsights';
 import { KitchenPlanner } from './features/KitchenPlanner';
@@ -271,7 +272,8 @@ function EntryCard({ entry, module, onEdit, onDelete, onUpdate }: {
     {module.id === 'listes' && <Checklist entry={entry} onUpdate={onUpdate} />}
     {module.id === 'equilibre' && entry.kind === 'booster' && <BoosterPlan entry={entry} onUpdate={onUpdate} />}
     {module.id === 'challenges' && <ChallengeCalendar key={entry.id} entry={entry} onUpdate={onUpdate} />}
-    {module.id !== 'listes' && module.id !== 'challenges' && kind?.fields.filter((f) => f.type === 'textarea' && value(entry.data, f.id))
+    {entry.kind === 'recipe' && <RecipeView entry={entry} />}
+    {module.id !== 'listes' && module.id !== 'challenges' && entry.kind !== 'recipe' && kind?.fields.filter((f) => f.type === 'textarea' && value(entry.data, f.id))
       .slice(0, 2).map((f) => <p key={f.id} className="entry-note"><strong>{f.label} : </strong>{value(entry.data, f.id)}</p>)}
   </article>;
 }
