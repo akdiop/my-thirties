@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Camera, Save, Trash2 } from 'lucide-react';
+import { Camera, Plus, Save, Trash2 } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
-import { birthdayLine, EMPTY_PROFILE, PROFILE_KIND, readProfile, shrinkPhoto, SITUATIONS, splitTags, type ProfileData } from '../lib/profile';
+import { birthdayLine, EMPTY_PROFILE, PROFILE_KIND, readProfile, shrinkPhoto, SITUATIONS, type ProfileData } from '../lib/profile';
 
 export function ProfileAvatar({ profile, size = 72 }: { profile: ProfileData; size?: number }) {
   const initial = profile.firstName.trim().charAt(0).toUpperCase() || 'M';
@@ -23,7 +23,7 @@ export function ProfileGreeting({ entry, onEdit }: { entry: Entry | undefined; o
 export function PersonalProfile({ entry, onSave }: { entry: Entry | undefined; onSave: (input: EntryInput, id?: string) => Promise<void> }) {
   const initial = entry ? readProfile(entry) : EMPTY_PROFILE;
   const [p, setP] = useState<ProfileData>(initial);
-  const [tags, setTags] = useState({ hobbies: initial.hobbies.join(', '), languages: initial.languages.join(', '), values: initial.values.join(', ') });
+  const [tags, setTags] = useState({ hobbies: initial.hobbies, languages: initial.languages, values: initial.values });
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const set = <K extends keyof ProfileData>(key: K, value: ProfileData[K]) => setP({ ...p, [key]: value });
@@ -38,7 +38,7 @@ export function PersonalProfile({ entry, onSave }: { entry: Entry | undefined; o
 
   const save = async () => {
     setBusy(true); setMessage('');
-    const data: ProfileData = { ...p, hobbies: splitTags(tags.hobbies), languages: splitTags(tags.languages), values: splitTags(tags.values) };
+    const data: ProfileData = { ...p, hobbies: tags.hobbies, languages: tags.languages, values: tags.values };
     try {
       await onSave({ module: 'quotidien', kind: PROFILE_KIND, title: 'Mon profil', entry_date: null, data }, entry?.id);
       setMessage('Profil enregistré.');
@@ -47,7 +47,6 @@ export function PersonalProfile({ entry, onSave }: { entry: Entry | undefined; o
   };
 
   const line = birthdayLine(p.birthDate, new Date());
-  const chips = (text: string) => splitTags(text).map((t) => <span key={t} className="profile-chip">{t}</span>);
 
   return <section className="panel form-stack profile-panel">
     <h2>Mon profil</h2>
@@ -72,13 +71,35 @@ export function PersonalProfile({ entry, onSave }: { entry: Entry | undefined; o
       <label>Enfants (facultatif)<input value={p.children} maxLength={200} onChange={(e) => set('children', e.target.value)} placeholder="Prénoms, âges…" /></label>
     </div>
     {line && <p className="profile-birthday">{line}</p>}
-    <label>Hobbies (séparés par des virgules)<input value={tags.hobbies} onChange={(e) => setTags({ ...tags, hobbies: e.target.value })} placeholder="Tennis, Pilates, cuisine, voyages…" /></label>
-    <div className="profile-chips">{chips(tags.hobbies)}</div>
-    <label>Langues parlées<input value={tags.languages} onChange={(e) => setTags({ ...tags, languages: e.target.value })} placeholder="Français, wolof, anglais…" /></label>
-    <label>Ce qui compte pour moi<input value={tags.values} onChange={(e) => setTags({ ...tags, values: e.target.value })} placeholder="Famille, foi, liberté, santé…" /></label>
-    <div className="profile-chips">{chips(tags.values)}</div>
+    <ChipPicker label="Mes hobbies" options={HOBBIES} value={tags.hobbies} onChange={(v) => setTags({ ...tags, hobbies: v })} />
+    <ChipPicker label="Langues parlées" options={LANGUES} value={tags.languages} onChange={(v) => setTags({ ...tags, languages: v })} />
+    <ChipPicker label="Ce qui compte pour moi" options={VALEURS} value={tags.values} onChange={(v) => setTags({ ...tags, values: v })} />
     <label>Mon intention pour mes trente ans<textarea value={p.intention} maxLength={500} rows={3} onChange={(e) => set('intention', e.target.value)} placeholder="Ce que je veux construire, vivre, apprendre…" /></label>
     <button className="button primary" disabled={busy} onClick={() => void save()}><Save size={17} /> {busy ? 'Enregistrement…' : 'Enregistrer mon profil'}</button>
     {message && <p role="status">{message}</p>}
   </section>;
+}
+
+const HOBBIES = ['Tennis', 'Padel', 'Pilates', 'Yoga', 'Workout', 'Course', 'Marche', 'Danse', 'Natation', 'Cuisine', 'Pâtisserie', 'Lecture', 'Écriture', 'Voyages', 'Photographie', 'Musique', 'Cinéma', 'Séries', 'Mode', 'Beauté', 'Déco', 'Jardinage', 'Dessin', 'Bénévolat', 'Podcasts'];
+const LANGUES = ['Français', 'Wolof', 'Anglais', 'Espagnol', 'Arabe', 'Pulaar', 'Sérère', 'Diola', 'Portugais', 'Italien', 'Allemand'];
+const VALEURS = ['Famille', 'Foi', 'Liberté', 'Santé', 'Amour', 'Amitié', 'Indépendance', 'Réussite', 'Paix intérieure', 'Bienveillance', 'Authenticité', 'Créativité', 'Sécurité', 'Aventure', 'Équilibre', 'Transmission'];
+
+/** Choix à cocher, avec la possibilité d'ajouter son propre choix. */
+function ChipPicker({ label, options, value, onChange }: { label: string; options: string[]; value: string[]; onChange: (v: string[]) => void }) {
+  const [other, setOther] = useState('');
+  const all = [...options, ...value.filter((v) => !options.includes(v))];
+  const toggle = (o: string) => onChange(value.includes(o) ? value.filter((v) => v !== o) : [...value, o]);
+  const add = () => {
+    const t = other.trim().slice(0, 40);
+    if (t && !value.includes(t)) onChange([...value, t]);
+    setOther('');
+  };
+  return <fieldset className="chip-picker">
+    <legend>{label}</legend>
+    <div className="chip-row">{all.map((o) => <button type="button" key={o} className={'chip' + (value.includes(o) ? ' on' : '')} aria-pressed={value.includes(o)} onClick={() => toggle(o)}>{o}</button>)}</div>
+    <div className="chip-other">
+      <input value={other} maxLength={40} onChange={(e) => setOther(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } }} placeholder="Autre…" aria-label={label + ' : ajouter un autre choix'} />
+      <button type="button" className="button secondary" disabled={!other.trim()} onClick={add}><Plus size={16} /> Ajouter</button>
+    </div>
+  </fieldset>;
 }
