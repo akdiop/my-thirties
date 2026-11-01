@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import {
-  BookOpen, CalendarDays, ChevronRight, Coffee, Download,
-  Home, LayoutGrid, Leaf, LogOut, Plus, Save, Settings, ShieldCheck, Trash2, UserRound, X,
+  BookOpen, CalendarDays, ChevronRight, Coffee, Download, Heart,
+  Home, LogOut, Plus, Save, Settings, ShieldCheck, Trash2, UserRound, X,
 } from 'lucide-react';
 import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
 import { downloadBackup, makeEncryptedBackup, parseEncryptedBackup } from './lib/backup';
@@ -45,8 +45,15 @@ import { SeriesTracker } from './features/SeriesTracker';
 import { TravelSuggestions } from './features/TravelSuggestions';
 import { CookingTips } from './features/CookingTips';
 import { HIDDEN_KIND, HiddenProvider, readHidden, useHidden, type Hidden } from './lib/hidden';
+import { RITUAL_KINDS } from './lib/rituals';
+import { MyDay } from './screens/MyDay';
+import { Habits } from './screens/Habits';
+import { Notes } from './screens/Notes';
+import { HomeRituals } from './screens/HomeRituals';
+import { EveningReminderRunner, EveningReminderSettings } from './features/EveningReminder';
+import { Sparkles } from 'lucide-react';
 
-type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | ModuleId;
+type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
 const today = () => new Date().toLocaleDateString('en-CA');
 const value = (obj: Record<string, unknown>, key: string) => typeof obj[key] === 'string' ? obj[key] as string : '';
@@ -54,9 +61,9 @@ const humanDate = (date: string | null) => date ? new Date(date + 'T12:00:00').t
 const safeLink = (v: unknown) => { try { const url = new URL(String(v)); return url.protocol === 'https:' ? url.href : null; } catch { return null; } };
 const nav: { id: Screen; label: string; icon: typeof Home }[] = [
   { id: 'home', label: 'Accueil', icon: Home },
+  { id: 'habits', label: 'Habitudes', icon: Heart },
+  { id: 'myday', label: 'Mon jour', icon: Sparkles },
   { id: 'agenda', label: 'Agenda', icon: CalendarDays },
-  { id: 'bienetre', label: 'Bien-être', icon: Leaf },
-  { id: 'spaces', label: 'Espaces', icon: LayoutGrid },
   { id: 'settings', label: 'Profil', icon: UserRound },
 ];
 
@@ -341,6 +348,7 @@ function Profile({ email, entries, profileEntry, onSaveProfile, onLogout, onRest
       {message && <p role="status">{message}</p>}
     </section>
     <p className="sec">Confidentialité et rappels</p>
+    <EveningReminderSettings />
     <PrivacyCenter />
     <BrowserReminders entries={entries} />
     <section className="panel"><h2>À propos de cette version</h2><p className="muted">Application web privée en cours de développement. L'export d'agenda est manuel ; les notifications web ne fonctionnent qu'avec la page ouverte. L'assistant IA nécessite un déploiement sécurisé et l'analyse vidéo reste expérimentale. La synchronisation iOS native est encore à réaliser.</p></section>
@@ -354,7 +362,9 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('home');
   const [allEntries, setEntries] = useState<Entry[]>([]);
   const profileEntry = allEntries.find((e) => e.kind === PROFILE_KIND);
-  const entries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND && e.kind !== HIDDEN_KIND), [allEntries]);
+  const entries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND && e.kind !== HIDDEN_KIND && !RITUAL_KINDS.includes(e.kind)), [allEntries]);
+  const ritualEntries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND && e.kind !== HIDDEN_KIND), [allEntries]);
+  const [dayTarget, setDayTarget] = useState<{ date?: string; part?: 'matin' | 'soir'; n: number }>({ n: 0 });
   const photoEntries = useMemo(() => allEntries.filter((e) => e.kind === PHOTO_KIND), [allEntries]);
   const photos = useMemo(() => Object.fromEntries(photoEntries.flatMap((e) =>
     typeof e.data.image === 'string' && /^data:image\/jpeg;base64,/.test(e.data.image) ? [[e.title, e.data.image]] : [])), [photoEntries]);
@@ -504,13 +514,19 @@ export default function App() {
     ) : <div className="empty-soft"><Coffee size={28} /><p>Un espace à remplir à ton rythme.</p><button className="button ghost" onClick={() => setEditor({ module: currentModule })}>Créer ma première entrée</button></div>}</div>
   </section>;
 
-  const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings'] as Screen[]).includes(screen);
+  const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings', 'myday', 'habits', 'notes'] as Screen[]).includes(screen);
+  const openDay = (date?: string, part?: 'matin' | 'soir') => { setDayTarget((t) => ({ date, part, n: t.n + 1 })); go('myday'); };
+  const editFull = async (id: string, patch: { title: string; data: Record<string, unknown> }) => { await editEntry(id, patch); await refresh(); };
 
   return <HiddenProvider value={hidden}><PhotoProvider value={{ photos, save: savePhoto }}><div className={'app' + (screen === 'calme' ? ' calm-mode' : '')}>
     <main className="phone">
+      <EveningReminderRunner entries={ritualEntries} />
       {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
       {loading && <div className="sync-status" role="status">Synchronisation…</div>}
-      {screen === 'home' && <HomeScreen entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} />}
+      {screen === 'home' && <HomeScreen rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} />}
+      {screen === 'myday' && <MyDay key={dayTarget.n} entries={ritualEntries} initialDate={dayTarget.date} initialPart={dayTarget.part} onCreate={createFromTool} onUpdate={updateData} />}
+      {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}
+      {screen === 'notes' && <Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={removeQuiet} onOpenDay={openDay} />}
       {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onImported={() => void refresh()} />}
       {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
       {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}

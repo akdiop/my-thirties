@@ -35,12 +35,12 @@ export function IphoneCalendar({ onImported }: { onImported?: () => void }) {
       setImportedAt(new Date().toISOString());
       setImportStatus(data.added || data.updated || data.removed || !quiet ? `iPhone → My Thirties : ${data.added} ajouté(s), ${data.updated} modifié(s), ${data.removed} retiré(s).` : '');
       if (data.added || data.updated || data.removed) onImported?.();
-    } catch { if (!quiet) setImportStatus('Import impossible : vérifie le lien du calendrier iCloud.'); }
+    } catch { if (!quiet) setImportStatus('Import impossible : vérifie le lien du calendrier.'); }
   };
   const saveImport = async () => {
     if (!cloud) return;
     const url = importUrl.trim();
-    if (!/^(webcal|https):\/\//i.test(url)) { setImportStatus('Colle le lien qui commence par webcal:// (calendrier public iCloud).'); return; }
+    if (!/^(webcal|https):\/\//i.test(url)) { setImportStatus('Colle le lien du calendrier (webcal:// pour iCloud, https://…/basic.ics pour Google).'); return; }
     setBusy(true);
     try {
       const { error } = await cloud.from('calendar_feeds').upsert({ import_url: url }, { onConflict: 'user_id' });
@@ -72,7 +72,7 @@ export function IphoneCalendar({ onImported }: { onImported?: () => void }) {
   };
 
   return <section className="soft-card iphone-cal">
-    <h3><CalendarPlus size={18} /> Calendrier de l’iPhone</h3>
+    <h3><CalendarPlus size={18} /> Calendrier iPhone et Google</h3>
     {token ? <>
       <p className="muted">Ton agenda, tes rendez-vous et tes repas planifiés apparaissent dans l’app Calendrier et se mettent à jour automatiquement.</p>
       <a className="button primary wide" href={feedUrl(token).replace(/^https:/, 'webcal:')}>Ajouter à Calendrier</a>
@@ -81,6 +81,7 @@ export function IphoneCalendar({ onImported }: { onImported?: () => void }) {
         <button className="button ghost" disabled={busy} onClick={() => { if (window.confirm('Créer un nouveau lien ? L’ancien abonnement cessera de fonctionner.')) void create(); }}><RefreshCw size={15} /> Nouveau lien</button>
       </div>
       <details className="challenge-more"><summary>Si le bouton ne marche pas</summary>
+        <p className="muted">Google Agenda (ordinateur) : Autres agendas › + › À partir de l’URL, colle le lien puis « Ajouter l’agenda ».</p>
         <ol className="how-list"><li>Copie le lien.</li><li>Sur l’iPhone : Réglages › Calendrier › Comptes › Ajouter un compte › Autre › Ajouter un calendrier avec abonnement.</li><li>Colle le lien, puis Suivant › Enregistrer.</li><li>Dans « Actualiser », choisis « Toutes les heures » ou « Toutes les 15 minutes ».</li></ol>
       </details>
     </> : <>
@@ -89,7 +90,7 @@ export function IphoneCalendar({ onImported }: { onImported?: () => void }) {
     </>}
     {status && <p role="status" className="fineprint">{status}</p>}
 
-    <h4 className="iphone-cal-sub"><Download size={16} /> iPhone → My Thirties</h4>
+    <h4 className="iphone-cal-sub"><Download size={16} /> iPhone ou Google → My Thirties</h4>
     {linked ? <>
       <p className="muted">Tes événements de l’iPhone arrivent dans l’Agenda (marqués « iPhone »), à chaque ouverture de l’Agenda.{importedAt ? ' Dernier import : ' + new Date(importedAt).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) + '.' : ''}</p>
       <div className="button-group">
@@ -103,9 +104,12 @@ export function IphoneCalendar({ onImported }: { onImported?: () => void }) {
         <li>Active « Calendrier public », puis « Partager le lien… » › Copier.</li>
         <li>Colle le lien ici :</li>
       </ol>
-      <input type="url" inputMode="url" placeholder="webcal://p…-caldav.icloud.com/published/…" value={importUrl} onChange={(e) => setImportUrl(e.target.value)} />
-      <button className="button primary wide" disabled={busy || !importUrl.trim()} onClick={() => void saveImport()}>Relier mon calendrier iPhone</button>
-      <p className="fineprint">Un calendrier public iCloud est lisible par toute personne qui a le lien : ne le partage qu’ici.</p>
+      <details className="challenge-more"><summary>Avec Google Agenda</summary>
+        <ol className="how-list"><li>Sur ordinateur, ouvre Google Agenda › Paramètres (roue dentée).</li><li>Choisis ton agenda à gauche, puis « Intégrer l’agenda ».</li>
+          <li>Copie « Adresse secrète au format iCal » et colle-la ci-dessous.</li></ol></details>
+      <input type="url" inputMode="url" placeholder="webcal://…icloud.com/… ou https://calendar.google.com/…/basic.ics" value={importUrl} onChange={(e) => setImportUrl(e.target.value)} />
+      <button className="button primary wide" disabled={busy || !importUrl.trim()} onClick={() => void saveImport()}>Relier mon calendrier</button>
+      <p className="fineprint">Ces liens donnent accès à ton calendrier à qui les possède : ne les partage qu’ici.</p>
     </>}
     {importStatus && <p role="status" className="fineprint">{importStatus}</p>}
   </section>;

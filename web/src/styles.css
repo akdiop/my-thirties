@@ -980,3 +980,120 @@ table{display:block;max-width:100%;overflow-x:auto}
 .tv-ep-text strong{font-size:.86rem}
 .tv-ep-text small{font-size:.72rem;color:#7A6355}
 .tv-upto{font-size:.72rem;white-space:nowrap}
+
+/* ===== Rituels : Mon jour, Habitudes, Notes, micro-rituels ===== */
+.button.dark{background:#2B1A12;color:#FAF7F2}
+.button.soft{background:#E9D3C7;color:#3C2116}
+.button.small{padding:8px 14px;min-height:36px;font-size:.78rem}
+.button.wide{width:100%}
+.cap::first-letter{text-transform:uppercase}
+.soft-input{width:100%;background:#fff;border:1px solid #EAD9CE;border-radius:16px;padding:13px 16px;font:inherit;font-size:.95rem;color:#2B1A12;margin-bottom:10px;box-sizing:border-box}
+textarea.soft-input,.ritual-card textarea{resize:vertical;min-height:64px}
+.soft-input:focus,.ritual-card textarea:focus{outline:2px solid #D9B8A8;border-color:#D9B8A8}
+.square-btn{width:52px;height:50px;border:0;border-radius:16px;background:#F1E4DC;color:#3C2116;display:grid;place-items:center;flex:none}
+.square-btn:disabled{opacity:.5}
+.ritual-label{font-weight:600;font-size:.95rem;margin:0 0 10px;color:#2B1A12}
+.ritual-card{background:#fff;border:1px solid #EFE2D8;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.ritual-card.accent{border-left:4px solid #E3C3B5}
+.ritual-card textarea{width:100%;border:1px solid #EAD9CE;border-radius:14px;padding:12px;font:inherit;box-sizing:border-box}
+.myday{display:flex;flex-direction:column;gap:14px}
+.myday-head{display:flex;justify-content:space-between;align-items:flex-end}
+.day-nav{display:flex;gap:2px}
+.myday-form{display:flex;flex-direction:column;gap:18px}
+.mood5{display:flex;justify-content:space-between;gap:4px}
+.mood5 button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px;border-radius:14px;flex:1;opacity:.75;cursor:pointer}
+.mood5 button span{font-size:1.9rem;line-height:1}
+.mood5 button small{font-size:.7rem;color:#7A6355}
+.mood5 button.on{background:#F4E6DD;opacity:1;box-shadow:0 0 0 2px #E3C3B5 inset}
+.mood5.small{justify-content:flex-start}.mood5.small button{flex:none;font-size:1.3rem;padding:4px 6px}
+.todo-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.todo-row{display:flex;align-items:center;gap:10px;font-size:.92rem}
+.todo-row .done{text-decoration:line-through;opacity:.55}
+.todo-row.edit .soft-input{margin:0}
+.todo-row .ring{width:22px;height:22px;border-radius:50%;border:2px solid #E3C3B5;flex:none}
+.todo-add{display:flex;gap:8px}.todo-add .soft-input{margin:0}
+.planned{margin:0 0 6px;padding-left:18px;color:#7A6355;font-size:.86rem}
+.affirm-inline{background:#F6EEE7;border-radius:16px;padding:14px;font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:#5A3A2C;text-align:center}
+.save-state{font-size:.75rem;color:#9C8676;text-align:center;margin:0}
+
+.reset-card{background:linear-gradient(160deg,#F1E1D7,#EAD3C6);border-radius:24px;padding:22px 18px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.reset-card h2{margin:4px 0 0;font-size:1.65rem;color:#2B1A12}
+.reset-card p{margin:0 0 8px;color:#7A6355;font-size:.9rem}
+.reset-icon{width:52px;height:52px;border-radius:50%;background:#E3C3B5;display:grid;place-items:center;color:#3C2116}
+.reset-btn{background:#DDB8A8;color:#2B1A12;box-shadow:0 6px 16px rgba(107,63,46,.15);padding:12px 26px}
+.ritual-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ritual-mini{background:#fff;border:1px solid #EFE2D8;border-radius:20px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;min-height:200px;justify-content:space-between}
+.ritual-k{font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:#8b7b6c;align-self:flex-start;text-align:left}
+.breath-dot{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle,#E9D3C7 40%,#F4E6DD 70%);box-shadow:0 0 0 8px #F7EEE8;transition:transform 4s ease-in-out}
+.breath-dot.in{transform:scale(1.35);transition-duration:4s}
+.breath-dot.out{transform:scale(.85);transition-duration:6s}
+.affirm{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.12rem;line-height:1.35;margin:0;color:#3C2116}
+.ritual-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.shortcut-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.shortcut{background:#fff;border:1px solid #EFE2D8;border-radius:18px;padding:14px;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;text-align:left;cursor:pointer}
+.shortcut span{grid-row:span 2;width:40px;height:40px;border-radius:12px;background:#F6EEE7;display:grid;place-items:center;color:#6B3F2E}
+.shortcut strong{font-size:.9rem}.shortcut small{font-size:.74rem;color:#8b7b6c}
+
+.habits{display:flex;flex-direction:column;gap:14px}
+.habits-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:30px 6px}
+.habits-empty h1{font-size:2.3rem;line-height:1.1;margin:0}
+.habits-empty p{color:#7A6355;margin:0 0 6px}
+.leaf-badge{width:84px;height:84px;border-radius:50%;background:#F1E4DC;display:grid;place-items:center;font-size:2.2rem}
+.habit-list{display:flex;flex-direction:column;gap:10px}
+.habit-card{background:#fff;border:1px solid #EFE2D8;border-radius:18px;padding:12px;display:flex;align-items:center;gap:12px}
+.habit-card.on{background:#F3F6EF;border-color:#D7E2D0}
+.habit-check{width:52px;height:52px;border-radius:50%;border:2px solid #E3C3B5;background:#fff;display:grid;place-items:center;font-size:1.4rem;flex:none;cursor:pointer;color:#fff}
+.habit-card.on .habit-check{background:#5E7A5F;border-color:#5E7A5F}
+.habit-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.habit-body strong{font-size:.95rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.habit-body small{font-size:.76rem;color:#7A6355;display:flex;align-items:center;gap:3px;flex-wrap:wrap}
+.week-dots{display:flex;gap:4px;margin-top:4px}
+.week-dots span{width:22px;height:22px;border-radius:50%;background:#F3ECE5;color:#9C8676;font-size:.62rem;display:grid;place-items:center;font-weight:600}
+.week-dots span.on{background:#5E7A5F;color:#fff}
+.week-dots span.today{box-shadow:0 0 0 2px #D9B8A8}
+.week-dots span.future{opacity:.45}
+.habit-group{font-size:1.05rem;margin:18px 0 8px}
+.habit-lib{background:#fff;border:1px solid #EFE2D8;border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.habit-emoji{font-size:1.7rem;width:40px;text-align:center;flex:none}
+.level{font-size:.68rem;font-weight:600;padding:3px 9px;border-radius:999px}
+.level.douce{background:#E8F1E4;color:#3D7A45}.level.modérée{background:#FBEFDF;color:#A4622A}.level.engagée{background:#F8E3E3;color:#A23B3B}
+
+.notes{display:flex;flex-direction:column;gap:14px}
+.notes-head{display:flex;align-items:center;gap:10px}.notes-head>div{flex:1}
+.folder-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.folder{background:#fff;border:1px solid #EFE2D8;border-radius:20px;padding:16px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;cursor:pointer;min-height:118px}
+.folder span{font-size:1.8rem}.folder strong{font-size:.95rem}.folder small{color:#8b7b6c;font-size:.76rem}
+.note-list{display:flex;flex-direction:column;gap:8px}
+.note-row,.type-row{display:flex;align-items:flex-start;gap:12px;width:100%;border:0;background:#fff;border-radius:16px;padding:12px;text-align:left;cursor:pointer}
+.note-row span:last-child,.type-row span:last-child{display:flex;flex-direction:column;gap:2px;min-width:0}
+.note-row small{color:#7A6355;font-size:.8rem;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.note-emoji{font-size:1.5rem;width:34px;text-align:center;flex:none}
+.type-row{background:#FAF6F2;margin-bottom:8px}
+.type-row small{color:#7A6355;font-size:.8rem}
+.modal-overlay.sheet{align-items:flex-end;padding:0}
+.sheet-body{background:#fff;border-radius:26px 26px 0 0;padding:12px 18px 28px;width:100%;max-width:560px;max-height:88vh;overflow:auto;margin:0 auto}
+.sheet-body h2{font-size:1.05rem;margin:10px 0 14px}
+.sheet-grip{display:block;width:44px;height:5px;border-radius:3px;background:#E3C3B5;margin:0 auto}
+.note-editor{display:flex;flex-direction:column;gap:10px;transition:opacity .9s, transform .9s, filter .9s}
+.note-editor.burning{opacity:0;transform:translateY(-20px) scale(.97);filter:sepia(1) saturate(3) hue-rotate(-20deg)}
+.note-type{flex:1;font-weight:600;color:#6B3F2E}
+.note-date{margin:0}
+.note-title{border:0;background:transparent;font-family:'Cormorant Garamond',serif;font-size:1.7rem;color:#2B1A12;padding:0;outline:none}
+.note-body{min-height:52vh;border:0;background:#fff;border-radius:18px;padding:16px;font:inherit;font-size:1rem;line-height:1.6;resize:vertical;outline:none;box-shadow:0 0 0 1px #EFE2D8 inset}
+.note-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.note-meta select{border:1px solid #EAD9CE;border-radius:12px;padding:8px;background:#fff;font:inherit}
+
+.toggle-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.toggle-row span{display:flex;flex-direction:column;gap:3px}
+.toggle-row strong{display:flex;align-items:center;gap:6px}
+.toggle-row small{color:#7A6355}
+.switch{width:52px;height:30px;border-radius:15px;border:0;background:#E9DDD2;position:relative;flex:none;cursor:pointer}
+.switch span{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .2s}
+.switch.on{background:#5E7A5F}.switch.on span{left:25px}
+.switch:disabled{opacity:.5}
+
+/* Vignettes de couleur (à la place des photos) */
+.color-tile{position:relative;width:100%;aspect-ratio:16/8;border-radius:16px;display:grid;place-items:center;overflow:hidden;margin-bottom:10px}
+.color-tile-emoji{font-size:2.6rem;filter:saturate(.9);z-index:1}
+.color-tile-badge{position:absolute;top:10px;right:12px;font-size:1.3rem;z-index:1}
+.color-tile-ring{position:absolute;width:150px;height:150px;border-radius:50%;border:18px solid;right:-40px;bottom:-70px}

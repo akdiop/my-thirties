@@ -5,8 +5,6 @@ import { CATEGORIES, dayNumber, templateById, templateLength, TEMPLATES, type Ch
 import { STAY_ON_TRACK } from '../lib/challengePrograms';
 import { pathById } from '../lib/learning';
 import { HeroPhoto } from './HeroPhoto';
-import { useUnsplash } from './EditorialPhoto';
-import { challengeItem } from '../lib/unsplashItems';
 import { HiddenNote, HideButton, useHidden } from '../lib/hidden';
 import { EXERCISES, GROUPS, type ExerciseGroup } from '../lib/exercises';
 
@@ -41,7 +39,6 @@ export function ChallengesBoard({ entries, onCreate, onUpdate, onQuit }: { entri
   const hidden = useHidden().ids;
   const previewed = preview ? templateById(preview) : undefined;
   const suggestions = TEMPLATES.filter((t) => t.category === tab && !t.retired && !hidden.has('challenge:' + t.id) && (t.title + ' ' + t.discipline + ' ' + t.tagline).toLocaleLowerCase('fr').includes(search.trim().toLocaleLowerCase('fr')));
-  const photos = useUnsplash(Object.fromEntries(suggestions.map((t) => ['challenge:' + t.id, challengeItem(t)])));
 
   const start = async (id: string) => {
     const t = templateById(id);
@@ -64,7 +61,7 @@ export function ChallengesBoard({ entries, onCreate, onUpdate, onQuit }: { entri
     <label>Rechercher une suggestion <input type="search" value={search} placeholder="Langues, écriture, organisation…" onChange={(e) => setSearch(e.target.value)} /></label>
     <div className="template-grid">{suggestions.map((t) =>
       <article key={t.id} className="template-card">
-        <HeroPhoto slot={'challenge-' + t.id} tone={t.tone} label={t.discipline === 'Autre' ? t.category : t.discipline} compact external={photos['challenge:' + t.id]} />
+        <HeroPhoto slot={'challenge-' + t.id} tone={t.tone} label={t.discipline === 'Autre' ? t.category : t.discipline} compact />
         <div className="template-body"><strong>{t.title}</strong><span className="muted">{t.tagline}</span>
           <div className="template-actions">
             <button className="button ghost" onClick={() => setPreview(t.id)}><Eye size={15} /> Voir</button>
@@ -84,11 +81,10 @@ export function ChallengesBoard({ entries, onCreate, onUpdate, onQuit }: { entri
 function ChallengePreview({ t, started, busy, onClose, onStart }: { t: ChallengeTemplate; started: boolean; busy: boolean; onClose: () => void; onStart: () => Promise<void> }) {
   const days = templateLength(t.id);
   const path = t.pathId ? pathById(t.pathId) : undefined;
-  const photo = useUnsplash({ ['challenge:' + t.id]: challengeItem(t) })['challenge:' + t.id];
   return <div className="modal-overlay" role="dialog" aria-modal="true" aria-label={'Aperçu : ' + t.title} onClick={onClose}>
     <div className="editor challenge-preview" onClick={(e) => e.stopPropagation()}>
       <button className="icon-btn preview-close" aria-label="Fermer" onClick={onClose}><X size={20} /></button>
-      <HeroPhoto slot={'challenge-' + t.id} tone={t.tone} label={t.discipline === 'Autre' ? t.category : t.discipline} external={photo}>
+      <HeroPhoto slot={'challenge-' + t.id} tone={t.tone} label={t.discipline === 'Autre' ? t.category : t.discipline}>
         <div className="hero-title"><h2>{t.title}</h2><span>{t.tagline}</span></div>
       </HeroPhoto>
       <p className="muted">{t.category} · {days} jours{path ? ' · avec le parcours « ' + path.title + ' »' : ''}</p>
@@ -118,7 +114,6 @@ function ExerciseLibrary() {
 
 function ActiveChallenge({ entry, onUpdate, onQuit }: { entry: Entry; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>; onQuit: (entry: Entry) => Promise<void> }) {
   const t = templateById(entry.data.template);
-  const photo = useUnsplash(t ? { ['challenge:' + t.id]: challengeItem(t) } : {})[t ? 'challenge:' + t.id : ''];
   const days = Math.min(30, Math.max(7, Number(entry.data.days) || 30));
   const startDate = typeof entry.data.start === 'string' ? entry.data.start : entry.entry_date ?? today();
   const current = Math.min(days, dayNumber(startDate, today()));
@@ -137,7 +132,7 @@ function ActiveChallenge({ entry, onUpdate, onQuit }: { entry: Entry; onUpdate: 
   const pathStep = path ? (() => { const index = Math.min(path.steps.length - 1, Math.floor((shown - 1) * path.steps.length / days)); return { index, step: path.steps[index] }; })() : null;
 
   return <article className="active-challenge">
-    <HeroPhoto slot={'challenge-' + (t?.id ?? 'custom')} tone={t?.tone ?? 'caramel'} label={String(entry.data.discipline || 'Défi')} external={photo}>
+    <HeroPhoto slot={'challenge-' + (t?.id ?? 'custom')} tone={t?.tone ?? 'caramel'} label={String(entry.data.discipline || 'Défi')}>
       <div className="hero-title"><h2>{entry.title}</h2>{t && <span>{t.tagline}</span>}</div>
     </HeroPhoto>
     <div className="active-head"><span className="muted">{current ? `Jour ${current} sur ${days}` : 'Commence bientôt'}</span><strong>{done}/{days} jours</strong></div>
