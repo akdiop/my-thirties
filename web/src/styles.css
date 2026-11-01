@@ -1239,3 +1239,12 @@ h2{font-size:1.55rem;line-height:1.2}
 .hero-photo.organic .hero-title h2{color:#3C2116}
 .hero-photo.organic .hero-title span{color:#7A5A46}
 .hero-photo.organic .hero-change{background:rgba(255,253,250,.9)}
+
+/* Choix à cocher du profil */
+.chip-picker{border:0;padding:0;margin:0 0 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.chip-picker legend{font-weight:600;color:#6b3f2e;font-size:.95rem;margin-bottom:10px;padding:0}
+.chip-picker .chip{font-size:.9rem;padding:9px 14px;background:#F1E6D8;color:#5A3A2A}
+.chip-picker .chip.on{background:#B5603F;color:#fffaf5}
+.chip-other{display:flex;gap:8px}
+.chip-other input{flex:1;min-width:0;border:1px solid #e3d8ca;border-radius:12px;padding:10px 12px;font-size:16px;background:#fffdfa}
+.chip-other .button{flex:none}
