@@ -1248,3 +1248,5 @@ h2{font-size:1.55rem;line-height:1.2}
 .chip-other{display:flex;gap:8px}
 .chip-other input{flex:1;min-width:0;border:1px solid #e3d8ca;border-radius:12px;padding:10px 12px;font-size:16px;background:#fffdfa}
 .chip-other .button{flex:none}
+.chip-picker select{border:1px solid #e3d8ca;border-radius:12px;padding:12px;font-size:16px;background:#fffdfa;color:#5A3A2A;width:100%}
+.chip-picker .chip.on{display:inline-flex;align-items:center;gap:6px}

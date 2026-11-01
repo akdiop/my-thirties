@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Camera, Plus, Save, Trash2 } from 'lucide-react';
+import { Camera, Plus, Save, Trash2, X } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { birthdayLine, EMPTY_PROFILE, PROFILE_KIND, readProfile, shrinkPhoto, SITUATIONS, type ProfileData } from '../lib/profile';
 
@@ -80,26 +80,45 @@ export function PersonalProfile({ entry, onSave }: { entry: Entry | undefined; o
   </section>;
 }
 
-const HOBBIES = ['Tennis', 'Padel', 'Pilates', 'Yoga', 'Workout', 'Course', 'Marche', 'Danse', 'Natation', 'Cuisine', 'Pâtisserie', 'Lecture', 'Écriture', 'Voyages', 'Photographie', 'Musique', 'Cinéma', 'Séries', 'Mode', 'Beauté', 'Déco', 'Jardinage', 'Dessin', 'Bénévolat', 'Podcasts'];
-const LANGUES = ['Français', 'Wolof', 'Anglais', 'Espagnol', 'Arabe', 'Pulaar', 'Sérère', 'Diola', 'Portugais', 'Italien', 'Allemand'];
-const VALEURS = ['Famille', 'Foi', 'Liberté', 'Santé', 'Amour', 'Amitié', 'Indépendance', 'Réussite', 'Paix intérieure', 'Bienveillance', 'Authenticité', 'Créativité', 'Sécurité', 'Aventure', 'Équilibre', 'Transmission'];
+const HOBBIES: Record<string, string[]> = {
+  'Sport': ['Tennis', 'Padel', 'Pilates', 'Yoga', 'Workout', 'Course', 'Marche', 'Danse', 'Natation'],
+  'Cuisine et maison': ['Cuisine', 'Pâtisserie', 'Déco', 'Jardinage'],
+  'Culture': ['Lecture', 'Écriture', 'Cinéma', 'Séries', 'Musique', 'Podcasts'],
+  'Créativité et style': ['Photographie', 'Dessin', 'Mode', 'Beauté'],
+  'Évasion et engagement': ['Voyages', 'Bénévolat'],
+};
+const LANGUES: Record<string, string[]> = {
+  'Langues du Sénégal': ['Wolof', 'Pulaar', 'Sérère', 'Diola', 'Mandingue', 'Soninké'],
+  'Langues internationales': ['Français', 'Anglais', 'Espagnol', 'Arabe', 'Portugais', 'Italien', 'Allemand'],
+};
+const VALEURS: Record<string, string[]> = {
+  'Mes liens': ['Famille', 'Amour', 'Amitié', 'Transmission'],
+  'Ma paix': ['Foi', 'Paix intérieure', 'Authenticité', 'Bienveillance', 'Équilibre'],
+  'Mon élan': ['Liberté', 'Indépendance', 'Réussite', 'Aventure', 'Créativité'],
+  'Ma base': ['Santé', 'Sécurité'],
+};
 
-/** Choix à cocher, avec la possibilité d'ajouter son propre choix. */
-function ChipPicker({ label, options, value, onChange }: { label: string; options: string[]; value: string[]; onChange: (v: string[]) => void }) {
-  const [other, setOther] = useState('');
-  const all = [...options, ...value.filter((v) => !options.includes(v))];
-  const toggle = (o: string) => onChange(value.includes(o) ? value.filter((v) => v !== o) : [...value, o]);
-  const add = () => {
-    const t = other.trim().slice(0, 40);
-    if (t && !value.includes(t)) onChange([...value, t]);
-    setOther('');
-  };
+const AUTRE = '__autre__';
+
+/** Liste déroulante rangée par catégorie : chaque choix s'ajoute une seule fois et se retire d'un geste. */
+function ChipPicker({ label, options, value, onChange }: { label: string; options: Record<string, string[]>; value: string[]; onChange: (v: string[]) => void }) {
+  const [other, setOther] = useState<string | null>(null);
+  const has = (o: string) => value.some((v) => v.toLowerCase() === o.toLowerCase());
+  const add = (o: string) => { const t = o.trim().slice(0, 40); if (t && !has(t)) onChange([...value, t]); };
   return <fieldset className="chip-picker">
     <legend>{label}</legend>
-    <div className="chip-row">{all.map((o) => <button type="button" key={o} className={'chip' + (value.includes(o) ? ' on' : '')} aria-pressed={value.includes(o)} onClick={() => toggle(o)}>{o}</button>)}</div>
-    <div className="chip-other">
-      <input value={other} maxLength={40} onChange={(e) => setOther(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } }} placeholder="Autre…" aria-label={label + ' : ajouter un autre choix'} />
-      <button type="button" className="button secondary" disabled={!other.trim()} onClick={add}><Plus size={16} /> Ajouter</button>
-    </div>
+    {value.length > 0 && <div className="chip-row">{value.map((v) => <button type="button" key={v} className="chip on" onClick={() => onChange(value.filter((x) => x !== v))} aria-label={'Retirer ' + v}>{v} <X size={14} /></button>)}</div>}
+    <select value="" aria-label={label + ' : ajouter'} onChange={(e) => { const v = e.target.value; if (v === AUTRE) setOther(''); else if (v) add(v); }}>
+      <option value="">+ Ajouter…</option>
+      {Object.entries(options).map(([cat, list]) => {
+        const free = list.filter((o) => !has(o));
+        return free.length ? <optgroup key={cat} label={cat}>{free.map((o) => <option key={o} value={o}>{o}</option>)}</optgroup> : null;
+      })}
+      <option value={AUTRE}>Autre…</option>
+    </select>
+    {other !== null && <div className="chip-other">
+      <input autoFocus value={other} maxLength={40} onChange={(e) => setOther(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add(other); setOther(null); } }} placeholder="Écris ton choix" aria-label={label + ' : autre choix'} />
+      <button type="button" className="button secondary" disabled={!other.trim()} onClick={() => { add(other); setOther(null); }}><Plus size={16} /> Ajouter</button>
+    </div>}
   </fieldset>;
 }
