@@ -1,8 +1,7 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 import { Camera } from 'lucide-react';
 import { shrinkHero } from '../lib/photos';
-import { defaultVisual, visualBackground } from '../lib/visuals';
-import type { UnsplashPhoto } from './EditorialPhoto';
+import { organicArt } from '../lib/organic';
 
 type Photos = { photos: Record<string, string>; save: (slot: string, image: string | null) => Promise<void> };
 
@@ -19,14 +18,11 @@ const TONES: Record<string, string> = {
   chocolat: 'linear-gradient(135deg,#c09072 0%,#6b3f2e 55%,#3c2116 100%)',
 };
 
-export function HeroPhoto({ slot, tone = 'caramel', label, children, compact, external }: { slot: string; tone?: keyof typeof TONES; label: string; children?: ReactNode; compact?: boolean; external?: UnsplashPhoto }) {
+export function HeroPhoto({ slot, label, children, compact }: { slot: string; tone?: keyof typeof TONES; label: string; children?: ReactNode; compact?: boolean }) {
   const { photos, save } = useContext(PhotoContext);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const image = photos[slot];
-  // Priorité : ma photo › photo Unsplash du sujet › visuel de la maquette › dégradé de la palette.
-  const web = image ? undefined : external;
-  const visual = image || web ? undefined : defaultVisual(slot);
   const pick = async (file: File | undefined) => {
     if (!file) return;
     setBusy(true); setError('');
@@ -34,18 +30,14 @@ export function HeroPhoto({ slot, tone = 'caramel', label, children, compact, ex
     catch (e) { setError(e instanceof Error ? e.message : 'Photo impossible à enregistrer.'); }
     finally { setBusy(false); }
   };
-  const style = image ? { backgroundImage: `url(${image})` }
-    : web ? { backgroundImage: `url("${web.src}"), ${TONES[tone]}`, backgroundPosition: 'center' }
-    : visual ? { backgroundImage: `${visualBackground(visual)}, ${TONES[tone]}`, backgroundPosition: `${visual.position}, center` }
-    : { backgroundImage: TONES[tone] };
-  return <div className={'hero-photo' + (compact ? ' compact' : '')} style={style}>
-    {!image && !web && !visual && <span className="hero-watermark" aria-hidden="true">{label}</span>}
+  // Ma photo si j'en ai choisi une, sinon le visuel « formes organiques » propre à ce sujet.
+  const style = image ? { backgroundImage: `url(${image})` } : { backgroundImage: organicArt(slot) };
+  return <div className={'hero-photo' + (compact ? ' compact' : '') + (image ? '' : ' organic')} style={style}>
     <div className="hero-shade">{children}</div>
     <label className="hero-change" title={'Changer la photo : ' + label}>
       <Camera size={15} /> <span>{busy ? '…' : image ? 'Changer' : 'Ma photo'}</span>
       <input type="file" accept="image/*" className="visually-hidden" disabled={busy} onChange={(e) => { void pick(e.target.files?.[0]); e.target.value = ''; }} />
     </label>
-    {web && <span className="hero-credit">Photo <a href={web.photoUrl} target="_blank" rel="noopener noreferrer">{web.author}</a> · <a href="https://unsplash.com/?utm_source=my_thirties&utm_medium=referral" target="_blank" rel="noopener noreferrer">Unsplash</a></span>}
     {image && <button className="hero-remove" onClick={() => void save(slot, null)} aria-label={'Retirer la photo : ' + label}>×</button>}
     {error && <p className="hero-error" role="alert">{error}</p>}
   </div>;

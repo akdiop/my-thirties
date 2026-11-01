@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { Entry } from '../lib/cloud';
 
-const disciplines = ['Tennis', 'Pilates', 'Yoga', 'Mobilité', 'Autre'];
+const disciplines = ['Tennis', 'Padel', 'Pilates', 'Yoga', 'Workout', 'Mobilité', 'Autre'];
 
 export function SportProgress({ entries }: { entries: Entry[] }) {
   const stats = useMemo(() => {
