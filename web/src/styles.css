@@ -3,7 +3,7 @@
 *{box-sizing:border-box}
 body{margin:0;min-width:320px}
 button,input,textarea,select{font:inherit}
-button{cursor:pointer}
+button{cursor:pointer;color:inherit;-webkit-tap-highlight-color:transparent}
 button:disabled{opacity:.55;cursor:not-allowed}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #8f9f7a;outline-offset:3px}
 a{color:inherit}
@@ -188,7 +188,14 @@ textarea{resize:vertical;min-height:90px}
 .calendar-agenda-item small{color:#81746b}
 .booster-panel{margin-top:16px;border-top:1px solid #eae0d6;padding-top:15px}
 .booster-grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;margin:15px 0}
-.booster-day{border:1px solid #e3d8ca;border-radius:8px;background:#faf7f2;color:#6b3f2e;min-height:32px;font-size:.74rem}
+.booster-day{border:1px solid #e3d8ca;border-radius:10px;background:#faf7f2;color:#6b3f2e;min-height:40px;font-size:.9rem;display:grid;place-items:center;position:relative}
+.booster-day.current{border:2px solid #6b3f2e;font-weight:700}
+.booster-day.written::after{content:'';position:absolute;bottom:4px;width:4px;height:4px;border-radius:50%;background:#B5603F}
+.booster-today{background:#fff;border:1px solid #eae0d6;border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.booster-today h3{margin:0;font-size:1.25rem}
+.booster-advice{margin:0;font-size:1rem;line-height:1.55;color:#4a3a30}
+.booster-write{display:flex;flex-direction:column;gap:8px;font-weight:600;color:#6b3f2e;font-size:.95rem;line-height:1.4}
+.booster-write textarea{border:1px solid #e3d8ca;border-radius:12px;padding:12px;font-size:16px;line-height:1.5;background:#fffdfa;resize:vertical;font-weight:400;color:#3c3029}
 .booster-day.done{background:#dfe6d7;color:#426244;font-weight:700}
 .sport-library{margin:20px 0}
 .sport-tabs{display:flex;gap:7px;margin:14px 0}
@@ -425,7 +432,7 @@ body{background:#FAF7F2}
 
 /* Barre d'onglets */
 .tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(480px,100%);height:calc(78px + env(safe-area-inset-bottom));padding:9px 6px env(safe-area-inset-bottom);background:rgba(250,247,242,.97);border-top:1px solid #EDE3D8;display:flex;justify-content:space-around;z-index:40;backdrop-filter:blur(10px)}
-.tabbar button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:#7A6355;width:68px;padding:0}
+.tabbar button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:#7A6355;flex:1;min-width:0;padding:0;white-space:nowrap}
 .tabbar button.on{color:#6B3F2E;font-weight:600}
 
 /* En-têtes */
@@ -733,7 +740,7 @@ table{display:block;max-width:100%;overflow-x:auto}
 @media (max-width:480px){
   .editor{width:100%;border-radius:22px 22px 0 0;margin-top:auto}
   .modal-overlay{align-items:flex-end}
-  .lesson-grid,.brief-grid,.health-stats,.sport-stats,.booster-grid,.finance-filters{grid-template-columns:1fr !important}
+  .lesson-grid,.brief-grid,.health-stats,.sport-stats,.finance-filters{grid-template-columns:1fr !important}
   .button-group{flex-wrap:wrap}
 }
 /* Champs guidés */
@@ -1178,3 +1185,45 @@ textarea.soft-input,.ritual-card textarea{resize:vertical;min-height:64px}
 /* Logo */
 .brand-lockup{display:flex;align-items:center;gap:12px}
 .brand-word{font-family:'Homemade Apple',cursive;font-size:1.45rem;line-height:1.4;color:#5A3A2A;letter-spacing:0}
+
+/* Règles et parcours workout */
+.rules{display:flex;flex-direction:column;gap:8px}
+.rule-block{background:#fff;border:1px solid #eae0d6;border-radius:14px;padding:12px 14px}
+.rule-block summary{font-weight:600;color:#6b3f2e;font-size:1rem;cursor:pointer}
+.rule-block ul{margin:10px 0 2px;padding-left:18px;display:flex;flex-direction:column;gap:8px}
+.rule-block li{line-height:1.55;font-size:.95rem;color:#3c3029}
+.workout-path{display:flex;flex-direction:column;gap:12px}
+.workout-level h4{margin:8px 0;color:#6b3f2e}
+.workout-step{background:#fff;border:1px solid #eae0d6;border-radius:14px;margin-bottom:8px;overflow:hidden}
+.workout-step.next{border-color:#B5603F}
+.workout-head{width:100%;border:0;background:none;display:flex;align-items:center;gap:12px;padding:12px 14px;text-align:left}
+.workout-dot{width:30px;height:30px;border-radius:50%;background:#f1e9df;color:#6b3f2e;display:grid;place-items:center;font-size:.85rem;font-weight:700;flex:none}
+.workout-step.done .workout-dot{background:#dfe6d7;color:#426244}
+.workout-title{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.workout-title strong{font-size:.98rem;color:#3c3029}
+.workout-title small{color:#7d7069;font-size:.82rem}
+.workout-head[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.workout-body{padding:0 14px 14px;font-size:.95rem;line-height:1.5}
+.workout-body h5{margin:12px 0 6px;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:#8b725e}
+.workout-body ul,.workout-moves{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.workout-moves .dose{color:#B5603F;font-weight:600;font-size:.88rem}
+.workout-moves p{margin:2px 0 0;color:#5a4a40}
+.workout-body .button{margin-top:14px;width:100%}
+
+/* Lisibilité mobile */
+.tip-list{display:flex;flex-direction:column;gap:10px}
+.tip-list .tip-card{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left}
+.tip-list .tip-card strong{font-size:1rem;color:#3c3029}
+.tip-list .tip-card p{margin:0;font-size:.95rem;line-height:1.55}
+@media (max-width:600px){
+  body{font-size:16px}
+  input,textarea,select{font-size:16px !important}
+  p,li{line-height:1.6}
+  small,.fineprint{font-size:.85rem}
+  .muted{font-size:.95rem}
+  .eyebrow{font-size:.72rem}
+  .button{font-size:.95rem;min-height:46px}
+  .link-btn{font-size:.92rem}
+  .lesson-card p,.sport-panel p,.sport-panel li{font-size:.95rem}
+  .button-group .button{font-size:.85rem}
+}

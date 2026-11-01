@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } fro
 import { BrandLockup } from './ui/BrandMark';
 import type { Session } from '@supabase/supabase-js';
 import {
-  BookOpen, CalendarDays, ChevronRight, Coffee, Download, Heart,
+  BookOpen, CalendarDays, LayoutGrid, ChevronRight, Coffee, Download, Heart,
   Home, LogOut, Plus, Save, Settings, ShieldCheck, Trash2, UserRound, X,
 } from 'lucide-react';
 import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
@@ -68,6 +68,7 @@ const nav: { id: Screen; label: string; icon: typeof Home }[] = [
   { id: 'home', label: 'Accueil', icon: Home },
   { id: 'habits', label: 'Habitudes', icon: Heart },
   { id: 'myday', label: 'Mon jour', icon: Sparkles },
+  { id: 'spaces', label: 'Espaces', icon: LayoutGrid },
   { id: 'agenda', label: 'Agenda', icon: CalendarDays },
   { id: 'settings', label: 'Profil', icon: UserRound },
 ];

@@ -28,7 +28,7 @@ export function SportNotebook({ entries, onCreate }: { entries: Entry[]; onCreat
     <p className="muted">Note tes observations sans score imposé et compare deux séances.</p>
     <div className="planner-form">
       <label>Discipline<select value={sport} onChange={(e) => setSport(e.target.value)}>
-        {['Tennis','Pilates','Yoga','Autre'].map((s) => <option key={s}>{s}</option>)}</select></label>
+        {['Tennis','Padel','Pilates','Yoga','Workout','Autre'].map((s) => <option key={s}>{s}</option>)}</select></label>
       <label>Date<input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></label>
       <label>Point observé<select value={focus} onChange={(e) => setFocus(e.target.value)}>
         {['Coordination','Appuis','Mobilité','Respiration','Autre'].map((s) => <option key={s}>{s}</option>)}</select></label>

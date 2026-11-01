@@ -6,8 +6,7 @@ import { fmt, mainCurrency, monthReport } from '../lib/money';
 import { dayNumber } from '../lib/challenges';
 import { readProfile } from '../lib/profile';
 import { ProfileAvatar } from '../features/PersonalProfile';
-import { Bar, Check22, ModuleTile, SectionTitle } from '../ui/kit';
-import { modules } from '../modules';
+import { Bar, Check22, SectionTitle } from '../ui/kit';
 
 type Go = (screen: ModuleId | 'calme' | 'assistant' | 'settings' | 'agenda' | 'spaces') => void;
 
@@ -76,13 +75,6 @@ export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, rituals }: 
       </button>
     </div>
 
-    <section>
-      <SectionTitle action="Tout voir" onAction={() => onGo('spaces')}>Mes espaces</SectionTitle>
-      <div className="tile-grid">
-        {modules.map((m) => <ModuleTile key={m.id} id={m.id} onClick={() => onGo(m.id)} />)}
-        <ModuleTile id="assistant" label="Assistant IA" onClick={() => onGo('assistant')} />
-      </div>
-    </section>
 
     <div className="tip-card"><Lightbulb size={22} /><span>{tip}</span></div>
   </div>;

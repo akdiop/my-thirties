@@ -22,7 +22,7 @@ const date: Field = { id: 'date', label: 'Date', type: 'date' };
 const time: Field = { id: 'time', label: 'Heure', type: 'time', optional: true };
 const amount: Field = { id: 'amount', label: 'Montant', type: 'stepper', min: 0, step: 500, presets: [1000, 5000, 10000, 25000, 50000] };
 const currency: Field = { id: 'currency', label: 'Devise', type: 'chips', options: ['XOF', 'EUR', 'USD'] };
-const discipline: Field = { id: 'discipline', label: 'Discipline', type: 'chips', options: ['Tennis', 'Pilates', 'Yoga', 'Marche', 'Renforcement', 'Course', 'Danse', 'Natation'], other: true };
+const discipline: Field = { id: 'discipline', label: 'Discipline', type: 'chips', options: ['Tennis', 'Padel', 'Pilates', 'Yoga', 'Workout', 'Marche', 'Renforcement', 'Course', 'Danse', 'Natation'], other: true };
 const repeat: Field = { id: 'frequency', label: 'Répétition', type: 'chips', options: ['Aucune', 'Quotidienne', 'Hebdomadaire'] };
 const minutes = (label = 'Durée'): Field => ({ id: 'duration', label, type: 'stepper', min: 5, max: 300, step: 5, unit: 'min', presets: [15, 30, 45, 60, 90] });
 const first = (d: Record<string, string>, k: string, fallback: string) => (d[k] || fallback);
@@ -73,7 +73,7 @@ export const modules: Module[] = [
     ],
   },
   {
-    id: 'sport', name: 'Mon sport', symbol: '✦', description: 'Tennis, Pilates, Yoga et journal de séances',
+    id: 'sport', name: 'Mon sport', symbol: '✦', description: 'Tennis, padel, Pilates, yoga, workout et journal de séances',
     kinds: [
       { id: 'session', label: 'Séance', title: (d) => `${first(d, 'discipline', 'Séance')} · ${first(d, 'duration', '?')} min`, fields: [date, time, discipline, minutes(),
         { id: 'intensity', label: 'Intensité', type: 'scale', low: 'douce', high: 'intense' },
