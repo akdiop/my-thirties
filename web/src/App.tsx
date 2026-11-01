@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { BrandLockup } from './ui/BrandMark';
 import type { Session } from '@supabase/supabase-js';
 import {
   BookOpen, CalendarDays, ChevronRight, Coffee, Download, Heart,
@@ -85,7 +86,7 @@ function Login({ onSignedIn }: { onSignedIn: () => void }) {
   }
   return (
     <main className="auth-layout">
-      <div className="auth-brand"><span className="logo-mark">M<span>·</span></span><span>MY THIRTIES</span></div>
+      <div className="auth-brand"><BrandLockup /></div>
       <section className="auth-card">
         <span className="eyebrow">ESPACE PERSONNEL</span>
         <h1>Tout ce qui compte,<br /><em>au même endroit.</em></h1>
