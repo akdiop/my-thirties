@@ -3,14 +3,13 @@ import { ChevronDown, Plus, Search } from 'lucide-react';
 import type { Entry } from '../lib/cloud';
 import { iso, parseDay, plusDays, timeline, todayIso, weekday, isDoneOn, toggledData } from '../lib/day';
 import { CalendarBoard } from '../features/CalendarBoard';
-import { IphoneCalendar } from '../features/IphoneCalendar';
 import { Check22, Segmented } from '../ui/kit';
 
 const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 const TONE_BG = { caramel: '#F3EBE2', chocolat: '#EFE3DA', sauge: '#E8EDE2', or: '#F3EBE2' } as const;
 const TONE_BAR = { caramel: '#B68F72', chocolat: '#6B3F2E', sauge: '#5E7A5F', or: '#D4B483' } as const;
 
-export function Agenda({ entries, onAdd, onOpen, onUpdate, onImported, embedded }: {
+export function Agenda({ entries, onAdd, onOpen, onUpdate, embedded }: {
   onImported?: () => void; embedded?: boolean; entries: Entry[]; onAdd: () => void; onOpen: (e: Entry) => void; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>;
 }) {
   const [mode, setMode] = useState<'day' | 'week' | 'month'>('week');
@@ -59,7 +58,6 @@ export function Agenda({ entries, onAdd, onOpen, onUpdate, onImported, embedded 
           </div>;
         }) : <p className="muted center">Rien de prévu ce jour-là.</p>}</div>
       </>}
-      {!embedded && <IphoneCalendar onImported={onImported} />}
     </>}
     {!embedded && <button className="fab" aria-label="Nouvel événement" onClick={onAdd}><Plus size={26} /></button>}
   </div>;

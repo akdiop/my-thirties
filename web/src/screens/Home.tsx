@@ -10,13 +10,14 @@ import { Bar, Check22, SectionTitle } from '../ui/kit';
 
 type Go = (screen: ModuleId | 'calme' | 'assistant' | 'settings' | 'agenda' | 'spaces') => void;
 
-export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, rituals }: {
+export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd, rituals }: {
   rituals?: ReactNode; entries: Entry[]; profileEntry: Entry | undefined; onGo: Go;
-  onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>; onAdd: () => void;
+  onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>; onAdd: () => void; onQuickAdd: (title: string) => Promise<void>;
 }) {
   const day = todayIso();
   const profile = readProfile(profileEntry);
-  const today = timeline(entries, new Date()).slice(0, 4);
+  // Briefing : seulement les rendez-vous du jour (ni prières, ni tâches, qui ont leur propre place).
+  const today = timeline(entries, new Date()).filter((t) => t.entry.kind !== 'prayer_schedule' && t.entry.kind !== 'task').slice(0, 4);
   const top = priorities(entries, day);
   const challenge = entries.find((e) => e.kind === 'challenge');
   const cur = mainCurrency(entries);
@@ -56,7 +57,12 @@ export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, rituals }: 
             <span className={done ? 'done' : ''}>{e.title}</span>
             {str(e, 'time') && <small>{str(e, 'time')}</small>}
           </div>;
-        }) : <button className="prio-empty" onClick={onAdd}>+ Ajouter une priorité</button>}
+        }) : null}
+        {top.length < 3 && <select className="prio-select" value="" aria-label="Ajouter une priorité" onChange={(e) => { const v = e.target.value; if (v === AUTRE) onAdd(); else if (v) void onQuickAdd(v); }}>
+          <option value="">+ Ajouter une priorité…</option>
+          {Object.entries(PRIORITY_IDEAS).map(([cat, list]) => <optgroup key={cat} label={cat}>{list.filter((t) => !top.some((e) => e.title === t)).map((t) => <option key={t} value={t}>{t}</option>)}</optgroup>)}
+          <option value={AUTRE}>Autre (écrire la mienne)…</option>
+        </select>}
       </div>
     </section>
 
@@ -79,3 +85,15 @@ export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, rituals }: 
     <div className="tip-card"><Lightbulb size={22} /><span>{tip}</span></div>
   </div>;
 }
+
+const AUTRE = '__autre__';
+/** Idées de priorités, rangées par thème, pour en ajouter une en un geste. */
+const PRIORITY_IDEAS: Record<string, string[]> = {
+  'Travail': ['Avancer sur mon dossier principal', 'Répondre aux mails importants', 'Préparer ma réunion', 'Terminer une tâche en retard', 'Faire le point avec mon équipe', 'Mettre à jour mon CV', 'Planifier ma semaine de travail'],
+  'Maison': ['Faire les courses', 'Lancer une lessive', 'Ranger une pièce', 'Changer les draps', 'Faire le ménage express', 'Préparer les repas de demain', 'Sortir les poubelles'],
+  'Administratif et argent': ['Payer une facture', 'Noter mes dépenses', 'Classer mes papiers', 'Prendre un rendez-vous médical', 'Appeler la banque', 'Faire un virement épargne', 'Vérifier mon budget du mois'],
+  'Santé et corps': ['Faire ma séance de sport', 'Marcher 30 minutes', 'Boire 1,5 L d’eau', 'Me coucher avant minuit', 'Préparer un repas sain', 'Prendre mes compléments', 'Faire mes étirements'],
+  'Moi et mes proches': ['Appeler ma famille', 'Prendre des nouvelles d’une amie', 'Un moment rien que pour moi', 'Lire 20 pages', 'Écrire dans mon journal', 'Prendre soin de moi (soin, cheveux)', 'Préparer une surprise'],
+  'Spiritualité': ['Prier à l’heure', 'Lire une page du Coran', 'Faire mon dhikr', 'Faire une sadaqa', 'Écouter un rappel'],
+  'Projets': ['Avancer sur un projet perso', 'Apprendre 30 minutes', 'Préparer mon prochain voyage', 'Faire une to-do de la semaine', 'Trier mes photos'],
+};
