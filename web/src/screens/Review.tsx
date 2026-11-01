@@ -98,7 +98,7 @@ function Week({ entries }: { entries: Entry[] }) {
       {ai ? <p className="ai-answer">{ai}</p> : <>
         <p className="muted">À ta demande uniquement : envoie ce bilan (humeurs, habitudes, victoires, gratitudes, tâches) à l’assistant IA pour un résumé bienveillant.{getIntegrationPrefs().assistant ? '' : ' Active d’abord l’assistant IA dans Paramètres › Intégrations.'}</p>
         <button className="button soft" disabled={aiBusy || !getIntegrationPrefs().assistant} onClick={() => void summarize()}>{aiBusy ? 'Résumé en cours…' : 'Résumer ma semaine'}</button>
-        <p className="fineprint">L’offre gratuite de Gemini peut utiliser les textes envoyés pour améliorer ses services.</p></>}
+        </>}
       {aiError && <p className="error" role="alert">{aiError}</p>}
     </section>
   </div>;

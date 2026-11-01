@@ -29,7 +29,7 @@ export function PersonalAssistant({ entries }: { entries: Entry[] }) {
       if (error) throw error;
       if (!data || typeof data.answer !== 'string') throw new Error('Assistant non configuré.');
       setAnswer(data.answer);
-    } catch { setStatus('Assistant indisponible pour le moment (fonction pas encore déployée, ou quota gratuit du jour atteint).'); }
+    } catch { setStatus('Assistant indisponible pour le moment. Réessaie un peu plus tard.'); }
     finally { setBusy(false); }
   };
   return <section className="tool-card ai-assistant">

@@ -56,6 +56,7 @@ import { Review } from './screens/Review';
 import { LockGate } from './features/LockGate';
 import { NotificationSettings } from './features/Notifications';
 import { JournalSettings } from './features/JournalSettings';
+import { IphoneCalendar } from './features/IphoneCalendar';
 import { removeLock } from './lib/journalLock';
 import { Sparkles } from 'lucide-react';
 
@@ -348,11 +349,13 @@ function Profile({ view, onSettings, email, entries, profileEntry, onSaveProfile
     <NotificationSettings />
     <p className="sec">Journal</p>
     <JournalSettings />
+    <p className="sec">Calendriers</p>
+    <IphoneCalendar onImported={() => void onRestored()} />
     <HiddenSuggestions />
     <p className="sec">Compte</p>
     <section className="panel form-stack">
       <h2>Compte personnel</h2><p>{email}</p>
-      <p className="muted">La session est conservée dans l'onglet de navigation, pas dans un stockage de données personnel permanent.</p>
+      <p className="muted">Tu restes connectée sur cet appareil jusqu’à ce que tu te déconnectes.</p>
       <button className="button secondary" onClick={() => void onLogout()}><LogOut size={16} /> Se déconnecter</button>
     </section>
     <p className="sec">Mes données</p>
@@ -550,7 +553,7 @@ export default function App() {
     <main className="phone">
       {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
       {loading && <div className="sync-status" role="status">Synchronisation…</div>}
-      {screen === 'home' && <HomeScreen rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} />}
+      {screen === 'home' && <HomeScreen rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} onQuickAdd={(title) => createFromTool({ module: 'quotidien', kind: 'task', title, entry_date: today(), data: { date: today(), priority: 'Haute' } })} />}
       {screen === 'myday' && <LockGate><MyDay key={dayTarget.n} entries={ritualEntries} initialDate={dayTarget.date} initialPart={dayTarget.part} onCreate={createFromTool} onUpdate={updateData} /></LockGate>}
       {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}
       {screen === 'notes' && <LockGate><Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={removeQuiet} onOpenDay={openDay} /></LockGate>}
