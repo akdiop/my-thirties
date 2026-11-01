@@ -1142,3 +1142,13 @@ textarea.soft-input,.ritual-card textarea{resize:vertical;min-height:64px}
   .print-area p{margin:2pt 0;font-size:10.5pt;line-height:1.45}
   .print-body{white-space:pre-wrap}
 }
+.glyph-badge{display:inline-grid;place-items:center;border-radius:50%;flex:none}
+.ritual-label{display:flex;align-items:center;gap:8px}
+.inline-glyph{display:inline-flex;align-items:center;gap:6px}
+.gchip.icon{padding:8px 10px}
+.color-tile-icon{z-index:1;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;box-shadow:0 4px 14px rgba(60,33,22,.08)}
+.color-tile-badge{position:absolute;top:10px;right:12px;z-index:1;font-size:.7rem;font-weight:700;letter-spacing:.08em;border:1px solid;border-radius:999px;padding:3px 8px;background:#fffaf5aa}
+.note-emoji{display:grid;place-items:center}
+.mood5 button{gap:6px}
+.mood5 button.on .glyph-badge{box-shadow:0 0 0 2px currentColor}
+.note-type{display:inline-flex;align-items:center;gap:6px}

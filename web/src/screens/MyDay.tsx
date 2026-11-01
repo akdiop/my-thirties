@@ -1,3 +1,4 @@
+import { Glyph } from '../ui/Glyph';
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
@@ -28,7 +29,7 @@ export function MyDay({ entries, initialDate, initialPart, onCreate, onUpdate }:
         <button className="icon-btn" aria-label="Jour suivant" disabled={date >= today} onClick={() => setDate(addDays(date, 1))}><ChevronRight size={20} /></button>
       </div>
     </header>
-    <Segmented label="Moment" value={part} onChange={setPart} options={[{ value: 'matin', label: '☀️ Matin' }, { value: 'soir', label: '🌙 Débriefing du soir' }]} />
+    <Segmented label="Moment" value={part} onChange={setPart} options={[{ value: 'matin', label: 'Matin' }, { value: 'soir', label: 'Débriefing du soir' }]} />
     <DayForm key={date} date={date} part={part} entry={entry} entries={entries} onCreate={onCreate} onUpdate={onUpdate} />
   </div>;
 }
@@ -59,9 +60,9 @@ function DayForm({ date, part, entry, entries, onCreate, onUpdate }: { date: str
     {part === 'matin' ? <>
       <section className="ritual-card"><p className="ritual-label">Comment te sens-tu ?</p>
         <div className="mood5">{MOODS.map((m) => <button key={m.value} className={mood === m.value ? 'on' : ''} aria-pressed={mood === m.value} onClick={() => t(setMood)(mood === m.value ? '' : m.value)}>
-          <span>{m.emoji}</span><small>{m.value}</small></button>)}</div></section>
+          <Glyph name={m.icon} tint={m.tint} size={22} badge={46} /><small>{m.value}</small></button>)}</div></section>
 
-      <section className="ritual-card accent"><p className="ritual-label">🎯 Mon intention du jour</p>
+      <section className="ritual-card accent"><p className="ritual-label"><Glyph name="target" tint="terre" /> Mon intention du jour</p>
         {!intention && plannedYesterday && <button className="link-btn" onClick={() => t(setIntention)(plannedYesterday)}>Reprendre celle d’hier soir : « {plannedYesterday} »</button>}
         <textarea rows={2} value={intention} placeholder="Quelle énergie veux-tu donner à ta journée ?" onChange={(e) => t(setIntention)(e.target.value)} /></section>
 
@@ -70,13 +71,13 @@ function DayForm({ date, part, entry, entries, onCreate, onUpdate }: { date: str
 
       <TodoToday date={date} entries={entries} onCreate={onCreate} onUpdate={onUpdate} />
 
-      <section><p className="ritual-label">3 gratitudes 🙏🏾</p>
+      <section><p className="ritual-label"><Glyph name="handHeart" tint="rose" /> 3 gratitudes</p>
         {grats.map((g, i) => <input key={i} className="soft-input" value={g} placeholder={'Gratitude ' + (i + 1)} onChange={(e) => t(setGrats)(grats.map((x, j) => j === i ? e.target.value : x))} />)}</section>
 
-      <section><p className="ritual-label">Mon moment pour moi 🌿</p>
+      <section><p className="ritual-label"><Glyph name="leaf" tint="sauge" /> Mon moment pour moi</p>
         <textarea className="soft-input" rows={2} value={selfcare} placeholder="Qu’est-ce que tu fais pour toi aujourd’hui ?" onChange={(e) => t(setSelfcare)(e.target.value)} /></section>
 
-      <div className="affirm-inline">✨ <em>{affirmationOf(date)}</em></div>
+      <div className="affirm-inline"><Glyph name="sparkles" tint="or" /> <em>{affirmationOf(date)}</em></div>
     </> : <>
       <section><p className="ritual-label">Ma victoire du jour (même petite)</p>
         <textarea className="soft-input" rows={3} value={win} placeholder="Même un petit pas compte…" onChange={(e) => t(setWin)(e.target.value)} /></section>
@@ -130,7 +131,7 @@ function TomorrowTodos({ date, entries, onCreate }: { date: string; entries: Ent
       setLines(['', '', '']); setDone(list.length + ' tâche(s) ajoutée(s) à demain.');
     } finally { setBusy(false); }
   };
-  return <section className="ritual-card"><p className="ritual-label">📋 Ma to-do de demain</p>
+  return <section className="ritual-card"><p className="ritual-label"><Glyph name="list" tint="caramel" /> Ma to-do de demain</p>
     {planned.length > 0 && <ul className="planned">{planned.map((e) => <li key={e.id}>{e.title}</li>)}</ul>}
     {lines.map((l, i) => <div key={i} className="todo-row edit"><span className="ring" />
       <input className="soft-input" value={l} placeholder="Une tâche pour demain…" onChange={(e) => setLines(lines.map((x, j) => j === i ? e.target.value : x))} />
@@ -147,9 +148,9 @@ function HabitsOfDay({ date, entries, onUpdate }: { date: string; entries: Entry
   const habits = entries.filter((e) => e.kind === HABIT_KIND);
   if (!habits.length) return null;
   const done = habits.filter((e) => habitDone(e)[date]).length;
-  return <section className="ritual-card"><p className="ritual-label">🌿 Mes habitudes du jour · {done}/{habits.length}</p>
+  return <section className="ritual-card"><p className="ritual-label"><Glyph name="sprout" tint="sauge" /> Mes habitudes du jour · {done}/{habits.length}</p>
     {habits.map((e) => { const d = habitDone(e), on = Boolean(d[date]); return <div key={e.id} className="todo-row">
       <Check22 checked={on} label={e.title} onChange={(v) => void onUpdate(e, { ...e.data, done: { ...d, [date]: v } })} />
-      <span className={on ? 'done' : ''}>{String(e.data.emoji ?? '')} {e.title}</span></div>; })}
+      <span className={on ? 'done' : ''}>{e.title}</span></div>; })}
   </section>;
 }

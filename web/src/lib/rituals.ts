@@ -1,4 +1,5 @@
 import type { Entry } from './cloud';
+import type { GlyphName, Tint } from '../ui/Glyph';
 
 /** Entrées des nouveaux écrans (Mon jour, Habitudes, Notes) : gérées par leurs propres écrans, pas par les listes des espaces. */
 export const DAILY_KIND = 'daily';
@@ -6,11 +7,11 @@ export const NOTE_KIND = 'note';
 export const HABIT_KIND = 'habit';
 export const RITUAL_KINDS = [DAILY_KIND, NOTE_KIND, HABIT_KIND];
 
-export const MOODS = [
-  { value: 'Épuisée', emoji: '😩' }, { value: 'Fatiguée', emoji: '😔' }, { value: 'Neutre', emoji: '😐' },
-  { value: 'Bien', emoji: '😊' }, { value: 'Rayonnante', emoji: '✨' },
-] as const;
-export const moodEmoji = (m: unknown) => MOODS.find((x) => x.value === m)?.emoji ?? '';
+export const MOODS: { value: string; icon: GlyphName; tint: Tint }[] = [
+  { value: 'Épuisée', icon: 'battery', tint: 'rose' }, { value: 'Fatiguée', icon: 'rain', tint: 'ardoise' }, { value: 'Neutre', icon: 'meh', tint: 'or' },
+  { value: 'Bien', icon: 'smile', tint: 'sauge' }, { value: 'Rayonnante', icon: 'sun', tint: 'terre' },
+];
+export const moodOf = (m: unknown) => MOODS.find((x) => x.value === m) ?? (m === 'Sereine' || m === 'Joyeuse' ? MOODS[3] : m === 'Stressée' ? MOODS[0] : undefined);
 
 /** Affirmations écrites pour l'app (aucune citation attribuée à une personne). */
 export const AFFIRMATIONS = [
@@ -32,39 +33,40 @@ export const affirmationOf = (day: string, shift = 0) => {
 /* ---------- Habitudes ---------- */
 export type HabitLevel = 'Douce' | 'Modérée' | 'Engagée';
 export type HabitFreq = 'daily' | '3w' | '1w';
-export type HabitTemplate = { id: string; group: string; emoji: string; title: string; why: string; level: HabitLevel; freq: HabitFreq };
+export type HabitTemplate = { id: string; group: string; icon: GlyphName; tint: Tint; title: string; why: string; level: HabitLevel; freq: HabitFreq };
 export const FREQ_LABEL: Record<HabitFreq, string> = { daily: 'Chaque jour', '3w': '3 fois par semaine', '1w': '1 fois par semaine' };
 export const freqTarget = (f: HabitFreq) => (f === 'daily' ? 7 : f === '3w' ? 3 : 1);
 
 export const HABIT_GROUPS = ['Bien-être & corps', 'Organisation & focus', 'Croissance & apprentissage', 'Relations & connexion', 'Spiritualité'];
-const h = (group: string, id: string, emoji: string, title: string, why: string, level: HabitLevel, freq: HabitFreq): HabitTemplate => ({ id, group, emoji, title, why, level, freq });
+const GROUP_TINT: Record<string, Tint> = { 'Bien-être & corps': 'sauge', 'Organisation & focus': 'caramel', 'Croissance & apprentissage': 'lilas', 'Relations & connexion': 'rose', 'Spiritualité': 'or' };
+const h = (group: string, id: string, icon: GlyphName, title: string, why: string, level: HabitLevel, freq: HabitFreq): HabitTemplate => ({ id, group, icon, tint: GROUP_TINT[group] ?? 'chocolat', title, why, level, freq });
 export const HABIT_LIBRARY: HabitTemplate[] = [
-  h('Bien-être & corps', 'eau', '💧', 'Boire 1,5 L d’eau', 'Un verre au réveil, une gourde à portée de main.', 'Douce', 'daily'),
-  h('Bien-être & corps', 'bouger', '🚶🏾‍♀️', 'Bouger 20 minutes', 'Marche, danse, étirements : tout compte.', 'Modérée', 'daily'),
-  h('Bien-être & corps', 'minuit', '🌙', 'Au lit avant minuit', 'Le sommeil répare tout le reste.', 'Modérée', 'daily'),
-  h('Bien-être & corps', 'air', '🌳', 'Prendre l’air', 'Cinq minutes dehors, sans téléphone.', 'Douce', 'daily'),
-  h('Bien-être & corps', 'ecran', '📵', 'Pas d’écran au lit', 'Le téléphone dort hors de la chambre.', 'Modérée', 'daily'),
-  h('Bien-être & corps', 'stretch', '🧘🏾‍♀️', '10 minutes d’étirements', 'Le matin ou avant de dormir.', 'Douce', 'daily'),
-  h('Bien-être & corps', 'maison', '🥗', 'Un repas fait maison', 'Simple, frais, préparé par toi.', 'Modérée', 'daily'),
-  h('Bien-être & corps', 'soin', '🧴', 'Ma routine soin du soir', 'Démaquillage, soin, cheveux : un rituel doux.', 'Douce', 'daily'),
-  h('Organisation & focus', 'planifier', '🗓️', 'Planifier ma journée', 'Deux minutes de clarté le matin.', 'Douce', 'daily'),
-  h('Organisation & focus', 'dur', '🎯', 'Le plus difficile d’abord', 'Commencer par ce qui pèse allège la journée.', 'Engagée', 'daily'),
-  h('Organisation & focus', 'ranger', '🧺', '10 minutes de rangement', 'Une zone à la fois.', 'Douce', 'daily'),
-  h('Organisation & focus', 'depenses', '💰', 'Noter mes dépenses', 'Trente secondes dans Mes finances.', 'Douce', 'daily'),
-  h('Organisation & focus', 'semaine', '📋', 'Préparer ma semaine', 'Le dimanche : agenda, repas, priorités.', 'Modérée', '1w'),
-  h('Croissance & apprentissage', 'lire', '📖', 'Lire 10 pages', 'Dix pages par jour, une douzaine de livres par an.', 'Douce', 'daily'),
-  h('Croissance & apprentissage', 'podcast', '🎧', 'Un podcast inspirant', 'Pendant le trajet ou le ménage.', 'Douce', '3w'),
-  h('Croissance & apprentissage', 'apprendre', '🧠', 'Apprendre quelque chose', 'Une vidéo, un article, une compétence.', 'Douce', '3w'),
-  h('Croissance & apprentissage', 'objectifs', '🧭', 'Revoir mes objectifs', 'Garder le cap, ajuster si besoin.', 'Douce', '1w'),
-  h('Croissance & apprentissage', 'journal', '📝', 'Écrire dans mon journal', 'Vider sa tête pour mieux avancer.', 'Douce', '3w'),
-  h('Croissance & apprentissage', 'langue', '🗣️', 'Pratiquer une langue', '15 minutes de wolof, d’espagnol ou d’arabe.', 'Modérée', 'daily'),
-  h('Relations & connexion', 'appeler', '📞', 'Appeler quelqu’un qui compte', 'Prendre des nouvelles, vraiment.', 'Douce', '1w'),
-  h('Relations & connexion', 'merci', '💌', 'Un message de gratitude', 'Dire à quelqu’un ce qu’il t’apporte.', 'Douce', '1w'),
-  h('Relations & connexion', 'qualite', '🤝🏾', 'Du temps sans écran avec mes proches', 'Être là, entièrement.', 'Modérée', '3w'),
-  h('Relations & connexion', 'moi', '💛', 'Un moment pour moi seule', 'Pas pour être productive : juste pour toi.', 'Douce', 'daily'),
-  h('Spiritualité', 'dhikr', '📿', 'Dhikr du matin', 'Quelques minutes de rappel au réveil.', 'Douce', 'daily'),
-  h('Spiritualité', 'coran', '📗', 'Lire une page du Coran', 'Une page, à ton rythme.', 'Douce', 'daily'),
-  h('Spiritualité', 'priere', '🕌', 'Prier à l’heure', 'Les cinq prières dans leur créneau.', 'Engagée', 'daily'),
+  h('Bien-être & corps', 'eau', 'drop', 'Boire 1,5 L d’eau', 'Un verre au réveil, une gourde à portée de main.', 'Douce', 'daily'),
+  h('Bien-être & corps', 'bouger', 'steps', 'Bouger 20 minutes', 'Marche, danse, étirements : tout compte.', 'Modérée', 'daily'),
+  h('Bien-être & corps', 'minuit', 'moon', 'Au lit avant minuit', 'Le sommeil répare tout le reste.', 'Modérée', 'daily'),
+  h('Bien-être & corps', 'air', 'trees', 'Prendre l’air', 'Cinq minutes dehors, sans téléphone.', 'Douce', 'daily'),
+  h('Bien-être & corps', 'ecran', 'phoneOff', 'Pas d’écran au lit', 'Le téléphone dort hors de la chambre.', 'Modérée', 'daily'),
+  h('Bien-être & corps', 'stretch', 'stretch', '10 minutes d’étirements', 'Le matin ou avant de dormir.', 'Douce', 'daily'),
+  h('Bien-être & corps', 'maison', 'salad', 'Un repas fait maison', 'Simple, frais, préparé par toi.', 'Modérée', 'daily'),
+  h('Bien-être & corps', 'soin', 'sparkles', 'Ma routine soin du soir', 'Démaquillage, soin, cheveux : un rituel doux.', 'Douce', 'daily'),
+  h('Organisation & focus', 'planifier', 'calendar', 'Planifier ma journée', 'Deux minutes de clarté le matin.', 'Douce', 'daily'),
+  h('Organisation & focus', 'dur', 'target', 'Le plus difficile d’abord', 'Commencer par ce qui pèse allège la journée.', 'Engagée', 'daily'),
+  h('Organisation & focus', 'ranger', 'brush', '10 minutes de rangement', 'Une zone à la fois.', 'Douce', 'daily'),
+  h('Organisation & focus', 'depenses', 'wallet', 'Noter mes dépenses', 'Trente secondes dans Mes finances.', 'Douce', 'daily'),
+  h('Organisation & focus', 'semaine', 'list', 'Préparer ma semaine', 'Le dimanche : agenda, repas, priorités.', 'Modérée', '1w'),
+  h('Croissance & apprentissage', 'lire', 'book', 'Lire 10 pages', 'Dix pages par jour, une douzaine de livres par an.', 'Douce', 'daily'),
+  h('Croissance & apprentissage', 'podcast', 'headphones', 'Un podcast inspirant', 'Pendant le trajet ou le ménage.', 'Douce', '3w'),
+  h('Croissance & apprentissage', 'apprendre', 'brain', 'Apprendre quelque chose', 'Une vidéo, un article, une compétence.', 'Douce', '3w'),
+  h('Croissance & apprentissage', 'objectifs', 'compass', 'Revoir mes objectifs', 'Garder le cap, ajuster si besoin.', 'Douce', '1w'),
+  h('Croissance & apprentissage', 'journal', 'notebook', 'Écrire dans mon journal', 'Vider sa tête pour mieux avancer.', 'Douce', '3w'),
+  h('Croissance & apprentissage', 'langue', 'languages', 'Pratiquer une langue', '15 minutes de wolof, d’espagnol ou d’arabe.', 'Modérée', 'daily'),
+  h('Relations & connexion', 'appeler', 'phone', 'Appeler quelqu’un qui compte', 'Prendre des nouvelles, vraiment.', 'Douce', '1w'),
+  h('Relations & connexion', 'merci', 'mail', 'Un message de gratitude', 'Dire à quelqu’un ce qu’il t’apporte.', 'Douce', '1w'),
+  h('Relations & connexion', 'qualite', 'users', 'Du temps sans écran avec mes proches', 'Être là, entièrement.', 'Modérée', '3w'),
+  h('Relations & connexion', 'moi', 'heart', 'Un moment pour moi seule', 'Pas pour être productive : juste pour toi.', 'Douce', 'daily'),
+  h('Spiritualité', 'dhikr', 'sparkle', 'Dhikr du matin', 'Quelques minutes de rappel au réveil.', 'Douce', 'daily'),
+  h('Spiritualité', 'coran', 'bookText', 'Lire une page du Coran', 'Une page, à ton rythme.', 'Douce', 'daily'),
+  h('Spiritualité', 'priere', 'landmark', 'Prier à l’heure', 'Les cinq prières dans leur créneau.', 'Engagée', 'daily'),
 ];
 
 export const isoOf = (d: Date) => d.toLocaleDateString('en-CA');
@@ -89,23 +91,23 @@ export function habitStreak(e: Entry, today: string) {
 }
 
 /* ---------- Notes ---------- */
-export const NOTE_FOLDERS = [
-  { id: 'journal', emoji: '📓', label: 'Journal personnel' },
-  { id: 'idees', emoji: '💡', label: 'Idées & projets' },
-  { id: 'bienetre', emoji: '🌿', label: 'Bien-être' },
-  { id: 'gratitude', emoji: '🙏🏾', label: 'Gratitude' },
-] as const;
-export type NoteType = { id: string; emoji: string; label: string; hint: string; folder: string; prompt: string; to?: 'matin' | 'soir' };
+export const NOTE_FOLDERS: { id: string; icon: GlyphName; tint: Tint; label: string }[] = [
+  { id: 'journal', icon: 'notebook', tint: 'chocolat', label: 'Journal personnel' },
+  { id: 'idees', icon: 'idea', tint: 'or', label: 'Idées & projets' },
+  { id: 'bienetre', icon: 'leaf', tint: 'sauge', label: 'Bien-être' },
+  { id: 'gratitude', icon: 'handHeart', tint: 'rose', label: 'Gratitude' },
+];
+export type NoteType = { id: string; icon: GlyphName; tint: Tint; label: string; hint: string; folder: string; prompt: string; to?: 'matin' | 'soir' };
 export const NOTE_TYPES: NoteType[] = [
-  { id: 'matin', emoji: '🌅', label: 'Journal du matin', hint: 'Intention, priorités, gratitudes', folder: 'journal', prompt: '', to: 'matin' },
-  { id: 'soir', emoji: '🌙', label: 'Débriefing du soir', hint: 'Victoire, leçon, lâcher prise', folder: 'journal', prompt: '', to: 'soir' },
-  { id: 'diary', emoji: '📔', label: 'Cher journal', hint: 'Raconte ta journée, librement', folder: 'journal', prompt: 'Cher journal, aujourd’hui…' },
-  { id: 'blank', emoji: '📄', label: 'Page blanche', hint: 'Une note libre', folder: 'journal', prompt: 'Écris ce que tu veux…' },
-  { id: 'brain', emoji: '☁️', label: 'Vide-tête', hint: 'Sans filtre, sans jugement', folder: 'bienetre', prompt: 'Tout ce qui tourne dans ma tête…' },
-  { id: 'insight', emoji: '✨', label: 'Ce que j’ai compris', hint: 'Une leçon, une prise de conscience', folder: 'journal', prompt: 'Aujourd’hui, j’ai compris que…' },
-  { id: 'idea', emoji: '💡', label: 'Idée ou projet', hint: 'À ne pas oublier', folder: 'idees', prompt: 'Mon idée…' },
-  { id: 'gratitude', emoji: '🙏🏾', label: 'Gratitude libre', hint: 'Ce qui me rend reconnaissante', folder: 'gratitude', prompt: 'Je suis reconnaissante pour…' },
-  { id: 'anger', emoji: '🔥', label: 'Note de colère', hint: 'Juste pour toi, à brûler ensuite si tu veux', folder: 'bienetre', prompt: 'Ce qui m’énerve, sans retenue…' },
+  { id: 'matin', icon: 'sunrise', tint: 'terre', label: 'Journal du matin', hint: 'Intention, priorités, gratitudes', folder: 'journal', prompt: '', to: 'matin' },
+  { id: 'soir', icon: 'moon', tint: 'ardoise', label: 'Débriefing du soir', hint: 'Victoire, leçon, lâcher prise', folder: 'journal', prompt: '', to: 'soir' },
+  { id: 'diary', icon: 'bookHeart', tint: 'rose', label: 'Cher journal', hint: 'Raconte ta journée, librement', folder: 'journal', prompt: 'Cher journal, aujourd’hui…' },
+  { id: 'blank', icon: 'file', tint: 'chocolat', label: 'Page blanche', hint: 'Une note libre', folder: 'journal', prompt: 'Écris ce que tu veux…' },
+  { id: 'brain', icon: 'cloud', tint: 'ardoise', label: 'Vide-tête', hint: 'Sans filtre, sans jugement', folder: 'bienetre', prompt: 'Tout ce qui tourne dans ma tête…' },
+  { id: 'insight', icon: 'sparkles', tint: 'or', label: 'Ce que j’ai compris', hint: 'Une leçon, une prise de conscience', folder: 'journal', prompt: 'Aujourd’hui, j’ai compris que…' },
+  { id: 'idea', icon: 'idea', tint: 'or', label: 'Idée ou projet', hint: 'À ne pas oublier', folder: 'idees', prompt: 'Mon idée…' },
+  { id: 'gratitude', icon: 'handHeart', tint: 'rose', label: 'Gratitude libre', hint: 'Ce qui me rend reconnaissante', folder: 'gratitude', prompt: 'Je suis reconnaissante pour…' },
+  { id: 'anger', icon: 'flame', tint: 'terre', label: 'Note de colère', hint: 'Juste pour toi, à brûler ensuite si tu veux', folder: 'bienetre', prompt: 'Ce qui m’énerve, sans retenue…' },
 ];
 export const noteType = (id: unknown) => NOTE_TYPES.find((t) => t.id === id) ?? NOTE_TYPES[3]!;
 

@@ -71,7 +71,7 @@ Deno.serve(async (request) => {
     if (!me?.user) return json({ error: 'Session invalide.' }, 401);
     const { data: owner } = await user.rpc('is_app_owner');
     if (owner !== true) return json({ error: 'Accès refusé.' }, 403);
-    return json({ sent: await send(me.user.id, { title: 'My Thirties', body: 'Les notifications fonctionnent sur cet appareil ✨', url: '/', tag: 'test' }) });
+    return json({ sent: await send(me.user.id, { title: 'My Thirties', body: 'Les notifications fonctionnent sur cet appareil.', url: '/', tag: 'test' }) });
   }
 
   // Tournée du minuteur : chaque utilisatrice avec au moins un appareil abonné.
@@ -88,15 +88,15 @@ Deno.serve(async (request) => {
     const today = list.find((e) => e.kind === 'daily' && e.entry_date === now.date);
 
     if (p.morning?.on !== false && due(now.minutes, mins(p.morning?.time ?? '08:00')) && !(today?.data.intention || today?.data.mood))
-      queue.push({ key: 'morning:' + now.date, title: 'Mon Daily Reset ☀️', body: '3 minutes pour poser ton intention du jour.', url: '/?ecran=myday&moment=matin' });
+      queue.push({ key: 'morning:' + now.date, title: 'Mon Daily Reset', body: '3 minutes pour poser ton intention du jour.', url: '/?ecran=myday&moment=matin' });
     if (p.evening?.on !== false && due(now.minutes, mins(p.evening?.time ?? '21:00')) && !(today?.data.win || today?.data.tomorrow))
-      queue.push({ key: 'evening:' + now.date, title: 'Mon débriefing du soir 🌙', body: 'Ta victoire du jour, ce que tu déposes, ton intention pour demain.', url: '/?ecran=myday&moment=soir' });
+      queue.push({ key: 'evening:' + now.date, title: 'Mon débriefing du soir', body: 'Ta victoire du jour, ce que tu déposes, ton intention pour demain.', url: '/?ecran=myday&moment=soir' });
     if (p.habits?.on !== false && due(now.minutes, mins(p.habits?.time ?? '19:00'))) {
       const left = list.filter((e) => e.kind === 'habit' && (e.data.freq ?? 'daily') === 'daily' && !(e.data.done as Record<string, boolean> | undefined)?.[now.date]);
-      if (left.length) queue.push({ key: 'habits:' + now.date, title: 'Mes habitudes 🌿', body: left.length === 1 ? 'Il te reste « ' + left[0]!.title + ' » aujourd’hui.' : 'Il te reste ' + left.length + ' habitudes aujourd’hui : ' + left.slice(0, 3).map((e) => e.title).join(', ') + '.', url: '/?ecran=habits' });
+      if (left.length) queue.push({ key: 'habits:' + now.date, title: 'Mes habitudes', body: left.length === 1 ? 'Il te reste « ' + left[0]!.title + ' » aujourd’hui.' : 'Il te reste ' + left.length + ' habitudes aujourd’hui : ' + left.slice(0, 3).map((e) => e.title).join(', ') + '.', url: '/?ecran=habits' });
     }
     if (p.weekly?.on !== false && now.weekday === (p.weekly?.day ?? 0) && due(now.minutes, mins(p.weekly?.time ?? '18:00')))
-      queue.push({ key: 'weekly:' + now.date, title: 'Mon bilan de la semaine 📊', body: 'Humeurs, habitudes, victoires : ta semaine t’attend.', url: '/?ecran=bilan' });
+      queue.push({ key: 'weekly:' + now.date, title: 'Mon bilan de la semaine', body: 'Humeurs, habitudes, victoires : ta semaine t’attend.', url: '/?ecran=bilan' });
     if (p.agenda?.on !== false) {
       const before = Math.max(0, Math.min(120, Number(p.agenda?.minutes ?? 15)));
       for (const e of list) {

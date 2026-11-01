@@ -1,33 +1,37 @@
-import { swatchOf } from '../lib/rituals';
+import { Glyph, TINTS, type GlyphName, type Tint } from './Glyph';
 
-/** Vignette de couleur (palette de l'app) avec un symbole : remplace les photos des recettes, destinations et défis. */
-export function ColorTile({ seed, emoji, label, badge }: { seed: string; emoji: string; label: string; badge?: string }) {
-  const [bg, ink] = swatchOf(seed);
-  return <div className="color-tile" style={{ background: `linear-gradient(135deg, ${bg} 0%, ${bg} 55%, ${ink}33 100%)`, color: ink }} role="img" aria-label={label}>
-    <span className="color-tile-emoji" aria-hidden="true">{emoji}</span>
-    {badge && <span className="color-tile-badge" aria-hidden="true">{badge}</span>}
-    <span className="color-tile-ring" style={{ borderColor: ink + '33' }} aria-hidden="true" />
+const TINT_NAMES = Object.keys(TINTS) as Tint[];
+const tintOf = (seed: string) => TINT_NAMES[[...seed].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 3) % TINT_NAMES.length]!;
+
+/** Vignette de couleur (palette de l'app) avec une icône : remplace les photos des recettes, destinations et défis. */
+export function ColorTile({ seed, icon, label, badge }: { seed: string; icon: GlyphName; label: string; badge?: string }) {
+  const tint = tintOf(seed), [bg, ink] = TINTS[tint];
+  return <div className="color-tile" style={{ background: `linear-gradient(135deg, ${bg} 0%, ${bg} 55%, ${ink}2e 100%)` }} role="img" aria-label={label}>
+    <span className="color-tile-icon" style={{ background: '#fffaf5cc' }}><Glyph name={icon} tint={tint} size={34} /></span>
+    {badge && <span className="color-tile-badge" style={{ color: ink, borderColor: ink + '55' }}>{badge}</span>}
+    <span className="color-tile-ring" style={{ borderColor: ink + '26' }} aria-hidden="true" />
   </div>;
 }
 
-export const RECIPE_EMOJI: Record<string, string> = {
-  'petit-dejeuner': '🥣', dejeuner: '🥗', diner: '🍲', 'casse-croute': '🥪', smoothie: '🥤', shot: '🧃',
-  boulangerie: '🥖', dessert: '🍰', 'base-maison': '🫙',
+const RECIPE_ICON: Record<string, GlyphName> = {
+  'petit-dejeuner': 'coffee', dejeuner: 'salad', diner: 'soup', 'casse-croute': 'sandwich', smoothie: 'drink', shot: 'citrus',
+  boulangerie: 'croissant', dessert: 'cake', 'base-maison': 'pot',
 };
-/** Symbole du plat d'après le titre (sinon celui de la catégorie). */
-export function dishEmoji(title: string, category: string) {
+/** Icône du plat d'après le titre (sinon celle de la catégorie). */
+export function dishIcon(title: string, category: string): GlyphName {
   const t = title.toLowerCase();
-  const rules: [RegExp, string][] = [[/smoothie/, '🥤'], [/^shot/, '🧃'], [/porridge|bouillie|avoine/, '🥣'], [/crêpe|crepe|pancake/, '🥞'], [/omelette|œuf|oeuf/, '🍳'],
-    [/poisson|thi[ée]b|thon|saumon|crevette/, '🐟'], [/poulet|yassa|dinde/, '🍗'], [/bœuf|boeuf|agneau|viande/, '🥩'], [/riz/, '🍚'], [/pâtes|spaghetti|lasagne|nouilles/, '🍝'],
-    [/soupe|velouté/, '🍜'], [/salade/, '🥗'], [/pizza/, '🍕'], [/wrap|tacos|sandwich|tartine/, '🌯'], [/pain|focaccia|naan|pita/, '🍞'], [/gâteau|cake|muffin|cookie|flan|clafoutis/, '🧁'],
-    [/curry|mafé|maf[eé]/, '🍛'], [/patate|légume|gratin/, '🥕'], [/yaourt|compote/, '🍨'], [/pop-corn/, '🍿']];
-  return rules.find(([re]) => re.test(t))?.[1] ?? RECIPE_EMOJI[category] ?? '🍽️';
+  const rules: [RegExp, GlyphName][] = [[/smoothie/, 'drink'], [/^shot/, 'citrus'], [/porridge|bouillie|avoine/, 'wheat'], [/crêpe|crepe|pancake/, 'eggFried'], [/omelette|œuf|oeuf/, 'egg'],
+    [/poisson|thi[ée]b|thon|saumon|crevette/, 'fish'], [/poulet|yassa|dinde/, 'drumstick'], [/bœuf|boeuf|agneau|viande/, 'beef'], [/riz|curry|maf[ée]/, 'pot'],
+    [/pâtes|spaghetti|lasagne|nouilles|soupe|velouté/, 'soup'], [/salade/, 'salad'], [/pizza/, 'pizza'], [/wrap|tacos|sandwich|tartine/, 'sandwich'],
+    [/pain|focaccia|naan|pita/, 'wheat'], [/gâteau|cake|muffin|flan|clafoutis/, 'cake'], [/cookie/, 'cookie'], [/patate|légume|gratin|carotte/, 'carrot'],
+    [/yaourt|lait/, 'milk'], [/compote|pomme/, 'apple'], [/pop-corn/, 'popcorn']];
+  return rules.find(([re]) => re.test(t))?.[1] ?? RECIPE_ICON[category] ?? 'utensils';
 }
 
-const FLAGS: Record<string, string> = {
-  Maroc: '🇲🇦', Sénégal: '🇸🇳', 'Cap-Vert': '🇨🇻', Portugal: '🇵🇹', Espagne: '🇪🇸', Turquie: '🇹🇷', Grèce: '🇬🇷', Italie: '🇮🇹', Danemark: '🇩🇰',
-  'Pays-Bas': '🇳🇱', Japon: '🇯🇵', Indonésie: '🇮🇩', Tanzanie: '🇹🇿', Rwanda: '🇷🇼', 'Afrique du Sud': '🇿🇦', Jordanie: '🇯🇴', 'Émirats arabes unis': '🇦🇪',
-  Canada: '🇨🇦', 'États-Unis': '🇺🇸', Brésil: '🇧🇷',
+const CODES: Record<string, string> = {
+  Maroc: 'MA', Sénégal: 'SN', 'Cap-Vert': 'CV', Portugal: 'PT', Espagne: 'ES', Turquie: 'TR', Grèce: 'GR', Italie: 'IT', Danemark: 'DK',
+  'Pays-Bas': 'NL', Japon: 'JP', Indonésie: 'ID', Tanzanie: 'TZ', Rwanda: 'RW', 'Afrique du Sud': 'ZA', Jordanie: 'JO', 'Émirats arabes unis': 'AE',
+  Canada: 'CA', 'États-Unis': 'US', Brésil: 'BR',
 };
-export const flagOf = (country: string) => FLAGS[country] ?? '';
-export const STYLE_EMOJI: Record<string, string> = { Culture: '🏛️', Nature: '🌿', Détente: '🏝️', Ville: '🏙️', Aventure: '🧭' };
+export const countryCode = (country: string) => CODES[country] ?? '';
+export const STYLE_ICON: Record<string, GlyphName> = { Culture: 'landmark', Nature: 'mountain', Détente: 'palm', Ville: 'city', Aventure: 'compass' };

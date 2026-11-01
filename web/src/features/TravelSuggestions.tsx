@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { DESTINATION_IDEAS } from '../lib/destinationIdeas';
 import { adviceUrl, DESTINATION_GUIDES } from '../lib/destinationGuides';
-import { ColorTile, flagOf, STYLE_EMOJI } from '../ui/ColorTile';
+import { ColorTile, countryCode, STYLE_ICON } from '../ui/ColorTile';
 import { HiddenNote, useHidden } from '../lib/hidden';
 
 export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onCreate: (input: EntryInput) => Promise<void> }) {
@@ -37,7 +37,7 @@ export function TravelSuggestions({ entries, onCreate }: { entries: Entry[]; onC
     </div>
     <p className="muted">{ideas.length} destination(s)</p>
     <div className="lesson-grid">{ideas.map((d) => <article className="lesson-card" key={d.id}>
-      <ColorTile seed={d.country + d.style} emoji={STYLE_EMOJI[d.style] ?? '✈️'} badge={flagOf(d.country)} label={d.name + ', ' + d.country} />
+      <ColorTile seed={d.country + d.style} icon={STYLE_ICON[d.style] ?? 'compass'} badge={countryCode(d.country)} label={d.name + ', ' + d.country} />
       <h3>{d.name}</h3><p>{d.country} · {d.style} · {d.duration}</p>
       <p>{d.description}</p>
       <Guide id={d.id} highlights={d.highlights} />

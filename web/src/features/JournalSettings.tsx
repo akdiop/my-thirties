@@ -33,7 +33,7 @@ export function JournalSettings() {
     {lock && biometricSupported() && <div className="toggle-row"><span><strong><ScanFace size={16} /> Face ID / Touch ID</strong><small>Ouvrir le journal sans taper le code.</small></span>
       <button className={'switch' + (lock.credential ? ' on' : '')} role="switch" aria-checked={Boolean(lock.credential)} aria-label="Face ID"
         onClick={async () => { try { if (lock.credential) disableBiometric(); else await enableBiometric(); refresh(); setMsg(''); } catch { setMsg('Face ID n’a pas pu être activé sur cet appareil.'); } }}><span /></button></div>}
-    <div className="toggle-row"><span><strong>🕰️ « Il y a un an… »</strong><small>Revoir ta journée et tes notes à la même date l’an dernier.</small></span>
+    <div className="toggle-row"><span><strong>« Il y a un an… »</strong><small>Revoir ta journée et tes notes à la même date l’an dernier.</small></span>
       <button className={'switch' + (year ? ' on' : '')} role="switch" aria-checked={year} aria-label="Il y a un an"
         onClick={() => { const v = !year; setYear(v); try { localStorage.setItem(YEAR_KEY, v ? 'on' : 'off'); } catch { /* stockage indisponible */ } }}><span /></button></div>
     {msg && <p role="status" className="fineprint">{msg}</p>}

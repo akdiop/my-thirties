@@ -66,7 +66,7 @@ function Affirmation({ day, onKeep }: { day: string; onKeep: (text: string) => P
   const [kept, setKept] = useState(false);
   const text = affirmationOf(day, shift);
   return <div className="ritual-mini">
-    <span className="ritual-k">Affirmation ☀️</span>
+    <span className="ritual-k">Affirmation</span>
     <p className="affirm">« {text} »</p>
     <div className="ritual-actions">
       <button className="link-btn" onClick={() => { setShift(shift + 1); setKept(false); }}>Une autre</button>

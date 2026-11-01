@@ -1,7 +1,8 @@
+import { Glyph, MoodIcon } from '../ui/Glyph';
 import { useMemo, useState } from 'react';
 import { ArrowLeft, Flame, Plus, Search, Trash2 } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
-import { DAILY_KIND, moodEmoji, MOODS, NOTE_FOLDERS, NOTE_KIND, NOTE_TYPES, noteType, type NoteType } from '../lib/rituals';
+import { DAILY_KIND, MOODS, NOTE_FOLDERS, NOTE_KIND, NOTE_TYPES, noteType, type NoteType } from '../lib/rituals';
 import { saveLabel, useAutosave } from '../lib/autosave';
 import { OneYearAgo } from './Review';
 import { yearAgoOn } from '../features/JournalSettings';
@@ -41,9 +42,9 @@ export function Notes({ entries, onCreate, onEdit, onRemove, onOpenDay }: {
   const start = (t: NoteType) => { setPicker(false); if (t.to) onOpenDay(new Date().toLocaleDateString('en-CA'), t.to); else setEditing({ noteId: crypto.randomUUID(), type: t }); };
 
   const list = (items: Entry[]) => <div className="note-list">{items.map((e) => e.kind === DAILY_KIND
-    ? <button key={e.id} className="note-row" onClick={() => open(e)}><span className="note-emoji">{moodEmoji(e.data.mood) || '📅'}</span>
+    ? <button key={e.id} className="note-row" onClick={() => open(e)}><span className="note-emoji">{e.data.mood ? <MoodIcon mood={e.data.mood} badge={36} /> : <Glyph name="calendar" tint="caramel" badge={36} />}</span>
       <span><strong>Mon jour · {when(String(e.entry_date) + 'T12:00:00')}</strong><small>{String(e.data.intention || e.data.win || 'Daily Reset')}</small></span></button>
-    : <button key={e.id} className="note-row" onClick={() => open(e)}><span className="note-emoji">{noteType(e.data.type).emoji}</span>
+    : <button key={e.id} className="note-row" onClick={() => open(e)}><span className="note-emoji"><Glyph name={noteType(e.data.type).icon} tint={noteType(e.data.type).tint} badge={36} /></span>
       <span><strong>{e.title}</strong><small>{String(e.data.body ?? '').slice(0, 90)}</small><small className="muted">{when(e.created_at)}</small></span></button>)}</div>;
 
   const current = NOTE_FOLDERS.find((f) => f.id === folder);
@@ -58,8 +59,8 @@ export function Notes({ entries, onCreate, onEdit, onRemove, onOpenDay }: {
       {q.trim() ? (found.length ? list(found) : <p className="muted">Rien trouvé pour « {q} ».</p>) : <>
         <p className="eyebrow-s">Dossiers</p>
         <div className="folder-grid">
-          {NOTE_FOLDERS.map((f) => <button key={f.id} className="folder" onClick={() => setFolder(f.id)}><span>{f.emoji}</span><strong>{f.label}</strong><small>{notes.filter((n) => (n.data.folder ?? 'journal') === f.id).length} note(s)</small></button>)}
-          <button className="folder" onClick={() => setFolder('daily')}><span>📅</span><strong>Mes journées</strong><small>{days.length} jour(s)</small></button>
+          {NOTE_FOLDERS.map((f) => <button key={f.id} className="folder" onClick={() => setFolder(f.id)}><Glyph name={f.icon} tint={f.tint} size={22} badge={44} /><strong>{f.label}</strong><small>{notes.filter((n) => (n.data.folder ?? 'journal') === f.id).length} note(s)</small></button>)}
+          <button className="folder" onClick={() => setFolder('daily')}><Glyph name="calendar" tint="caramel" size={22} badge={44} /><strong>Mes journées</strong><small>{days.length} jour(s)</small></button>
         </div>
         {yearAgoOn() && <OneYearAgo entries={entries} onOpenDay={(d) => onOpenDay(d)} onOpenNote={open} />}
         {notes.length > 0 && <><p className="eyebrow-s">Récentes</p>{list(notes.slice(0, 5))}</>}
@@ -76,7 +77,7 @@ export function Notes({ entries, onCreate, onEdit, onRemove, onOpenDay }: {
     {picker && <div className="modal-overlay sheet" role="dialog" aria-modal="true" aria-label="Nouvelle note" onClick={() => setPicker(false)}>
       <div className="sheet-body" onClick={(e) => e.stopPropagation()}>
         <span className="sheet-grip" /><h2>Quel type de note ?</h2>
-        {NOTE_TYPES.map((t) => <button key={t.id} className="type-row" onClick={() => start(t)}><span className="note-emoji">{t.emoji}</span><span><strong>{t.label}</strong><small>{t.hint}</small></span></button>)}
+        {NOTE_TYPES.map((t) => <button key={t.id} className="type-row" onClick={() => start(t)}><span className="note-emoji"><Glyph name={t.icon} tint={t.tint} badge={38} /></span><span><strong>{t.label}</strong><small>{t.hint}</small></span></button>)}
       </div>
     </div>}
   </div>;
@@ -103,15 +104,15 @@ function NoteEditor({ noteId, type, entry, onCreate, onEdit, onRemove, onClose }
   };
   return <div className={'screen note-editor' + (burning ? ' burning' : '')}>
     <header className="screen-header"><button className="icon-btn back" onClick={onClose} aria-label="Retour"><ArrowLeft size={22} /></button>
-      <span className="note-type">{type.emoji} {type.label}</span>
+      <span className="note-type"><Glyph name={type.icon} tint={type.tint} /> {type.label}</span>
       {entry && type.id !== 'anger' && <button className="icon-btn" aria-label="Supprimer la note" onClick={() => { if (confirm('Supprimer cette note ?')) void onRemove(entry); }}><Trash2 size={18} /></button>}
     </header>
     <p className="muted note-date">{when(entry?.created_at ?? new Date().toISOString())}</p>
     <input className="note-title" value={title} placeholder={type.label} maxLength={170} onChange={(e) => t(setTitle)(e.target.value)} />
     <textarea className="note-body" autoFocus={!entry} value={body} placeholder={type.prompt} onChange={(e) => t(setBody)(e.target.value)} />
     <div className="note-meta">
-      <div className="mood5 small">{MOODS.map((m) => <button key={m.value} className={mood === m.value ? 'on' : ''} aria-label={m.value} onClick={() => t(setMood)(mood === m.value ? '' : m.value)}>{m.emoji}</button>)}</div>
-      <select value={folder} aria-label="Dossier" onChange={(e) => t(setFolder)(e.target.value)}>{NOTE_FOLDERS.map((f) => <option key={f.id} value={f.id}>{f.emoji} {f.label}</option>)}</select>
+      <div className="mood5 small">{MOODS.map((m) => <button key={m.value} className={mood === m.value ? 'on' : ''} aria-label={m.value} onClick={() => t(setMood)(mood === m.value ? '' : m.value)}><Glyph name={m.icon} tint={m.tint} size={18} badge={34} /></button>)}</div>
+      <select value={folder} aria-label="Dossier" onChange={(e) => t(setFolder)(e.target.value)}>{NOTE_FOLDERS.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}</select>
     </div>
     <p className="save-state" aria-live="polite">{saveLabel(state) || 'S’enregistre automatiquement.'}</p>
     {type.id === 'anger' && entry && <button className="button ghost wide burn" onClick={() => void burn()}><Flame size={16} /> Brûler cette note</button>}

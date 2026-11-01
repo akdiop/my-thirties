@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { dishOf } from '../lib/editorialPhotos';
-import { ColorTile, dishEmoji } from '../ui/ColorTile';
+import { ColorTile, dishIcon } from '../ui/ColorTile';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { HiddenNote, HideButton, useHidden } from '../lib/hidden';
 import { PERSONALIZED_RECIPES } from '../recipes/recipeIndex';
@@ -99,7 +99,7 @@ export function RecipeIdeas({ entries, onCreate }: { entries: Entry[]; onCreate:
       const isAdded = existing.has(recipe.id);
       const dish = dishOf(recipe.title);
       return <article className="lesson-card recipe-photo-card" key={recipe.id}>
-        <ColorTile seed={dish ?? recipe.category} emoji={dishEmoji(recipe.title, recipe.category)} label={recipe.title} />
+        <ColorTile seed={dish ?? recipe.category} icon={dishIcon(recipe.title, recipe.category)} label={recipe.title} />
         <h3>{recipe.title}</h3>
         <p>{recipe.prepMin + recipe.cookMin} min environ · {recipe.servings} portions · {culinaryStyleLabel(recipeStyle(recipe))}</p>
         <details><summary>Ingrédients et préparation</summary>

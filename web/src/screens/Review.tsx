@@ -1,10 +1,11 @@
+import { Glyph, MoodIcon, type Tint } from '../ui/Glyph';
 import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import type { Entry } from '../lib/cloud';
 import { cloud } from '../lib/cloud';
 import { isDoneOn } from '../lib/day';
 import { amountOf, currencyOf, fmt } from '../lib/money';
-import { addDays, DAILY_KIND, freqTarget, HABIT_KIND, habitDone, habitFreq, isoOf, moodEmoji, MOODS, NOTE_KIND, weekStartOf } from '../lib/rituals';
+import { addDays, DAILY_KIND, freqTarget, HABIT_KIND, habitDone, habitFreq, isoOf, MOODS, NOTE_KIND, weekStartOf } from '../lib/rituals';
 import { getIntegrationPrefs } from '../lib/integrations';
 import { Bar, Segmented } from '../ui/kit';
 
@@ -80,18 +81,18 @@ function Week({ entries }: { entries: Entry[] }) {
       <button className="icon-btn" aria-label="Semaine suivante" disabled={days[6]! >= today} onClick={() => { setStart(addDays(start, 7)); setAi(''); }}><ChevronRight size={20} /></button>
     </div>
     <section className="ritual-card"><p className="ritual-label">Mes humeurs</p>
-      <div className="mood-week">{days.map((d, i) => <div key={d}><span className="mood-pill" style={{ background: MOOD_COLOR[s.moods[i]!] ?? '#F3ECE5' }}>{moodEmoji(s.moods[i]) || (s.moods[i] ? '•' : '')}</span><small>{LETTERS[i]}</small></div>)}</div></section>
+      <div className="mood-week">{days.map((d, i) => <div key={d}><span className="mood-pill" style={{ background: MOOD_COLOR[s.moods[i]!] ?? '#F3ECE5' }}><MoodIcon mood={s.moods[i]} size={18} /></span><small>{LETTERS[i]}</small></div>)}</div></section>
     <div className="stat-row">
       <div><strong>{s.dailies.length}/7</strong><small>jours notés</small></div>
       <div><strong>{s.doneTasks}/{s.tasks}</strong><small>tâches faites</small></div>
       <div><strong>{s.notes}</strong><small>notes écrites</small></div>
     </div>
     {s.habits.length > 0 && <section className="ritual-card"><p className="ritual-label">Mes habitudes</p>
-      {s.habits.map(({ e, count, target }) => <div key={e.id} className="habit-stat"><span>{String(e.data.emoji ?? '•')} {e.title}</span><small>{count}/{target}</small><Bar value={Math.min(1, count / target)} /></div>)}</section>}
-    <section className="ritual-card"><p className="ritual-label">🏆 Mes victoires</p>
+      {s.habits.map(({ e, count, target }) => <div key={e.id} className="habit-stat"><span className="inline-glyph"><Glyph name={String(e.data.icon || 'sprout')} tint={(e.data.tint as Tint) || 'sauge'} size={16} /> {e.title}</span><small>{count}/{target}</small><Bar value={Math.min(1, count / target)} /></div>)}</section>}
+    <section className="ritual-card"><p className="ritual-label"><Glyph name="trophy" tint="or" /> Mes victoires</p>
       {s.wins.length ? <ul className="win-list">{s.wins.map((w) => <li key={w.day}><small>{short(w.day)}</small> {w.text}</li>)}</ul> : <p className="muted">Note ta victoire du jour dans le débriefing du soir.</p>}</section>
-    {s.grats.length > 0 && <section className="ritual-card"><p className="ritual-label">🙏🏾 {s.grats.length} gratitude(s)</p><p className="muted">{s.grats.slice(0, 8).join(' · ')}</p></section>}
-    {s.spend.size > 0 && <section className="ritual-card"><p className="ritual-label">💸 Dépenses de la semaine</p>{[...s.spend].map(([c, n]) => <strong key={c}>{fmt(n, c)}</strong>)}</section>}
+    {s.grats.length > 0 && <section className="ritual-card"><p className="ritual-label"><Glyph name="handHeart" tint="rose" /> {s.grats.length} gratitude(s)</p><p className="muted">{s.grats.slice(0, 8).join(' · ')}</p></section>}
+    {s.spend.size > 0 && <section className="ritual-card"><p className="ritual-label"><Glyph name="coins" tint="caramel" /> Dépenses de la semaine</p>{[...s.spend].map(([c, n]) => <strong key={c}>{fmt(n, c)}</strong>)}</section>}
     <section className="ritual-card ai-card">
       <p className="ritual-label"><Sparkles size={16} /> Résumé de l’assistant</p>
       {ai ? <p className="ai-answer">{ai}</p> : <>
@@ -121,8 +122,8 @@ function MoodCalendar({ entries }: { entries: Entry[] }) {
     <div className="cal-grid">{LETTERS.map((l, i) => <span key={'h' + i} className="cal-h">{l}</span>)}
       {Array.from({ length: lead }, (_, i) => <span key={'b' + i} />)}
       {days.map((d, i) => <span key={d} className={'cal-day' + (d === isoOf(now) ? ' today' : '')} style={{ background: MOOD_COLOR[moods[i]!] ?? '#F7F2EC' }} title={moods[i] || ''}>
-        <small>{i + 1}</small>{moodEmoji(moods[i])}</span>)}</div>
-    <div className="cal-legend">{totals.map((t) => <span key={t.value}><i style={{ background: MOOD_COLOR[t.value] }} />{t.emoji} {t.value} · {t.n}</span>)}</div>
+        <small>{i + 1}</small><MoodIcon mood={moods[i]} size={16} /></span>)}</div>
+    <div className="cal-legend">{totals.map((t) => <span key={t.value}><i style={{ background: MOOD_COLOR[t.value] }} />{t.value} · {t.n}</span>)}</div>
   </div>;
 }
 
@@ -133,9 +134,9 @@ export function OneYearAgo({ entries, onOpenDay, onOpenNote }: { entries: Entry[
   const notes = entries.filter((e) => e.kind === NOTE_KIND && e.entry_date === d);
   if (!day && !notes.length) return null;
   return <section className="year-ago">
-    <p className="ritual-label">🕰️ Il y a un an, jour pour jour</p>
-    {day && <button className="note-row" onClick={() => onOpenDay(d)}><span className="note-emoji">{moodEmoji(day.data.mood) || '📅'}</span>
+    <p className="ritual-label"><Glyph name="history" tint="lilas" /> Il y a un an, jour pour jour</p>
+    {day && <button className="note-row" onClick={() => onOpenDay(d)}><span className="note-emoji">{day.data.mood ? <MoodIcon mood={day.data.mood} badge={36} /> : <Glyph name="calendar" tint="caramel" badge={36} />}</span>
       <span><strong>Mon jour</strong><small>{String(day.data.intention || day.data.win || '')}</small></span></button>}
-    {notes.map((n) => <button key={n.id} className="note-row" onClick={() => onOpenNote?.(n)}><span className="note-emoji">📓</span><span><strong>{n.title}</strong><small>{String(n.data.body ?? '').slice(0, 100)}</small></span></button>)}
+    {notes.map((n) => <button key={n.id} className="note-row" onClick={() => onOpenNote?.(n)}><span className="note-emoji"><Glyph name="notebook" badge={36} /></span><span><strong>{n.title}</strong><small>{String(n.data.body ?? '').slice(0, 100)}</small></span></button>)}
   </section>;
 }
