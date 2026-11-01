@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Check } from 'lucide-react';
 import type { Entry } from '../lib/cloud';
 import { boosterDay } from '../lib/boosterDays';
@@ -17,17 +17,56 @@ export function BoosterPlan({ entry, onUpdate }: {
   const firstOpen = Array.from({ length: days }, (_, i) => i + 1).find((d) => !progress[String(d)]) ?? days;
   const [day, setDay] = useState(firstOpen);
   const [text, setText] = useState(notes[String(day)] ?? '');
-  useEffect(() => { setText(notes[String(day)] ?? ''); }, [day]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const save = async (extra: Record<string, unknown> = {}) => onUpdate(entry, {
-    ...entry.data, notes: { ...notes, [day]: text }, ...extra,
+  // Dernières données connues (mises à jour dès qu'on enregistre, sans attendre le rechargement).
+  const dataRef = useRef(entry.data);
+  useEffect(() => { dataRef.current = entry.data; }, [entry.data]);
+  // Texte en attente d'enregistrement automatique, et son minuteur.
+  const pending = useRef<{ day: number; text: string } | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const latest = useRef({ entry, onUpdate });
+  latest.current = { entry, onUpdate };
+
+  const write = (patch: (data: Record<string, unknown>) => Record<string, unknown>) => {
+    const next = patch(dataRef.current);
+    dataRef.current = next;
+    return latest.current.onUpdate(latest.current.entry, next);
+  };
+  const withNote = (data: Record<string, unknown>, d: number, t: string) => ({
+    ...data, notes: { ...((data.notes && typeof data.notes === 'object' ? data.notes : {}) as Record<string, string>), [d]: t },
   });
-  // Enregistrement automatique pendant l'écriture.
-  useEffect(() => {
-    if ((notes[String(day)] ?? '') === text) return;
-    const t = setTimeout(() => void save(), 900);
-    return () => clearTimeout(t);
-  }, [text]); // eslint-disable-line react-hooks/exhaustive-deps
+  /** Enregistre tout de suite le texte en attente (changement de jour, sortie de l'écran, bouton « fait »). */
+  const flush = () => {
+    if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+    const p = pending.current;
+    pending.current = null;
+    return p ? write((data) => withNote(data, p.day, p.text)) : Promise.resolve();
+  };
+  useEffect(() => () => { void flush(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const onType = (value: string) => {
+    setText(value);
+    pending.current = { day, text: value };
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => void flush(), 900);
+  };
+  const choose = (d: number) => {
+    void flush();
+    const saved = (dataRef.current.notes && typeof dataRef.current.notes === 'object' ? dataRef.current.notes : {}) as Record<string, string>;
+    setDay(d);
+    setText(saved[String(d)] ?? '');
+  };
+  const toggleDone = async () => {
+    // Le texte du jour et l'état « fait » partent ensemble : aucun enregistrement en retard ne peut l'écraser.
+    if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+    pending.current = null;
+    const wasDone = Boolean(((dataRef.current.progress ?? {}) as Record<string, boolean>)[String(day)]);
+    await write((data) => ({
+      ...withNote(data, day, text),
+      progress: { ...((data.progress && typeof data.progress === 'object' ? data.progress : {}) as Record<string, boolean>), [day]: !wasDone },
+    }));
+    if (!wasDone && day < days) choose(day + 1);
+  };
 
   const done = Boolean(progress[String(day)]);
   const p = boosterDay(axis, day);
@@ -40,7 +79,7 @@ export function BoosterPlan({ entry, onUpdate }: {
       const d = i + 1;
       const isDone = Boolean(progress[String(d)]);
       return <button key={d} className={'booster-day' + (isDone ? ' done' : '') + (d === day ? ' current' : '') + (notes[String(d)] ? ' written' : '')}
-        onClick={() => setDay(d)} aria-pressed={d === day} aria-label={'Jour ' + d + (isDone ? ', accompli' : '')}>
+        onClick={() => choose(d)} aria-pressed={d === day} aria-label={'Jour ' + d + (isDone ? ', accompli' : '')}>
         {isDone ? <Check size={14} /> : d}
       </button>;
     })}</div>
@@ -51,10 +90,10 @@ export function BoosterPlan({ entry, onUpdate }: {
       <p className="booster-advice">{p.conseil}</p>
       <label className="booster-write">
         <span>{p.question}</span>
-        <textarea rows={5} value={text} onChange={(e) => setText(e.target.value)} placeholder="Écris ici, librement…" />
+        <textarea rows={5} value={text} onChange={(e) => onType(e.target.value)} placeholder="Écris ici, librement…" />
       </label>
       <button className={'button ' + (done ? 'secondary' : 'primary')}
-        onClick={() => void save({ progress: { ...progress, [day]: !done } }).then(() => { if (!done && day < days) setDay(day + 1); })}>
+        onClick={() => void toggleDone()}>
         {done ? 'Marquer comme non fait' : 'J’ai fait ce jour'}
       </button>
     </section>
