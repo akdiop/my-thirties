@@ -1384,3 +1384,13 @@ h2{font-size:1.55rem;line-height:1.2}
 .insight-list{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:.95rem;line-height:1.5}
 .screen-loading{min-height:60vh;display:grid;place-items:center;color:#8b725e;font-size:.95rem}
 .offline-banner{position:sticky;top:0;z-index:30;background:#F5E9DA;color:#6b3f2e;font-size:.85rem;padding:8px 14px;border-radius:0 0 12px 12px;text-align:center}
+.assistant-sources{border:1px solid var(--line, #0001);border-radius:14px;padding:10px 12px;margin:10px 0;display:flex;flex-direction:column;gap:6px}
+.assistant-sources legend{font-weight:600;font-size:.9rem;padding:0 4px}
+.assistant-sources .checklist-item{display:flex;flex-direction:row;gap:8px;align-items:flex-start;font-weight:400}
+.assistant-sources .checklist-item input{width:18px;min-height:18px;flex-shrink:0;margin-top:3px}
+.assistant-actions{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.assistant-action{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#fff8;border-radius:12px;padding:8px 10px}
+.assistant-action div{display:flex;flex-direction:column;min-width:0}
+.assistant-action small{color:var(--muted, #8a7568)}
+.assistant-action .added{display:inline-flex;gap:4px;align-items:center;font-size:.85rem;font-weight:600}
+.ai-answer p{white-space:pre-wrap}
