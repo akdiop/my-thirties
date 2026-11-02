@@ -97,7 +97,7 @@ export function EquilibreTop({ tab, onTab, entries, onAxis, onQuest, booster }: 
 /* ---------- Ma spiritualité ---------- */
 const hijri = (d = new Date()) => { try { return new Intl.DateTimeFormat('fr-FR-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric' }).format(d); } catch { return ''; } };
 const DHIKR = ['SubhanAllah', 'Alhamdulillah', 'Allahu akbar', 'Astaghfirullah', 'La ilaha illa Allah'];
-export type SpiritTab = 'home' | 'dhikr' | 'hijri' | 'journal' | 'horaires';
+export type SpiritTab = 'home' | 'dhikr' | 'hijri' | 'journal' | 'horaires' | 'invocations';
 export function SpiritTop({ tab, onTab, entries, onCreate, onRemove }: { tab: SpiritTab; onTab: (t: SpiritTab) => void; entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onRemove: (e: Entry) => Promise<void> }) {
   const day = todayIso();
   const p = prayerDay(entries);
@@ -125,6 +125,7 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onRemove }: { tab: Sp
       })}</div>
       <div className="rows">
         <RowLink icon={CalendarDays} title="Horaires des prières" sub="ville, méthode de calcul" onClick={() => onTab('horaires')} />
+        <RowLink icon={Heart} title="Mes invocations" sub="routine de dhikr, protection, pardon, réussite…" onClick={() => onTab('invocations')} />
         <RowLink icon={Check} title="Dhikr et compteur" sub="libre ou routine" onClick={() => onTab('dhikr')} />
         <RowLink icon={Sun} title="Calendrier hégirien" onClick={() => onTab('hijri')} />
         <RowLink icon={BookHeart} title="Mon journal spirituel" onClick={() => onTab('journal')} />

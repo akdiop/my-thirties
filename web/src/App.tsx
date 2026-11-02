@@ -59,6 +59,7 @@ const Supplements = lazy(() => import('./screens/Supplements').then((m) => ({ de
 const Relatives = lazy(() => import('./screens/Relatives').then((m) => ({ default: m.Relatives })));
 const Reading = lazy(() => import('./screens/Reading').then((m) => ({ default: m.Reading })));
 const Wishes = lazy(() => import('./screens/Wishes').then((m) => ({ default: m.Wishes })));
+const Duas = lazy(() => import('./features/Duas').then((m) => ({ default: m.Duas })));
 const PandaScreen = lazy(() => import('./features/panda/PandaScreen').then((m) => ({ default: m.PandaScreen })));
 const LearningPaths = lazy(() => import('./features/LearningPaths').then((m) => ({ default: m.LearningPaths })));
 const SeriesTracker = lazy(() => import('./features/SeriesTracker').then((m) => ({ default: m.SeriesTracker })));
@@ -666,6 +667,7 @@ export default function App() {
           {equilibreTab === 'journal' && <><EquilibriumInsights entries={allModuleEntries} /><BalanceReview entries={allModuleEntries} onCreate={createFromTool} /></>}
           <button className="calm-pill" onClick={() => go('calme')}>J’ai besoin de me calmer</button></>}
         {currentModule.id === 'spiritualite' && <><SpiritTop tab={spiritTab} onTab={setSpiritTab} entries={allModuleEntries} onCreate={createFromTool} onRemove={removeQuiet} />
+          {spiritTab === 'invocations' && <Duas entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} />}
           {spiritTab === 'horaires' && <><AutomaticPrayerTimes entries={allModuleEntries} onCreate={createFromTool} /><PrayerPlanner entries={allModuleEntries} onCreate={createFromTool} />
             <p className="disclaimer"><BookOpen size={14} /> Les horaires automatiques nécessitent une connexion et une ville choisie. Les calculs peuvent varier selon les sources locales.</p></>}</>}
         {currentModule.id === 'passions' && <>
