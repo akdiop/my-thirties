@@ -49,7 +49,8 @@ export function linkedPandaDays(entries: Entry[]): string[] {
     .map((e) => e.entry_date!))];
 }
 export function pandaProgress(data: PandaData, entries: Entry[]) {
-  const linked = data.linkHabits ? linkedPandaDays(entries) : [];
+  const currentDay = new Date().toLocaleDateString('en-CA');
+  const linked = data.linkHabits ? linkedPandaDays(entries).filter((day) => day >= data.adoptedAt && day <= currentDay) : [];
   // Les journées suivies comptent une fois ; aucune mauvaise humeur ou journée sans entrée ne pénalise.
   const loggedDays = new Set(data.moments.map((m) => m.day));
   const extraDays = linked.filter((day) => !loggedDays.has(day)).length;
