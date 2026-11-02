@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Eye, GraduationCap, Heart, RotateCcw, Volume2 } from 'lucide-react';
+import { Check, Eye, GraduationCap, Heart, RotateCcw } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { isoOf } from '../lib/rituals';
 import { DHIKR_ROUTINE, DUA_CATEGORIES, DUAS, type Dua, type DuaCategory } from '../lib/duas';
@@ -110,7 +110,6 @@ function Study({ dua, state, today, onDone, onClose }: { dua: Dua; state?: Learn
   const level = state?.level ?? 0;
   const [step, setStep] = useState(Math.max(1, level));
   const [reveal, setReveal] = useState(false);
-  const speak = () => { try { const u = new SpeechSynthesisUtterance(dua.arabic.replace(/۝/g, '')); u.lang = 'ar-SA'; u.rate = 0.75; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch { /* lecture indisponible */ } };
   const next = Math.min(LEVELS.length - 1, step + 1);
   return <article className="dua-card study">
     <div className="dua-head"><div><strong>{dua.title}</strong><small className="muted"> · {niveau(step)}</small></div>
@@ -121,7 +120,6 @@ function Study({ dua, state, today, onDone, onClose }: { dua: Dua; state?: Learn
     {step <= 2 || reveal ? <p className="dua-fr">{dua.french}</p> : null}
     <small className="muted">{[dua.ref, dua.source].filter(Boolean).join(' · ')}</small>
     <div className="repeat-row">
-      {'speechSynthesis' in window && <button className="button ghost small" onClick={speak}><Volume2 size={14} /> Écouter</button>}
       {step >= 2 && <button className="button ghost small" onClick={() => setReveal(!reveal)}><Eye size={14} /> {reveal ? 'Cacher' : 'Voir la réponse'}</button>}
     </div>
     <p className="muted small">Récite-la à voix haute, puis dis-moi comment ça s’est passé.</p>
