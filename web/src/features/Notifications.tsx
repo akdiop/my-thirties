@@ -5,11 +5,11 @@ import { cloud } from '../lib/cloud';
 /** Réglages des rappels envoyés par le serveur (fonction push-reminders), même app fermée. */
 export type NotifPrefs = {
   morning: { on: boolean; time: string }; evening: { on: boolean; time: string }; habits: { on: boolean; time: string };
-  agenda: { on: boolean; minutes: number }; weekly: { on: boolean; day: number; time: string };
+  agenda: { on: boolean; minutes: number }; weekly: { on: boolean; day: number; time: string }; supplements: { on: boolean };
 };
 export const DEFAULT_PREFS: NotifPrefs = {
   morning: { on: true, time: '08:00' }, evening: { on: true, time: '21:00' }, habits: { on: true, time: '19:00' },
-  agenda: { on: true, minutes: 15 }, weekly: { on: true, day: 0, time: '18:00' },
+  agenda: { on: true, minutes: 15 }, weekly: { on: true, day: 0, time: '18:00' }, supplements: { on: true },
 };
 const DAYS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 const pushSupported = () => typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window && typeof Notification !== 'undefined';
@@ -19,7 +19,7 @@ const keyBytes = (b64: string) => { const s = (b64 + '='.repeat((4 - b64.length 
 const merge = (v: unknown): NotifPrefs => {
   const p = (v && typeof v === 'object' ? v : {}) as Partial<NotifPrefs>;
   return { morning: { ...DEFAULT_PREFS.morning, ...p.morning }, evening: { ...DEFAULT_PREFS.evening, ...p.evening }, habits: { ...DEFAULT_PREFS.habits, ...p.habits },
-    agenda: { ...DEFAULT_PREFS.agenda, ...p.agenda }, weekly: { ...DEFAULT_PREFS.weekly, ...p.weekly } };
+    agenda: { ...DEFAULT_PREFS.agenda, ...p.agenda }, weekly: { ...DEFAULT_PREFS.weekly, ...p.weekly }, supplements: { ...DEFAULT_PREFS.supplements, ...p.supplements } };
 };
 
 export function NotificationSettings() {
@@ -102,6 +102,7 @@ export function NotificationSettings() {
     {row('Agenda', 'Avant chaque rendez-vous, événement ou tâche avec une heure.', prefs.agenda.on, (on) => void save({ ...prefs, agenda: { ...prefs.agenda, on } }),
       <select value={prefs.agenda.minutes} onChange={(e) => void save({ ...prefs, agenda: { ...prefs.agenda, minutes: Number(e.target.value) } })}>
         {[0, 5, 15, 30, 60].map((m) => <option key={m} value={m}>{m ? m + ' min avant' : 'À l’heure'}</option>)}</select>)}
+    {row('Mes compléments', 'À l’heure de chaque complément, tant que la prise n’est pas cochée.', prefs.supplements.on, (on) => void save({ ...prefs, supplements: { on } }))}
     {row('Bilan de la semaine', 'Ton résumé de la semaine est prêt.', prefs.weekly.on, (on) => void save({ ...prefs, weekly: { ...prefs.weekly, on } }),
       <div className="inline-pick"><select value={prefs.weekly.day} onChange={(e) => void save({ ...prefs, weekly: { ...prefs.weekly, day: Number(e.target.value) } })}>
         {DAYS.map((d, i) => <option key={d} value={i}>{d}</option>)}</select>{time(prefs.weekly.time, (v) => void save({ ...prefs, weekly: { ...prefs.weekly, time: v } }))}</div>)}

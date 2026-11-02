@@ -1,4 +1,4 @@
-import { ChevronRight, CloudSun, Frown, Smile, Meh, Zap } from 'lucide-react';
+import { ChevronRight, CloudSun, Compass, Flower2, Frown, Smile, Meh, Moon, Pill, Timer, Zap } from 'lucide-react';
 import { useContext, useState } from 'react';
 import type { Entry, EntryInput, ModuleId } from '../lib/cloud';
 import { str, todayIso } from '../lib/day';
@@ -13,7 +13,7 @@ const MOODS = [
 ] as const;
 
 export function Wellbeing({ entries, onGo, onCreate, onUpdate }: {
-  entries: Entry[]; onGo: (s: ModuleId | 'calme') => void;
+  entries: Entry[]; onGo: (s: ModuleId | 'calme' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements') => void;
   onCreate: (input: EntryInput) => Promise<void>; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>;
 }) {
   const day = todayIso();
@@ -37,6 +37,10 @@ export function Wellbeing({ entries, onGo, onCreate, onUpdate }: {
 
   return <div className="screen">
     <header className="tab-head"><h1>Bien-être</h1><p>Votre corps et votre esprit, aujourd’hui</p></header>
+    <div className="tool-chips">
+      {([['mediter', 'Méditer', Flower2], ['sommeil', 'Sommeil', Moon], ['complements', 'Compléments', Pill], ['focus', 'Focus', Timer], ['boussole', 'Ma boussole', Compass]] as const).map(([id, label, Icon]) =>
+        <button key={id} className="tool-chip" onClick={() => onGo(id)}><Icon size={16} /> {label}</button>)}
+    </div>
     <section className="stack-8">
       <span className="label-strong">Comment vous sentez-vous ?</span>
       <div className="mood-row">{MOODS.map(({ value, icon: Icon }) =>

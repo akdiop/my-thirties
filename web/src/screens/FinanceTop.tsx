@@ -20,7 +20,9 @@ function Donut({ parts, total, currency }: { parts: { share: number; color: stri
   </div>;
 }
 
-export function FinanceTop({ entries, onAdd, onOpen }: { entries: Entry[]; onAdd: (kind: string) => void; onOpen: (e: Entry) => void }) {
+export function FinanceTop({ entries, onAdd, onOpen, onUpdate }: { entries: Entry[]; onAdd: (kind: string) => void; onOpen: (e: Entry) => void; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void> }) {
+  const recurring = entries.filter((e) => e.kind === 'recurring').sort((a, b) => (num(a.data.day) || 1) - (num(b.data.day) || 1));
+  const save = async () => { if (!goal) return; const v = window.prompt('Combien veux-tu ajouter à ton épargne ? (' + currencyOf(goal) + ')'); const n = Number(String(v ?? '').replace(/[^\d.,]/g, '').replace(',', '.')); if (n > 0) await onUpdate(goal, { ...goal.data, saved: (num(goal.data.saved) || 0) + n }); };
   const [currency, setCurrency] = useState<string>(() => mainCurrency(entries));
   const [month, setMonth] = useState(todayIso().slice(0, 7));
   const [list, setList] = useState<'expense' | 'income'>('expense');
@@ -48,8 +50,17 @@ export function FinanceTop({ entries, onAdd, onOpen }: { entries: Entry[]; onAdd
       <div className="mini-card sauge"><span>Budget restant</span><strong>{r.left !== null ? fmt(r.left, currency) : '—'}</strong>
         <small>{eurOfLeft !== null ? `≈ ${fmt(eurOfLeft, 'EUR')} (parité fixe)` : r.left === null ? 'Ajoute un budget mensuel' : `Revenus : ${fmt(r.income, currency)}`}</small></div>
       <div className="mini-card sable"><span>Épargne{goal ? ' · ' + goal.title : ''}</span><strong>{goalShare !== null ? Math.round(goalShare * 100) + ' %' : '—'}</strong>
-        {goalShare !== null ? <div className="mini-bar"><div style={{ width: goalShare * 100 + '%' }} /></div> : <small>Ajoute un objectif d’épargne</small>}</div>
+        {goalShare !== null ? <><div className="mini-bar"><div style={{ width: goalShare * 100 + '%' }} /></div>
+          <small>{fmt(num(goal!.data.saved) || 0, currencyOf(goal!))} sur {fmt(amountOf(goal!), currencyOf(goal!))}</small>
+          <button className="link-btn small" onClick={() => void save()}>+ Épargner</button></>
+          : <button className="link-btn small" onClick={() => onAdd('goal')}>+ Créer un objectif d’épargne</button>}</div>
     </div>
+    <SectionTitle action="Ajouter" onAction={() => onAdd('recurring')}>Dépenses récurrentes</SectionTitle>
+    <div className="line-list">{recurring.length ? recurring.map((s) => <button key={s.id} className="line-row" onClick={() => onOpen(s)}>
+      <span className="line-icon"><Repeat size={17} /></span>
+      <span className="line-text"><strong>{s.title}</strong><small>le {num(s.data.day) || 1} de chaque mois · ajoutée automatiquement</small></span>
+      <span className="line-amount">{fmt(amountOf(s), currencyOf(s))}</span></button>)
+      : <p className="muted">Loyer, transport, tontine… Ajoute-les une fois : elles seront comptées chaque mois automatiquement.</p>}</div>
     <SectionTitle action="Abonnements" onAction={() => onAdd('subscription')}>Prochains prélèvements</SectionTitle>
     <div className="line-list">{subs.length ? subs.map((s) => <button key={s.id} className="line-row" onClick={() => onOpen(s)}>
       <span className="line-icon"><Repeat size={17} /></span>

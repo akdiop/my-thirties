@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { BrandLockup } from './ui/BrandMark';
 import type { Session } from '@supabase/supabase-js';
 import {
@@ -10,32 +10,12 @@ import { downloadBackup, makeEncryptedBackup, parseEncryptedBackup } from './lib
 import { moduleById, modules, type Module } from './modules';
 import { validateRestore } from './lib/restore';
 import { consolidateIngredients, groceryTitle, mergeGroceryItems, weekGroceryItems, weekStart, type ListItem } from './lib/groceries';
-import { BoosterPlan } from './features/BoosterPlan';
-import { RecipeView } from './features/RecipeView';
-import { TravelTools } from './features/TravelTools';
-import { EquilibriumInsights } from './features/EquilibriumInsights';
-import { KitchenPlanner } from './features/KitchenPlanner';
-import { PassionPath } from './features/PassionPath';
-import { TravelPlanner } from './features/TravelPlanner';
-import { PrayerPlanner } from './features/PrayerPlanner';
-import { PersonalBrief } from './features/PersonalBrief';
-import { RecipeIdeas } from './features/RecipeIdeas';
-import { BalanceReview } from './features/BalanceReview';
-import { AutomaticPrayerTimes } from './features/AutomaticPrayerTimes';
-import { PersonalAssistant } from './features/PersonalAssistant';
-import { PrivacyCenter } from './features/PrivacyCenter';
 import { deleteEntryMedia } from './lib/mediaLibrary';
 import { PersonalProfile, ProfileAvatar } from './features/PersonalProfile';
 import { birthdayLine, PROFILE_KIND, readProfile } from './lib/profile';
 import { PHOTO_KIND } from './lib/photos';
 import { PhotoProvider } from './features/HeroPhoto';
-import { SportHub } from './features/SportHub';
-import { ChallengesBoard } from './features/ChallengesBoard';
 import { Home as HomeScreen } from './screens/Home';
-import { Compass } from './screens/Compass';
-import { Focus } from './screens/Focus';
-import { Sleep } from './screens/Sleep';
-import { Meditate } from './screens/Meditate';
 import { Agenda } from './screens/Agenda';
 import { Wellbeing } from './screens/Wellbeing';
 import { Spaces } from './screens/Spaces';
@@ -45,26 +25,50 @@ import { FinanceTop } from './screens/FinanceTop';
 import { CuisineTop, EquilibreTop, SpiritTop, TravelTop, type CuisineTab, type EquilibreTab, type SpiritTab } from './screens/ModuleTops';
 import { ScreenHeader, SectionTitle, Segmented } from './ui/kit';
 import { GuidedField } from './ui/fields';
-import { LearningPaths } from './features/LearningPaths';
-import { SeriesTracker } from './features/SeriesTracker';
-import { TravelSuggestions } from './features/TravelSuggestions';
-import { CookingTips } from './features/CookingTips';
-import { WeekLunches } from './features/WeekLunches';
 import { HIDDEN_KIND, HiddenProvider, readHidden, useHidden, type Hidden } from './lib/hidden';
 import { RITUAL_KINDS } from './lib/rituals';
-import { MyDay } from './screens/MyDay';
-import { Habits } from './screens/Habits';
-import { Notes } from './screens/Notes';
 import { HomeRituals } from './screens/HomeRituals';
-import { Review } from './screens/Review';
 import { LockGate } from './features/LockGate';
-import { NotificationSettings } from './features/Notifications';
-import { JournalSettings } from './features/JournalSettings';
-import { IphoneCalendar } from './features/IphoneCalendar';
 import { removeLock } from './lib/journalLock';
+import { clearOffline, isNetworkError, knownOwner, loadOffline, rememberOwner, saveOffline } from './lib/offline';
 import { Sparkles } from 'lucide-react';
 
-type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | ModuleId;
+// Écrans chargés à la demande : l'app s'ouvre plus vite.
+const BoosterPlan = lazy(() => import('./features/BoosterPlan').then((m) => ({ default: m.BoosterPlan })));
+const RecipeView = lazy(() => import('./features/RecipeView').then((m) => ({ default: m.RecipeView })));
+const TravelTools = lazy(() => import('./features/TravelTools').then((m) => ({ default: m.TravelTools })));
+const EquilibriumInsights = lazy(() => import('./features/EquilibriumInsights').then((m) => ({ default: m.EquilibriumInsights })));
+const KitchenPlanner = lazy(() => import('./features/KitchenPlanner').then((m) => ({ default: m.KitchenPlanner })));
+const PassionPath = lazy(() => import('./features/PassionPath').then((m) => ({ default: m.PassionPath })));
+const TravelPlanner = lazy(() => import('./features/TravelPlanner').then((m) => ({ default: m.TravelPlanner })));
+const PrayerPlanner = lazy(() => import('./features/PrayerPlanner').then((m) => ({ default: m.PrayerPlanner })));
+const PersonalBrief = lazy(() => import('./features/PersonalBrief').then((m) => ({ default: m.PersonalBrief })));
+const RecipeIdeas = lazy(() => import('./features/RecipeIdeas').then((m) => ({ default: m.RecipeIdeas })));
+const BalanceReview = lazy(() => import('./features/BalanceReview').then((m) => ({ default: m.BalanceReview })));
+const AutomaticPrayerTimes = lazy(() => import('./features/AutomaticPrayerTimes').then((m) => ({ default: m.AutomaticPrayerTimes })));
+const PersonalAssistant = lazy(() => import('./features/PersonalAssistant').then((m) => ({ default: m.PersonalAssistant })));
+const PrivacyCenter = lazy(() => import('./features/PrivacyCenter').then((m) => ({ default: m.PrivacyCenter })));
+const SportHub = lazy(() => import('./features/SportHub').then((m) => ({ default: m.SportHub })));
+const ChallengesBoard = lazy(() => import('./features/ChallengesBoard').then((m) => ({ default: m.ChallengesBoard })));
+const Compass = lazy(() => import('./screens/Compass').then((m) => ({ default: m.Compass })));
+const Focus = lazy(() => import('./screens/Focus').then((m) => ({ default: m.Focus })));
+const Sleep = lazy(() => import('./screens/Sleep').then((m) => ({ default: m.Sleep })));
+const Meditate = lazy(() => import('./screens/Meditate').then((m) => ({ default: m.Meditate })));
+const Supplements = lazy(() => import('./screens/Supplements').then((m) => ({ default: m.Supplements })));
+const LearningPaths = lazy(() => import('./features/LearningPaths').then((m) => ({ default: m.LearningPaths })));
+const SeriesTracker = lazy(() => import('./features/SeriesTracker').then((m) => ({ default: m.SeriesTracker })));
+const TravelSuggestions = lazy(() => import('./features/TravelSuggestions').then((m) => ({ default: m.TravelSuggestions })));
+const CookingTips = lazy(() => import('./features/CookingTips').then((m) => ({ default: m.CookingTips })));
+const WeekLunches = lazy(() => import('./features/WeekLunches').then((m) => ({ default: m.WeekLunches })));
+const MyDay = lazy(() => import('./screens/MyDay').then((m) => ({ default: m.MyDay })));
+const Habits = lazy(() => import('./screens/Habits').then((m) => ({ default: m.Habits })));
+const Notes = lazy(() => import('./screens/Notes').then((m) => ({ default: m.Notes })));
+const Review = lazy(() => import('./screens/Review').then((m) => ({ default: m.Review })));
+const NotificationSettings = lazy(() => import('./features/Notifications').then((m) => ({ default: m.NotificationSettings })));
+const JournalSettings = lazy(() => import('./features/JournalSettings').then((m) => ({ default: m.JournalSettings })));
+const IphoneCalendar = lazy(() => import('./features/IphoneCalendar').then((m) => ({ default: m.IphoneCalendar })));
+
+type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
 const today = () => new Date().toLocaleDateString('en-CA');
 const value = (obj: Record<string, unknown>, key: string) => typeof obj[key] === 'string' ? obj[key] as string : '';
@@ -394,7 +398,7 @@ export default function App() {
   useEffect(() => {
     const q = new URLSearchParams(window.location.search), target = q.get('ecran');
     if (!target) return;
-    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter'].includes(target)) {
+    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements'].includes(target)) {
       if (target === 'myday') setDayTarget((t) => ({ part: q.get('moment') === 'soir' ? 'soir' : 'matin', n: t.n + 1 }));
       setScreen(target as Screen);
     }
@@ -430,18 +434,25 @@ export default function App() {
     return () => { active = false; sub?.data.subscription.unsubscribe(); };
   }, []);
 
+  const [offline, setOffline] = useState<string | null>(null);
   const refresh = useCallback(async () => {
     setLoading(true); setError('');
-    try { setEntries(await readEntries()); }
-    catch (e) { setError(e instanceof Error ? e.message : 'Impossible de charger les données.'); }
+    try { const all = await readEntries(); setEntries(all); saveOffline(all); setOffline(null); }
+    catch (e) {
+      const copy = isNetworkError(e) ? loadOffline() : null;
+      if (copy) { setEntries(copy.entries); setOffline(copy.at); }
+      else setError(e instanceof Error ? e.message : 'Impossible de charger les données.');
+    }
     finally { setLoading(false); }
   }, []);
+  // Retour du réseau : on recharge les données à jour.
+  useEffect(() => { const on = () => { if (offline) void refresh(); }; window.addEventListener('online', on); return () => window.removeEventListener('online', on); }, [offline, refresh]);
 
   useEffect(() => {
     if (!session) { setEntries([]); setOwner(null); return; }
     let active = true;
-    isOwner().then((allowed) => { if (active) setOwner(allowed); })
-      .catch(() => { if (active) setOwner(false); });
+    isOwner().then((allowed) => { if (active) { setOwner(allowed); rememberOwner(allowed); } })
+      .catch((e) => { if (active) setOwner(isNetworkError(e) && knownOwner() ? true : false); });
     return () => { active = false; };
   }, [session?.user.id]);
 
@@ -483,6 +494,23 @@ export default function App() {
     if (isMeal(input)) await syncGroceries([input.entry_date]);
     await refresh();
   };
+  // Dépenses récurrentes : chaque mois, une dépense est ajoutée automatiquement le jour prévu (une seule fois par mois).
+  const recurringDone = useRef(new Set<string>());
+  useEffect(() => {
+    const now = today(), month = now.slice(0, 7), dayNow = Number(now.slice(8, 10));
+    const todo = allEntries.filter((r) => r.kind === 'recurring' && (Number(r.data.day) || 1) <= dayNow && !recurringDone.current.has(r.id + month)
+      && !allEntries.some((e) => e.kind === 'expense' && e.data.recurringId === r.id && String(e.entry_date ?? '').startsWith(month)));
+    if (!todo.length) return;
+    todo.forEach((r) => recurringDone.current.add(r.id + month));
+    void (async () => {
+      for (const r of todo) {
+        const date = month + '-' + String(Math.min(28, Number(r.data.day) || 1)).padStart(2, '0');
+        await createEntry({ module: 'finances', kind: 'expense', title: r.title, entry_date: date,
+          data: { date, amount: r.data.amount, currency: r.data.currency, category: r.data.category, payment: r.data.payment, note: 'Dépense récurrente', recurringId: r.id } });
+      }
+      await refresh();
+    })();
+  }, [allEntries]); // eslint-disable-line react-hooks/exhaustive-deps
   const hiddenEntry = allEntries.find((e) => e.kind === HIDDEN_KIND);
   const hidden = useMemo<Hidden>(() => {
     const items = readHidden(hiddenEntry);
@@ -549,15 +577,16 @@ export default function App() {
     ) : <div className="empty-soft"><Coffee size={28} /><p>Un espace à remplir à ton rythme.</p><button className="button ghost" onClick={() => setEditor({ module: currentModule })}>Créer ma première entrée</button></div>}</div>
   </section>;
 
-  const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings', 'myday', 'habits', 'notes', 'bilan', 'parametres', 'boussole', 'focus', 'sommeil', 'mediter'] as Screen[]).includes(screen);
+  const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings', 'myday', 'habits', 'notes', 'bilan', 'parametres', 'boussole', 'focus', 'sommeil', 'mediter', 'complements'] as Screen[]).includes(screen);
   const openDay = (date?: string, part?: 'matin' | 'soir') => { setDayTarget((t) => ({ date, part, n: t.n + 1 })); go('myday'); };
   const editFull = async (id: string, patch: { title: string; data: Record<string, unknown> }) => { await editEntry(id, patch); await refresh(); };
 
-  return <HiddenProvider value={hidden}><PhotoProvider value={{ photos, save: savePhoto }}><div className={'app' + (screen === 'calme' ? ' calm-mode' : '')}>
+  return <HiddenProvider value={hidden}><PhotoProvider value={{ photos, save: savePhoto }}><Suspense fallback={<div className="screen-loading" aria-busy="true">Chargement…</div>}><div className={'app' + (screen === 'calme' ? ' calm-mode' : '')}>
     <main className="phone">
+      {offline && <div className="offline-banner" role="status">Hors connexion · tu consultes la copie du {new Date(offline).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}. Les modifications et ton journal reviendront avec le réseau.</div>}
       {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
       {loading && <div className="sync-status" role="status">Synchronisation…</div>}
-      {screen === 'home' && <HomeScreen rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} onQuickAdd={(title) => createFromTool({ module: 'quotidien', kind: 'task', title, entry_date: today(), data: { date: today(), priority: 'Haute' } })} />}
+      {screen === 'home' && <HomeScreen rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} onUpdate={updateData} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} onQuickAdd={(title) => createFromTool({ module: 'quotidien', kind: 'task', title, entry_date: today(), data: { date: today(), priority: 'Haute' } })} />}
       {screen === 'myday' && <LockGate><MyDay key={dayTarget.n} entries={ritualEntries} initialDate={dayTarget.date} initialPart={dayTarget.part} onCreate={createFromTool} onUpdate={updateData} /></LockGate>}
       {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}
       {screen === 'notes' && <LockGate><Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={removeQuiet} onOpenDay={openDay} /></LockGate>}
@@ -565,14 +594,15 @@ export default function App() {
       {screen === 'boussole' && <><ScreenHeader title="" onBack={() => go('home')} /><Compass entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} onEditProfile={() => go('settings')} /></>}
       {screen === 'focus' && <><ScreenHeader title="" onBack={() => go('home')} /><Focus entries={ritualEntries} onCreate={createFromTool} /></>}
       {screen === 'sommeil' && <><ScreenHeader title="" onBack={() => go('home')} /><Sleep entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} /></>}
+      {screen === 'complements' && <><ScreenHeader title="" onBack={() => go('home')} /><Supplements entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
       {screen === 'mediter' && <><ScreenHeader title="" onBack={() => go('home')} /><Meditate entries={ritualEntries} onCreate={createFromTool} /></>}
       {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onImported={() => void refresh()} />}
       {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
       {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}
       {screen === 'calme' && <Calm onQuit={() => go('home')} onWrite={() => addIn('equilibre', 'emotion', { date: today() })} />}
       {screen === 'assistant' && <div className="screen"><ScreenHeader title="Assistant" onBack={() => go('home')} /><PersonalBrief entries={entries} onGo={go} /><PersonalAssistant entries={entries} /></div>}
-      {screen === 'settings' && <div className="screen"><Profile view="profile" onSettings={() => go('parametres')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); await signOut(); setEntries([]); }} /></div>}
-      {screen === 'parametres' && <div className="screen"><Profile view="settings" onSettings={() => go('settings')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); await signOut(); setEntries([]); }} /></div>}
+      {screen === 'settings' && <div className="screen"><Profile view="profile" onSettings={() => go('parametres')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); clearOffline(); await signOut(); setEntries([]); }} /></div>}
+      {screen === 'parametres' && <div className="screen"><Profile view="settings" onSettings={() => go('settings')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); clearOffline(); await signOut(); setEntries([]); }} /></div>}
       {currentModule && <div className="screen">
         <ScreenHeader title={currentModule.name} onBack={() => go('spaces')}
           right={<button className="icon-btn" aria-label="Ajouter" onClick={() => setEditor({ module: currentModule })}><Plus size={24} /></button>} />
@@ -580,7 +610,7 @@ export default function App() {
         {currentModule.id === 'sante' && <HealthTop entries={allModuleEntries} onAdd={(kind) => addIn('sante', kind, { date: today() })} />}
         {currentModule.id === 'sport' && <SportHub entries={allModuleEntries} challengeEntries={entries.filter((e) => e.module === 'challenges')} onCreate={createFromTool} onGoChallenges={() => go('challenges')} />}
         {currentModule.id === 'challenges' && <ChallengesBoard entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onQuit={removeQuiet} />}
-        {currentModule.id === 'finances' && <FinanceTop entries={allModuleEntries} onAdd={(kind) => addIn('finances', kind, { date: today() })} onOpen={openEntry} />}
+        {currentModule.id === 'finances' && <FinanceTop entries={allModuleEntries} onAdd={(kind) => addIn('finances', kind, { date: today() })} onOpen={openEntry} onUpdate={updateData} />}
         {currentModule.id === 'cuisine' && <><CuisineTop tab={cuisineTab} onTab={setCuisineTab} entries={allModuleEntries} />
           {cuisineTab === 'recettes' && <RecipeIdeas entries={allModuleEntries} onCreate={createFromTool} />}
           {cuisineTab === 'semaine' && <><KitchenPlanner entries={allModuleEntries} onCreate={createFromTool} onRemove={removeQuiet} /><KitchenTools entries={allModuleEntries} onGenerate={createGroceries} /></>}
@@ -616,5 +646,5 @@ export default function App() {
       return <button key={id} className={on ? 'on' : ''} aria-current={on ? 'page' : undefined} onClick={() => go(id)}><Icon size={24} strokeWidth={on ? 2.2 : 1.6} /><span>{label}</span></button>;
     })}</nav>}
     {editor && <Editor key={(editor.initial?.id ?? editor.module.id) + (editor.preset?.kind ?? '')} module={editor.module} initial={editor.initial} preset={editor.preset} entries={entries} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
-  </div></PhotoProvider></HiddenProvider>;
+  </div></Suspense></PhotoProvider></HiddenProvider>;
 }

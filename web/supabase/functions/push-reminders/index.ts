@@ -8,7 +8,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import webpush from 'npm:web-push@3.6.7';
 
 type Prefs = { morning?: { on?: boolean; time?: string }; evening?: { on?: boolean; time?: string }; habits?: { on?: boolean; time?: string };
-  agenda?: { on?: boolean; minutes?: number }; weekly?: { on?: boolean; day?: number; time?: string } };
+  agenda?: { on?: boolean; minutes?: number }; weekly?: { on?: boolean; day?: number; time?: string }; supplements?: { on?: boolean } };
 type Row = { id: string; module: string; kind: string; title: string; entry_date: string | null; data: Record<string, unknown> };
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 const json = (d: unknown, status = 200) => new Response(JSON.stringify(d), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -83,7 +83,7 @@ Deno.serve(async (request) => {
     const p = (u.prefs ?? {}) as Prefs, now = localNow(u.tz);
     const queue: { key: string; title: string; body: string; url: string }[] = [];
     const { data: rows } = await db.from('entries').select('id,module,kind,title,entry_date,data').eq('user_id', u.user_id)
-      .in('kind', ['daily', 'habit', 'task', 'event', 'appointment', 'routine']);
+      .in('kind', ['daily', 'habit', 'task', 'event', 'appointment', 'routine', 'complement']);
     const list = (rows ?? []) as Row[];
     const today = list.find((e) => e.kind === 'daily' && e.entry_date === now.date);
 
@@ -94,6 +94,16 @@ Deno.serve(async (request) => {
     if (p.habits?.on !== false && due(now.minutes, mins(p.habits?.time ?? '19:00'))) {
       const left = list.filter((e) => e.kind === 'habit' && (e.data.freq ?? 'daily') === 'daily' && !(e.data.done as Record<string, boolean> | undefined)?.[now.date]);
       if (left.length) queue.push({ key: 'habits:' + now.date, title: 'Mes habitudes', body: left.length === 1 ? 'Il te reste « ' + left[0]!.title + ' » aujourd’hui.' : 'Il te reste ' + left.length + ' habitudes aujourd’hui : ' + left.slice(0, 3).map((e) => e.title).join(', ') + '.', url: '/?ecran=habits' });
+    }
+    // Compléments : à l'heure choisie, tant que la prise du jour n'est pas cochée et que la cure est en cours.
+    if (p.supplements?.on !== false) {
+      for (const e of list.filter((x) => x.kind === 'complement' && x.data.remind !== false)) {
+        const t = typeof e.data.time === 'string' ? mins(e.data.time) : -1;
+        const start = String(e.data.start ?? e.entry_date ?? now.date), days = Number(e.data.days) || 0;
+        const n = Math.floor((Date.parse(now.date + 'T12:00:00Z') - Date.parse(start + 'T12:00:00Z')) / 86_400_000) + 1;
+        if (t < 0 || n < 1 || (days && n > days) || (e.data.done as Record<string, boolean> | undefined)?.[now.date]) continue;
+        if (due(now.minutes, t)) queue.push({ key: 'supp:' + e.id + ':' + now.date, title: 'Mes compléments', body: e.title + (e.data.dose ? ' · ' + String(e.data.dose) : '') + (days ? ' · jour ' + n + '/' + days : ''), url: '/?ecran=complements' });
+      }
     }
     if (p.weekly?.on !== false && now.weekday === (p.weekly?.day ?? 0) && due(now.minutes, mins(p.weekly?.time ?? '18:00')))
       queue.push({ key: 'weekly:' + now.date, title: 'Mon bilan de la semaine', body: 'Humeurs, habitudes, victoires : ta semaine t’attend.', url: '/?ecran=bilan' });

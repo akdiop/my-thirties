@@ -1,14 +1,37 @@
 import { useEffect, useState } from 'react';
-import { BookHeart, CalendarCheck, Compass, Flower2, Heart, Leaf, Moon, Sparkles, Timer } from 'lucide-react';
+import { BookHeart, CalendarCheck, ChevronDown, ChevronUp, Compass, Flower2, Heart, Leaf, Moon, Pill, Settings2, Sparkles, Timer } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, isoOf, NOTE_KIND } from '../lib/rituals';
 
-type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter';
+type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements';
+type Shortcut = { id: Exclude<Target, 'myday'>; label: string; sub: string; icon: typeof Heart };
+const SHORTCUTS: Shortcut[] = [
+  { id: 'habits', label: 'Habitudes', sub: 'Suivi quotidien', icon: Heart },
+  { id: 'notes', label: 'Mon journal', sub: 'Notes et historique', icon: BookHeart },
+  { id: 'bienetre', label: 'Bien-être', sub: 'Humeur, cycle, prière', icon: Leaf },
+  { id: 'bilan', label: 'Bilan de la semaine', sub: 'Humeurs, habitudes, victoires', icon: CalendarCheck },
+  { id: 'boussole', label: 'Ma boussole', sub: 'Vision, objectifs, roue de la vie', icon: Compass },
+  { id: 'focus', label: 'Focus', sub: 'Une plante pousse quand tu te concentres', icon: Timer },
+  { id: 'sommeil', label: 'Sommeil', sub: 'Routine du soir et nuits', icon: Moon },
+  { id: 'mediter', label: 'Méditer', sub: 'Respirations, guidées, minuteur', icon: Flower2 },
+  { id: 'complements', label: 'Mes compléments', sub: 'Vitamines, cures, rappels', icon: Pill },
+];
+export const HOME_CFG_KIND = 'reglages_accueil';
 
 /** Accueil : carte « Mon jour », micro-rituels (respiration, affirmation) et raccourcis. */
-export function HomeRituals({ entries, onGo, onOpenDay, onCreate }: {
+export function HomeRituals({ entries, onGo, onOpenDay, onCreate, onUpdate }: {
   entries: Entry[]; onGo: (t: Target) => void; onOpenDay: (part: 'matin' | 'soir') => void; onCreate: (i: EntryInput) => Promise<void>;
+  onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void>;
 }) {
+  // Raccourcis de l'accueil : choisis et ordonnés par moi (enregistrés avec mes données).
+  const cfg = entries.find((e) => e.kind === HOME_CFG_KIND);
+  const ids = SHORTCUTS.map((x) => x.id) as string[];
+  const savedOrder = Array.isArray(cfg?.data.order) ? (cfg!.data.order as string[]).filter((x) => ids.includes(x)) : [];
+  const order = [...savedOrder, ...ids.filter((x) => !savedOrder.includes(x))] as Shortcut['id'][];
+  const shown = Array.isArray(cfg?.data.shown) ? (cfg!.data.shown as string[]) : ['habits', 'notes', 'bienetre', 'bilan', 'boussole', 'complements'];
+  const [editing, setEditing] = useState(false);
+  const saveCfg = (o: string[], sh: string[]) => cfg ? onUpdate(cfg, { ...cfg.data, order: o, shown: sh })
+    : onCreate({ module: 'quotidien', kind: HOME_CFG_KIND, title: 'Réglages de l’accueil', entry_date: null, data: { order: o, shown: sh } });
   const today = isoOf(new Date());
   const day = entries.find((e) => e.kind === DAILY_KIND && e.entry_date === today);
   const evening = new Date().getHours() >= 18;
@@ -34,16 +57,20 @@ export function HomeRituals({ entries, onGo, onOpenDay, onCreate }: {
         data: { noteId: crypto.randomUUID(), type: 'gratitude', heading: 'Affirmation', body: text, folder: 'bienetre', mood: '', updated: new Date().toISOString() } })} />
     </div>
 
-    <div className="shortcut-grid">
-      <button className="shortcut" onClick={() => onGo('habits')}><span><Heart size={20} /></span><strong>Habitudes</strong><small>{habits.length ? habitsDone + '/' + habits.length + ' aujourd’hui' : 'Suivi quotidien'}</small></button>
-      <button className="shortcut" onClick={() => onGo('notes')}><span><BookHeart size={20} /></span><strong>Mon journal</strong><small>Notes et historique</small></button>
-      <button className="shortcut" onClick={() => onGo('bienetre')}><span><Leaf size={20} /></span><strong>Bien-être</strong><small>Humeur, cycle, prière</small></button>
-      <button className="shortcut" onClick={() => onGo('bilan')}><span><CalendarCheck size={20} /></span><strong>Bilan de la semaine</strong><small>Humeurs, habitudes, victoires</small></button>
-      <button className="shortcut" onClick={() => onGo('boussole')}><span><Compass size={20} /></span><strong>Ma boussole</strong><small>Vision, objectifs, roue de la vie</small></button>
-      <button className="shortcut" onClick={() => onGo('focus')}><span><Timer size={20} /></span><strong>Focus</strong><small>Une plante pousse quand tu te concentres</small></button>
-      <button className="shortcut" onClick={() => onGo('sommeil')}><span><Moon size={20} /></span><strong>Sommeil</strong><small>Routine du soir et nuits</small></button>
-      <button className="shortcut" onClick={() => onGo('mediter')}><span><Flower2 size={20} /></span><strong>Méditer</strong><small>Respirations, guidées, minuteur</small></button>
-    </div>
+    <div className="shortcut-head"><span className="ritual-label">Mes raccourcis</span><button className="link-btn small" onClick={() => setEditing(!editing)}><Settings2 size={14} /> {editing ? 'Terminé' : 'Personnaliser'}</button></div>
+    {editing ? <div className="shortcut-edit">
+      {order.map((id, i) => { const sc = SHORTCUTS.find((x) => x.id === id)!; const on = shown.includes(id);
+        return <div key={id} className={'sc-row' + (on ? '' : ' off')}>
+          <button className={'switch' + (on ? ' on' : '')} role="switch" aria-checked={on} aria-label={'Afficher ' + sc.label} onClick={() => void saveCfg(order, on ? shown.filter((x) => x !== id) : [...shown, id])}><span /></button>
+          <span className="sc-label"><sc.icon size={16} /> {sc.label}</span>
+          <button className="icon-btn" aria-label={'Monter ' + sc.label} disabled={i === 0} onClick={() => { const o = [...order]; [o[i - 1], o[i]] = [o[i]!, o[i - 1]!]; void saveCfg(o, shown); }}><ChevronUp size={16} /></button>
+          <button className="icon-btn" aria-label={'Descendre ' + sc.label} disabled={i === order.length - 1} onClick={() => { const o = [...order]; [o[i + 1], o[i]] = [o[i]!, o[i + 1]!]; void saveCfg(o, shown); }}><ChevronDown size={16} /></button>
+        </div>; })}
+      <p className="muted small">Les raccourcis masqués restent accessibles depuis Espaces ou Bien-être.</p>
+    </div> : <div className="shortcut-grid">
+      {order.filter((id) => shown.includes(id)).map((id) => { const sc = SHORTCUTS.find((x) => x.id === id)!;
+        return <button key={id} className="shortcut" onClick={() => onGo(sc.id)}><span><sc.icon size={20} /></span><strong>{sc.label}</strong><small>{sc.id === 'habits' && habits.length ? habitsDone + '/' + habits.length + ' aujourd’hui' : sc.sub}</small></button>; })}
+    </div>}
   </>;
 }
 
