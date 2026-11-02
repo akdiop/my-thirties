@@ -1,6 +1,6 @@
 import { QUESTS } from '../lib/boosterDays';
 import { useState, type ReactNode } from 'react';
-import { BookHeart, CalendarDays, Check, CloudSun, HandCoins, Heart, Lightbulb, MapPin, Mountain, Star, Sun, Waves, Zap, Shield, Smile, Scale, Feather } from 'lucide-react';
+import { BookHeart, CalendarDays, CloudSun, HandCoins, Heart, Lightbulb, MapPin, Mountain, Star, Sun, Waves, Zap, Shield, Smile, Scale, Feather } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { str, todayIso } from '../lib/day';
 import { amountOf, currencyOf, fmt } from '../lib/money';
@@ -98,12 +98,24 @@ export function EquilibreTop({ tab, onTab, entries, onAxis, onQuest, booster }: 
 const hijri = (d = new Date()) => { try { return new Intl.DateTimeFormat('fr-FR-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric' }).format(d); } catch { return ''; } };
 const DHIKR = ['SubhanAllah', 'Alhamdulillah', 'Allahu akbar', 'Astaghfirullah', 'La ilaha illa Allah'];
 export type SpiritTab = 'home' | 'dhikr' | 'hijri' | 'journal' | 'horaires' | 'invocations';
-export function SpiritTop({ tab, onTab, entries, onCreate, onRemove }: { tab: SpiritTab; onTab: (t: SpiritTab) => void; entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onRemove: (e: Entry) => Promise<void> }) {
-  const day = todayIso();
-  const p = prayerDay(entries);
+/** Compteur de dhikr : on touche le cercle, objectif 33, enregistrement du total du jour. */
+function DhikrCounter({ day, entries, onCreate }: { day: string; entries: Entry[]; onCreate: (i: EntryInput) => Promise<void> }) {
   const [count, setCount] = useState(0);
   const [phrase, setPhrase] = useState(DHIKR[0]!);
   const [saving, setSaving] = useState(false);
+  const todayTotal = entries.filter((e) => e.kind === 'dhikr' && e.entry_date === day).reduce((n, e) => n + (Number(str(e, 'count')) || 0), 0);
+  return <div className="dhikr">
+    <div className="chip-row">{DHIKR.map((d) => <button key={d} className={'chip' + (d === phrase ? ' on' : '')} onClick={() => { setPhrase(d); setCount(0); }}>{d}</button>)}</div>
+    <button className="dhikr-btn" onClick={() => setCount((c) => c + 1)} aria-label={'Compter ' + phrase}><strong>{count}</strong><small>{phrase}</small><span className="dhikr-ring" style={{ background: `conic-gradient(#6F8A80 ${Math.min(1, count / 33) * 360}deg, #DFE8E3 0)` }} /></button>
+    <p className="muted center">{count >= 33 ? '33 atteints · continue librement' : `${33 - count} pour atteindre 33`}{todayTotal ? ` · ${todayTotal} enregistrés aujourd’hui` : ''}</p>
+    <div className="two-btn"><button className="button ghost" onClick={() => setCount(0)}>Remettre à zéro</button>
+      <button className="button primary" disabled={!count || saving} onClick={async () => { setSaving(true); try { await onCreate({ module: 'spiritualite', kind: 'dhikr', title: `${phrase} · ${count}`, entry_date: day, data: { date: day, phrase, count: String(count) } }); setCount(0); } finally { setSaving(false); } }}>Enregistrer</button></div>
+  </div>;
+}
+
+export function SpiritTop({ tab, onTab, entries, onCreate, onRemove }: { tab: SpiritTab; onTab: (t: SpiritTab) => void; entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onRemove: (e: Entry) => Promise<void> }) {
+  const day = todayIso();
+  const p = prayerDay(entries);
   const toggle = async (name: string, on: boolean) => {
     const existing = entries.find((e) => e.kind === 'prayer' && e.entry_date === day && str(e, 'prayer') === name);
     if (on && !existing) await onCreate({ module: 'spiritualite', kind: 'prayer', title: name, entry_date: day, data: { date: day, prayer: name } });
@@ -123,22 +135,16 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onRemove }: { tab: Sp
         return <div className={'prio-row' + (p?.next?.name === name ? ' strong' : '')} key={name}><span>{name}</span><small className="num">{t}</small>
           <Check22 checked={done} label={name + ' accomplie'} onChange={(v) => void toggle(name, v)} /></div>;
       })}</div>
+      <DhikrCounter day={day} entries={entries} onCreate={onCreate} />
       <div className="rows">
         <RowLink icon={CalendarDays} title="Horaires des prières" sub="ville, méthode de calcul" onClick={() => onTab('horaires')} />
         <RowLink icon={Heart} title="Mes invocations" sub="routine de dhikr, protection, pardon, réussite…" onClick={() => onTab('invocations')} />
-        <RowLink icon={Check} title="Dhikr et compteur" sub="libre ou routine" onClick={() => onTab('dhikr')} />
         <RowLink icon={Sun} title="Calendrier hégirien" onClick={() => onTab('hijri')} />
         <RowLink icon={BookHeart} title="Mon journal spirituel" onClick={() => onTab('journal')} />
       </div>
     </>}
     {tab !== 'home' && <button className="link-btn back-link" onClick={() => onTab('home')}>‹ Ma spiritualité</button>}
-    {tab === 'dhikr' && <div className="dhikr">
-      <div className="chip-row">{DHIKR.map((d) => <button key={d} className={'chip' + (d === phrase ? ' on' : '')} onClick={() => { setPhrase(d); setCount(0); }}>{d}</button>)}</div>
-      <button className="dhikr-btn" onClick={() => setCount((c) => c + 1)} aria-label={'Compter ' + phrase}><strong>{count}</strong><small>{phrase}</small><span className="dhikr-ring" style={{ background: `conic-gradient(#6F8A80 ${Math.min(1, count / 33) * 360}deg, #DFE8E3 0)` }} /></button>
-      <p className="muted center">{count >= 33 ? '33 atteints · continue librement' : `${33 - count} pour atteindre 33`}</p>
-      <div className="two-btn"><button className="button ghost" onClick={() => setCount(0)}>Remettre à zéro</button>
-        <button className="button primary" disabled={!count || saving} onClick={async () => { setSaving(true); try { await onCreate({ module: 'spiritualite', kind: 'dhikr', title: `${phrase} · ${count}`, entry_date: day, data: { date: day, phrase, count: String(count) } }); setCount(0); } finally { setSaving(false); } }}>Enregistrer</button></div>
-    </div>}
+    {tab === 'dhikr' && <DhikrCounter day={day} entries={entries} onCreate={onCreate} />}
     {tab === 'hijri' && <div className="soft-card hijri-card">{Array.from({ length: 7 }, (_, i) => { const d = new Date(Date.now() + i * 86_400_000); return <div className="prio-row" key={i}>
       <span>{d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'short' })}</span><small>{hijri(d)}</small></div>; })}
       <p className="disclaimer">Calendrier Umm al-Qura calculé par le navigateur ; le début des mois peut différer d’un jour selon l’observation locale.</p></div>}

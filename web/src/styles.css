@@ -465,7 +465,8 @@ body{background:#FAF7F3}
 .pill-tabs button.active{background:#6F8A80}
 
 /* Cartes */
-.soft-card{background:#FFFCFA;border:1px solid #EFE3DE;border-radius:16px;color:#3A2A24;text-align:left}
+.soft-card{background:#FFFCFA;border:1px solid #EFE3DE;border-radius:16px;color:#3A2A24;text-align:left;padding:16px}
+.soft-card>strong:first-child{display:block;margin-bottom:6px}
 .list-card{padding:4px 16px}
 .two-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .stat-card{padding:14px;display:flex;flex-direction:column;gap:8px;font:inherit}
@@ -1539,7 +1540,8 @@ html.dark img,html.dark video,html.dark picture,html.dark canvas,html.dark ifram
 .fiche-head{display:flex;justify-content:space-between;align-items:center;width:100%;background:none;border:0;padding:0;text-align:left;font-size:1rem}
 .fiche-head span{font-size:1.3rem;color:#8c6257}
 .fiche-pt{margin:0;line-height:1.5;padding-left:12px;border-left:2px solid #f2e2dc}
-.affirm{font-style:italic;color:#6a4d44}
+.soft-card .affirm{font-style:normal;font-size:.98rem;line-height:1.45;color:#5a3f36;background:#f8f1ec;border-radius:12px;padding:10px 12px;margin:0 0 8px}
+.soft-card .affirm:last-child{margin-bottom:0}
 .reframe-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 8px 0; border-bottom: 1px solid var(--line, rgba(0,0,0,.08)); }
 .reframe-from { color: var(--muted, #8a7f78); text-decoration: line-through; font-size: .92rem; }
 .reframe-to { grid-column: 1; font-weight: 600; }
