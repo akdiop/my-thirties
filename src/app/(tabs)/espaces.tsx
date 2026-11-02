@@ -42,6 +42,14 @@ export default function Espaces() {
             <AppText variant="label" center>{module.label}</AppText>
           </Pressable>
         ))}
+        <Pressable accessibilityRole="button" accessibilityLabel="Mon panda compagnon"
+          onPress={() => router.push('/panda')}
+          style={({ pressed }) => ({ width: '31%', aspectRatio: 0.95, borderRadius: radius.lg + 2,
+            backgroundColor: '#E8DCD6', alignItems: 'center', justifyContent: 'center',
+            gap: 8, padding: 6, opacity: pressed ? 0.85 : 1 })}>
+          <AppText style={{ fontSize: 34 }}>🐼</AppText>
+          <AppText variant="label" center>Mon panda</AppText>
+        </Pressable>
       </View>
       <AppText variant="caption" color={c.textMuted} center>
         Les espaces se masquent depuis Profil › Espaces affichés.
