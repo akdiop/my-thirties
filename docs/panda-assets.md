@@ -3,7 +3,7 @@
 Aïda crée les visuels ; le code les affiche dès qu'ils sont déposés dans `web/public/panda/` et déclarés dans `web/src/features/panda/assets.ts`. Tant qu'une image manque, le dessin SVG actuel sert de secours.
 
 ## Règles communes
-- **Format** : PNG transparent (WebP accepté), sRGB.
+- **Format** : PNG transparent, sRGB (converti en WebP à l’intégration pour alléger l’app).
 - **Noms** : minuscules, sans accents ni espaces, mots séparés par `_`, extension `.png`.
 - **Palette** : crème `#FBEADB`, chocolat `#6E4A3C`, contour `#4A3128`, caramel `#C08A5E`, joues `#F3B9A3`, foulard sauge `#9AA77E`.
 - **Même cadre pour tout le panda** : 1024 × 1126 px, panda centré, **bas des pattes à 40 px du bord inférieur**, même taille de tête d'une image à l'autre. Les calques (tenues) sont dessinés sur ce même cadre, à la même place, pour se superposer exactement.
