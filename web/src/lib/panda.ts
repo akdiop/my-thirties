@@ -20,7 +20,7 @@ export const PANDA_LEVELS = [
   { name: 'Panda sage', text: 'Une belle histoire de petits pas.' },
 ] as const;
 const LEVEL_LIMITS = [0, 3, 9, 18, 30] as const;
-export const pandaLevel = (points: number) => LEVEL_LIMITS.reduce((level, min, i) => points >= min ? i : level, 0);
+export const pandaLevel = (points: number) => LEVEL_LIMITS.reduce<number>((level, min, i) => points >= min ? i : level, 0);
 export const nextPandaMilestone = (level: number) => LEVEL_LIMITS[level + 1] ?? null;
 
 export function readPandaData(value: Record<string, unknown>): PandaData {
