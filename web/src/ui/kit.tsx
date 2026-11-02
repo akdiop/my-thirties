@@ -66,20 +66,9 @@ export function RowLink({ icon: Icon, title, sub, onClick, tone }: { icon: Lucid
   </button>;
 }
 
-/** Illustrations des espaces (public/modules/<id>.webp). */
-export const MODULE_IMAGE: Partial<Record<ModuleId | 'assistant', string>> = {
-  quotidien: '/modules/maison.webp', sante: '/modules/sante.webp', sport: '/modules/sport.webp', equilibre: '/modules/equilibre.webp',
-  spiritualite: '/modules/spiritualite.webp', cuisine: '/modules/cuisine.webp', decouvertes: '/modules/decouvertes.webp', passions: '/modules/passions.webp',
-  finances: '/modules/finances.webp', listes: '/modules/listes.webp',
-};
-
 export function ModuleTile({ id, label, onClick }: { id: ModuleId | 'assistant'; label?: string; onClick: () => void }) {
   const look = MODULE_LOOK[id];
   const Icon = look.icon;
-  const img = MODULE_IMAGE[id];
-  if (img) return <button className="module-tile has-photo illustrated" style={{ backgroundImage: `linear-gradient(180deg, rgba(58,42,36,0) 45%, rgba(58,42,36,.62)), url(${img})` }} onClick={onClick}>
-    <span>{label ?? look.short}</span>
-  </button>;
   return <button className="module-tile" style={{ background: TILE[look.tone].bg }} onClick={onClick}>
     <Icon size={26} color={TILE[look.tone].fg} strokeWidth={1.6} />
     <span>{label ?? look.short}</span>
