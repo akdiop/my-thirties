@@ -1,64 +1,82 @@
 import type { ItemId } from './data';
 import type { PandaMood } from './types';
+import { assetUrl } from './assets';
 type OutfitId = string;
 
 export type Mood = PandaMood;
-const INK = '#6B4433', CREAM = '#FFF9F2', BLUSH = '#F3BFA9', CARAMEL = '#C98A55', SAND = '#E9C79A';
+const INK = '#6B4433', CREAM = '#FFF9F2', CARAMEL = '#C98A55', SAND = '#E9C79A';
 
-/** Le panda en 2D (style planche : contour chocolat, visage crème, joues rosées). Animations douces en CSS. */
+const FUR = '#6E4A3C', LINE = '#4A3128', FACE = '#FBEADB', PAD = '#C08A5E', SCARF = '#9AA77E', EYE = '#3B2620';
+
+/** Le panda en 2D, d'après la planche validée : visage crème pêche, grandes taches, yeux brillants, foulard sauge, coussinets caramel. */
 export function PandaCharacter({ mood = 'idle', outfit = 'aucune', level = 1, size = 180, party = false }: { mood?: Mood; outfit?: OutfitId; level?: number; size?: number; party?: boolean }) {
-  const closed = mood === 'happy' || mood === 'sleepy' || mood === 'proud' || mood === 'tea' || mood === 'calm' || mood === 'playful';
-  const grow = 0.82 + level * 0.036;
+  // Images livrées : panda_<expression> + calques acc_<tenue> / acc_fete, tous sur le même cadre 1024×1126.
+  const img = assetUrl('panda_' + mood) || (mood !== 'idle' ? assetUrl('panda_idle') : '');
+  if (img) {
+    const grow = 0.84 + level * 0.032, layers = [outfit !== 'aucune' ? assetUrl('acc_' + outfit) : '', party ? assetUrl('acc_fete') : ''].filter(Boolean);
+    return <span className={'panda-art panda-img mood-' + mood} style={{ width: size, height: size * 1.1 }} role="img" aria-label="Mon panda">
+      <span className="panda-body" style={{ transform: `scale(${grow})` }}><img src={img} alt="" draggable={false} />{layers.map((l) => <img key={l} src={l} alt="" draggable={false} />)}</span>
+    </span>;
+  }
+  const shut = mood === 'sleepy' || mood === 'calm' || mood === 'tea' || mood === 'proud';
+  const joy = mood === 'happy' || mood === 'playful';
+  const wave = mood === 'happy' || mood === 'playful';
+  const grow = 0.84 + level * 0.032;
   return <svg className={'panda-art mood-' + mood} viewBox="0 0 200 220" width={size} height={size * 1.1} role="img" aria-label="Mon panda">
-    <g transform={`translate(100 210) scale(${grow}) translate(-100 -210)`}>
-      <ellipse cx="100" cy="212" rx="62" ry="7" fill="#000" opacity=".08" />
+    <g transform={`translate(100 212) scale(${grow}) translate(-100 -212)`}>
+      <ellipse cx="100" cy="212" rx="60" ry="6" fill="#000" opacity=".07" />
       <g className="panda-body">
-        {/* corps */}
-        <path d="M52 150 Q50 205 100 206 Q150 205 148 150 Q140 112 100 112 Q60 112 52 150Z" fill={CREAM} stroke={INK} strokeWidth="4" />
-        <ellipse cx="64" cy="190" rx="22" ry="17" fill={INK} />
-        <ellipse cx="136" cy="190" rx="22" ry="17" fill={INK} />
+        <ellipse cx="100" cy="164" rx="58" ry="47" fill={FACE} stroke={LINE} strokeWidth="3.5" />
+        <ellipse cx="100" cy="196" rx="40" ry="10" fill="#EBD5C2" opacity=".7" />
         {/* bras */}
         <g className="panda-arms">
-          <ellipse cx="66" cy="148" rx="15" ry="22" fill={INK} transform="rotate(20 66 148)" />
-          <ellipse cx="134" cy="148" rx="15" ry="22" fill={INK} transform="rotate(-20 134 148)" />
+          <path d="M54 134 Q36 160 50 186 Q63 193 70 178 Q72 156 76 138Z" fill={FUR} stroke={LINE} strokeWidth="3" strokeLinejoin="round" />
+          {!wave && <path d="M146 134 Q164 160 150 186 Q137 193 130 178 Q128 156 124 138Z" fill={FUR} stroke={LINE} strokeWidth="3" strokeLinejoin="round" />}
         </g>
-        {mood === 'reading' && <g><path d="M72 150 L100 156 L128 150 L128 176 L100 182 L72 176Z" fill={CARAMEL} stroke={INK} strokeWidth="3" /><path d="M100 156 V182" stroke={INK} strokeWidth="2" /><path d="M110 164 q4 -4 7 0 q-3 5 -7 8 q-4 -3 -7 -8 q3 -4 7 0Z" fill={SAND} /></g>}
-        {mood === 'tea' && <g><rect x="88" y="150" width="24" height="22" rx="5" fill={CREAM} stroke={INK} strokeWidth="3" /><path d="M96 158 q4 -4 8 0 q-4 6 -8 0Z" fill={CARAMEL} /><path className="steam" d="M96 142 q-4 -6 0 -12 M104 142 q4 -6 0 -12" stroke={INK} strokeWidth="2" fill="none" opacity=".5" /></g>}
-        {mood === 'eating' && <g className="bamboo-snack"><rect x="92" y="96" width="9" height="62" rx="4" fill="#9CB27A" stroke="#5F7A45" strokeWidth="2" /><path d="M92 118 h9 M92 138 h9" stroke="#5F7A45" strokeWidth="2" /><path d="M101 104 q14 -6 18 2 q-10 4 -18 -2Z" fill="#9CB27A" /></g>}
+        {/* pattes et coussinets */}
+        {[64, 136].map((x) => <g key={x}><ellipse cx={x} cy="196" rx="24" ry="20" fill={FUR} stroke={LINE} strokeWidth="3" />
+          <ellipse cx={x} cy="200" rx="10" ry="8.5" fill={PAD} /><circle cx={x - 10} cy="188" r="3.6" fill={PAD} /><circle cx={x} cy="185" r="3.6" fill={PAD} /><circle cx={x + 10} cy="188" r="3.6" fill={PAD} /></g>)}
+        {mood === 'reading' && <g><path d="M72 150 L100 156 L128 150 L128 176 L100 182 L72 176Z" fill={CARAMEL} stroke={LINE} strokeWidth="3" /><path d="M100 156 V182" stroke={LINE} strokeWidth="2" /><path d="M110 164 q4 -4 7 0 q-3 5 -7 8 q-4 -3 -7 -8 q3 -4 7 0Z" fill={SAND} /></g>}
+        {mood === 'tea' && <g><rect x="88" y="150" width="24" height="22" rx="5" fill={FACE} stroke={LINE} strokeWidth="3" /><path d="M96 158 q4 -4 8 0 q-4 6 -8 0Z" fill={CARAMEL} /><path className="steam" d="M96 142 q-4 -6 0 -12 M104 142 q4 -6 0 -12" stroke={LINE} strokeWidth="2" fill="none" opacity=".5" /></g>}
       </g>
       <g className="panda-head">
-        <circle cx="54" cy="44" r="20" fill={INK} />
-        <circle cx="146" cy="44" r="20" fill={INK} />
-        <path d="M30 86 Q28 36 100 34 Q172 36 170 86 Q170 128 100 128 Q30 128 30 86Z" fill={CREAM} stroke={INK} strokeWidth="4" />
-        {/* taches des yeux */}
-        <ellipse cx="72" cy="82" rx="15" ry="19" fill={INK} transform="rotate(25 72 82)" />
-        <ellipse cx="128" cy="82" rx="15" ry="19" fill={INK} transform="rotate(-25 128 82)" />
-        {closed ? <g stroke={CREAM} strokeWidth="3.5" fill="none" strokeLinecap="round">
-            {mood === 'happy' || mood === 'playful' ? <><path d="M64 84 q8 -9 16 0" /><path d="M120 84 q8 -9 16 0" /></> : <><path d="M64 82 q8 7 16 0" /><path d="M120 82 q8 7 16 0" /></>}
-          </g>
-          : <g className="panda-eyes"><circle cx="74" cy="80" r="5.5" fill={CREAM} /><circle cx="126" cy="80" r="5.5" fill={CREAM} /></g>}
-        <ellipse cx="54" cy="104" rx="10" ry="6" fill={BLUSH} />
-        <ellipse cx="146" cy="104" rx="10" ry="6" fill={BLUSH} />
-        <ellipse cx="100" cy="96" rx="6" ry="4.5" fill={INK} />
-        {mood === 'surprised' ? <ellipse cx="100" cy="108" rx="5" ry="6.5" fill="#D9776A" stroke={INK} strokeWidth="3" />
-          : mood === 'happy' || mood === 'eating' || mood === 'playful'
-          ? <path d="M90 104 q10 14 20 0Z" fill="#D9776A" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
-          : mood === 'sleepy' ? <ellipse cx="100" cy="107" rx="3" ry="4" fill={INK} />
-          : <path d="M89 103 q5.5 7 11 0 q5.5 7 11 0" stroke={INK} strokeWidth="3.5" fill="none" strokeLinecap="round" />}
-        {/* tenues */}
-        {outfit === 'noeud' && <g transform="translate(140 34)"><path d="M0 0 l-14 -9 v18Z M0 0 l14 -9 v18Z" fill="#E8A3A0" stroke={INK} strokeWidth="2.5" /><circle r="4" fill="#C9706C" /></g>}
-        {outfit === 'bandana' && <path d="M38 62 Q100 40 162 62 L160 72 Q100 52 40 72Z" fill="#C38380" stroke={INK} strokeWidth="2.5" />}
-        {outfit === 'chapeau' && <g><ellipse cx="100" cy="40" rx="72" ry="12" fill={SAND} stroke={INK} strokeWidth="3" /><path d="M64 40 Q66 10 100 10 Q134 10 136 40Z" fill={SAND} stroke={INK} strokeWidth="3" /><path d="M65 32 H135" stroke="#C38380" strokeWidth="5" /></g>}
-        {outfit === 'couronne' && <g>{[52, 72, 92, 112, 132, 150].map((x, i) => <circle key={x} cx={x} cy={i % 2 ? 36 : 40} r="7" fill={['#F3BFA9', '#E9C79A', '#C9D8C5'][i % 3]} stroke={INK} strokeWidth="2" />)}</g>}
-        {outfit === 'lunettes' && <g fill="none" stroke="#3a2a24" strokeWidth="3"><circle cx="74" cy="82" r="13" /><circle cx="126" cy="82" r="13" /><path d="M87 82 h26" /></g>}
-        {party && <g><path d="M100 0 L82 38 H118Z" fill="#C38380" stroke={INK} strokeWidth="3" /><circle cx="100" cy="0" r="5" fill={SAND} /></g>}
+        <circle cx="48" cy="40" r="22" fill={FUR} stroke={LINE} strokeWidth="3.5" />
+        <circle cx="152" cy="40" r="22" fill={FUR} stroke={LINE} strokeWidth="3.5" />
+        <path d="M24 84 Q22 30 100 28 Q178 30 176 84 Q176 128 100 130 Q24 128 24 84Z" fill={FACE} stroke={LINE} strokeWidth="3.5" />
+        {/* grandes taches des yeux */}
+        <ellipse cx="68" cy="82" rx="21" ry="17" fill={FUR} transform="rotate(-18 68 82)" />
+        <ellipse cx="132" cy="82" rx="21" ry="17" fill={FUR} transform="rotate(18 132 82)" />
+        {shut ? <g stroke={FACE} strokeWidth="3.5" fill="none" strokeLinecap="round"><path d="M60 82 q8 7 16 0" /><path d="M124 82 q8 7 16 0" /></g>
+          : joy ? <g stroke={EYE} strokeWidth="3.5" fill="none" strokeLinecap="round"><path d="M60 84 q8 -10 16 0" /><path d="M124 84 q8 -10 16 0" /></g>
+          : <g className="panda-eyes"><circle cx="70" cy="82" r="8.5" fill={EYE} /><circle cx="130" cy="82" r="8.5" fill={EYE} /><circle cx="73" cy="78.5" r="2.8" fill="#fff" /><circle cx="133" cy="78.5" r="2.8" fill="#fff" /></g>}
+        <ellipse cx="46" cy="106" rx="12" ry="8" fill="#F3B9A3" />
+        <ellipse cx="154" cy="106" rx="12" ry="8" fill="#F3B9A3" />
+        <path d="M94 95 q6 -4 12 0 q-1 6 -6 7 q-5 -1 -6 -7Z" fill={EYE} />
+        {mood === 'surprised' ? <ellipse cx="100" cy="112" rx="5" ry="6" fill="#D9776A" stroke={LINE} strokeWidth="2.5" />
+          : joy || mood === 'eating' ? <path d="M90 106 q10 15 20 0Z" fill="#D9776A" stroke={LINE} strokeWidth="2.5" strokeLinejoin="round" />
+          : mood === 'sleepy' ? <ellipse cx="100" cy="110" rx="3" ry="3.5" fill={EYE} />
+          : <path d="M90 105 q5 6 10 0 q5 6 10 0" stroke={EYE} strokeWidth="3" fill="none" strokeLinecap="round" />}
+        {/* tenues de tête */}
+        {outfit === 'noeud' && <g transform="translate(148 30)"><path d="M0 0 l-14 -9 v18Z M0 0 l14 -9 v18Z" fill="#E8A3A0" stroke={LINE} strokeWidth="2.5" /><circle r="4" fill="#C9706C" /></g>}
+        {outfit === 'bandana' && <path d="M32 60 Q100 36 168 60 L166 70 Q100 48 34 70Z" fill="#C38380" stroke={LINE} strokeWidth="2.5" />}
+        {outfit === 'chapeau' && <g><ellipse cx="100" cy="36" rx="74" ry="12" fill={SAND} stroke={LINE} strokeWidth="3" /><path d="M62 36 Q64 6 100 6 Q136 6 138 36Z" fill={SAND} stroke={LINE} strokeWidth="3" /><path d="M63 28 H137" stroke="#C38380" strokeWidth="5" /></g>}
+        {outfit === 'couronne' && <g>{[48, 70, 92, 112, 132, 154].map((x, i) => <circle key={x} cx={x} cy={i % 2 ? 32 : 36} r="7" fill={['#F3BFA9', '#E9C79A', '#C9D8C5'][i % 3]} stroke={LINE} strokeWidth="2" />)}</g>}
+        {outfit === 'lunettes' && <g fill="none" stroke={EYE} strokeWidth="3"><circle cx="70" cy="82" r="15" /><circle cx="130" cy="82" r="15" /><path d="M85 82 h30" /></g>}
+        {party && <g><path d="M100 -6 L82 32 H118Z" fill="#C38380" stroke={LINE} strokeWidth="3" /><circle cx="100" cy="-6" r="5" fill={SAND} /></g>}
       </g>
-      {outfit === 'echarpe' && <g><path d="M56 122 Q100 140 144 122 L146 134 Q100 152 54 134Z" fill="#9FB5AA" stroke={INK} strokeWidth="3" /><path d="M120 134 l6 30 l12 -4 l-8 -28Z" fill="#9FB5AA" stroke={INK} strokeWidth="3" /></g>}
-      {mood === 'sleepy' && <g className="zzz" fill={INK} fontFamily="inherit" fontWeight="700"><text x="150" y="40" fontSize="16">z</text><text x="162" y="26" fontSize="20">z</text><text x="176" y="10" fontSize="24">Z</text></g>}
-      {mood === 'curious' && <text className="sparkle" x="160" y="40" fontSize="30" fontWeight="700" fill="#C98A55">?</text>}
-      {mood === 'surprised' && <g stroke="#C98A55" strokeWidth="4" strokeLinecap="round"><path d="M24 30 l10 10 M40 18 l4 14 M160 18 l-4 14 M176 30 l-10 10" /></g>}
-      {mood === 'playful' && <g className="ball"><circle cx="168" cy="190" r="14" fill="#E8A3A0" stroke={INK} strokeWidth="3" /><path d="M156 186 q12 8 24 0" stroke={INK} strokeWidth="2" fill="none" /></g>}
-      {mood === 'proud' && <path className="sparkle" d="M168 30 l4 10 l10 4 l-10 4 l-4 10 l-4 -10 l-10 -4 l10 -4Z" fill={SAND} stroke={CARAMEL} strokeWidth="2" />}
+      {wave && <g className="wave-arm"><path d="M146 138 Q176 124 190 98 Q190 84 178 84 Q168 108 140 124Z" fill={FUR} stroke={LINE} strokeWidth="3" strokeLinejoin="round" /></g>}
+      {/* foulard sauge noué en feuilles (signature du panda) ; l'écharpe le remplace en hiver */}
+      {outfit === 'echarpe'
+        ? <g><path d="M56 124 Q100 142 144 124 L146 136 Q100 154 54 136Z" fill="#C9A08C" stroke={LINE} strokeWidth="3" /><path d="M120 136 l6 30 l12 -4 l-8 -28Z" fill="#C9A08C" stroke={LINE} strokeWidth="3" /></g>
+        : <g><path d="M60 124 Q100 138 140 124 L138 132 Q100 146 62 132Z" fill={SCARF} stroke={LINE} strokeWidth="2.5" />
+          <path d="M100 134 q-16 -2 -20 10 q12 6 20 -10Z" fill={SCARF} stroke={LINE} strokeWidth="2.5" /><path d="M100 134 q16 -2 20 10 q-12 6 -20 -10Z" fill={SCARF} stroke={LINE} strokeWidth="2.5" />
+          <path d="M100 134 q-6 10 0 18 q6 -8 0 -18Z" fill={SCARF} stroke={LINE} strokeWidth="2.5" /></g>}
+      {mood === 'eating' && <g className="bamboo-snack"><rect x="122" y="92" width="10" height="62" rx="4" fill="#9CB27A" stroke="#5F7A45" strokeWidth="2" transform="rotate(-18 127 123)" /><path d="M118 112 l10 -3 M124 132 l10 -3" stroke="#5F7A45" strokeWidth="2" /><path d="M126 96 q14 -10 20 -2 q-10 6 -20 2Z" fill="#9CB27A" stroke="#5F7A45" strokeWidth="1.5" /><ellipse cx="128" cy="150" rx="11" ry="9" fill={FUR} stroke={LINE} strokeWidth="2.5" /></g>}
+      {mood === 'sleepy' && <g className="zzz" fill={LINE} fontFamily="inherit" fontWeight="700"><text x="150" y="40" fontSize="16">z</text><text x="162" y="26" fontSize="20">z</text><text x="176" y="10" fontSize="24">Z</text></g>}
+      {(joy || mood === 'proud') && <g className="sparkle" stroke="#7E8F5E" strokeWidth="4" strokeLinecap="round"><path d="M6 60 l10 4 M12 42 l8 8 M20 26 l4 10" /></g>}
+      {mood === 'curious' && <text className="sparkle" x="160" y="40" fontSize="30" fontWeight="700" fill={CARAMEL}>?</text>}
+      {mood === 'surprised' && <g stroke={CARAMEL} strokeWidth="4" strokeLinecap="round"><path d="M24 30 l10 10 M40 18 l4 14 M160 18 l-4 14 M176 30 l-10 10" /></g>}
+      {mood === 'playful' && <g className="ball"><circle cx="30" cy="196" r="13" fill="#E8A3A0" stroke={LINE} strokeWidth="3" /><path d="M18 192 q12 8 24 0" stroke={LINE} strokeWidth="2" fill="none" /></g>}
     </g>
   </svg>;
 }
