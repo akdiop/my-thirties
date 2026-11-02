@@ -89,8 +89,9 @@ export const FICHES: Fiche[] = [
   { id: 'entourage', title: 'Un environnement sain', points: [
     'Ces personnes me rapprochent-elles d’Allah ? Me corrigent-elles avec bienveillance ?',
     'M’encouragent-elles au bien ? Je ressors de leur compagnie plus forte ou plus vide ?',
-    'J’ai le droit de m’éloigner de ce qui m’abîme.',
-    'M’entourer de personnes qui incarnent ce que je veux devenir.'],
+    'J’ai le droit de filtrer mon entourage et le devoir de préserver mon cœur, même face à des amis d’enfance ou à la famille, même si j’ai peur d’être seule.',
+    'M’entourer de personnes qui incarnent ce que je veux devenir : des croyantes sincères pour ma foi, des gens doux et patients pour guérir, des personnes qui ont réussi avec éthique pour mes projets.',
+    'Leur état d’esprit et leur énergie déteignent sur moi sans que je m’en rende compte.'],
     quote: { text: 'L’homme suit la religion de son ami proche ; que chacun de vous regarde donc qui il prend pour ami.', ref: 'Rapporté par Abû Dâwûd et at-Tirmidhî' } },
   { id: 'secret', title: 'Agir pour le bien, même en secret', points: [
     'Une sadaqa, même petite. Une bonne parole. Aider sans le dire. Rappeler Allah avec douceur.',

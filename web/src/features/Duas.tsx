@@ -59,6 +59,8 @@ export function Duas({ entries, onCreate, onUpdate }: { entries: Entry[]; onCrea
         <p className="dua-ph">{d.phonetic}</p>
         <p className="dua-fr">{d.french}</p>
         <small className="muted">{[d.ref, d.source].filter(Boolean).join(' · ')}</small>
+        {d.uses && <details className="dua-uses"><summary>Quand la réciter</summary>
+          {d.uses.map((u) => <div key={u.title}><strong>{u.title}</strong><ul>{u.items.map((i) => <li key={i}>{i}</li>)}</ul></div>)}</details>}
         <div className="repeat-row">{d.repeat && <RepeatCounter key={d.id} total={d.repeat} />}
           <button className="button ghost small" onClick={() => { setCat('Apprendre'); setStudying(d.id); }}><GraduationCap size={14} /> {learn[d.id]?.level ? niveau(learn[d.id]!.level) : 'Apprendre'}</button></div>
       </article>)}

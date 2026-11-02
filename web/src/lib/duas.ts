@@ -3,7 +3,7 @@
  * Le texte arabe et la phonétique reprennent les publications ; la traduction suit leur sens.
  */
 export type DuaCategory = 'Réussite' | 'Protection' | 'Famille' | 'Pardon' | 'Détresse' | 'Coran';
-export type Dua = { id: string; category: DuaCategory; title: string; arabic: string; phonetic: string; french: string; ref?: string; source: string; repeat?: number };
+export type Dua = { id: string; category: DuaCategory; title: string; arabic: string; phonetic: string; french: string; ref?: string; source: string; repeat?: number; uses?: { title: string; items: string[] }[] };
 
 export const DUA_CATEGORIES: DuaCategory[] = ['Réussite', 'Protection', 'Famille', 'Pardon', 'Détresse', 'Coran'];
 
@@ -68,6 +68,34 @@ export const DUAS: Dua[] = [
     phonetic: 'Allāhumma raḥmataka arjū, falā takilnī ilā nafsī ṭarfata ‘ayn, wa aṣliḥ lī sha’nī kullah, lā ilāha illā ant',
     french: 'Ô Allah, c’est Ta miséricorde que j’espère. Ne me confie pas à moi-même, ne serait-ce que le temps d’un clin d’œil, et arrange toutes mes affaires. Il n’y a de divinité que Toi.',
     ref: 'Sunan Abî Dâwûd 5090', source: '@piousdeenn' },
+  { id: 'laqad', category: 'Protection', title: 'Laqad jâ’akum (fin de la sourate At-Tawba)',
+    arabic: 'لَقَدْ جَاءَكُمْ رَسُولٌ مِّنْ أَنفُسِكُمْ عَزِيزٌ عَلَيْهِ مَا عَنِتُّمْ حَرِيصٌ عَلَيْكُم بِالْمُؤْمِنِينَ رَءُوفٌ رَّحِيمٌ ۝ فَإِن تَوَلَّوْا فَقُلْ حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ',
+    phonetic: 'Laqad jā’akum rasūlun min anfusikum, ‘azīzun ‘alayhi mā ‘anittum, ḥarīṣun ‘alaykum bil-mu’minīna ra’ūfun raḥīm. Fa-in tawallaw fa-qul ḥasbiyallāhu lā ilāha illā huwa, ‘alayhi tawakkaltu wa huwa rabbul-‘arshil-‘aẓīm',
+    french: 'Certes, un Messager issu de vous est venu à vous ; vos difficultés lui pèsent, il est plein de sollicitude pour vous, compatissant et miséricordieux envers les croyants. S’ils se détournent, dis : « Allah me suffit. Il n’y a de divinité que Lui. En Lui je place ma confiance, et Il est le Seigneur du Trône immense. »',
+    ref: 'Coran 9:128-129', source: 'daaraserignemordiop.net',
+    uses: [
+      { title: 'Après les prières (1 fois)', items: [
+        'Soubh : préserve le cœur et la foi.', 'Tisbaar (Zohr) : un cœur vivifié par la foi, dans cette vie et après.',
+        'Takussaan : préservation d’une mort subite.', 'Timis (Maghrib) : droiture de tous les membres (istiqâma).',
+        'Guéé (Ichaa) : préservation des grands péchés.', 'Witr : facilite les ressources et libère de la crainte des gens.',
+        'Fajr : voir sa demeure au Paradis.', 'Après l’istikhâra : le soutien des anges dans ses actions.',
+        'Après toute prière surérogatoire (nâfila) : goûter la douceur de la foi.', '99 fois après la prière du vendredi : des ressources préservées de l’illicite.'] },
+      { title: 'Au quotidien', items: [
+        '1 fois matin et soir : préservée de tout désagrément.', '1 fois au coucher : préservée de tout maléfice.',
+        '1 fois (ou 7) en sortant de chez soi, la main sur la tête : protégée de ce qui nuit et des mal intentionnés.',
+        '3 fois au lever et au coucher du soleil : préservée de tout ce qui nuit.', '3 fois le vendredi soir : protégée de la sorcellerie et de l’empoisonnement.',
+        '1 fois sur un objet, un bien, une maison ou un magasin : Allah le garde.', '111 fois par jour sur son portefeuille ou là où l’on garde ses biens.'] },
+      { title: 'Voyage', items: [
+        '1 fois en partant de chez soi ou en voyage, la main sur la tête : un retour garanti.',
+        '1 fois en tenant la main de quelqu’un qui part : il revient sain et sauf, inch’Allah.', '1 fois pour un groupe qui voyage.'] },
+      { title: 'Maladie', items: [
+        '7 fois sur un mal ou une douleur (récité ou en saafara) : soulagement et guérison.',
+        '100 fois sur une maladie dite incurable, en persévérant.', '66 fois sur une morsure ou une piqûre venimeuse.'] },
+      { title: 'Jours particuliers', items: [
+        '7 fois le jour de la Korité : préservée de la surdité toute l’année.', '21 fois le jour de la Tabaski : préservée de la perte de la vue.',
+        '360 fois le jour d’Arafat : Allah te tient par la main et satisfait tes besoins.', '1000 fois le jour d’Achoura : facilité dans toutes tes entreprises.',
+        '500 fois la nuit du 15 Chaabane (Nisfou Chaabane).', '66 fois un jour d’éclipse solaire : guérison.'] },
+    ] },
   { id: 'hasbi', category: 'Détresse', title: 'Allah me suffit',
     arabic: 'حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ',
     phonetic: 'Ḥasbunallāhu wa ni‘ma l-wakīl',

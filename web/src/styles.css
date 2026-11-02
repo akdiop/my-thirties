@@ -1544,3 +1544,7 @@ html.dark img,html.dark video,html.dark picture,html.dark canvas,html.dark ifram
 .reframe-from { color: var(--muted, #8a7f78); text-decoration: line-through; font-size: .92rem; }
 .reframe-to { grid-column: 1; font-weight: 600; }
 .reframe-row .icon-btn { grid-row: 1 / span 2; grid-column: 2; align-self: center; }
+.dua-uses { margin-top: 8px; font-size: .92rem; }
+.dua-uses summary { cursor: pointer; font-weight: 600; padding: 4px 0; }
+.dua-uses ul { margin: 4px 0 10px; padding-left: 18px; }
+.dua-uses li { margin: 3px 0; }
