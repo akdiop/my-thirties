@@ -48,7 +48,6 @@ export function TravelTop({ tab, onTab, entries, onCreate, onAdd }: { tab: 'dest
         <div className="info"><span className="k">Meilleure période</span><span className="v">{str(d, 'season') || 'À vérifier'}</span><span className="s">Selon tes sources</span></div>
         <div className="info"><span className="k">Formalités d’entrée</span><span className="v">À vérifier</span><span className="s">Site officiel du pays</span></div>
       </div>
-      <p className="note-box">Les prix et conditions d’entrée ne sont jamais inventés : vérifie-les sur les sites officiels et note la source.</p>
       <button className="big-btn" disabled={busy || trips.some((t) => t.title === d.title)} onClick={async () => {
         setBusy(true);
         try { await onCreate({ module: 'decouvertes', kind: 'trip', title: d.title, entry_date: null, data: { currency: 'XOF', itinerary: '', packing: '' } }); onTab('voyage'); }

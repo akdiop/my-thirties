@@ -44,9 +44,9 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
     <header className="tab-head"><h1>Mon Panda</h1><p>Un compagnon doux qui grandit avec toi, à ton rythme.</p></header>
     <div className="panda-adopt"><PandaCharacter mood="happy" size={190} level={1} /></div>
     <section className="ritual-card form-stack">
-      <p>Ton bébé panda mange, dort, joue et aménage son cocon. Ce que tu fais dans My Thirties peut l’aider à grandir, mais ne rien faire ne lui enlève jamais rien : il reste là, bienveillant.</p>
+      <p>Ton bébé panda mange, dort, joue et aménage son cocon. Ce que tu fais dans My Thirties l’aide à grandir.</p>
       <label>Son nom<input value={name} maxLength={24} placeholder="Bambou, Mochi, Caramel…" onChange={(e) => setName(e.target.value)} /></label>
-      <label className="checklist-item"><input type="checkbox" checked={link} onChange={() => setLink(!link)} /> Relier mes activités (sport, sommeil, lecture, cuisine, habitudes, objectifs…) — seulement « fait tel jour », jamais le contenu</label>
+      <label className="checklist-item"><input type="checkbox" checked={link} onChange={() => setLink(!link)} /> Relier mes activités (sport, sommeil, lecture, cuisine, habitudes, objectifs…)</label>
       <button className="button primary" disabled={!name.trim()} onClick={() => void onCreate({ module: 'equilibre', kind: PANDA_KIND, title: 'Mon panda', entry_date: null,
         data: { name: name.trim(), createdAt: today, xpPeak: 0, spent: 0, care: {}, games: {}, unlocked: ['tapis', 'tenue:aucune'], equipped: ['tapis'], outfit: 'aucune', room: 'maison', levelSeen: 1,
           memories: [{ date: today, text: name.trim() + ' arrive dans ton cocon.' }], prefs: { linkPersonalActivities: link, useMoodContext: false, animationsEnabled: true }, rulesVersion: RULES_VERSION } })}>Adopter {name.trim() || 'mon panda'}</button>
@@ -69,7 +69,6 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
     window.clearTimeout(timer.current); timer.current = window.setTimeout(() => setAct(null), 3500);
     if (kind) { const patch = addCare(s, kind, today); if (Object.keys(patch).length) void save(patch); }
   };
-  const careLeft = Number(s.care[today]) || 0;
   const gameToday = Math.max(0, (Number(s.games[today]) || 0));
   const unlock = (id: string, price: number, equip = true) => void save({ unlocked: [...s.unlocked, id], spent: s.spent + price, ...(equip && !id.startsWith('tenue:') ? { equipped: [...s.equipped, id] } : {}),
     memories: [...s.memories, { date: today, text: 'Nouveau : ' + (ITEMS.find((i) => i.id === id)?.name ?? OUTFITS.find((o) => 'tenue:' + o.id === id)?.name ?? id) + '.' }] });
@@ -112,10 +111,10 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
         <button className="button secondary" onClick={() => { react('playful', MESSAGES.play, 'play'); setGame(true); }}><Gamepad2 size={16} /> Jouer</button>
         <button className="button secondary" onClick={() => { setAct({ mood: 'sleepy', text: pick(MESSAGES.rest, Date.now()) }); window.clearTimeout(timer.current); timer.current = window.setTimeout(() => setAct(null), 6000); }}><Moon size={16} /> Repos</button>
       </div>
-      <p className="muted small">Touche {s.name} pour un câlin. {careLeft >= 5 ? 'Il a eu plein d’attentions aujourd’hui : l’XP de câlins est au maximum, mais il adore toujours ça.' : ''}</p>
+      <p className="muted small">Touche {s.name} pour un câlin.</p>
       {game && <BambooGame left={Math.max(0, DAILY_CAP.gameBamboo - gameToday)} onEnd={(n) => { setGame(false); if (n > 0) { void save({ games: { ...s.games, [today]: gameToday + n } }); setAct({ mood: 'proud', text: 'Bravo ! +' + n + ' bambous.' }); } }} />}
       <section className="ritual-card"><p className="ritual-label">Son garde-manger</p><div className="chip-row">{foods.map((f) => <span key={f} className="chip">{f}</span>)}</div>
-        <p className="muted small">Chaque recette ou repas noté dans Ma cuisine lui fait découvrir un nouvel aliment.</p></section>
+        </section>
     </>}
 
     {tab === 'evolution' && <>
@@ -125,21 +124,19 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
       <section className="ritual-card"><p className="ritual-label">Ce qui l’a fait grandir</p>
         {!s.prefs.linkPersonalActivities && <p className="muted small">Le lien avec tes modules est désactivé : il grandit seulement grâce à vos moments ensemble.</p>}
         <div className="skill-grid">{DOMAINS.map((d) => <div key={d.id} className="skill"><strong>{d.module}</strong><small>{pr.counts[d.id]} activité{pr.counts[d.id] > 1 ? 's' : ''} · il {d.reaction}</small><small className="muted">Récompense : {d.reward}</small></div>)}</div>
-        <p className="muted small">Ces récompenses sont un petit plus facultatif, pas une mesure de ta valeur ni de ta santé.</p>
       </section>
       <section className="ritual-card"><p className="ritual-label"><Sparkles size={14} /> Nos souvenirs</p>
         {[...s.memories].reverse().map((m, i) => <p key={i} className="memory"><small className="muted">{new Date(m.date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</small> {m.text}</p>)}</section>
       <section className="ritual-card form-stack"><p className="ritual-label">Réglages et confidentialité</p>
-        <label className="checklist-item"><input type="checkbox" checked={s.prefs.linkPersonalActivities} onChange={() => void save({ prefs: { ...s.prefs, linkPersonalActivities: !s.prefs.linkPersonalActivities } })} /> Relier mes activités (seulement « fait tel jour », jamais le contenu)</label>
+        <label className="checklist-item"><input type="checkbox" checked={s.prefs.linkPersonalActivities} onChange={() => void save({ prefs: { ...s.prefs, linkPersonalActivities: !s.prefs.linkPersonalActivities } })} /> Relier mes activités</label>
         <label className="checklist-item"><input type="checkbox" checked={s.prefs.useMoodContext} onChange={() => void save({ prefs: { ...s.prefs, useMoodContext: !s.prefs.useMoodContext } })} /> Adapter ses messages à mon humeur déclarée du jour</label>
         <label className="checklist-item"><input type="checkbox" checked={s.prefs.animationsEnabled} onChange={() => void save({ prefs: { ...s.prefs, animationsEnabled: !s.prefs.animationsEnabled } })} /> Animations</label>
         <label>Son nom<input defaultValue={s.name} maxLength={24} onBlur={(e) => e.target.value.trim() && e.target.value.trim() !== s.name && void save({ name: e.target.value.trim() })} /></label>
-        <p className="muted small">Tout reste dans tes données privées. Aucune IA externe, aucun achat réel, aucune notification du panda. Désactiver un lien n’efface jamais l’XP déjà acquise.</p>
       </section>
     </>}
 
     {tab === 'deco' && <>
-      <p className="muted">Tu as <strong>{pr.bamboo} bambous</strong>, gagnés avec tes activités et les jeux, jamais avec de l’argent réel.</p>
+      <p className="muted">Tu as <strong>{pr.bamboo} bambous</strong>.</p>
       <section className="ritual-card"><p className="ritual-label">Maison et jardin</p>
         <div className="shop-grid">{ITEMS.map((it) => <ShopItem key={it.id} it={it} level={pr.level.n} gift={isGift(it, pr.counts)} owned={unlocked.has(it.id)} on={equipped.has(it.id)} bamboo={pr.bamboo}
           onUnlock={(free) => unlock(it.id, free ? 0 : it.price)} onToggle={() => void save({ equipped: equipped.has(it.id) ? s.equipped.filter((x) => x !== it.id) : [...s.equipped, it.id] })} />)}</div></section>
