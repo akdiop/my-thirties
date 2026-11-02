@@ -40,3 +40,17 @@ Jardin : `item_fleurs`, `item_lanterne`, `item_balancoire`, `item_fontaine`.
 
 ## Livraison
 Déposer les fichiers dans le dépôt (`web/public/panda/`) ou les envoyer dans la conversation : Claude les ajoute, les déclare et vérifie l'alignement.
+
+## 5. Bannières d'activité : `banner_<nom>.png` (module Mon Panda uniquement)
+Le panda en situation, environ 1024 × 530 px (format paysage ≈ 2:1). Affichées dans l'espace du panda : « Aujourd'hui, il… » et les cartes de l'onglet Évolution.
+| Fichier | Domaine |
+| --- | --- |
+| `banner_bienetre` | Mon équilibre |
+| `banner_sport` | Sport et bien-être |
+| `banner_sommeil` | Sommeil |
+| `banner_lecture` | Lecture et apprentissage |
+| `banner_spiritualite` | Spiritualité |
+| `banner_cuisine` | Cuisine |
+| `banner_organisation` | Défis et habitudes |
+| `banner_voyages` | Voyages |
+| `banner_objectifs` | Mon projet personnel |

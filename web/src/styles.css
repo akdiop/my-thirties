@@ -1505,3 +1505,8 @@ html.dark img,html.dark video,html.dark picture,html.dark canvas,html.dark ifram
 .panda-img{display:inline-block;position:relative}
 .panda-img .panda-body{position:absolute;inset:0;transform-origin:50% 100%}
 .panda-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none}
+.panda-banner{display:block;width:100%;aspect-ratio:498/237;object-fit:cover;border-radius:22px;margin:4px 0 16px;background:#f6e9dc}
+.panda-activity{background:#fffcfa;border:1px solid #efe3de;border-radius:22px;overflow:hidden;margin:14px 0}
+.panda-activity .panda-banner{margin:0;border-radius:0}
+.panda-activity p{margin:0;padding:10px 14px;display:flex;flex-direction:column}
+.skill .panda-banner{margin:0 0 6px;border-radius:12px}

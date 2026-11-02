@@ -6,5 +6,6 @@
 export const PANDA_ASSETS = new Set<string>([
   'panda_idle', 'panda_happy', 'panda_playful', 'panda_sleepy', 'panda_calm', 'panda_curious',
   'panda_surprised', 'panda_proud', 'panda_eating', 'panda_reading', 'panda_tea',
+  'banner_lecture', 'banner_organisation', 'banner_cuisine', 'banner_bienetre', 'banner_objectifs',
 ]);
 export const assetUrl = (name: string) => (PANDA_ASSETS.has(name) ? '/panda/' + name + '.webp' : '');
