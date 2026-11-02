@@ -404,7 +404,7 @@ function Profile({ view, onSettings, email, entries, profileEntry, onSaveProfile
     </section>
     <p className="sec">Intégrations et confidentialité</p>
     <PrivacyCenter />
-    <section className="panel"><h2>À propos de cette version</h2><p className="muted">Application web privée en cours de développement. L'export d'agenda est manuel ; les notifications web ne fonctionnent qu'avec la page ouverte. L'assistant IA nécessite un déploiement sécurisé et l'analyse vidéo reste expérimentale. La synchronisation iOS native est encore à réaliser.</p></section>
+    <section className="panel"><h2>À propos de cette version</h2><p className="muted">Application privée. Les rappels arrivent même app fermée une fois les notifications activées sur cet appareil. L’assistant ne voit que ce que tu coches. Les sauvegardes chiffrées se restaurent sans doublons.</p></section>
   </div>;
 }
 
