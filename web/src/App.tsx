@@ -15,6 +15,7 @@ import { deleteEntryMedia } from './lib/mediaLibrary';
 import { PersonalProfile, ProfileAvatar } from './features/PersonalProfile';
 import { birthdayLine, PROFILE_KIND, readProfile } from './lib/profile';
 import { PHOTO_KIND } from './lib/photos';
+import { PANDA_KIND } from './lib/panda';
 import { PhotoProvider } from './features/HeroPhoto';
 import { Home as HomeScreen } from './screens/Home';
 import { Agenda } from './screens/Agenda';
@@ -70,9 +71,10 @@ const Notes = lazy(() => import('./screens/Notes').then((m) => ({ default: m.Not
 const Review = lazy(() => import('./screens/Review').then((m) => ({ default: m.Review })));
 const NotificationSettings = lazy(() => import('./features/Notifications').then((m) => ({ default: m.NotificationSettings })));
 const JournalSettings = lazy(() => import('./features/JournalSettings').then((m) => ({ default: m.JournalSettings })));
+const PandaCompanion = lazy(() => import('./features/PandaCompanion').then((m) => ({ default: m.PandaCompanion })));
 const IphoneCalendar = lazy(() => import('./features/IphoneCalendar').then((m) => ({ default: m.IphoneCalendar })));
 
-type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | ModuleId;
+type Screen = 'panda' | 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
 const today = () => new Date().toLocaleDateString('en-CA');
 const value = (obj: Record<string, unknown>, key: string) => typeof obj[key] === 'string' ? obj[key] as string : '';
@@ -416,8 +418,8 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('home');
   const [allEntries, setEntries] = useState<Entry[]>([]);
   const profileEntry = allEntries.find((e) => e.kind === PROFILE_KIND);
-  const entries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND && e.kind !== HIDDEN_KIND && !RITUAL_KINDS.includes(e.kind)), [allEntries]);
-  const ritualEntries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND && e.kind !== HIDDEN_KIND), [allEntries]);
+  const entries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND && e.kind !== HIDDEN_KIND && e.kind !== PANDA_KIND && !RITUAL_KINDS.includes(e.kind)), [allEntries]);
+  const ritualEntries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND && e.kind !== HIDDEN_KIND && e.kind !== PANDA_KIND), [allEntries]);
   const [assistantIdea, setAssistantIdea] = useState('');
   const [pendingExpense, setPendingExpense] = useState(false);
   const [dayTarget, setDayTarget] = useState<{ date?: string; part?: 'matin' | 'soir'; n: number }>({ n: 0 });
@@ -425,7 +427,7 @@ export default function App() {
   useEffect(() => {
     const q = new URLSearchParams(window.location.search), target = q.get('ecran');
     if (!target) return;
-    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'assistant', 'proches', 'lectures', 'envies'].includes(target)) {
+    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'assistant', 'proches', 'lectures', 'envies', 'panda'].includes(target)) {
       if (target === 'myday') setDayTarget((t) => ({ part: q.get('moment') === 'soir' ? 'soir' : 'matin', n: t.n + 1 }));
       if (target === 'assistant') setAssistantIdea(q.get('idee') ?? '');
       setScreen(target as Screen);
@@ -608,7 +610,7 @@ export default function App() {
     ) : <div className="empty-soft"><Coffee size={28} /><p>Un espace à remplir à ton rythme.</p><button className="button ghost" onClick={() => setEditor({ module: currentModule })}>Créer ma première entrée</button></div>}</div>
   </section>;
 
-  const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings', 'myday', 'habits', 'notes', 'bilan', 'parametres', 'boussole', 'focus', 'sommeil', 'mediter', 'complements'] as Screen[]).includes(screen);
+  const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings', 'myday', 'habits', 'notes', 'bilan', 'parametres', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'panda'] as Screen[]).includes(screen);
   const openDay = (date?: string, part?: 'matin' | 'soir') => { setDayTarget((t) => ({ date, part, n: t.n + 1 })); go('myday'); };
   const editFull = async (id: string, patch: { title: string; data: Record<string, unknown> }) => { await editEntry(id, patch); await refresh(); };
 
@@ -632,7 +634,8 @@ export default function App() {
       {screen === 'mediter' && <><ScreenHeader title="" onBack={() => go('home')} /><Meditate entries={ritualEntries} onCreate={createFromTool} /></>}
       {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onImported={() => void refresh()} />}
       {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
-      {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}
+      {screen === 'panda' && <div className="screen"><ScreenHeader title="Mon panda" onBack={() => go('spaces')} /><PandaCompanion entries={allEntries} onCreate={createFromTool} onUpdate={updateData} /></div>}
+       {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}
       {screen === 'calme' && <Calm onQuit={() => go('home')} onWrite={() => addIn('equilibre', 'emotion', { date: today() })} />}
       {screen === 'assistant' && <div className="screen"><ScreenHeader title="Assistant" onBack={() => go('home')} /><PersonalBrief entries={entries} onGo={go} /><PersonalAssistant key={assistantIdea} entries={ritualEntries} onCreate={createFromTool} initialIdea={assistantIdea} /></div>}
       {screen === 'settings' && <div className="screen"><Profile view="profile" onSettings={() => go('parametres')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); clearOffline(); await signOut(); setEntries([]); }} /></div>}
