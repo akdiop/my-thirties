@@ -16,8 +16,8 @@ export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd,
 }) {
   const day = todayIso();
   const profile = readProfile(profileEntry);
-  // Briefing : seulement les rendez-vous du jour (ni prières, ni tâches, qui ont leur propre place).
-  const today = timeline(entries, new Date()).filter((t) => t.entry.kind !== 'prayer_schedule' && t.entry.kind !== 'task').slice(0, 4);
+  // Briefing : seulement les rendez-vous de l'agenda (pas les prières, tâches, repas planifiés ni séances).
+  const today = timeline(entries, new Date()).filter((t) => t.entry.module === 'quotidien' && t.entry.kind === 'event').slice(0, 4);
   const top = priorities(entries, day);
   const challenge = entries.find((e) => e.kind === 'challenge');
   const cur = mainCurrency(entries);
