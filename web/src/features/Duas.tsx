@@ -3,6 +3,7 @@ import { Check, Eye, GraduationCap, Heart, RotateCcw, Volume2 } from 'lucide-rea
 import type { Entry, EntryInput } from '../lib/cloud';
 import { isoOf } from '../lib/rituals';
 import { DHIKR_ROUTINE, DUA_CATEGORIES, DUAS, type Dua, type DuaCategory } from '../lib/duas';
+import { AFFIRMATIONS, AKHIRA_GOALS, FICHES, QURAN_DAILY } from '../lib/mindset';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 export const DUA_PREFS_KIND = 'invocations';
@@ -14,7 +15,7 @@ export function Duas({ entries, onCreate, onUpdate }: { entries: Entry[]; onCrea
   const routine = (prefs?.data.routine && typeof prefs.data.routine === 'object' ? prefs.data.routine : {}) as Record<string, string[]>;
   const today = isoOf(new Date());
   const doneToday = new Set(routine[today] ?? []);
-  const [cat, setCat] = useState<DuaCategory | 'Favoris' | 'Routine' | 'Apprendre'>('Routine');
+  const [cat, setCat] = useState<DuaCategory | 'Favoris' | 'Routine' | 'Apprendre' | 'Carnet'>('Routine');
   const learn = (prefs?.data.learn && typeof prefs.data.learn === 'object' ? prefs.data.learn : {}) as Record<string, Learn>;
   const [studying, setStudying] = useState<string | null>(null);
   const [counts, setCounts] = useState<Record<string, number>>({});
@@ -31,7 +32,7 @@ export function Duas({ entries, onCreate, onUpdate }: { entries: Entry[]; onCrea
   const streak = (() => { let n = 0; for (let i = 0; i < 365; i++) { const d = isoOf(new Date(Date.now() - i * 86_400_000)); if ((routine[d]?.length ?? 0) >= DHIKR_ROUTINE.length) n++; else if (i > 0) break; } return n; })();
 
   return <section className="duas">
-    <div className="chip-row">{(['Routine', 'Apprendre', 'Favoris', ...DUA_CATEGORIES] as const).map((c) => <button key={c} className={'chip' + (cat === c ? ' on' : '')} onClick={() => { setCat(c); setStudying(null); }}>{c === 'Routine' ? 'Routine du jour' : c === 'Favoris' ? '♥ Favoris' : c === 'Apprendre' ? 'Apprendre par cœur' + (dueCount(learn, today) ? ' (' + dueCount(learn, today) + ')' : '') : c}</button>)}</div>
+    <div className="chip-row">{(['Routine', 'Apprendre', 'Carnet', 'Favoris', ...DUA_CATEGORIES] as const).map((c) => <button key={c} className={'chip' + (cat === c ? ' on' : '')} onClick={() => { setCat(c); setStudying(null); }}>{c === 'Routine' ? 'Routine du jour' : c === 'Carnet' ? 'Carnet de foi' : c === 'Favoris' ? '♥ Favoris' : c === 'Apprendre' ? 'Apprendre par cœur' + (dueCount(learn, today) ? ' (' + dueCount(learn, today) + ')' : '') : c}</button>)}</div>
 
     {cat === 'Apprendre' && (studying ? <Study key={studying} dua={DUAS.find((d) => d.id === studying)!} state={learn[studying]} today={today}
         onDone={(next) => { void save({ learn: { ...learn, [studying]: next } }); setStudying(null); }} onClose={() => setStudying(null)} />
@@ -48,7 +49,9 @@ export function Duas({ entries, onCreate, onUpdate }: { entries: Entry[]; onCrea
       <p className="muted small">Source : @your._habibtii</p>
     </div>}
 
-    {cat !== 'Routine' && cat !== 'Apprendre' && <div className="stack-8">
+    {cat === 'Carnet' && <Carnet data={prefs?.data ?? {}} today={today} onSave={save} />}
+
+    {cat !== 'Routine' && cat !== 'Apprendre' && cat !== 'Carnet' && <div className="stack-8">
       {list.map((d) => <article key={d.id} className="dua-card">
         <div className="dua-head"><div><strong>{d.title}</strong>{d.repeat ? <small className="muted"> · à réciter {d.repeat} fois</small> : null}</div>
           <button className={'icon-btn' + (favs.includes(d.id) ? ' fav' : '')} aria-pressed={favs.includes(d.id)} aria-label={(favs.includes(d.id) ? 'Retirer des favoris : ' : 'Ajouter aux favoris : ') + d.title} onClick={() => toggleFav(d.id)}><Heart size={18} /></button></div>
@@ -125,4 +128,49 @@ function Study({ dua, state, today, onDone, onClose }: { dua: Dua; state?: Learn
       <button className="button secondary" onClick={() => onDone({ level: Math.max(1, step - 1), next: addDays(today, 1) })}>À revoir demain</button>
     </div>
   </article>;
+}
+
+/* ---------- Carnet de foi : Coran du jour, objectifs pour l'au-delà, affirmations, fiches ---------- */
+function Carnet({ data, today, onSave }: { data: Record<string, unknown>; today: string; onSave: (p: Record<string, unknown>) => Promise<void> }) {
+  const quran = (data.quran && typeof data.quran === 'object' ? data.quran : {}) as Record<string, string[]>;
+  const qToday = new Set(quran[today] ?? []);
+  const akhira = (data.akhira && typeof data.akhira === 'object' ? data.akhira : {}) as Record<string, string>;
+  const [open, setOpen] = useState<string | null>(null);
+  const toggleQ = (id: string) => void onSave({ quran: { ...quran, [today]: qToday.has(id) ? [...qToday].filter((x) => x !== id) : [...qToday, id] } });
+  const toggleA = (i: number) => { const n = { ...akhira }; if (n[i]) delete n[i]; else n[i] = today; void onSave({ akhira: n }); };
+  const reframes = (Array.isArray(data.reframes) ? data.reframes : []) as { from: string; to: string }[];
+  const reads = (Array.isArray(data.reframeReads) ? data.reframeReads : []) as string[];
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const week = new Set(Array.from({ length: 7 }, (_, i) => { const d = new Date(today + 'T12:00:00'); d.setDate(d.getDate() - i); return isoOf(d); }));
+  const readsWeek = reads.filter((d) => week.has(d)).length;
+  const addReframe = () => { if (!from.trim() || !to.trim()) return; void onSave({ reframes: [...reframes, { from: from.trim().slice(0, 200), to: to.trim().slice(0, 200) }] }); setFrom(''); setTo(''); };
+  const toggleRead = () => void onSave({ reframeReads: reads.includes(today) ? reads.filter((d) => d !== today) : [...reads, today].slice(-60) });
+  return <div className="stack-8">
+    <div className="soft-card dhikr-routine">
+      <div className="routine-head"><strong>Mon Coran du jour</strong><small className="muted">{qToday.size} / {QURAN_DAILY.length}</small></div>
+      {QURAN_DAILY.map((q) => <label key={q.id} className="checklist-item routine-check"><input type="checkbox" checked={qToday.has(q.id)} onChange={() => toggleQ(q.id)} /> {q.label}</label>)}
+    </div>
+    <div className="soft-card dhikr-routine">
+      <div className="routine-head"><strong>Mes objectifs pour l’au-delà</strong><small className="muted">{Object.keys(akhira).length} / {AKHIRA_GOALS.length}</small></div>
+      {AKHIRA_GOALS.map((g, i) => <label key={i} className="checklist-item routine-check"><input type="checkbox" checked={Boolean(akhira[i])} onChange={() => toggleA(i)} /> <span>{g}{akhira[i] ? <small className="muted"> · fait le {new Date(akhira[i] + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</small> : null}</span></label>)}
+    </div>
+    <div className="soft-card dhikr-routine">
+      <div className="routine-head"><strong>Mes reformulations</strong><small className="muted">lues {readsWeek} / 7 jours</small></div>
+      <p className="muted small">Une pensée négative → sa version alignée avec la foi. À relire à voix haute chaque matin.</p>
+      {reframes.map((r, i) => <div key={i} className="reframe-row"><span className="reframe-from">{r.from}</span><span className="reframe-to">→ {r.to}</span>
+        <button className="icon-btn" aria-label="Supprimer" onClick={() => void onSave({ reframes: reframes.filter((_, j) => j !== i) })}>×</button></div>)}
+      <input className="input" placeholder="Ex. : je n’y arrive jamais" value={from} onChange={(e) => setFrom(e.target.value)} maxLength={200} />
+      <input className="input" placeholder="Ex. : j’apprends à gérer, Allah me donne la force" value={to} onChange={(e) => setTo(e.target.value)} maxLength={200} />
+      <button className="button secondary" disabled={!from.trim() || !to.trim()} onClick={addReframe}>Ajouter la reformulation</button>
+      {reframes.length > 0 && <label className="checklist-item routine-check"><input type="checkbox" checked={reads.includes(today)} onChange={toggleRead} /> Je les ai relues ce matin</label>}
+    </div>
+    <div className="soft-card"><strong>Mes affirmations</strong>{AFFIRMATIONS.map((a) => <p key={a} className="dua-fr affirm">« {a} »</p>)}</div>
+    {FICHES.map((f) => <article key={f.id} className="dua-card">
+      <button className="fiche-head" aria-expanded={open === f.id} onClick={() => setOpen(open === f.id ? null : f.id)}><strong>{f.title}</strong><span>{open === f.id ? '−' : '+'}</span></button>
+      {open === f.id && <>{f.points.map((p) => <p key={p} className="fiche-pt">{p}</p>)}
+        {f.quote && <blockquote className="book-quote">« {f.quote.text} »<br /><small>{f.quote.ref}</small></blockquote>}</>}
+    </article>)}
+    <p className="muted small">D’après ma lecture de Muslima Mindset Reset (Muslima Glow).</p>
+  </div>;
 }
