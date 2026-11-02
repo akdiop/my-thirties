@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import './PandaCompanion.css';
 import { Heart, Pencil, Sparkles } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
-import { PANDA_KIND, PANDA_ACTIONS, PANDA_LEVELS, pandaLevel, pandaProgress, readPandaData, type PandaAction, type PandaData } from '../lib/panda';
+import { PANDA_KIND, PANDA_ACTIONS, PANDA_LEVELS, pandaProgress, readPandaData, type PandaAction, type PandaData } from '../lib/panda';
 
 const today = () => new Date().toLocaleDateString('en-CA');
 
