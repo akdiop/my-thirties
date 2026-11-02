@@ -103,7 +103,7 @@ const PHRASES: Record<string, ([string, string][] | undefined)[]> = {
 };
 
 const lang = (id: string, title: string, tone: LearningPath['tone']): LearningPath => ({
-  id: 'lang-' + id, category: 'Langues', title, tagline: 'Débutante · 10 étapes · 20 min par jour', tone, weeks: 10,
+  id: 'lang-' + id, category: 'Langues', title, tagline: 'Débutante · 20 min par jour', tone, weeks: 10,
   steps: LANG_STEPS.map((s, i) => ({ ...s, phrases: PHRASES[id]?.[i] })),
 });
 

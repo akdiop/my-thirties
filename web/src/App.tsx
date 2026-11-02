@@ -585,7 +585,8 @@ export default function App() {
   if (!owner) return <main className="auth-layout"><section className="auth-card"><h1>Accès non autorisé</h1><p>Ce compte n'est pas enregistré comme propriétaire de l'application.</p><button className="button secondary" onClick={() => void signOut()}>Se déconnecter</button></section></main>;
 
   const currentModule = modules.find((m) => m.id === screen);
-  const allModuleEntries = currentModule ? entries.filter((e) => e.module === currentModule.id) : [];
+  // En spiritualité, la liste ne garde que le journal (les prières cochées et les dhikr ont leurs propres écrans).
+  const allModuleEntries = currentModule ? entries.filter((e) => e.module === currentModule.id && !(e.module === 'spiritualite' && (e.kind === 'dhikr' || e.kind.startsWith('prayer')))) : [];
   const moduleEntries = allModuleEntries.filter((e) => !search || e.title.toLowerCase().includes(search.toLowerCase()));
   const go = (next: Screen) => { setScreen(next); setSearch(''); window.scrollTo({ top: 0 }); };
   const openEntry = (e: Entry) => setEditor({ module: moduleById(e.module), initial: e });
@@ -603,7 +604,7 @@ export default function App() {
   };
 
   const entryList = currentModule && <section className="entries-section">
-    <SectionTitle>Mes entrées <span className="count">{allModuleEntries.length}</span></SectionTitle>
+    <SectionTitle>{currentModule.id === 'spiritualite' ? 'Mon journal spirituel' : 'Mes entrées'} <span className="count">{allModuleEntries.length}</span></SectionTitle>
     {allModuleEntries.length > 4 && <input className="search-field" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher dans cet espace…" />}
     <div className="entries">{moduleEntries.length ? moduleEntries.map((entry) =>
       <EntryCard key={entry.id} entry={entry} module={currentModule} onEdit={openEntry} onDelete={(e) => void remove(e)} onUpdate={updateData} />
@@ -676,7 +677,7 @@ export default function App() {
           {passionTab === 'series' && <SeriesTracker entries={allModuleEntries} onUpdate={updateData} onCreate={createFromTool} onAdd={() => addIn('passions', 'series', { status: 'À voir', seasons: '1', episodes: '10' })} />}
           {passionTab === 'libre' && <PassionPath entries={allModuleEntries} onUpdate={updateData} />}
         </>}
-        {!(currentModule.id === 'spiritualite' && spiritTab === 'home') && currentModule.id !== 'challenges' && !(currentModule.id === 'passions' && passionTab !== 'libre') && entryList}
+        {(currentModule.id !== 'spiritualite' || spiritTab === 'journal') && currentModule.id !== 'challenges' && !(currentModule.id === 'passions' && passionTab !== 'libre') && entryList}
       </div>}
     </main>
     {(tabScreen || currentModule) && screen !== 'calme' && <nav className="tabbar" aria-label="Navigation principale">{nav.map(({ id, label, icon: Icon }) => {
