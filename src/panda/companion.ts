@@ -20,7 +20,7 @@ export type PandaState = {
 };
 const LIMITS = [0, 3, 9, 18, 30] as const;
 export const PANDA_STAGES = ['Petit panda', 'Panda curieux', 'Panda explorateur', 'Panda épanoui', 'Panda sage'] as const;
-export const stageFromPoints = (points: number) => LIMITS.reduce((best, limit, i) => points >= limit ? i : best, 0);
+export const stageFromPoints = (points: number) => LIMITS.reduce<number>((best, limit, i) => points >= limit ? i : best, 0);
 export const nextStage = (stage: number) => LIMITS[stage + 1] ?? null;
 export const isCareDone = (state: PandaState, day: string, action: CareAction) =>
   state.moments.some((item) => item.day === day && item.action === action);
