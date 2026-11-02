@@ -8,7 +8,8 @@ import {
 import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
 import { downloadBackup, makeEncryptedBackup, parseEncryptedBackup } from './lib/backup';
 import { moduleById, modules, type Module } from './modules';
-import { validateRestore } from './lib/restore';
+import { newOnly, validateRestore } from './lib/restore';
+import { useThemeClock, useThemeMode, NIGHT_FROM, NIGHT_TO, type ThemeMode } from './lib/theme';
 import { consolidateIngredients, groceryTitle, mergeGroceryItems, weekGroceryItems, weekStart, type ListItem } from './lib/groceries';
 import { deleteEntryMedia } from './lib/mediaLibrary';
 import { PersonalProfile, ProfileAvatar } from './features/PersonalProfile';
@@ -55,6 +56,9 @@ const Focus = lazy(() => import('./screens/Focus').then((m) => ({ default: m.Foc
 const Sleep = lazy(() => import('./screens/Sleep').then((m) => ({ default: m.Sleep })));
 const Meditate = lazy(() => import('./screens/Meditate').then((m) => ({ default: m.Meditate })));
 const Supplements = lazy(() => import('./screens/Supplements').then((m) => ({ default: m.Supplements })));
+const Relatives = lazy(() => import('./screens/Relatives').then((m) => ({ default: m.Relatives })));
+const Reading = lazy(() => import('./screens/Reading').then((m) => ({ default: m.Reading })));
+const Wishes = lazy(() => import('./screens/Wishes').then((m) => ({ default: m.Wishes })));
 const LearningPaths = lazy(() => import('./features/LearningPaths').then((m) => ({ default: m.LearningPaths })));
 const SeriesTracker = lazy(() => import('./features/SeriesTracker').then((m) => ({ default: m.SeriesTracker })));
 const TravelSuggestions = lazy(() => import('./features/TravelSuggestions').then((m) => ({ default: m.TravelSuggestions })));
@@ -68,7 +72,7 @@ const NotificationSettings = lazy(() => import('./features/Notifications').then(
 const JournalSettings = lazy(() => import('./features/JournalSettings').then((m) => ({ default: m.JournalSettings })));
 const IphoneCalendar = lazy(() => import('./features/IphoneCalendar').then((m) => ({ default: m.IphoneCalendar })));
 
-type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | ModuleId;
+type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
 const today = () => new Date().toLocaleDateString('en-CA');
 const value = (obj: Record<string, unknown>, key: string) => typeof obj[key] === 'string' ? obj[key] as string : '';
@@ -300,6 +304,22 @@ function HiddenSuggestions() {
     </section></>;
 }
 
+function Appearance() {
+  const [mode, setMode] = useThemeMode();
+  const opts: { value: ThemeMode; label: string; sub: string }[] = [
+    { value: 'auto', label: 'Sombre le soir', sub: 'Automatiquement de ' + NIGHT_FROM + ' h à ' + NIGHT_TO + ' h' },
+    { value: 'jour', label: 'Toujours clair', sub: 'Palette Version douce' },
+    { value: 'nuit', label: 'Toujours sombre', sub: 'Plus doux pour les yeux' }];
+  return <section className="panel form-stack">
+    <h2>Thème</h2>
+    {opts.map((o) => <label key={o.value} className="checklist-item theme-opt"><input type="radio" name="theme" checked={mode === o.value} onChange={() => setMode(o.value)} /><span><strong>{o.label}</strong><small className="muted"> · {o.sub}</small></span></label>)}
+    <details><summary>Raccourcis sur l’icône de l’app</summary>
+      <p className="muted small">Sur Android et sur ordinateur, un appui long (ou clic droit) sur l’icône propose : Mon jour, Ajouter une dépense, Mes habitudes, Mon assistant.</p>
+      <p className="muted small">Sur iPhone, Apple ne permet pas encore ces raccourcis pour les apps installées depuis Safari. Astuce : dans l’app Raccourcis, crée un raccourci « Ouvrir l’URL » avec l’adresse de l’app suivie de <code>?ecran=depense</code> (ou <code>myday</code>, <code>habits</code>, <code>assistant</code>), puis ajoute-le à l’écran d’accueil. Il s’ouvre dans Safari.</p>
+    </details>
+  </section>;
+}
+
 function Profile({ view, onSettings, email, entries, profileEntry, onSaveProfile, onLogout, onRestored }: { view: 'profile' | 'settings'; onSettings: () => void; email: string; entries: Entry[]; profileEntry: Entry | undefined; onSaveProfile: (input: EntryInput, id?: string) => Promise<void>; onLogout: () => Promise<void>; onRestored: () => Promise<void> }) {
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
@@ -325,11 +345,13 @@ function Profile({ view, onSettings, email, entries, profileEntry, onSaveProfile
       if (file.size > 8_000_000) throw new Error('Fichier trop volumineux.');
       const raw = await parseEncryptedBackup(await file.text(), password);
       const validated = validateRestore(raw);
-      if (!window.confirm('Importer ' + validated.length + ' entrées ? Elles seront ajoutées aux données existantes, sans suppression. Une seconde importation créera des doublons.')) return;
-      await restoreEntries(validated);
+      const fresh = newOnly(validated, entries);
+      if (!fresh.length) { setMessage('Tout est déjà là : aucune entrée à restaurer.'); return; }
+      if (!window.confirm('Restaurer ' + fresh.length + ' entrée' + (fresh.length > 1 ? 's' : '') + ' ? ' + (validated.length - fresh.length ? (validated.length - fresh.length) + ' déjà présentes seront ignorées. ' : '') + 'Rien n’est supprimé.')) return;
+      await restoreEntries(fresh, (n) => setMessage('Restauration… ' + n + ' / ' + fresh.length));
       await onRestored();
       setPassword(''); setConfirmation('');
-      setMessage(validated.length + ' entrées restaurées.');
+      setMessage(fresh.length + ' entrées restaurées.');
     } catch { setMessage('Restauration impossible : vérifie le fichier, la phrase secrète et le format.'); }
     finally { setBusy(false); }
   };
@@ -353,6 +375,8 @@ function Profile({ view, onSettings, email, entries, profileEntry, onSaveProfile
   </div>;
   return <div className="profile-screen settings-screen">
     <ScreenHeader title="Paramètres" onBack={onSettings} />
+    <p className="sec">Apparence</p>
+    <Appearance />
     <p className="sec">Notifications</p>
     <NotificationSettings />
     <p className="sec">Journal</p>
@@ -372,10 +396,10 @@ function Profile({ view, onSettings, email, entries, profileEntry, onSaveProfile
       <label>Phrase secrète (12 caractères minimum)<input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
       <label>Confirmer la phrase secrète<input type="password" autoComplete="new-password" value={confirmation} onChange={(e) => setConfirmation(e.target.value)} /></label>
       <button className="button primary" disabled={busy || password.length < 12 || password !== confirmation} onClick={() => void exportData()}><Download size={17} /> {busy ? 'Chiffrement…' : 'Exporter mes données'}</button>
-      <label>Restaurer une sauvegarde chiffrée (500 entrées maximum par fichier)
+      <label>Restaurer une sauvegarde chiffrée (même phrase secrète, saisie ci-dessus)
         <input type="file" accept=".json,application/json" disabled={busy} onChange={(e) => { const file = e.target.files?.[0]; void restoreFile(file); e.target.value = ''; }} />
       </label>
-      <p className="fineprint">La restauration ajoute les entrées au compte. Elle ne supprime pas les données existantes et peut créer des doublons. Vérifie toujours ton fichier de sauvegarde.</p>
+      <p className="fineprint">La restauration ajoute seulement ce qui manque : rien n’est supprimé, et ce qui existe déjà est ignoré (pas de doublons). Pratique pour passer sur un nouveau téléphone.</p>
       {message && <p role="status">{message}</p>}
     </section>
     <p className="sec">Intégrations et confidentialité</p>
@@ -385,6 +409,7 @@ function Profile({ view, onSettings, email, entries, profileEntry, onSaveProfile
 }
 
 export default function App() {
+  useThemeClock();
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [owner, setOwner] = useState<boolean | null>(null);
@@ -393,15 +418,19 @@ export default function App() {
   const profileEntry = allEntries.find((e) => e.kind === PROFILE_KIND);
   const entries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND && e.kind !== HIDDEN_KIND && !RITUAL_KINDS.includes(e.kind)), [allEntries]);
   const ritualEntries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND && e.kind !== HIDDEN_KIND), [allEntries]);
+  const [assistantIdea, setAssistantIdea] = useState('');
+  const [pendingExpense, setPendingExpense] = useState(false);
   const [dayTarget, setDayTarget] = useState<{ date?: string; part?: 'matin' | 'soir'; n: number }>({ n: 0 });
   // Lien ouvert depuis une notification : ?ecran=myday&moment=soir, ?ecran=habits…
   useEffect(() => {
     const q = new URLSearchParams(window.location.search), target = q.get('ecran');
     if (!target) return;
-    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'assistant'].includes(target)) {
+    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'assistant', 'proches', 'lectures', 'envies'].includes(target)) {
       if (target === 'myday') setDayTarget((t) => ({ part: q.get('moment') === 'soir' ? 'soir' : 'matin', n: t.n + 1 }));
+      if (target === 'assistant') setAssistantIdea(q.get('idee') ?? '');
       setScreen(target as Screen);
     }
+    if (target === 'depense') setPendingExpense(true);
     window.history.replaceState(null, '', window.location.pathname);
   }, []);
   const photoEntries = useMemo(() => allEntries.filter((e) => e.kind === PHOTO_KIND), [allEntries]);
@@ -545,6 +574,8 @@ export default function App() {
     } catch (e) { setError(e instanceof Error ? e.message : 'Création impossible.'); }
   };
 
+  // Raccourci « Ajouter une dépense » : ouvre directement le formulaire une fois connectée.
+  useEffect(() => { if (pendingExpense && owner) { setPendingExpense(false); setScreen('finances'); setEditor({ module: moduleById('finances'), preset: { kind: 'expense', data: { date: today() } } }); } }, [pendingExpense, owner]);
   if (!configured) return <main className="auth-layout"><section className="auth-card"><h1>Configuration nécessaire</h1><p>Configure un projet Supabase dédié et les variables VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans Vercel. Aucune donnée personnelle n'est chargée.</p></section></main>;
   if (!authReady) return <div className="loading">Chargement sécurisé…</div>;
   if (!session) return <Login onSignedIn={() => {}} />;
@@ -595,12 +626,15 @@ export default function App() {
       {screen === 'focus' && <><ScreenHeader title="" onBack={() => go('home')} /><Focus entries={ritualEntries} onCreate={createFromTool} /></>}
       {screen === 'sommeil' && <><ScreenHeader title="" onBack={() => go('home')} /><Sleep entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} /></>}
       {screen === 'complements' && <><ScreenHeader title="" onBack={() => go('home')} /><Supplements entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
+      {screen === 'proches' && <><ScreenHeader title="" onBack={() => go('home')} /><Relatives entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
+      {screen === 'lectures' && <><ScreenHeader title="" onBack={() => go('home')} /><Reading entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
+      {screen === 'envies' && <><ScreenHeader title="" onBack={() => go('home')} /><Wishes entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
       {screen === 'mediter' && <><ScreenHeader title="" onBack={() => go('home')} /><Meditate entries={ritualEntries} onCreate={createFromTool} /></>}
       {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onImported={() => void refresh()} />}
       {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
       {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}
       {screen === 'calme' && <Calm onQuit={() => go('home')} onWrite={() => addIn('equilibre', 'emotion', { date: today() })} />}
-      {screen === 'assistant' && <div className="screen"><ScreenHeader title="Assistant" onBack={() => go('home')} /><PersonalBrief entries={entries} onGo={go} /><PersonalAssistant entries={ritualEntries} onCreate={createFromTool} /></div>}
+      {screen === 'assistant' && <div className="screen"><ScreenHeader title="Assistant" onBack={() => go('home')} /><PersonalBrief entries={entries} onGo={go} /><PersonalAssistant key={assistantIdea} entries={ritualEntries} onCreate={createFromTool} initialIdea={assistantIdea} /></div>}
       {screen === 'settings' && <div className="screen"><Profile view="profile" onSettings={() => go('parametres')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); clearOffline(); await signOut(); setEntries([]); }} /></div>}
       {screen === 'parametres' && <div className="screen"><Profile view="settings" onSettings={() => go('settings')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); clearOffline(); await signOut(); setEntries([]); }} /></div>}
       {currentModule && <div className="screen">

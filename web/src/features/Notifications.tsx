@@ -6,10 +6,12 @@ import { cloud } from '../lib/cloud';
 export type NotifPrefs = {
   morning: { on: boolean; time: string }; evening: { on: boolean; time: string }; habits: { on: boolean; time: string };
   agenda: { on: boolean; minutes: number }; weekly: { on: boolean; day: number; time: string }; supplements: { on: boolean };
+  plan: { on: boolean; time: string }; birthdays: { on: boolean; time: string };
 };
 export const DEFAULT_PREFS: NotifPrefs = {
   morning: { on: true, time: '08:00' }, evening: { on: true, time: '21:00' }, habits: { on: true, time: '19:00' },
   agenda: { on: true, minutes: 15 }, weekly: { on: true, day: 0, time: '18:00' }, supplements: { on: true },
+  plan: { on: true, time: '19:30' }, birthdays: { on: true, time: '09:00' },
 };
 const DAYS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 const pushSupported = () => typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window && typeof Notification !== 'undefined';
@@ -19,7 +21,8 @@ const keyBytes = (b64: string) => { const s = (b64 + '='.repeat((4 - b64.length 
 const merge = (v: unknown): NotifPrefs => {
   const p = (v && typeof v === 'object' ? v : {}) as Partial<NotifPrefs>;
   return { morning: { ...DEFAULT_PREFS.morning, ...p.morning }, evening: { ...DEFAULT_PREFS.evening, ...p.evening }, habits: { ...DEFAULT_PREFS.habits, ...p.habits },
-    agenda: { ...DEFAULT_PREFS.agenda, ...p.agenda }, weekly: { ...DEFAULT_PREFS.weekly, ...p.weekly }, supplements: { ...DEFAULT_PREFS.supplements, ...p.supplements } };
+    agenda: { ...DEFAULT_PREFS.agenda, ...p.agenda }, weekly: { ...DEFAULT_PREFS.weekly, ...p.weekly }, supplements: { ...DEFAULT_PREFS.supplements, ...p.supplements },
+    plan: { ...DEFAULT_PREFS.plan, ...p.plan }, birthdays: { ...DEFAULT_PREFS.birthdays, ...p.birthdays } };
 };
 
 export function NotificationSettings() {
@@ -106,6 +109,10 @@ export function NotificationSettings() {
     {row('Bilan de la semaine', 'Ton résumé de la semaine est prêt.', prefs.weekly.on, (on) => void save({ ...prefs, weekly: { ...prefs.weekly, on } }),
       <div className="inline-pick"><select value={prefs.weekly.day} onChange={(e) => void save({ ...prefs, weekly: { ...prefs.weekly, day: Number(e.target.value) } })}>
         {DAYS.map((d, i) => <option key={d} value={i}>{d}</option>)}</select>{time(prefs.weekly.time, (v) => void save({ ...prefs, weekly: { ...prefs.weekly, time: v } }))}</div>)}
+    {row('Préparer ma semaine', 'Le dimanche soir, l’assistant t’aide à planifier la semaine (ajouts à valider).', prefs.plan.on, (on) => void save({ ...prefs, plan: { ...prefs.plan, on } }),
+      time(prefs.plan.time, (v) => void save({ ...prefs, plan: { ...prefs.plan, time: v } })))}
+    {row('Anniversaires de mes proches', '3 jours avant et le jour J.', prefs.birthdays.on, (on) => void save({ ...prefs, birthdays: { ...prefs.birthdays, on } }),
+      time(prefs.birthdays.time, (v) => void save({ ...prefs, birthdays: { ...prefs.birthdays, time: v } })))}
     {msg && <p role="status" className="fineprint">{msg}</p>}
   </section>;
 }

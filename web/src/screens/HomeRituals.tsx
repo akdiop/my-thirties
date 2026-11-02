@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { BookHeart, CalendarCheck, ChevronDown, ChevronUp, Compass, Flower2, Heart, Leaf, Moon, Pill, Settings2, Sparkles, Timer } from 'lucide-react';
+import { BookHeart, BookOpen, Cake, Gift, CalendarCheck, ChevronDown, ChevronUp, Compass, Flower2, Heart, Leaf, Moon, Pill, Settings2, Sparkles, Timer } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, isoOf, NOTE_KIND } from '../lib/rituals';
 
-type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements';
+type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies';
 type Shortcut = { id: Exclude<Target, 'myday'>; label: string; sub: string; icon: typeof Heart };
 const SHORTCUTS: Shortcut[] = [
   { id: 'habits', label: 'Habitudes', sub: 'Suivi quotidien', icon: Heart },
@@ -15,6 +15,9 @@ const SHORTCUTS: Shortcut[] = [
   { id: 'sommeil', label: 'Sommeil', sub: 'Routine du soir et nuits', icon: Moon },
   { id: 'mediter', label: 'Méditer', sub: 'Respirations, guidées, minuteur', icon: Flower2 },
   { id: 'complements', label: 'Mes compléments', sub: 'Vitamines, cures, rappels', icon: Pill },
+  { id: 'proches', label: 'Mes proches', sub: 'Anniversaires et idées de cadeaux', icon: Cake },
+  { id: 'lectures', label: 'Mes lectures', sub: 'Livres et citations', icon: BookOpen },
+  { id: 'envies', label: 'Mes envies', sub: 'Ce que je veux m’offrir', icon: Gift },
 ];
 export const HOME_CFG_KIND = 'reglages_accueil';
 
@@ -28,7 +31,8 @@ export function HomeRituals({ entries, onGo, onOpenDay, onCreate, onUpdate }: {
   const ids = SHORTCUTS.map((x) => x.id) as string[];
   const savedOrder = Array.isArray(cfg?.data.order) ? (cfg!.data.order as string[]).filter((x) => ids.includes(x)) : [];
   const order = [...savedOrder, ...ids.filter((x) => !savedOrder.includes(x))] as Shortcut['id'][];
-  const shown = Array.isArray(cfg?.data.shown) ? (cfg!.data.shown as string[]) : ['habits', 'notes', 'bienetre', 'bilan', 'boussole', 'complements'];
+  // Un raccourci ajouté depuis mon dernier réglage apparaît d'office (je peux le masquer ensuite).
+  const shown = Array.isArray(cfg?.data.shown) ? [...(cfg!.data.shown as string[]), ...ids.filter((x) => !savedOrder.includes(x))] : ['habits', 'notes', 'bienetre', 'bilan', 'boussole', 'complements', 'proches'];
   const [editing, setEditing] = useState(false);
   const saveCfg = (o: string[], sh: string[]) => cfg ? onUpdate(cfg, { ...cfg.data, order: o, shown: sh })
     : onCreate({ module: 'quotidien', kind: HOME_CFG_KIND, title: 'Réglages de l’accueil', entry_date: null, data: { order: o, shown: sh } });

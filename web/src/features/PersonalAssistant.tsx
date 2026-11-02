@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react';
-import { Check, Plus, Sparkles } from 'lucide-react';
-import { cloud, type Entry, type EntryInput } from '../lib/cloud';
+import { BookmarkPlus, Check, Plus, Sparkles } from 'lucide-react';
+import type { Entry, EntryInput } from '../lib/cloud';
+import { askAssistant, type Turn } from '../lib/assistant';
+import { Dictate, appendText } from '../ui/Dictate';
 import { useIntegrationPrefs } from '../lib/integrations';
-import { addDays, habitStreak, isoOf } from '../lib/rituals';
+import { addDays, habitStreak, isoOf, NOTE_KIND } from '../lib/rituals';
 import { GOAL_KIND, goalProgress, goalSteps, VISION_KIND } from '../lib/growth';
 import { fmt, mainCurrency, monthReport } from '../lib/money';
 import { moodOn } from '../screens/Review';
@@ -21,8 +23,8 @@ const SOURCES: { id: Source; label: string }[] = [
   { id: 'supplements', label: 'Mes compléments' },
 ];
 
-const IDEAS: { label: string; prompt: string; sources: Source[] }[] = [
-  { label: 'Planifier ma semaine', prompt: 'Aide-moi à organiser ma semaine de façon réaliste, avec des moments de repos. Propose les tâches à ajouter.', sources: ['agenda', 'habits', 'goals'] },
+const IDEAS: { id?: string; label: string; prompt: string; sources: Source[] }[] = [
+  { id: 'semaine', label: 'Planifier ma semaine', prompt: 'Aide-moi à organiser ma semaine de façon réaliste, avec des moments de repos. Propose les tâches à ajouter.', sources: ['agenda', 'habits', 'goals'] },
   { label: 'Que cuisiner ce soir ?', prompt: 'Que puis-je cuisiner ce soir, simplement, avec mes recettes ?', sources: ['kitchen'] },
   { label: 'Message difficile', prompt: 'Aide-moi à écrire un message délicat, avec douceur et fermeté. Voici la situation : ', sources: [] },
   { label: 'Me remotiver', prompt: 'Je manque de motivation aujourd’hui. Aide-moi à repartir avec 3 petits pas concrets.', sources: ['habits', 'goals', 'mood'] },
@@ -127,57 +129,84 @@ function toInput(a: Action, today: string): EntryInput {
   return { module: 'quotidien', kind: a.type, title: a.title, entry_date: date, data: { date, ...(a.time ? { time: a.time } : {}), ...(a.type === 'task' ? { priority: 'Normale' } : {}) } };
 }
 
-/** Mon assistant : il ne voit que les rubriques cochées, propose des idées prêtes et des ajouts que je valide un par un. */
-export function PersonalAssistant({ entries, onCreate }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void> }) {
+/** Mon assistant : il ne voit que les rubriques cochées, garde le fil de la conversation, propose des ajouts que je valide un par un. */
+export function PersonalAssistant({ entries, onCreate, initialIdea }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; initialIdea?: string }) {
   const { prefs } = useIntegrationPrefs();
   const today = isoOf(new Date());
-  const [message, setMessage] = useState('');
-  const [on, setOn] = useState<Set<Source>>(new Set());
-  const [answer, setAnswer] = useState<{ text: string; actions: Action[] } | null>(null);
-  const [added, setAdded] = useState<Set<number>>(new Set());
+  const start = IDEAS.find((x) => x.id === initialIdea);
+  const [message, setMessage] = useState(start?.prompt ?? '');
+  const [on, setOn] = useState<Set<Source>>(new Set(start?.sources ?? []));
+  const [thread, setThread] = useState<{ q: string; text: string; actions: Action[] }[]>([]);
+  const [added, setAdded] = useState<Set<string>>(new Set());
+  const [saved, setSaved] = useState<Set<number>>(new Set());
   const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
   const context = useMemo(() => buildContext(entries, on, today), [entries, on, today]);
   const toggle = (s: Source) => setOn((cur) => { const n = new Set(cur); if (n.has(s)) n.delete(s); else n.add(s); return n; });
 
   const ask = async () => {
-    if (!cloud || !prefs.assistant || message.trim().length < 2) return;
-    setBusy(true); setAnswer(null); setStatus(''); setAdded(new Set());
+    if (!prefs.assistant || message.trim().length < 2) return;
+    setBusy(true); setStatus('');
     try {
-      const { data, error } = await cloud.functions.invoke('personal-assistant', { body: { message: message.trim().slice(0, 1200), actions: true, ...(context ? { context } : {}) } });
-      if (error) throw error;
-      if (!data || typeof data.answer !== 'string') throw new Error('Assistant non configuré.');
-      setAnswer(splitAnswer(data.answer));
+      const history: Turn[] = thread.flatMap((t) => [{ role: 'user' as const, content: t.q }, { role: 'assistant' as const, content: t.text }]);
+      // Le contexte coché n'est envoyé qu'une fois, au début de la conversation.
+      const raw = await askAssistant(message, { actions: true, history, context: thread.length ? undefined : context || undefined });
+      setThread((t) => [...t, { q: message.trim(), ...splitAnswer(raw) }]);
+      setMessage('');
     } catch { setStatus('Assistant indisponible pour le moment. Réessaie un peu plus tard.'); }
     finally { setBusy(false); }
   };
-  const add = async (a: Action, i: number) => {
-    try { await onCreate(toInput(a, today)); setAdded((s) => new Set(s).add(i)); }
+  const add = async (a: Action, key: string) => {
+    try { await onCreate(toInput(a, today)); setAdded((s) => new Set(s).add(key)); }
     catch { setStatus('Ajout impossible pour le moment.'); }
   };
+  const saveNote = async (i: number) => {
+    const t = thread[i]!;
+    try {
+      const heading = ('Assistant · ' + t.q).slice(0, 170);
+      await onCreate({ module: 'equilibre', kind: NOTE_KIND, title: heading, entry_date: today,
+        data: { noteId: crypto.randomUUID(), type: 'insight', heading, body: 'Ma question : ' + t.q + '\n\n' + t.text, folder: 'idees', mood: '', media: [], updated: new Date().toISOString() } });
+      setSaved((s) => new Set(s).add(i));
+    } catch { setStatus('Enregistrement impossible pour le moment.'); }
+  };
+  const reset = () => { setThread([]); setAdded(new Set()); setSaved(new Set()); setMessage(''); setStatus(''); };
+  const last = thread.length - 1;
 
   return <section className="tool-card ai-assistant">
     <h3><Sparkles size={18} /> Mon assistant</h3>
     {!prefs.assistant && <p className="privacy-hint">L'assistant est désactivé. Active-le dans Profil → Centre de confidentialité.</p>}
-    <div className="chip-row">{IDEAS.map((idea) => <button key={idea.label} className="chip" disabled={!prefs.assistant}
-      onClick={() => { setMessage(idea.prompt); setOn(new Set(idea.sources)); }}>{idea.label}</button>)}</div>
-    <label>Ma question<textarea rows={3} maxLength={1200} value={message} onChange={(e) => setMessage(e.target.value)}
-      placeholder="Par exemple : aide-moi à organiser ma semaine." /></label>
-    <fieldset className="assistant-sources"><legend>Ce que l’assistant peut voir</legend>
+    {!thread.length && <div className="chip-row">{IDEAS.map((idea) => <button key={idea.label} className="chip" disabled={!prefs.assistant}
+      onClick={() => { setMessage(idea.prompt); setOn(new Set(idea.sources)); }}>{idea.label}</button>)}</div>}
+
+    {thread.map((t, ti) => <div key={ti} className="ai-turn">
+      <p className="ai-q">{t.q}</p>
+      <div className="ai-answer" role="status"><p>{t.text}</p>
+        {t.actions.length > 0 && <div className="assistant-actions"><p className="ritual-label">Ajouts proposés</p>
+          {t.actions.map((a, i) => { const key = ti + '-' + i; return <div key={key} className="assistant-action"><div><strong>{a.title}</strong><small>{describe(a)}</small></div>
+            {added.has(key) ? <span className="added"><Check size={16} /> Ajouté</span>
+              : <button className="button secondary small" onClick={() => void add(a, key)}><Plus size={14} /> Ajouter</button>}</div>; })}
+          {t.actions.length > 1 && t.actions.some((_, i) => !added.has(ti + '-' + i)) && <button className="link-btn small" onClick={() => void (async () => { for (const [i, a] of t.actions.entries()) if (!added.has(ti + '-' + i)) await add(a, ti + '-' + i); })()}>Tout ajouter</button>}
+        </div>}
+        {saved.has(ti) ? <small className="added"><Check size={14} /> Enregistrée dans mon journal (Idées & projets)</small>
+          : <button className="link-btn small" onClick={() => void saveNote(ti)}><BookmarkPlus size={14} /> Enregistrer dans mon journal</button>}
+      </div>
+    </div>)}
+
+    <label>{thread.length ? 'Ta réponse ou une autre question' : 'Ma question'}
+      <textarea rows={3} maxLength={1200} value={message} onChange={(e) => setMessage(e.target.value)}
+        placeholder={thread.length ? 'Par exemple : et pour mercredi ?' : 'Par exemple : aide-moi à organiser ma semaine.'} /></label>
+    <Dictate onText={(t) => setMessage((m) => appendText(m, t).slice(0, 1200))} />
+    {!thread.length && <fieldset className="assistant-sources"><legend>Ce que l’assistant peut voir</legend>
       {SOURCES.map((s) => <label key={s.id} className="checklist-item"><input type="checkbox" checked={on.has(s.id)} disabled={!prefs.assistant} onChange={() => toggle(s.id)} />{s.label}</label>)}
       {context ? <details><summary>Voir ce qui sera envoyé ({context.length} caractères)</summary><pre className="context-preview">{context}</pre></details>
         : <p className="fineprint">Rien n’est coché : seule ta question est envoyée.</p>}
-    </fieldset>
-    <button className="button primary" disabled={busy || !prefs.assistant || message.trim().length < 2} onClick={() => void ask()}>{busy ? 'Réflexion en cours…' : 'Demander'}</button>
-    {answer && <div className="ai-answer" role="status"><strong>Réponse</strong><p>{answer.text}</p>
-      {answer.actions.length > 0 && <div className="assistant-actions"><p className="ritual-label">Ajouts proposés</p>
-        {answer.actions.map((a, i) => <div key={i} className="assistant-action"><div><strong>{a.title}</strong><small>{describe(a)}</small></div>
-          {added.has(i) ? <span className="added"><Check size={16} /> Ajouté</span>
-            : <button className="button secondary small" onClick={() => void add(a, i)}><Plus size={14} /> Ajouter</button>}</div>)}
-        {answer.actions.length > 1 && added.size < answer.actions.length && <button className="link-btn small" onClick={() => void (async () => { for (const [i, a] of answer.actions.entries()) if (!added.has(i)) await add(a, i); })()}>Tout ajouter</button>}
-      </div>}
-    </div>}
+    </fieldset>}
+    <div className="button-group">
+      <button className="button primary" disabled={busy || !prefs.assistant || message.trim().length < 2} onClick={() => void ask()}>{busy ? 'Réflexion en cours…' : thread.length ? 'Envoyer' : 'Demander'}</button>
+      {thread.length > 0 && <button className="button ghost" onClick={reset}>Nouvelle conversation</button>}
+    </div>
     {status && <p role="status">{status}</p>}
+    {last >= 0 && thread.length >= 8 && <p className="fineprint">Longue conversation : l’assistant se souvient des 4 derniers échanges.</p>}
     <p className="fineprint">Rien n’est ajouté sans ton clic.</p>
   </section>;
 }

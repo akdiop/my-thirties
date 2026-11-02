@@ -1394,3 +1394,34 @@ h2{font-size:1.55rem;line-height:1.2}
 .assistant-action small{color:var(--muted, #8a7568)}
 .assistant-action .added{display:inline-flex;gap:4px;align-items:center;font-size:.85rem;font-weight:600}
 .ai-answer p{white-space:pre-wrap}
+.dictate{display:inline-flex;align-items:center;gap:8px;margin:4px 0}
+.dictate-btn{width:38px;height:38px;border-radius:50%;background:#f0e7e3;color:#8c6257;display:inline-grid;place-items:center;border:0}
+.dictate-btn.on{background:#c38380;color:#fff;animation:dictpulse 1.2s ease-in-out infinite}
+.dictate-hint{color:#8c7468}
+@keyframes dictpulse{50%{box-shadow:0 0 0 8px #c3838033}}
+.ai-turn{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.ai-q{align-self:flex-end;background:#f2e2dc;border-radius:16px 16px 4px 16px;padding:8px 12px;margin:0;max-width:85%;white-space:pre-wrap}
+.ai-steps{display:flex;flex-direction:column;gap:6px;background:#f7f0ec;border-radius:14px;padding:10px 12px;margin-top:8px}
+.ai-steps .checklist-item{display:flex;flex-direction:row;gap:8px;align-items:flex-start;font-weight:400}
+.ai-steps .checklist-item input{width:18px;min-height:18px;flex-shrink:0;margin-top:3px}
+.relative-card,.book-card,.wish-card{background:#fffcfa;border:1px solid #efe3de;border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.relative-card.soon{border-color:#c38380;background:#fbf1ee}
+.relative-head{display:flex;align-items:center;gap:12px;background:none;border:0;padding:0;text-align:left;width:100%}
+.relative-head .habit-body{flex:1;min-width:0;display:flex;flex-direction:column}
+.relative-head small{color:#8c7468}
+.relative-badge{width:40px;height:40px;border-radius:12px;background:#f2e2dc;color:#8c6257;display:grid;place-items:center;flex-shrink:0}
+.relative-days{font-weight:700;color:#8c6257;font-size:.85rem;white-space:nowrap}
+.relative-more{border-top:1px solid #efe3de;padding-top:10px}
+.link-btn.danger{color:#a2564f}
+.stars{display:flex;gap:4px}
+.stars button{background:none;border:0;padding:2px;color:#ded6cf}
+.stars button.on{color:#c9a08c}
+.stars button.on svg{fill:currentColor}
+.book-quote{margin:0;padding:8px 10px;background:#f7f0ec;border-radius:12px;font-style:italic;display:flex;gap:6px;align-items:flex-start}
+.book-quote .icon-btn{margin-left:auto;flex-shrink:0}
+.wish-card .goal-head small{display:block}
+/* Mode sombre : inversion douce des couleurs claires ; photos, vidéos et images gardent leurs vraies couleurs. */
+html.dark{background:#0a0c0e;filter:invert(1) hue-rotate(180deg)}
+html.dark img,html.dark video,html.dark picture,html.dark canvas,html.dark iframe,html.dark [style*="background-image"],html.dark .keep-colors{filter:invert(1) hue-rotate(180deg)}
+.theme-opt{display:flex;flex-direction:row;gap:10px;align-items:center;font-weight:400}.theme-opt input{width:18px;min-height:18px}
+.relative-more .checklist-item{display:flex;flex-direction:row;gap:8px;align-items:center;font-weight:400}.relative-more .checklist-item input{width:18px;min-height:18px;flex-shrink:0}

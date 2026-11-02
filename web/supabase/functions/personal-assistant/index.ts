@@ -64,8 +64,9 @@ Deno.serve(async (request) => {
   let agenda: { date: string; title: string; time: string }[] = [];
   let context = '';
   let allowActions = false;
+  let history: { role: 'user' | 'assistant'; content: string }[] = [];
   try {
-    if (Number(request.headers.get('content-length') || 0) > 24000) throw new Error('Too large');
+    if (Number(request.headers.get('content-length') || 0) > 48000) throw new Error('Too large');
     const body = await request.json();
     if (typeof body?.message !== 'string') throw new Error('Invalid');
     prompt = body.message.trim();
@@ -74,6 +75,11 @@ Deno.serve(async (request) => {
       agenda = body.agenda.slice(0, 8).filter((item: any) => item && typeof item.date === 'string' && typeof item.title === 'string' && typeof item.time === 'string' && item.title.length <= 120 && /^\d{4}-\d{2}-\d{2}$/.test(item.date) && (item.time === '' || /^([01]\d|2[0-3]):[0-5]\d$/.test(item.time))).map((item: any) => ({ date: item.date, title: item.title, time: item.time }));
     }
     allowActions = body.actions === true;
+    if (body.history !== undefined) {
+      if (!Array.isArray(body.history) || body.history.length > 8) throw new Error('Invalid history');
+      history = body.history.filter((t: any) => t && (t.role === 'user' || t.role === 'assistant') && typeof t.content === 'string' && t.content.length <= 3000)
+        .map((t: any) => ({ role: t.role, content: t.content }));
+    }
     if (body.context !== undefined) { if (typeof body.context !== 'string' || body.context.length > 6000) throw new Error('Invalid context'); context = body.context; }
     if (prompt.length < 2 || prompt.length > 1200) throw new Error('Invalid');
   } catch { return json({ error: 'Question invalide (2 à 1200 caractères).' }, 400, cors); }
@@ -84,6 +90,7 @@ Deno.serve(async (request) => {
         model: name, max_tokens: 1400,
         messages: [
           { role: 'system', content: 'Tu es l’assistante personnelle de My Thirties, l’application perso d’Aïda (Dakar). Réponds en français, de façon chaleureuse, concrète et structurée (listes courtes quand c’est utile), en t’appuyant sur le contexte fourni quand il y en a. Aide à organiser la vie quotidienne, les repas et les courses, le sport, le bien-être, les objectifs, l’argent, les apprentissages, les voyages et les loisirs. Tu ne vois que la question et le contexte explicitement fourni par Aïda. Pas de diagnostic médical. Si tu n’es pas sûre d’un fait (prix, horaires, conditions d’entrée), dis-le et indique où vérifier. Tu n’exécutes rien toi-même.' + (allowActions ? ' Quand c’est utile tu peux PROPOSER des ajouts qu’Aïda validera : termine alors ta réponse par une ligne ACTIONS: suivie d’un tableau JSON sur une seule ligne, chaque élément étant l’un de {"type":"task","title":"…","date":"AAAA-MM-JJ","time":"HH:MM"}, {"type":"event","title":"…","date":"AAAA-MM-JJ","time":"HH:MM"}, {"type":"habit","title":"…"}, {"type":"expense","title":"…","amount":1000,"currency":"XOF","category":"…","date":"AAAA-MM-JJ"}. Maximum 6 actions, time facultatif. N’ajoute pas de ligne ACTIONS si aucun ajout n’est utile.' : '') },
+          ...history,
           { role: 'user', content: 'Date du jour : ' + new Date().toLocaleDateString('fr-CA', { timeZone: 'Africa/Dakar' }) + '\n\n' + prompt + (agenda.length ? '\n\nAgenda sélectionné : ' + JSON.stringify(agenda) : '') + (context ? '\n\nContexte choisi par Aïda :\n' + context : '') },
         ],
       }),
