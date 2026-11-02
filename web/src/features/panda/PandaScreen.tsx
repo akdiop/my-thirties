@@ -8,6 +8,7 @@ import { usePanda } from './PandaWidget';
 import { DAILY_CAP, DOMAINS, ITEMS, LEVELS, MESSAGES, OUTFITS, PANDA_KIND, pick, RULES_VERSION, type Item } from './data';
 import { addCare, booksOnShelf, foodsUnlocked, isGift, trim } from './engine';
 import { GardenArt, ItemArt, PandaCharacter } from './PandaCharacter';
+import { assetUrl } from './assets';
 import type { PandaMood, PandaState, Room } from './types';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
@@ -88,14 +89,15 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
       {pr.level.n >= 4 && <Segmented label="Pièce" value={room} onChange={(r) => void save({ room: r })} options={[{ value: 'maison', label: 'Maison' }, { value: 'jardin', label: 'Jardin' }]} />}
       <div className={'panda-scene room-' + room} style={{ background: room === 'jardin' ? '#E7F0E4' : WALL[season] }}>
         <svg className="scene-bg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-          {room === 'maison' ? <>
+          {assetUrl(room === 'jardin' ? 'bg_jardin' : 'bg_maison_' + season) ? <image href={assetUrl(room === 'jardin' ? 'bg_jardin' : 'bg_maison_' + season)} x="0" y="0" width="400" height="300" />
+            : room === 'maison' ? <>
             <rect x="0" y="210" width="400" height="90" fill="#EAD9C7" />
             <rect x="130" y="40" width="140" height="110" rx="12" fill="#E9EEF0" stroke="#6B4433" strokeWidth="3" /><path d="M200 40 V150 M130 95 H270" stroke="#6B4433" strokeWidth="3" />
-            {shown.filter((i) => i.room === 'maison').map((i) => <ItemArt key={i.id} id={i.id} books={booksOnShelf(pr.counts)} />)}
           </> : <>
             <rect x="0" y="0" width="400" height="300" fill="#DDEBDF" /><path d="M0 200 Q200 150 400 200 V300 H0Z" fill="#B9CFAE" />
-            <g transform="translate(0 110)">{shown.filter((i) => i.room === 'jardin').map((i) => <GardenArt key={i.id} id={i.id} />)}</g>
           </>}
+          {shown.filter((i) => i.room === room).map((i) => assetUrl('item_' + i.id) ? <image key={i.id} href={assetUrl('item_' + i.id)} x="0" y="0" width="400" height="300" />
+            : i.room === 'maison' ? <ItemArt key={i.id} id={i.id} books={booksOnShelf(pr.counts)} /> : <g key={i.id} transform="translate(0 110)"><GardenArt id={i.id} /></g>)}
           {season === 'automne' && <g fill="#C98A55">{[40, 340, 90, 300].map((x, i) => <path key={x} className="leaf-fall" style={{ animationDelay: i * 1.2 + 's' }} d={`M${x} 20 q8 -8 14 0 q-6 10 -14 0Z`} />)}</g>}
           {season === 'hiver' && <g fill="#fff">{[60, 330, 110, 280].map((x, i) => <circle key={x} className="leaf-fall" style={{ animationDelay: i * 1.1 + 's' }} cx={x} cy="20" r="4" />)}</g>}
           {(myBirthday || pandaBirthday) && <g><rect x="320" y="226" width="44" height="26" rx="4" fill="#F7E3C3" stroke="#6B4433" strokeWidth="3" /><path d="M342 226 v-12" stroke="#6B4433" strokeWidth="3" /><circle cx="342" cy="210" r="4" fill="#FFB86B" /></g>}
