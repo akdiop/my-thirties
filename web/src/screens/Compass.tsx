@@ -5,7 +5,7 @@ import { saveLabel, useAutosave } from '../lib/autosave';
 import { readProfile } from '../lib/profile';
 import { DAILY_KIND, HABIT_KIND, habitDone, isoOf, MOODS, NOTE_KIND } from '../lib/rituals';
 import { isDoneOn } from '../lib/day';
-import { DOMAIN_QUESTIONS, GOAL_KIND, goalHabits, goalProgress, goalSteps, LIFE_DOMAINS, monthKey, VISION_KIND, WHEEL_KIND, wheelScores, type GoalStep, type LifeDomain } from '../lib/growth';
+import { BASE_NUMBERS, birthNumber, DOMAIN_QUESTIONS, GOAL_KIND, goalHabits, goalProgress, goalSteps, LIFE_DOMAINS, monthKey, VISION_KIND, WHEEL_KIND, wheelScores, type GoalStep, type LifeDomain } from '../lib/growth';
 import { moodOn } from './Review';
 import { Bar, Segmented } from '../ui/kit';
 
@@ -64,9 +64,10 @@ function Vision({ entries, profileEntry, onCreate, onUpdate, onEditProfile }: { 
   const [notList, setNotList] = useState(init('notList'));
   const [lifePath, setLifePath] = useState(init('lifePath') || LIFE_PATH_DEFAULT);
   const [lifeNotes, setLifeNotes] = useState(init('lifeNotes'));
+  const [people, setPeople] = useState<Person[]>(Array.isArray(entry?.data.people) ? entry!.data.people as Person[] : []);
   const [touched, setTouched] = useState(false);
-  const t = (f: (v: string) => void) => (v: string) => { f(v); setTouched(true); };
-  const draft = useMemo(() => touched ? { words, year1, year5, who, notList, lifePath, lifeNotes } : null, [touched, words, year1, year5, who, notList, lifePath, lifeNotes]);
+  const t = <A,>(f: (v: A) => void) => (v: A) => { f(v); setTouched(true); };
+  const draft = useMemo(() => touched ? { words, year1, year5, who, notList, lifePath, lifeNotes, people } : null, [touched, words, year1, year5, who, notList, lifePath, lifeNotes, people]);
   const state = useAutosave(entry, draft, () => onCreate({ module: 'equilibre', kind: VISION_KIND, title: 'Ma vision', entry_date: null, data: draft! }), onUpdate);
   const goals = entries.filter((e) => e.kind === GOAL_KIND && goalProgress(e) < 1);
 
@@ -81,6 +82,7 @@ function Vision({ entries, profileEntry, onCreate, onUpdate, onEditProfile }: { 
       <p className="ritual-label">Mon chemin de vie · 30/3</p>
       <p className="muted small">Résumé de ce que dit Life Purpose App, modifiable :</p>
       <textarea rows={14} value={lifePath} maxLength={6000} onChange={(e) => t(setLifePath)(e.target.value)} />
+      <LifePathCalc people={people} onChange={(p) => t(setPeople)(p)} />
       <details className="life-notes"><summary>Mes extraits Life Purpose (à coller moi-même)</summary>
         <textarea rows={10} value={lifeNotes} maxLength={40000} placeholder="Colle ici les passages que tu as lus ou débloqués : ils restent privés dans tes données." onChange={(e) => t(setLifeNotes)(e.target.value)} />
       </details>
@@ -94,6 +96,31 @@ function Vision({ entries, profileEntry, onCreate, onUpdate, onEditProfile }: { 
       {goals.map((g) => <div key={g.id} className="goal-mini"><span>{g.title}</span><Bar value={goalProgress(g)} tone="caramel" /></div>)}
     </section>}
     <p className="save-state" aria-live="polite">{saveLabel(state) || 'Tout s’enregistre automatiquement.'}</p>
+  </div>;
+}
+
+type Person = { name: string; date: string };
+
+/** Calcul du nombre de naissance pour moi et mes proches, avec les intitulés des chiffres. */
+function LifePathCalc({ people, onChange }: { people: Person[]; onChange: (p: Person[]) => void }) {
+  const [name, setName] = useState(''), [date, setDate] = useState('');
+  const all: Person[] = [{ name: 'Moi', date: '1992-01-17' }, ...people];
+  const preview = birthNumber(date);
+  return <div className="life-calc">
+    <p className="ritual-label">Calculer un chemin de vie</p>
+    {all.map((p, i) => { const n = birthNumber(p.date); const digits = [...new Set(n.replace('/', '').split(''))];
+      return <div key={p.name + p.date} className="life-row">
+        <div><strong>{p.name}</strong><small className="muted"> · {new Date(p.date + 'T12:00:00').toLocaleDateString('fr-FR')}</small></div>
+        <div className="life-num">{n}</div>
+        <small className="muted">{digits.map((d) => d + ' : ' + BASE_NUMBERS[d]).join(' · ')}</small>
+        {i > 0 && <button className="link-btn small" onClick={() => onChange(people.filter((x) => x !== p))}>Retirer</button>}
+      </div>; })}
+    <div className="two-inputs">
+      <input value={name} maxLength={40} placeholder="Prénom" onChange={(e) => setName(e.target.value)} />
+      <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+    </div>
+    {preview && <p className="muted">Résultat : <strong>{preview}</strong></p>}
+    <button className="button secondary" disabled={!name.trim() || !preview} onClick={() => { onChange([...people, { name: name.trim(), date }]); setName(''); setDate(''); }}>Ajouter ce proche</button>
   </div>;
 }
 

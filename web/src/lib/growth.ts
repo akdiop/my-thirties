@@ -85,3 +85,18 @@ export function eveningQuestion(iso: string) {
   const n = Math.floor(new Date(iso + 'T12:00:00').getTime() / 86400000);
   return EVENING_QUESTIONS[((n % EVENING_QUESTIONS.length) + EVENING_QUESTIONS.length) % EVENING_QUESTIONS.length]!;
 }
+
+/** Nombre de naissance (méthode de Dan Millman) : somme de tous les chiffres de la date, puis somme des chiffres de ce total. */
+export function birthNumber(iso: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return '';
+  const sum = (s: string) => [...s].reduce((a, c) => a + Number(c), 0);
+  const total = sum(iso.replace(/-/g, ''));
+  const second = sum(String(total));
+  return total + '/' + second;
+}
+
+/** Intitulés des nombres de base (titres seuls). */
+export const BASE_NUMBERS: Record<string, string> = {
+  '1': 'Créativité et sécurité', '2': 'Coopération et équilibre', '3': 'Expression et sensibilité', '4': 'Stabilité et processus', '5': 'Liberté et discipline',
+  '6': 'Vision et acceptation', '7': 'Confiance et ouverture', '8': 'Influence et autorité', '9': 'Intégrité et sagesse', '0': 'Don intérieur',
+};

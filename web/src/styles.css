@@ -1362,3 +1362,7 @@ h2{font-size:1.55rem;line-height:1.2}
 .life-notes{margin-top:10px}
 .life-notes summary{font-weight:600;color:#6b3f2e;cursor:pointer;padding:6px 0}
 .life-notes textarea{margin-top:8px;border:1px solid #e3d8ca;border-radius:12px;padding:12px;font-size:16px;line-height:1.5;background:#fffdfa;width:100%;box-sizing:border-box;font-family:inherit}
+.life-calc{margin-top:14px;border-top:1px solid #f0e6dc;padding-top:12px;display:flex;flex-direction:column;gap:10px}
+.life-row{display:flex;flex-direction:column;gap:2px;background:#faf4ec;border-radius:12px;padding:10px 12px}
+.life-num{font-size:1.6rem;font-weight:700;color:#B5603F}
+.life-calc input{border:1px solid #e3d8ca;border-radius:12px;padding:10px;font-size:16px;background:#fffdfa;min-width:0}
