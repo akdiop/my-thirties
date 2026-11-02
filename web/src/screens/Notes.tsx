@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { ArrowLeft, Flame, Plus, Search, Trash2 } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { NoteMedia } from '../features/NoteMedia';
+import { fold, fullText } from '../lib/search';
 import { deleteMedia, mediaOf, type Media } from '../lib/media';
 import { DAILY_KIND, MOODS, NOTE_FOLDERS, NOTE_KIND, NOTE_TYPES, noteType, type NoteType } from '../lib/rituals';
 import { saveLabel, useAutosave } from '../lib/autosave';
@@ -31,8 +32,8 @@ export function Notes({ entries, onCreate, onEdit, onRemove, onOpenDay }: {
   const [pdfMonth, setPdfMonth] = useState(new Date().toLocaleDateString('en-CA').slice(0, 7));
 
   const found = useMemo(() => {
-    const s = q.trim().toLocaleLowerCase('fr');
-    return s ? [...notes, ...days].filter((e) => textOf(e).toLocaleLowerCase('fr').includes(s)) : [];
+    const s = fold(q.trim());
+    return s ? [...notes, ...days].filter((e) => fold(textOf(e) + ' ' + fullText(e)).includes(s)) : [];
   }, [q, notes, days]);
 
   if (editing) {

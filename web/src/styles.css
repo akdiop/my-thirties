@@ -1366,3 +1366,21 @@ h2{font-size:1.55rem;line-height:1.2}
 .life-row{display:flex;flex-direction:column;gap:2px;background:#faf4ec;border-radius:12px;padding:10px 12px}
 .life-num{font-size:1.6rem;font-weight:700;color:#B5603F}
 .life-calc input{border:1px solid #e3d8ca;border-radius:12px;padding:10px;font-size:16px;background:#fffdfa;min-width:0}
+
+/* Raccourcis personnalisables, outils, compléments */
+.shortcut-head{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.shortcut-edit{display:flex;flex-direction:column;gap:6px}
+.sc-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #eae0d6;border-radius:14px;padding:8px 10px}
+.sc-row.off{opacity:.6}
+.sc-label{flex:1;display:flex;align-items:center;gap:8px;font-weight:600;color:#3c3029}
+.tool-chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:-4px 0 14px;padding-bottom:2px}
+.tool-chips::-webkit-scrollbar{display:none}
+.tool-chip{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid #eae0d6;background:#fff;border-radius:999px;padding:9px 14px;font-weight:600;color:#6b3f2e;font-size:.9rem}
+.supp-card{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #eae0d6;border-radius:18px;padding:14px}
+.supp-card.on{background:#F4F7F0}
+.supp-card .week-dots span{font-size:.7rem}
+.time-inline{border:1px solid #e3d8ca;border-radius:999px;padding:6px 10px;font-size:16px;background:#fffdfa}
+.search-hit{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}.search-hit .snippet{font-size:.85rem;color:#7d7069;line-height:1.4}
+.insight-list{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:.95rem;line-height:1.5}
+.screen-loading{min-height:60vh;display:grid;place-items:center;color:#8b725e;font-size:.95rem}
+.offline-banner{position:sticky;top:0;z-index:30;background:#F5E9DA;color:#6b3f2e;font-size:.85rem;padding:8px 14px;border-radius:0 0 12px 12px;text-align:center}

@@ -7,6 +7,10 @@ import { DAILY_KIND, HABIT_KIND, habitDone, isoOf, MOODS, NOTE_KIND } from '../l
 import { isDoneOn } from '../lib/day';
 import { BASE_NUMBERS, birthNumber, DOMAIN_QUESTIONS, GOAL_KIND, goalHabits, goalProgress, goalSteps, LIFE_DOMAINS, monthKey, VISION_KIND, WHEEL_KIND, wheelScores, type GoalStep, type LifeDomain } from '../lib/growth';
 import { moodOn } from './Review';
+import { Insights } from '../features/Insights';
+import { cloud } from '../lib/cloud';
+import { getIntegrationPrefs } from '../lib/integrations';
+import { Sparkles } from 'lucide-react';
 import { Bar, Segmented } from '../ui/kit';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
@@ -297,8 +301,37 @@ function Retro({ entries }: { entries: Entry[] }) {
       {s.habits.slice(0, 6).map((h) => <div key={h.title} className="goal-habit"><span>{h.title}</span><small>{h.n} fois</small></div>)}</section>}
     {s.goalsDone.length > 0 && <section className="ritual-card"><p className="ritual-label">Objectifs atteints</p>
       {s.goalsDone.map((g) => <div key={g.id} className="goal-done"><Trophy size={16} /> <span>{g.title}</span></div>)}</section>}
+    <RetroAi label={range.label} facts={[
+      'Période : ' + range.label,
+      'Jours écrits : ' + s.journal + ' ; habitudes cochées : ' + s.habits.reduce((a, h) => a + h.n, 0) + ' ; tâches : ' + s.tasksDone + '/' + s.tasks + ' ; séances de sport : ' + s.sport,
+      'Humeurs : ' + [...s.moods].map(([m, n]) => m + ' ' + n + ' j').join(', '),
+      'Habitudes les plus tenues : ' + s.habits.slice(0, 5).map((h) => h.title + ' ' + h.n).join(' ; '),
+      'Objectifs atteints : ' + s.goalsDone.map((g) => g.title).join(' ; '),
+      'Victoires : ' + s.wins.slice(-12).map((w) => w.text.slice(0, 70)).join(' ; '),
+    ].join('\n')} />
+    <Insights entries={entries} />
     <section className="ritual-card"><p className="ritual-label">Mes victoires</p>
       {s.wins.length ? <ul className="retro-wins">{s.wins.slice(-30).map((w) => <li key={w.day + w.text}><small>{new Date(w.day + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</small> {w.text}</li>)}</ul>
         : <p className="muted">Note ta victoire du jour dans le débriefing du soir : elles apparaîtront ici.</p>}</section>
   </div>;
+}
+
+/** Résumé de l'assistant, uniquement à ma demande (comme pour la semaine). */
+function RetroAi({ label, facts }: { label: string; facts: string }) {
+  const [ai, setAi] = useState(''), [busy, setBusy] = useState(false), [err, setErr] = useState('');
+  const on = getIntegrationPrefs().assistant;
+  const run = async () => {
+    if (!cloud) return;
+    setBusy(true); setErr('');
+    const message = ('Voici mon bilan de ' + label + '. Fais-moi une rétrospective bienveillante en 5 points courts (mes réussites, ce qui a pesé, une tendance, ce que je peux célébrer, une intention simple pour la suite), sans diagnostic.\n' + facts).slice(0, 1190);
+    try { const { data, error } = await cloud.functions.invoke('personal-assistant', { body: { message } }); if (error || typeof data?.answer !== 'string') throw new Error(); setAi(data.answer); }
+    catch { setErr('Le résumé n’a pas pu être généré.'); } finally { setBusy(false); }
+  };
+  return <section className="ritual-card ai-card">
+    <p className="ritual-label"><Sparkles size={16} /> Résumé de l’assistant</p>
+    {ai ? <p className="ai-answer">{ai}</p> : <>
+      <p className="muted">À ta demande uniquement : envoie ce bilan à l’assistant pour une rétrospective.{on ? '' : ' Active d’abord l’assistant IA dans Paramètres › Intégrations.'}</p>
+      <button className="button soft" disabled={busy || !on} onClick={() => void run()}>{busy ? 'Résumé en cours…' : 'Résumer ' + label}</button></>}
+    {err && <p className="error" role="alert">{err}</p>}
+  </section>;
 }
