@@ -41,7 +41,6 @@ export function Habits({ entries, onCreate, onUpdate, onRemove }: { entries: Ent
       <button className="button ghost wide" onClick={() => setTab('parcours')}>Suivre un parcours progressif</button>
     </div> : <>
       <header className="tab-head"><h1>Habitudes</h1><p>{dueToday ? doneToday + ' sur ' + mine.length + ' aujourd’hui' : 'Ton suivi de la semaine'}</p></header>
-    <img className="screen-cover" src="/modules/habitudes.webp" alt="Calendrier d’habitudes cochées" loading="lazy" />
       <Segmented label="Habitudes" value={tab} onChange={setTab} options={[{ value: 'today', label: 'Aujourd’hui' }, { value: 'parcours', label: 'Parcours' }, { value: 'stats', label: 'Statistiques' }]} />
       {tab === 'parcours' && <Journeys entries={entries} onCreate={onCreate} onUpdate={onUpdate} onRemove={onRemove} />}
       {tab === 'stats' && <HabitStats habits={mine} />}
