@@ -74,7 +74,7 @@ export function PersonalProfile({ entry, onSave }: { entry: Entry | undefined; o
     <ChipPicker label="Mes hobbies" options={HOBBIES} value={tags.hobbies} onChange={(v) => setTags({ ...tags, hobbies: v })} />
     <ChipPicker label="Langues parlées" options={LANGUES} value={tags.languages} onChange={(v) => setTags({ ...tags, languages: v })} />
     <ChipPicker label="Ce qui compte pour moi" options={VALEURS} value={tags.values} onChange={(v) => setTags({ ...tags, values: v })} />
-    <label>Mon intention pour mes trente ans<textarea value={p.intention} maxLength={500} rows={3} onChange={(e) => set('intention', e.target.value)} placeholder="Ce que je veux construire, vivre, apprendre…" /></label>
+    <label>Mon intention pour ma trentaine<textarea value={p.intention} maxLength={500} rows={3} onChange={(e) => set('intention', e.target.value)} placeholder="Ce que je veux construire, vivre, apprendre…" /></label>
     <button className="button primary" disabled={busy} onClick={() => void save()}><Save size={17} /> {busy ? 'Enregistrement…' : 'Enregistrer mon profil'}</button>
     {message && <p role="status">{message}</p>}
   </section>;
