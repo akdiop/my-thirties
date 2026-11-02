@@ -46,6 +46,7 @@ export default function PandaScreen() {
   const from = panda?.adoptedAt || today;
   // L'app ne lit que les dates de présence d'entrées, jamais les valeurs ni les textes.
   const linkedDates = useData(({ well }) => {
+    if (!panda?.linkHabits) return [];
     const dates = [
       ...well.dailyHealthRange(from, today).map((row) => row.date),
       ...well.listSleep(from, today).map((row) => row.date),
@@ -53,7 +54,7 @@ export default function PandaScreen() {
       ...well.listEmotions(300).map((row) => row.at.slice(0, 10)),
     ];
     return [...new Set(dates.filter((day) => day >= from && day <= today))];
-  }, [from, today]);
+  }, [from, today, panda?.linkHabits]);
   const progress = panda ? pandaProgress(panda, linkedDates) : null;
 
   const save = (next: PandaState) => {
