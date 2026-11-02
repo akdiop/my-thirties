@@ -10,6 +10,7 @@ import { addCare, booksOnShelf, foodsUnlocked, isGift, trim } from './engine';
 import { GardenArt, ItemArt, PandaCharacter } from './PandaCharacter';
 import { assetUrl } from './assets';
 import { PandaBanner } from './PandaBanner';
+import { GameHub } from './games';
 import type { PandaMood, PandaState, Room } from './types';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
@@ -128,7 +129,7 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
         <button className="button secondary" onClick={() => { setAct({ mood: 'sleepy', text: pick(MESSAGES.rest, Date.now()) }); window.clearTimeout(timer.current); timer.current = window.setTimeout(() => setAct(null), 6000); }}><Moon size={16} /> Repos</button>
       </div>
       <p className="muted small">Touche {s.name} pour un câlin.</p>
-      {game && <BambooGame left={Math.max(0, DAILY_CAP.gameBamboo - gameToday)} onEnd={(n) => { setGame(false); if (n > 0) { void save({ games: { ...s.games, [today]: gameToday + n } }); setAct({ mood: 'proud', text: 'Bravo ! +' + n + ' bambous.' }); } }} />}
+      {game && <GameHub left={Math.max(0, DAILY_CAP.gameBamboo - gameToday)} onEnd={(n) => { setGame(false); if (n > 0) { void save({ games: { ...s.games, [today]: gameToday + n } }); setAct({ mood: 'proud', text: 'Bravo ! +' + n + ' bambous.' }); } }} />}
       {latest && <section className="panda-activity">
         <PandaBanner name={DOMAIN_BANNER[latest.domain]} alt={s.name + ' ' + latestDomain!.reaction} />
         <p><strong>{latest.date === today ? 'Aujourd’hui' : 'Dernièrement'}, {s.name} {latestDomain!.reaction}</strong><small className="muted"> grâce à {latestDomain!.module.toLowerCase()}</small></p>
@@ -185,20 +186,3 @@ function ShopItem({ it, level, gift, owned, on, bamboo, onUnlock, onToggle }: { 
   </div>;
 }
 
-/** Mini-jeu indépendant de mes habitudes : attraper les bambous pendant 20 secondes. */
-function BambooGame({ left, onEnd }: { left: number; onEnd: (n: number) => void }) {
-  const [t, setT] = useState(20), [score, setScore] = useState(0), [spots, setSpots] = useState<{ id: number; x: number; y: number }[]>([]);
-  const id = useRef(0);
-  useEffect(() => {
-    const tick = window.setInterval(() => setT((v) => v - 1), 1000);
-    const spawn = window.setInterval(() => { const n = ++id.current; setSpots((v) => [...v.slice(-4), { id: n, x: 6 + Math.random() * 80, y: 14 + Math.random() * 66 }]); window.setTimeout(() => setSpots((v) => v.filter((x) => x.id !== n)), 1400); }, 650);
-    return () => { window.clearInterval(tick); window.clearInterval(spawn); };
-  }, []);
-  useEffect(() => { if (t <= 0) onEnd(Math.min(score, left)); }, [t]); // eslint-disable-line react-hooks/exhaustive-deps
-  return <section className="bamboo-game" aria-label="Mini-jeu : attrape les bambous">
-    <div className="game-top"><strong>{score} bambou{score > 1 ? 's' : ''}</strong><span>{Math.max(0, t)} s</span></div>
-    {!left && <p className="muted small">Les bambous de jeu du jour sont déjà gagnés : on joue juste pour le plaisir !</p>}
-    {spots.map((p) => <button key={p.id} className="bamboo-target" style={{ left: p.x + '%', top: p.y + '%' }} aria-label="Attraper le bambou"
-      onClick={() => { setScore((n) => n + 1); setSpots((x) => x.filter((y) => y.id !== p.id)); }}><Leaf size={26} /></button>)}
-  </section>;
-}
