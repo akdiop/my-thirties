@@ -5,10 +5,11 @@ import { readProfile } from '../../lib/profile';
 import { moodOn } from '../../screens/Review';
 import { Bar, Segmented } from '../../ui/kit';
 import { usePanda } from './PandaWidget';
-import { DAILY_CAP, DOMAINS, ITEMS, LEVELS, MESSAGES, OUTFITS, PANDA_KIND, pick, RULES_VERSION, type Item } from './data';
+import { DAILY_CAP, DOMAIN_BANNER, DOMAINS, ITEMS, LEVELS, MESSAGES, OUTFITS, PANDA_KIND, pick, RULES_VERSION, type Item } from './data';
 import { addCare, booksOnShelf, foodsUnlocked, isGift, trim } from './engine';
 import { GardenArt, ItemArt, PandaCharacter } from './PandaCharacter';
 import { assetUrl } from './assets';
+import { PandaBanner } from './PandaBanner';
 import type { PandaMood, PandaState, Room } from './types';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
@@ -18,7 +19,7 @@ const seasonOf = (d: Date) => { const m = d.getMonth() + 1; return m >= 9 && m <
 const WALL: Record<string, string> = { automne: '#F6E7D8', hiver: '#EEF0F2', printemps: '#F7EEEA', ete: '#FBF1DF' };
 
 export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }: { entries: Entry[]; profileEntry?: Entry; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onGo: (s: string) => void }) {
-  const { entry, s, pr, today } = usePanda(entries);
+  const { entry, s, pr, today, events } = usePanda(entries);
   const [tab, setTab] = useState<Tab>('panda');
   const [act, setAct] = useState<{ mood: PandaMood; text: string } | null>(null);
   const [resting, setResting] = useState(false);
@@ -76,6 +77,8 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
   const season = seasonOf(now);
   const shown = ITEMS.filter((i) => unlocked.has(i.id) && equipped.has(i.id));
   const foods = foodsUnlocked(pr.counts);
+  const latest = [...events].sort((a, b) => b.date.localeCompare(a.date))[0];
+  const latestDomain = latest ? DOMAINS.find((d) => d.id === latest.domain) : undefined;
 
   return <div className={'screen panda-screen' + (s.prefs.animationsEnabled ? '' : ' no-anim')}>
     <header className="panda-head">
@@ -115,6 +118,10 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
       </div>
       <p className="muted small">Touche {s.name} pour un câlin.</p>
       {game && <BambooGame left={Math.max(0, DAILY_CAP.gameBamboo - gameToday)} onEnd={(n) => { setGame(false); if (n > 0) { void save({ games: { ...s.games, [today]: gameToday + n } }); setAct({ mood: 'proud', text: 'Bravo ! +' + n + ' bambous.' }); } }} />}
+      {latest && <section className="panda-activity">
+        <PandaBanner name={DOMAIN_BANNER[latest.domain]} alt={s.name + ' ' + latestDomain!.reaction} />
+        <p><strong>{latest.date === today ? 'Aujourd’hui' : 'Dernièrement'}, {s.name} {latestDomain!.reaction}</strong><small className="muted"> grâce à {latestDomain!.module.toLowerCase()}</small></p>
+      </section>}
       <section className="ritual-card"><p className="ritual-label">Son garde-manger</p><div className="chip-row">{foods.map((f) => <span key={f} className="chip">{f}</span>)}</div>
         </section>
     </>}
@@ -125,7 +132,7 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
         <div><strong>{l.name}</strong> <small className="muted">· {l.stage} · {l.from} XP</small><p className="muted small">{l.unlock}</p></div></li>)}</ol>
       <section className="ritual-card"><p className="ritual-label">Ce qui l’a fait grandir</p>
         {!s.prefs.linkPersonalActivities && <p className="muted small">Le lien avec tes modules est désactivé : il grandit seulement grâce à vos moments ensemble.</p>}
-        <div className="skill-grid">{DOMAINS.map((d) => <div key={d.id} className="skill"><strong>{d.module}</strong><small>{pr.counts[d.id]} activité{pr.counts[d.id] > 1 ? 's' : ''} · il {d.reaction}</small><small className="muted">Récompense : {d.reward}</small></div>)}</div>
+        <div className="skill-grid">{DOMAINS.map((d) => <div key={d.id} className="skill"><PandaBanner name={DOMAIN_BANNER[d.id]} alt={d.module} /><strong>{d.module}</strong><small>{pr.counts[d.id]} activité{pr.counts[d.id] > 1 ? 's' : ''} · il {d.reaction}</small><small className="muted">Récompense : {d.reward}</small></div>)}</div>
       </section>
       <section className="ritual-card"><p className="ritual-label"><Sparkles size={14} /> Nos souvenirs</p>
         {[...s.memories].reverse().map((m, i) => <p key={i} className="memory"><small className="muted">{new Date(m.date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</small> {m.text}</p>)}</section>

@@ -33,6 +33,12 @@ export const DOMAINS: { id: Domain; module: string; reward: string; reaction: st
   { id: 'projets', module: 'Mon projet personnel', reward: 'Objets pour la maison', reaction: 'construit sa maison' },
 ];
 
+/** Bannière illustrée du panda pour chaque domaine (banner_<nom> dans public/panda/). */
+export const DOMAIN_BANNER: Record<Domain, string> = {
+  equilibre: 'bienetre', corps: 'sport', repos: 'sommeil', savoir: 'lecture', serenite: 'spiritualite',
+  cuisine: 'cuisine', objectifs: 'organisation', voyages: 'voyages', projets: 'objectifs',
+};
+
 export type ItemId = 'tapis' | 'coussin' | 'plante' | 'lampe' | 'etagere' | 'panier' | 'guirlande' | 'tableau' | 'bonsai' | 'theiere' | 'yoga' | 'lanterne' | 'fleurs' | 'fontaine' | 'balancoire' | 'valise';
 export type Item = { id: ItemId; name: string; price: number; level: number; room: 'maison' | 'jardin'; gift?: { domain: Domain; n: number } };
 /** Objets : à acheter avec des bambous, ou offerts quand un module atteint un nombre d'activités. */

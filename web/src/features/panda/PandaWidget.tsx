@@ -14,7 +14,7 @@ export function usePanda(entries: Entry[]) {
   const today = isoOf(new Date());
   const events = useMemo(() => eventsFrom(entries, s.prefs, today), [entries, s.prefs, today]);
   const pr = progress(events, s);
-  return { entry, s, pr, today };
+  return { entry, s, pr, today, events };
 }
 
 /** Widget permanent du tableau de bord. */
