@@ -43,6 +43,15 @@ export default function BienEtre() {
   return (
     <Screen title="Bien-être" subtitle="Votre corps et votre esprit, aujourd’hui">
       <CalmButton />
+      <Pressable accessibilityRole="button" accessibilityLabel="Mon panda compagnon" onPress={() => router.push('/panda')}>
+        <Card tone="sand" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <AppText style={{ fontSize: 30 }}>🐼</AppText>
+          <View style={{ flex: 1, gap: 2 }}>
+            <AppText variant="cardTitle">Mon panda</AppText>
+            <AppText variant="caption" color={c.textMuted}>Grandir ensemble, même les jours de repos.</AppText>
+          </View>
+        </Card>
+      </Pressable>
       <View style={{ gap: 8 }}>
         <AppText variant="cardTitle">Comment vous sentez-vous ?</AppText>
         <Scale label="Humeur" value={health?.mood ?? null} onChange={(v) => mutate(({ well }) => well.saveDailyHealth(today, { mood: v }))} low="Difficile" high="Très bien" />
