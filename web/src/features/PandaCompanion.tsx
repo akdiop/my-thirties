@@ -53,7 +53,8 @@ export function PandaCompanion({ entries, onCreate, onUpdate }: Props) {
   const persist = async (changes: PandaData) => {
     if (!pandaEntry) return;
     const newProgress = pandaProgress(changes, entries);
-    await onUpdate(pandaEntry, { ...changes, bestLevel: Math.max(changes.bestLevel, newProgress.level) });
+    const previousLevel = panda ? pandaProgress(panda, entries).level : 0;
+    await onUpdate(pandaEntry, { ...changes, bestLevel: Math.max(changes.bestLevel, newProgress.level, previousLevel) });
   };
   const run = async (fn: () => Promise<void>) => {
     if (busy) return;
