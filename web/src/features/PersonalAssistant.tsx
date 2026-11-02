@@ -199,7 +199,7 @@ export function PersonalAssistant({ entries, onCreate, initialIdea }: { entries:
     {!thread.length && <fieldset className="assistant-sources"><legend>Ce que l’assistant peut voir</legend>
       {SOURCES.map((s) => <label key={s.id} className="checklist-item"><input type="checkbox" checked={on.has(s.id)} disabled={!prefs.assistant} onChange={() => toggle(s.id)} />{s.label}</label>)}
       {context ? <details><summary>Voir ce qui sera envoyé ({context.length} caractères)</summary><pre className="context-preview">{context}</pre></details>
-        : <p className="fineprint">Rien n’est coché : seule ta question est envoyée.</p>}
+        : null}
     </fieldset>}
     <div className="button-group">
       <button className="button primary" disabled={busy || !prefs.assistant || message.trim().length < 2} onClick={() => void ask()}>{busy ? 'Réflexion en cours…' : thread.length ? 'Envoyer' : 'Demander'}</button>
@@ -207,6 +207,5 @@ export function PersonalAssistant({ entries, onCreate, initialIdea }: { entries:
     </div>
     {status && <p role="status">{status}</p>}
     {last >= 0 && thread.length >= 8 && <p className="fineprint">Longue conversation : l’assistant se souvient des 4 derniers échanges.</p>}
-    <p className="fineprint">Rien n’est ajouté sans ton clic.</p>
   </section>;
 }

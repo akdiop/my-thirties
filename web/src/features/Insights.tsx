@@ -57,6 +57,5 @@ export function Insights({ entries }: { entries: Entry[] }) {
     <p className="ritual-label"><Link2 size={16} /> Mes liens (90 derniers jours)</p>
     {lines.length ? <ul className="insight-list">{lines.map((l) => <li key={l}>{l}</li>)}</ul>
       : <p className="muted">Note ton humeur quelques semaines (dans Mon jour ou Bien-être) : l’app te montrera ici les liens avec ton sport, ton cycle et tes dépenses.</p>}
-    <p className="muted small">Ce sont des tendances dans tes propres notes, pas des diagnostics.</p>
   </section>;
 }
