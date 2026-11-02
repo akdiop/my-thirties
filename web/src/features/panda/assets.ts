@@ -4,6 +4,6 @@
  * Convention : voir docs/panda-assets.md.
  */
 export const PANDA_ASSETS = new Set<string>([
-  // ex. 'panda_idle', 'panda_happy', 'acc_chapeau', 'item_coussin', 'bg_maison_automne'
+  'panda_playful', 'panda_proud', 'panda_reading', 'panda_sleepy', 'panda_surprised',
 ]);
-export const assetUrl = (name: string) => (PANDA_ASSETS.has(name) ? '/panda/' + name + '.png' : '');
+export const assetUrl = (name: string) => (PANDA_ASSETS.has(name) ? '/panda/' + name + '.webp' : '');
