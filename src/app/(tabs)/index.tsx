@@ -79,6 +79,17 @@ export default function Accueil() {
     >
       <CalmButton />
 
+      <Pressable accessibilityRole="button" accessibilityLabel="Ouvrir mon panda compagnon"
+        onPress={() => router.push('/panda')}>
+        <Card tone="sand" style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+          <AppText style={{ fontSize: 38 }}>🐼</AppText>
+          <View style={{ flex: 1, gap: 3 }}>
+            <AppText variant="cardTitle">Mon panda compagnon</AppText>
+            <AppText variant="caption" color={c.textMuted}>Il grandit avec mes petits moments de bien-être.</AppText>
+          </View>
+        </Card>
+      </Pressable>
+
       {evening ? (
         <Card tone="sage" style={{ gap: 8 }}>
           <AppText variant="cardTitle">Bilan du soir</AppText>

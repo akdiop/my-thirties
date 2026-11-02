@@ -1,0 +1,33 @@
+
+.panda-page {display:grid;gap:16px;padding-bottom:26px}
+.panda-world {position:relative;overflow:hidden;isolation:isolate;border:1px solid #e6d9cd;border-radius:26px;background:linear-gradient(154deg,#faf4ea 0%,#ead9c6 82%,#dec4ad 100%);text-align:center;padding:24px 14px 18px;color:#4f382c}
+.panda-world h2 {margin:7px 0 0;font-family:'Cormorant Garamond',Georgia,serif;font-size:35px;font-weight:600}
+.panda-world-orb {position:absolute;border-radius:50%;background:#fff9f1;opacity:.48;z-index:-1}
+.panda-world .orb-one {height:160px;width:160px;top:-80px;right:-60px}
+.panda-world .orb-two {height:100px;width:100px;bottom:6px;left:-40px}
+.panda-illustration {width:min(100%,300px);height:auto;display:block;margin:0 auto;filter:drop-shadow(0 8px 13px #6c473b18)}
+.panda-illustration.small {width:95px}
+.panda-message {max-width:320px;margin:0 auto 10px;font-size:14px;color:#6e4f3c;line-height:1.55}
+.panda-panel {border:1px solid #ebe0d5;border-radius:20px;background:#fffcf7;padding:18px;display:grid;gap:12px}
+.panda-panel h3 {margin:0;display:flex;align-items:center;gap:8px;font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:600;color:#50382b}
+.panda-panel p {margin:0;line-height:1.55;font-size:14px;color:#6e594d}
+.panda-panel label:not(.panda-toggle) {display:grid;gap:6px;font-size:13px;color:#5a4638}
+.panda-panel label:not(.panda-toggle) input {width:100%;min-height:42px;padding:10px 12px;border:1px solid #d8c7b9;border-radius:12px;background:#fffdfa;color:#3d2d25}
+.panda-heading {display:flex;justify-content:space-between;align-items:center;gap:14px}
+.panda-heading h3 {margin:4px 0 0}
+.panda-stage {white-space:nowrap;background:#eee1d4;color:#684c3b;border-radius:30px;padding:7px 11px;font-size:12px}
+.panda-track {height:11px;background:#f1e8df;border-radius:999px;overflow:hidden}
+.panda-track div {height:100%;border-radius:999px;background:linear-gradient(90deg,#c79f7a,#8c6250);transition:width 250ms ease}
+.panda-small {font-size:12px!important;color:#7d6759!important}
+.panda-actions {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.panda-care {text-align:left;border:1px solid #e6d5c5;border-radius:15px;background:#f6eee5;padding:12px;display:grid;gap:5px;min-height:80px;color:#513c30;cursor:pointer;font:inherit}
+.panda-care span {font-size:14px;font-weight:600}
+.panda-care small {font-size:12px;line-height:1.35}
+.panda-care:focus-visible {outline:2px solid #8c6250;outline-offset:3px}
+.panda-care.done {background:#eae1d9;border-color:#ddcebf}
+.panda-care:disabled {cursor:default}
+.panda-toggle {display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;color:#50382b}
+.panda-toggle input {accent-color:#8c6250;width:18px;height:18px;margin-top:2px}
+.panda-rename {display:grid;gap:10px}
+@media(max-width:390px){.panda-actions{grid-template-columns:1fr}.panda-world h2{font-size:31px}}
+@media(prefers-reduced-motion:reduce){.panda-track div{transition:none}}
