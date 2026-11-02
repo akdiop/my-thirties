@@ -6,8 +6,8 @@ import { CalendarBoard } from '../features/CalendarBoard';
 import { Check22, Segmented } from '../ui/kit';
 
 const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-const TONE_BG = { caramel: '#F3EBE2', chocolat: '#EFE3DA', sauge: '#E8EDE2', or: '#F3EBE2' } as const;
-const TONE_BAR = { caramel: '#B68F72', chocolat: '#6B3F2E', sauge: '#5E7A5F', or: '#D4B483' } as const;
+const TONE_BG = { caramel: '#F3EBE2', chocolat: '#EFE3DA', sauge: '#E6ECE8', or: '#F3EBE2' } as const;
+const TONE_BAR = { caramel: '#C9A08C', chocolat: '#8C6257', sauge: '#6F8A80', or: '#D8B69F' } as const;
 
 export function Agenda({ entries, onAdd, onOpen, onUpdate, embedded }: {
   onImported?: () => void; embedded?: boolean; entries: Entry[]; onAdd: () => void; onOpen: (e: Entry) => void; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>;
@@ -41,7 +41,7 @@ export function Agenda({ entries, onAdd, onOpen, onUpdate, embedded }: {
           const key = iso(d);
           const has = timeline(entries, d).length > 0;
           return <button key={key} className={'week-day' + (key === selected ? ' on' : '') + (key === todayIso() ? ' today' : '')} onClick={() => setSelected(key)}>
-            <span>{DAYS[i]}</span><strong>{d.getDate()}</strong><i style={{ background: has ? '#B68F72' : 'transparent' }} />
+            <span>{DAYS[i]}</span><strong>{d.getDate()}</strong><i style={{ background: has ? '#C9A08C' : 'transparent' }} />
           </button>;
         })}</div>}
         {mode === 'day' && <p className="day-title">{sel.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>}

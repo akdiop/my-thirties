@@ -73,9 +73,9 @@ export function Focus({ entries, onCreate }: { entries: Entry[]; onCreate: (i: E
 
 function Plant({ progress, wilted }: { progress: number; wilted: boolean }) {
   const s = 0.25 + progress * 0.75;
-  const leaf = wilted ? '#B9AFA4' : '#8F9F7A', leaf2 = wilted ? '#CFC6BC' : '#B5603F', stem = wilted ? '#A89C90' : '#5E7A5F';
+  const leaf = wilted ? '#B9AFA4' : '#9FB5AA', leaf2 = wilted ? '#CFC6BC' : '#C38380', stem = wilted ? '#A89C90' : '#6F8A80';
   return <svg className={'plant' + (wilted ? ' wilted' : '')} viewBox="0 0 200 200" aria-hidden="true">
-    <ellipse cx="100" cy="182" rx="62" ry="10" fill="#E9DCCF" />
+    <ellipse cx="100" cy="182" rx="62" ry="10" fill="#E8DCD6" />
     <path d="M70 150 h60 l-8 32 h-44 z" fill="#C48A5A" />
     <g transform={`translate(100 150) scale(${s}) ${wilted ? 'rotate(18)' : ''}`}>
       <path d="M0 0 C0 -40 2 -70 0 -110" stroke={stem} strokeWidth="5" fill="none" strokeLinecap="round" />

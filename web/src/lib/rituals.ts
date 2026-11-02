@@ -172,7 +172,7 @@ export const noteType = (id: unknown) => NOTE_TYPES.find((t) => t.id === id) ?? 
 /* ---------- Couleurs (à la place des photos) ---------- */
 /** Palette beige, crème, sauge, caramel, chocolat de l'app : un fond doux et une couleur d'accent. */
 export const SWATCHES = [
-  ['#F3E6D8', '#B5835A'], ['#E3E8DB', '#5E7A5F'], ['#F1E4E0', '#B07A6E'], ['#E9DCCF', '#6B3F2E'],
+  ['#F3E6D8', '#B5835A'], ['#DFE8E3', '#6F8A80'], ['#F1E4E0', '#B07A6E'], ['#E8DCD6', '#8C6257'],
   ['#EFE7D2', '#A88A4C'], ['#E2E6EA', '#5D6F7E'], ['#EADFEA', '#86688A'], ['#F5E9DA', '#C0703F'],
 ] as const;
 export const swatchOf = (key: string) => SWATCHES[[...key].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 3) % SWATCHES.length]!;

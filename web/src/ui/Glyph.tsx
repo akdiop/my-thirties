@@ -23,7 +23,7 @@ export type GlyphName = keyof typeof GLYPHS;
 
 /** Teintes de la palette : fond doux + trait. */
 export const TINTS = {
-  caramel: ['#F3E6D8', '#B5835A'], sauge: ['#E3E8DB', '#5E7A5F'], rose: ['#F1E4E0', '#B07A6E'], chocolat: ['#E9DCCF', '#6B3F2E'],
+  caramel: ['#F3E6D8', '#B5835A'], sauge: ['#DFE8E3', '#6F8A80'], rose: ['#F1E4E0', '#B07A6E'], chocolat: ['#E8DCD6', '#8C6257'],
   or: ['#EFE7D2', '#A88A4C'], ardoise: ['#E2E6EA', '#5D6F7E'], lilas: ['#EADFEA', '#86688A'], terre: ['#F5E9DA', '#C0703F'],
 } as const;
 export type Tint = keyof typeof TINTS;

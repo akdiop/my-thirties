@@ -147,7 +147,7 @@ function ShowSheet({ entry, show, onUpdate, onClose }: { entry: Entry; show: Sho
       <div className="tv-sheet-head"><Poster entry={entry} big /><div><h2>{entry.title}</h2>
         <small>{[entry.data.platform, entry.data.genre, show?.status === 'Ended' ? 'Série terminée' : show?.status === 'Running' ? 'En diffusion' : ''].filter(Boolean).join(' · ')}</small>
         {tvId(entry) > 0 && <div className="stars" aria-label="Ma note">{[1, 2, 3, 4, 5].map((i) => <button key={i} aria-label={i + ' étoiles'} onClick={() => void onUpdate(entry, { ...entry.data, rating: String(i === rating ? 0 : i) })}>
-          <Star size={18} fill={i <= rating ? '#D4B483' : 'none'} color="#B68F72" /></button>)}</div>}</div></div>
+          <Star size={18} fill={i <= rating ? '#D8B69F' : 'none'} color="#C9A08C" /></button>)}</div>}</div></div>
       {show?.summary && <p className="tv-summary">{show.summary} <small className="muted">(résumé TVmaze, en anglais)</small></p>}
       {tvId(entry) > 0 ? <div className="gchips small">{['À voir', 'En cours', 'En pause', 'Terminée', 'Abandonnée'].map((s) => <button key={s} className={'gchip' + (s === status ? ' on' : '')} onClick={() => void onUpdate(entry, { ...entry.data, status: s })}>{s}</button>)}</div>
         : <SeriesCard entry={entry} onUpdate={onUpdate} />}
@@ -221,7 +221,7 @@ function SeriesCard({ entry, onUpdate }: { entry: Entry; onUpdate: (e: Entry, d:
           <button aria-label="Épisode suivant vu" onClick={() => step(1)}><Plus size={18} /></button>
         </div>}
       {(status === 'Terminée' || status === 'En cours' || status === 'En pause') && <div className="stars" aria-label="Ma note">{[1, 2, 3, 4, 5].map((i) =>
-        <button key={i} aria-label={i + ' étoiles'} onClick={() => save({ rating: String(i === rating ? 0 : i) })}><Star size={18} fill={i <= rating ? '#D4B483' : 'none'} color="#B68F72" /></button>)}</div>}
+        <button key={i} aria-label={i + ' étoiles'} onClick={() => save({ rating: String(i === rating ? 0 : i) })}><Star size={18} fill={i <= rating ? '#D8B69F' : 'none'} color="#C9A08C" /></button>)}</div>}
     </div>
     {!entry.data.tvmazeId && <LinkToBase entry={entry} onUpdate={onUpdate} />}
     <div className="gchips small">{['En cours', 'En pause', 'Terminée', 'Abandonnée'].filter((s) => s !== status && !(status === 'À voir' && s !== 'Abandonnée')).map((s) =>
