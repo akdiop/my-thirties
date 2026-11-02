@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import type { NotificationSettings } from '@/notifications/planner';
+import type { PandaState } from '@/panda/companion';
 import { DEFAULT_PRAYER_SETTINGS, type PrayerSettings } from '@/spiritualite/prayer';
 
 export type Appearance = 'system' | 'light' | 'dark';
@@ -17,6 +18,7 @@ export type Settings = {
   healthForSport: boolean;
   stepsEnabled: boolean;
   stepGoal: number;
+  panda: PandaState | null;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -31,6 +33,7 @@ export const DEFAULT_SETTINGS: Settings = {
   healthForSport: false,
   stepsEnabled: false,
   stepGoal: 8000,
+  panda: null,
 };
 
 type SettingsStore = Settings & {
