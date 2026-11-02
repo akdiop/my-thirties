@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { BookOpen, Brush, Check, ChevronDown, Languages, PenLine, Volume2 } from 'lucide-react';
+import { BookOpen, Brush, Check, ChevronDown, Languages, PenLine, Trash2, Volume2, X } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { PATH_CATEGORIES, PATHS, pathById, type PathCategory } from '../lib/learning';
 import { HeroPhoto } from './HeroPhoto';
 import { Bar, Segmented } from '../ui/kit';
-import { HiddenNote, HideButton, useHidden } from '../lib/hidden';
+import { HiddenNote, useHidden } from '../lib/hidden';
 
 const ICON: Record<PathCategory, typeof Languages> = { Langues: Languages, 'Peinture & dessin': Brush, Écriture: PenLine };
 const doneOf = (e: Entry) => (e.data.done && typeof e.data.done === 'object' ? e.data.done as Record<string, boolean> : {});
@@ -17,15 +17,23 @@ function speak(text: string, lang: string) {
     window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
   } catch { /* synthèse vocale indisponible */ }
 }
-const LANG_CODE: Record<string, string> = { 'lang-espagnol': 'es-ES', 'lang-portugais': 'pt-PT', 'lang-arabe': 'ar-SA' };
+const LANG_CODE: Record<string, string> = { 'lang-espagnol': 'es-ES', 'lang-portugais': 'pt-PT', 'lang-arabe': 'ar-SA', 'lang-anglais': 'en-GB', 'lang-italien': 'it-IT', 'lang-allemand': 'de-DE', 'lang-japonais': 'ja-JP', 'lang-coreen': 'ko-KR' };
+/** Nombre de suggestions visibles par catégorie : quand j'en retire une, la suivante prend sa place. */
+const VISIBLE = 5;
 
-export function LearningPaths({ entries, onCreate, onUpdate }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void> }) {
+export function LearningPaths({ entries, onCreate, onUpdate, onRemove }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void>; onRemove: (e: Entry) => Promise<void> }) {
   const mine = entries.filter((e) => e.kind === 'path' && pathById(e.data.pathId));
   const [focus, setFocus] = useState<string | null>(null);
   const [cat, setCat] = useState<PathCategory>('Langues');
   const [busy, setBusy] = useState('');
-  const hidden = useHidden().ids;
+  const { ids: hidden, hide } = useHidden();
   const active = mine.find((e) => e.id === focus) ?? mine[0];
+  const suggestions = PATHS.filter((p) => p.category === cat && !hidden.has('path:' + p.id) && !mine.some((e) => e.data.pathId === p.id)).slice(0, VISIBLE);
+  // Arrêter un parcours : il disparaît (avec sa progression) et n'est plus proposé ; un autre prend sa place dans les suggestions.
+  const stop = async (e: Entry) => {
+    if (!confirm('Arrêter « ' + e.title + ' » ? Ta progression sur ce parcours sera supprimée.')) return;
+    await onRemove(e); await hide('path:' + String(e.data.pathId), e.title); setFocus(null);
+  };
 
   const start = async (id: string) => {
     const p = pathById(id)!;
@@ -37,25 +45,25 @@ export function LearningPaths({ entries, onCreate, onUpdate }: { entries: Entry[
   return <section className="learning">
     {active && <>
       {mine.length > 1 && <div className="challenge-switch">{mine.map((e) => <button key={e.id} className={e.id === active.id ? 'active' : ''} onClick={() => setFocus(e.id)}>{e.title}</button>)}</div>}
-      <ActivePath key={active.id} entry={active} onUpdate={onUpdate} />
+      <ActivePath key={active.id} entry={active} onUpdate={onUpdate} onStop={() => void stop(active)} />
     </>}
     <h3 className="board-subtitle">{mine.length ? 'Commencer un autre parcours' : 'Choisir un parcours'}</h3>
     <Segmented label="Catégorie" value={cat} onChange={setCat} options={PATH_CATEGORIES.map((c) => ({ value: c, label: c === 'Peinture & dessin' ? 'Art' : c }))} />
-    <div className="path-list">{PATHS.filter((p) => p.category === cat && !hidden.has('path:' + p.id)).map((p) => {
+    <div className="path-list">{suggestions.map((p) => {
       const Icon = ICON[p.category];
-      const started = mine.some((e) => e.data.pathId === p.id);
       return <div key={p.id} className="path-item">
         <span className="row-icon"><Icon size={19} /></span>
         <span className="row-text"><strong>{p.title}</strong><small>{p.tagline} · {p.steps.length} étapes</small></span>
-        <button className="button ghost" disabled={Boolean(busy) || started} onClick={() => void start(p.id)}>{started ? 'En cours' : busy === p.id ? '…' : 'Commencer'}</button>
-        {!started && <HideButton id={'path:' + p.id} label={p.title} />}
+        <button className="button ghost" disabled={Boolean(busy)} onClick={() => void start(p.id)}>{busy === p.id ? '…' : 'Commencer'}</button>
+        <button className="icon-btn hide-btn" aria-label={'Pas pour moi : ' + p.title} title="Pas pour moi" onClick={() => void hide('path:' + p.id, p.title)}><X size={18} /></button>
       </div>;
-    })}</div>
+    })}
+    {!suggestions.length && <p className="muted">Plus d’autres suggestions dans cette catégorie pour l’instant.</p>}</div>
     <HiddenNote prefix="path:" />
   </section>;
 }
 
-function ActivePath({ entry, onUpdate }: { entry: Entry; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void> }) {
+function ActivePath({ entry, onUpdate, onStop }: { entry: Entry; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void>; onStop: () => void }) {
   const p = pathById(entry.data.pathId)!;
   const done = doneOf(entry);
   const count = p.steps.filter((_, i) => done[i]).length;
@@ -68,7 +76,8 @@ function ActivePath({ entry, onUpdate }: { entry: Entry; onUpdate: (e: Entry, d:
     <HeroPhoto slot={'path-' + p.id} tone={p.tone} label={p.title}>
       <div className="hero-title"><h2>{p.title}</h2><span>{p.tagline}</span></div>
     </HeroPhoto>
-    <div className="active-head"><span className="muted">{next === -1 ? 'Parcours terminé, bravo !' : `Étape ${next + 1} sur ${p.steps.length}`}</span><strong>{count}/{p.steps.length}</strong></div>
+    <div className="active-head"><span className="muted">{next === -1 ? 'Parcours terminé, bravo !' : `Étape ${next + 1} sur ${p.steps.length}`}</span><strong>{count}/{p.steps.length}</strong>
+      <button className="icon-btn" aria-label={'Arrêter le parcours ' + p.title} title="Arrêter ce parcours" onClick={onStop}><Trash2 size={17} /></button></div>
     <Bar value={count / p.steps.length} />
     <ol className="steps">{p.steps.map((s, i) => <li key={i} className={'step' + (done[i] ? ' done' : '') + (i === next ? ' current' : '')}>
       <button className="step-head" aria-expanded={open === i} onClick={() => setOpen(open === i ? -1 : i)}>
