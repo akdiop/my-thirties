@@ -170,7 +170,7 @@ export const PATHS: LearningPath[] = [
       { title: 'La famille', goal: 'Raconter d’où tu viens.', minutes: 25, tasks: ['Portrait d’un parent ou d’une grand-mère.', 'Une recette ou une tradition familiale.'] },
       { title: 'Les tournants', goal: 'Raconter un choix qui a tout changé.', minutes: 30, tasks: ['Écris la scène du choix, au présent.'] },
       { title: 'Mes vingt ans', goal: 'Ce que j’ai appris.', minutes: 30, tasks: ['Lettre à toi-même à 20 ans.'] },
-      { title: 'Aujourd’hui', goal: 'Qui je suis à trente ans.', minutes: 30, tasks: ['Une journée ordinaire racontée en détail.'] },
+      { title: 'Aujourd’hui', goal: 'Qui je suis aujourd’hui, dans ma trentaine.', minutes: 30, tasks: ['Une journée ordinaire racontée en détail.'] },
       { title: 'Demain', goal: 'La femme que je deviens.', minutes: 30, tasks: ['Lettre à toi-même à 40 ans.'] },
       { title: 'Relier les chapitres', goal: 'Rassembler et relire.', minutes: 45, tasks: ['Mets tes textes dans l’ordre, ajoute un titre à chacun.', 'Relis et choisis un titre pour l’ensemble.'] },
     ],
