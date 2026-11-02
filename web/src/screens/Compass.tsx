@@ -30,10 +30,28 @@ export function Compass({ entries, profileEntry, onCreate, onUpdate, onRemove, o
 }
 
 /* ---------- 1. Vision ---------- */
-const LIFE_PATH_DEFAULT = 'Mon grand thème : m’exprimer, avec le cœur autant qu’avec la tête.\n'
-  + 'Mes forces : une grande sensibilité, de l’intuition, de la force intérieure, le talent d’encourager et d’inspirer les autres.\n'
-  + 'Mon défi : dépasser le doute de moi et le perfectionnisme, ne pas me décourager, et transformer la critique en propositions.\n'
-  + 'Ma piste : oser prendre la parole (écrire, parler, créer), en commençant par un petit cercle, et me concentrer sur les solutions.';
+const LIFE_PATH_DEFAULT = [
+  'MON CHEMIN · 30/3 : Expression et sensibilité, avec des dons intérieurs.',
+  '',
+  'Mon thème de vie : l’expression affective. Je suis là pour exprimer ce que je ressens, une fois le doute de moi dépassé, et pour utiliser mes dons pour encourager, transmettre et inspirer les autres. Mon chemin est clair et cohérent.',
+  '',
+  'Mes dons : une sensibilité très vive, une force intérieure, de l’expressivité et une intuition développée. Quand je suis en contact avec mes émotions, je sens ce dont les autres et le monde ont besoin, et je sais le dire. Je parle avec le cœur autant qu’avec la tête : c’est ce qui touche les gens.',
+  '',
+  'Mes pièges :',
+  '• Le perfectionnisme : je me décourage ou je suis déçue facilement.',
+  '• Une grande sensibilité à la souffrance des autres.',
+  '• Exprimer les choses en négatif : me plaindre, critiquer. Même quand c’est justifié, ça ne fait pas avancer.',
+  '• Me blinder pour ne pas ressentir : paraître froide alors que tout bouillonne à l’intérieur, ou faire un drame d’un rien pour provoquer des réactions.',
+  '• Le doute de moi, mon principal frein : des hauts (« je peux tout faire ») et des bas (« c’est trop pour moi, je ne suis pas prête »). Ne jamais me sentir assez prête ni assez bonne, même quand je le suis.',
+  '',
+  'Ce qui m’aide :',
+  '• Le besoin de m’exprimer doit sortir : le diriger vers quelque chose de constructif, chercher la solution plutôt que le problème.',
+  '• Commencer par un petit public (une personne, des proches), puis oser plus grand. La prise de parole en public (cours d’art oratoire) est un bon entraînement.',
+  '• Toutes les formes comptent : la parole, l’écriture, le théâtre, l’art, la musique. Et aider les autres à s’exprimer aussi.',
+  '• Voir le doute comme un obstacle à franchir sur le chemin, pas comme une preuve que je ne suis pas capable.',
+  '',
+  'Au début, je peux me sentir incapable de parler en public ou complexée. Mais une fois lancée, les mots viennent naturellement, et j’y trouve une vraie satisfaction : je sais que c’est ma voie.',
+].join('\n');
 
 function Vision({ entries, profileEntry, onCreate, onUpdate, onEditProfile }: { entries: Entry[]; profileEntry: Entry | undefined; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onEditProfile: () => void }) {
   const entry = entries.find((e) => e.kind === VISION_KIND);
@@ -45,9 +63,10 @@ function Vision({ entries, profileEntry, onCreate, onUpdate, onEditProfile }: { 
   const [who, setWho] = useState(init('who'));
   const [notList, setNotList] = useState(init('notList'));
   const [lifePath, setLifePath] = useState(init('lifePath') || LIFE_PATH_DEFAULT);
+  const [lifeNotes, setLifeNotes] = useState(init('lifeNotes'));
   const [touched, setTouched] = useState(false);
   const t = (f: (v: string) => void) => (v: string) => { f(v); setTouched(true); };
-  const draft = useMemo(() => touched ? { words, year1, year5, who, notList, lifePath } : null, [touched, words, year1, year5, who, notList, lifePath]);
+  const draft = useMemo(() => touched ? { words, year1, year5, who, notList, lifePath, lifeNotes } : null, [touched, words, year1, year5, who, notList, lifePath, lifeNotes]);
   const state = useAutosave(entry, draft, () => onCreate({ module: 'equilibre', kind: VISION_KIND, title: 'Ma vision', entry_date: null, data: draft! }), onUpdate);
   const goals = entries.filter((e) => e.kind === GOAL_KIND && goalProgress(e) < 1);
 
@@ -60,8 +79,11 @@ function Vision({ entries, profileEntry, onCreate, onUpdate, onEditProfile }: { 
     </section>
     <section className="ritual-card life-path">
       <p className="ritual-label">Mon chemin de vie · 30/3</p>
-      <p className="muted small">Expression et sensibilité, avec des dons intérieurs (d’après Life Purpose App). Résumé à ma façon, modifiable :</p>
-      <textarea rows={6} value={lifePath} maxLength={2000} onChange={(e) => t(setLifePath)(e.target.value)} />
+      <p className="muted small">Résumé de ce que dit Life Purpose App, modifiable :</p>
+      <textarea rows={14} value={lifePath} maxLength={6000} onChange={(e) => t(setLifePath)(e.target.value)} />
+      <details className="life-notes"><summary>Mes extraits Life Purpose (à coller moi-même)</summary>
+        <textarea rows={10} value={lifeNotes} maxLength={40000} placeholder="Colle ici les passages que tu as lus ou débloqués : ils restent privés dans tes données." onChange={(e) => t(setLifeNotes)(e.target.value)} />
+      </details>
     </section>
     <Field label="Mes 3 mots pour cette année" hint="Par exemple : sereine, audacieuse, alignée" value={words} onChange={t(setWords)} rows={1} />
     <Field label="Dans 1 an, ma vie ressemble à…" hint="Décris une journée type, ce que tu ressens, ce qui a changé." value={year1} onChange={t(setYear1)} rows={4} />
