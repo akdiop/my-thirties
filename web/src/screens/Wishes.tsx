@@ -34,6 +34,7 @@ export function Wishes({ entries, onCreate, onUpdate, onRemove }: { entries: Ent
 
   return <div className="screen wishes">
     <header className="tab-head"><h1>Mes envies</h1><p>{open.length ? open.length + ' envie' + (open.length > 1 ? 's' : '') + (totalLeft ? ' · encore ' + fmt(totalLeft, currency) + ' à mettre de côté' : '') : 'Ce que j’ai envie de m’offrir'}</p></header>
+    <img className="screen-cover" src="/modules/envies.webp" alt="Sac, parfum et vêtements" loading="lazy" />
     <div className="stack-8">{open.map((e) => {
       const p = Number(e.data.price) || 0, s = Number(e.data.saved) || 0, cur = String(e.data.currency || 'XOF'), url = safeLink(e.data.link);
       return <article key={e.id} className="wish-card">
