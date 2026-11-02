@@ -5,14 +5,13 @@ import { Pressable, Switch, TextInput, View } from 'react-native';
 import { AppText, Card, Screen } from '@/components/ui';
 import { useSession } from '@/db/DatabaseProvider';
 import { useData } from '@/hooks/useData';
-import { CARE_ACTIONS, isCareDone, nextStage, pandaProgress, PANDA_STAGES, stageFromPoints, type CareAction, type PandaState } from '@/panda/companion';
+import { CARE_ACTIONS, isCareDone, pandaProgress, PANDA_STAGES, type CareAction, type PandaState } from '@/panda/companion';
 import { useSettings } from '@/state/settings';
 import { useTheme } from '@/theme/ThemeProvider';
 
 const dayIso = () => new Date().toLocaleDateString('en-CA');
 
 function PandaArt({ stage }: { stage: number }) {
-  const { scheme } = useTheme();
   const fur = '#342C29', face = '#FFF8EF', blush = '#DBA59A', scarf = stage >= 3 ? '#AD8066' : '#D8B899';
   return <View accessibilityLabel={'Panda compagnon, étape ' + (stage + 1)} style={{ width: 276, height: 270, alignSelf: 'center' }}>
     <View style={{ position: 'absolute', left: 62, top: 18, width: 64, height: 65, borderRadius: 40, backgroundColor: fur }} />
@@ -33,7 +32,6 @@ function PandaArt({ stage }: { stage: number }) {
     {stage >= 1 ? <View style={{ position: 'absolute', left: 65, top: 213, width: 146, height: 23, borderRadius: 12, backgroundColor: scarf }} /> : null}
     {stage >= 2 ? <AppText style={{ position: 'absolute', right: 1, top: 93, fontSize: 24, color: '#B78E6D' }}>✦</AppText> : null}
     {stage >= 4 ? <AppText style={{ position: 'absolute', left: 122, top: -12, fontSize: 36, color: '#C6A16D' }}>♛</AppText> : null}
-    {scheme === 'dark' ? <View style={{ position: 'absolute', top: 20, width: 1, height: 1, opacity: 0 }} /> : null}
   </View>;
 }
 
