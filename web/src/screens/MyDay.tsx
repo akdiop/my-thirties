@@ -1,4 +1,5 @@
 import { Glyph } from '../ui/Glyph';
+import { Dictate, appendText } from '../ui/Dictate';
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
@@ -67,7 +68,7 @@ function DayForm({ date, part, entry, entries, onCreate, onUpdate }: { date: str
 
       <section className="ritual-card accent"><p className="ritual-label"><Glyph name="target" tint="terre" /> Mon intention du jour</p>
         {!intention && plannedYesterday && <button className="link-btn" onClick={() => t(setIntention)(plannedYesterday)}>Reprendre celle d’hier soir : « {plannedYesterday} »</button>}
-        <textarea rows={2} value={intention} placeholder="Quelle énergie veux-tu donner à ta journée ?" onChange={(e) => t(setIntention)(e.target.value)} /></section>
+        <textarea rows={2} value={intention} placeholder="Quelle énergie veux-tu donner à ta journée ?" onChange={(e) => t(setIntention)(e.target.value)} /><Dictate onText={(x) => t(setIntention)(appendText(intention, x))} /></section>
 
       <section><p className="ritual-label">Mes 3 priorités</p>
         {prios.map((p, i) => <input key={i} className="soft-input" value={p} placeholder={'Priorité ' + (i + 1)} onChange={(e) => t(setPrios)(prios.map((x, j) => j === i ? e.target.value : x))} />)}</section>
@@ -83,14 +84,14 @@ function DayForm({ date, part, entry, entries, onCreate, onUpdate }: { date: str
       <div className="affirm-inline"><Glyph name="sparkles" tint="or" /> <em>{affirmationOf(date)}</em></div>
     </> : <>
       <section><p className="ritual-label">Ma victoire du jour (même petite)</p>
-        <textarea className="soft-input" rows={3} value={win} placeholder="Même un petit pas compte…" onChange={(e) => t(setWin)(e.target.value)} /></section>
+        <textarea className="soft-input" rows={3} value={win} placeholder="Même un petit pas compte…" onChange={(e) => t(setWin)(e.target.value)} /><Dictate onText={(x) => t(setWin)(appendText(win, x))} /></section>
       <section><p className="ritual-label">Ce que je ferais autrement</p>
         <textarea className="soft-input" rows={3} value={different} placeholder="Sans jugement, juste une leçon…" onChange={(e) => t(setDifferent)(e.target.value)} /></section>
       <section className="ritual-card question-card"><p className="ritual-label">La question du soir</p>
         <p className="evening-q">{question}</p>
-        <textarea className="soft-input" rows={3} value={answer} placeholder="Réponds librement…" onChange={(e) => t(setAnswer)(e.target.value)} /></section>
+        <textarea className="soft-input" rows={3} value={answer} placeholder="Réponds librement…" onChange={(e) => t(setAnswer)(e.target.value)} /><Dictate onText={(x) => t(setAnswer)(appendText(answer, x))} /></section>
       <section><p className="ritual-label">Ce que je dépose ce soir</p>
-        <textarea className="soft-input" rows={3} value={letgo} placeholder="Je le pose ici pour ne plus y penser…" onChange={(e) => t(setLetgo)(e.target.value)} /></section>
+        <textarea className="soft-input" rows={3} value={letgo} placeholder="Je le pose ici pour ne plus y penser…" onChange={(e) => t(setLetgo)(e.target.value)} /><Dictate onText={(x) => t(setLetgo)(appendText(letgo, x))} /></section>
       <HabitsOfDay date={date} entries={entries} onUpdate={onUpdate} />
       <section><p className="ritual-label">Mon intention pour demain</p>
         <textarea className="soft-input" rows={2} value={tomorrow} placeholder="Demain, je veux avant tout…" onChange={(e) => t(setTomorrow)(e.target.value)} /></section>

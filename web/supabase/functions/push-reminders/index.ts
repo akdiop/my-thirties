@@ -8,7 +8,8 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import webpush from 'npm:web-push@3.6.7';
 
 type Prefs = { morning?: { on?: boolean; time?: string }; evening?: { on?: boolean; time?: string }; habits?: { on?: boolean; time?: string };
-  agenda?: { on?: boolean; minutes?: number }; weekly?: { on?: boolean; day?: number; time?: string }; supplements?: { on?: boolean } };
+  agenda?: { on?: boolean; minutes?: number }; weekly?: { on?: boolean; day?: number; time?: string }; supplements?: { on?: boolean };
+  plan?: { on?: boolean; time?: string }; birthdays?: { on?: boolean; time?: string } };
 type Row = { id: string; module: string; kind: string; title: string; entry_date: string | null; data: Record<string, unknown> };
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 const json = (d: unknown, status = 200) => new Response(JSON.stringify(d), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -83,7 +84,7 @@ Deno.serve(async (request) => {
     const p = (u.prefs ?? {}) as Prefs, now = localNow(u.tz);
     const queue: { key: string; title: string; body: string; url: string }[] = [];
     const { data: rows } = await db.from('entries').select('id,module,kind,title,entry_date,data').eq('user_id', u.user_id)
-      .in('kind', ['daily', 'habit', 'task', 'event', 'appointment', 'routine', 'complement']);
+      .in('kind', ['daily', 'habit', 'task', 'event', 'appointment', 'routine', 'complement', 'proche']);
     const list = (rows ?? []) as Row[];
     const today = list.find((e) => e.kind === 'daily' && e.entry_date === now.date);
 
@@ -107,6 +108,18 @@ Deno.serve(async (request) => {
     }
     if (p.weekly?.on !== false && now.weekday === (p.weekly?.day ?? 0) && due(now.minutes, mins(p.weekly?.time ?? '18:00')))
       queue.push({ key: 'weekly:' + now.date, title: 'Mon bilan de la semaine', body: 'Humeurs, habitudes, victoires : ta semaine t’attend.', url: '/?ecran=bilan' });
+    // Dimanche soir : préparer la semaine avec l'assistant (ouvre l'idée « Planifier ma semaine »).
+    if (p.plan?.on !== false && now.weekday === 0 && due(now.minutes, mins(p.plan?.time ?? '19:30')))
+      queue.push({ key: 'plan:' + now.date, title: 'Préparer ma semaine', body: 'Quelques minutes avec l’assistant pour organiser la semaine qui vient.', url: '/?ecran=assistant&idee=semaine' });
+    // Anniversaires : 3 jours avant et le jour J.
+    if (p.birthdays?.on !== false && due(now.minutes, mins(p.birthdays?.time ?? '09:00'))) {
+      const md = now.date.slice(5), in3 = new Date(Date.parse(now.date + 'T12:00:00Z') + 3 * 86_400_000).toISOString().slice(5, 10);
+      for (const e of list.filter((x) => x.kind === 'proche' && x.data.remind !== false)) {
+        const day = String(e.data.day ?? '');
+        if (day === md) queue.push({ key: 'bday:' + e.id + ':' + now.date, title: 'Anniversaire aujourd’hui', body: 'C’est l’anniversaire de ' + e.title.slice(0, 60) + ' !', url: '/?ecran=proches' });
+        else if (day === in3) queue.push({ key: 'bday3:' + e.id + ':' + now.date, title: 'Anniversaire dans 3 jours', body: e.title.slice(0, 60) + (e.data.gifts ? ' · tes idées de cadeaux t’attendent' : ' · pense au cadeau'), url: '/?ecran=proches' });
+      }
+    }
     if (p.agenda?.on !== false) {
       const before = Math.max(0, Math.min(120, Number(p.agenda?.minutes ?? 15)));
       for (const e of list) {

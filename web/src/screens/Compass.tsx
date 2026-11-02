@@ -10,6 +10,7 @@ import { moodOn } from './Review';
 import { Insights } from '../features/Insights';
 import { cloud } from '../lib/cloud';
 import { getIntegrationPrefs } from '../lib/integrations';
+import { askAssistant, parseSteps } from '../lib/assistant';
 import { Sparkles } from 'lucide-react';
 import { Bar, Segmented } from '../ui/kit';
 
@@ -180,7 +181,23 @@ function GoalCard({ goal, habits, onUpdate, onRemove }: { goal: Entry; habits: E
   const steps = goalSteps(goal), linked = goalHabits(goal);
   const [text, setText] = useState('');
   const [pickHabits, setPickHabits] = useState(false);
+  const [ideas, setIdeas] = useState<string[] | null>(null);
+  const [picked, setPicked] = useState<Set<number>>(new Set());
+  const [thinking, setThinking] = useState(false);
+  const [aiMsg, setAiMsg] = useState('');
   const save = (patch: Record<string, unknown>) => onUpdate(goal, { ...goal.data, ...patch });
+  const propose = async () => {
+    setThinking(true); setAiMsg(''); setIdeas(null);
+    try {
+      const answer = await askAssistant('Découpe cet objectif en 4 à 8 étapes concrètes, courtes et réalisables, dans l’ordre. Réponds uniquement par un tableau JSON de textes (moins de 100 caractères chacun), sans autre texte.\nObjectif : ' + goal.title
+        + (goal.data.why ? '\nPourquoi : ' + String(goal.data.why).slice(0, 300) : '') + (goal.data.deadline ? '\nÉchéance : ' + String(goal.data.deadline) : '')
+        + (steps.length ? '\nÉtapes déjà prévues (ne pas répéter) : ' + steps.map((x) => x.text).join(' ; ').slice(0, 600) : ''));
+      const list = parseSteps(answer).filter((t) => !steps.some((x) => x.text.toLowerCase() === t.toLowerCase()));
+      if (!list.length) throw new Error();
+      setIdeas(list); setPicked(new Set(list.map((_, i) => i)));
+    } catch { setAiMsg('L’assistant n’a pas pu répondre. Réessaie dans un moment.'); }
+    finally { setThinking(false); }
+  };
   const week = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return isoOf(d); });
   const domain = typeof goal.data.domain === 'string' ? goal.data.domain : '';
   const deadline = typeof goal.data.deadline === 'string' && goal.data.deadline ? new Date(goal.data.deadline + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
@@ -199,6 +216,16 @@ function GoalCard({ goal, habits, onUpdate, onRemove }: { goal: Entry; habits: E
         onKeyDown={(e) => { if (e.key === 'Enter' && text.trim()) { void save({ steps: [...steps, { id: uid(), text: text.trim(), done: false }] }); setText(''); } }} />
       <button className="button secondary" disabled={!text.trim()} onClick={() => { void save({ steps: [...steps, { id: uid(), text: text.trim(), done: false }] }); setText(''); }}><Plus size={16} /></button>
     </div>
+    {getIntegrationPrefs().assistant && !ideas && <button className="link-btn small" disabled={thinking} onClick={() => void propose()}><Sparkles size={14} /> {thinking ? 'L’assistant réfléchit…' : 'Proposer des étapes avec l’assistant'}</button>}
+    {aiMsg && <p className="muted small">{aiMsg}</p>}
+    {ideas && <div className="ai-steps">
+      <p className="ritual-label">Étapes proposées : garde celles qui te parlent</p>
+      {ideas.map((t, i) => <label key={i} className="checklist-item"><input type="checkbox" checked={picked.has(i)} onChange={() => setPicked((p) => { const n = new Set(p); if (n.has(i)) n.delete(i); else n.add(i); return n; })} />{t}</label>)}
+      <div className="button-group">
+        <button className="button primary" disabled={!picked.size} onClick={() => { void save({ steps: [...steps, ...ideas.filter((_, i) => picked.has(i)).map((t) => ({ id: uid(), text: t, done: false }))] }); setIdeas(null); }}>Ajouter {picked.size} étape{picked.size > 1 ? 's' : ''}</button>
+        <button className="button ghost" onClick={() => setIdeas(null)}>Annuler</button>
+      </div>
+    </div>}
     <div className="goal-habits">
       <p className="ritual-label">Habitudes qui m’y mènent</p>
       {linked.length ? linked.map((id) => { const h = habits.find((x) => x.id === id); if (!h) return null; const done = habitDone(h);

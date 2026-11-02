@@ -5,6 +5,7 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { NoteMedia } from '../features/NoteMedia';
 import { fold, fullText } from '../lib/search';
 import { deleteMedia, mediaOf, type Media } from '../lib/media';
+import { Dictate, appendText } from '../ui/Dictate';
 import { DAILY_KIND, MOODS, NOTE_FOLDERS, NOTE_KIND, NOTE_TYPES, noteType, type NoteType } from '../lib/rituals';
 import { saveLabel, useAutosave } from '../lib/autosave';
 import { OneYearAgo } from './Review';
@@ -114,6 +115,7 @@ function NoteEditor({ noteId, type, entry, onCreate, onEdit, onRemove, onClose }
     <p className="muted note-date">{when(entry?.created_at ?? new Date().toISOString())}</p>
     <input className="note-title" value={title} placeholder={type.label} maxLength={170} onChange={(e) => t(setTitle)(e.target.value)} />
     <textarea className="note-body" autoFocus={!entry} value={body} placeholder={type.prompt} onChange={(e) => t(setBody)(e.target.value)} />
+    <Dictate label="Dicter ma note" onText={(x) => t(setBody)(appendText(body, x))} />
     <NoteMedia folder={noteId} media={media} onChange={t(setMedia)} />
     <div className="note-meta">
       <div className="mood5 small">{MOODS.map((m) => <button key={m.value} className={mood === m.value ? 'on' : ''} aria-label={m.value} onClick={() => t(setMood)(mood === m.value ? '' : m.value)}><Glyph name={m.icon} tint={m.tint} size={18} badge={34} /></button>)}</div>

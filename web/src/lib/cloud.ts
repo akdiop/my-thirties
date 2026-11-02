@@ -99,11 +99,12 @@ export async function removeEntry(id: string) {
   if (error) throw error;
 }
 
-export async function restoreEntries(inputs: EntryInput[]) {
+export async function restoreEntries(inputs: EntryInput[], onProgress?: (done: number) => void) {
   if (!cloud) throw new Error('Connexion non configurée.');
-  if (inputs.length < 1 || inputs.length > 500) {
-    throw new Error('La restauration accepte actuellement de 1 à 500 entrées par fichier.');
+  if (inputs.length > 5000) throw new Error('La restauration accepte jusqu’à 5000 entrées par fichier.');
+  for (let i = 0; i < inputs.length; i += 100) {
+    const { error } = await cloud.from('entries').insert(inputs.slice(i, i + 100));
+    if (error) throw error;
+    onProgress?.(Math.min(inputs.length, i + 100));
   }
-  const { error } = await cloud.from('entries').insert(inputs);
-  if (error) throw error;
 }
