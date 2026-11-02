@@ -68,7 +68,7 @@ export function RowLink({ icon: Icon, title, sub, onClick, tone }: { icon: Lucid
 
 /** Illustrations des espaces (public/modules/<id>.webp). */
 export const MODULE_IMAGE: Partial<Record<ModuleId | 'assistant', string>> = {
-  quotidien: '/modules/quotidien.webp', sante: '/modules/sante.webp', sport: '/modules/sport.webp', equilibre: '/modules/equilibre.webp',
+  quotidien: '/modules/maison.webp', sante: '/modules/sante.webp', sport: '/modules/sport.webp', equilibre: '/modules/equilibre.webp',
   spiritualite: '/modules/spiritualite.webp', cuisine: '/modules/cuisine.webp', decouvertes: '/modules/decouvertes.webp', passions: '/modules/passions.webp',
   finances: '/modules/finances.webp', listes: '/modules/listes.webp',
 };
