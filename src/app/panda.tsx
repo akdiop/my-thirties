@@ -98,7 +98,7 @@ export default function PandaScreen() {
         </View>
         <View accessibilityLabel={'Progression du panda : ' + progress!.points + ' moments enregistrés'}
           style={{ height: 10, backgroundColor: c.progressTrack, borderRadius: 6, overflow: 'hidden' }}>
-          <View style={{ height: 10, width: (progress!.next ? Math.min(100, 100 * progress!.points / progress!.next) : 100) + '%',
+          <View style={{ height: 10, width: `${progress!.next ? Math.min(100, 100 * progress!.points / progress!.next) : 100}%` as const,
             backgroundColor: '#B68F72', borderRadius: 6 }} />
         </View>
         <AppText variant="caption" color={c.textMuted}>{progress!.next
