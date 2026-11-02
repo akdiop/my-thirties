@@ -1,6 +1,6 @@
 import type { Entry } from './cloud';
 
-export const PANDA_KIND = 'panda-companion';
+export const PANDA_KIND = 'panda_companion';
 export const PANDA_ACTIONS = [
   { id: 'pause', title: 'Souffler', description: 'Un moment pour respirer' },
   { id: 'repos', title: 'Me reposer', description: 'Le repos compte aussi' },
