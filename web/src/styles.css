@@ -1512,3 +1512,6 @@ html.dark img,html.dark video,html.dark picture,html.dark canvas,html.dark ifram
 .skill .panda-banner{margin:0 0 6px;border-radius:12px}
 .pill-icon{width:20px;height:20px;object-fit:contain}
 .shop-icon{width:56px;height:56px;object-fit:contain;align-self:center}
+.tile-grid .module-tile{height:132px}
+.module-tile.illustrated{height:132px;justify-content:flex-end;align-items:flex-start;padding:10px 11px;font-weight:600;font-size:.84rem;text-align:left;background-size:cover;background-position:center}
+.screen-cover{display:block;width:100%;height:150px;object-fit:cover;border-radius:22px;margin:4px 0 16px}

@@ -62,6 +62,7 @@ export function Sleep({ entries, onCreate, onUpdate }: { entries: Entry[]; onCre
 
   return <div className="screen sleep">
     <header className="tab-head"><h1>Sommeil</h1><p>{stats.avg ? 'Moyenne sur 30 jours : ' + fmtH(stats.avg) : 'Prépare-toi à bien dormir'}</p></header>
+    <img className="screen-cover" src="/modules/sommeil.webp" alt="Chambre douce et apaisante" loading="lazy" />
 
     <section className="ritual-card">
       <p className="ritual-label"><Moon size={16} /> Ma routine du soir</p>
