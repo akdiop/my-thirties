@@ -8,7 +8,7 @@ import { readProfile } from '../lib/profile';
 import { ProfileAvatar } from '../features/PersonalProfile';
 import { Bar, Check22, SectionTitle } from '../ui/kit';
 
-type Go = (screen: ModuleId | 'calme' | 'assistant' | 'settings' | 'agenda' | 'spaces') => void;
+type Go = (screen: ModuleId | 'calme' | 'assistant' | 'settings' | 'agenda' | 'spaces' | 'panda') => void;
 
 export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd, rituals }: {
   rituals?: ReactNode; entries: Entry[]; profileEntry: Entry | undefined; onGo: Go;
@@ -38,6 +38,13 @@ export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd,
     </header>
 
     {rituals}
+
+    <button className="soft-card" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, textAlign: 'left', padding: 16, background: '#f2e7db' }}
+      onClick={() => onGo('panda')} aria-label="Ouvrir mon panda compagnon">
+      <span style={{ fontSize: 40, lineHeight: 1 }} aria-hidden="true">🐼</span>
+      <span style={{ display: 'grid', gap: 4 }}><strong>Mon panda compagnon</strong>
+        <small>Un petit pas à la fois, ensemble.</small></span>
+    </button>
 
     <button className="calm-pill" onClick={() => onGo('calme')}><Waves size={20} /> J’ai besoin de me calmer</button>
 
