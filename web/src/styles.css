@@ -1359,3 +1359,6 @@ h2{font-size:1.55rem;line-height:1.2}
 .media-audio{display:flex;align-items:center;gap:8px;padding:10px 40px 10px 12px;color:#6b3f2e}
 .media-audio audio{flex:1;min-width:0;height:36px}
 .media-x{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(255,253,250,.92);color:#6b3f2e;display:grid;place-items:center}
+.life-notes{margin-top:10px}
+.life-notes summary{font-weight:600;color:#6b3f2e;cursor:pointer;padding:6px 0}
+.life-notes textarea{margin-top:8px;border:1px solid #e3d8ca;border-radius:12px;padding:12px;font-size:16px;line-height:1.5;background:#fffdfa;width:100%;box-sizing:border-box;font-family:inherit}
