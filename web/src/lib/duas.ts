@@ -68,6 +68,11 @@ export const DUAS: Dua[] = [
     phonetic: 'Allāhumma raḥmataka arjū, falā takilnī ilā nafsī ṭarfata ‘ayn, wa aṣliḥ lī sha’nī kullah, lā ilāha illā ant',
     french: 'Ô Allah, c’est Ta miséricorde que j’espère. Ne me confie pas à moi-même, ne serait-ce que le temps d’un clin d’œil, et arrange toutes mes affaires. Il n’y a de divinité que Toi.',
     ref: 'Sunan Abî Dâwûd 5090', source: '@piousdeenn' },
+  { id: 'hasbi', category: 'Détresse', title: 'Allah me suffit',
+    arabic: 'حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ',
+    phonetic: 'Ḥasbunallāhu wa ni‘ma l-wakīl',
+    french: 'Allah nous suffit, et quel excellent Garant !',
+    ref: 'Coran 3:173', source: 'Muslima Mindset Reset' },
 ];
 
 /** Routine quotidienne de dhikr (liste « Ramadan daily Dhikr checklist » de @your._habibtii). */

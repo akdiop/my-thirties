@@ -1534,3 +1534,13 @@ html.dark img,html.dark video,html.dark picture,html.dark canvas,html.dark ifram
 .study .blank{color:#c9a08c;letter-spacing:1px}
 .learn-row{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left}
 .learn-row small{color:#8c7468}
+.routine-check{display:flex;flex-direction:row;gap:10px;align-items:flex-start;font-weight:400;padding:4px 0}
+.routine-check input{width:18px;min-height:18px;flex-shrink:0;margin-top:3px}
+.fiche-head{display:flex;justify-content:space-between;align-items:center;width:100%;background:none;border:0;padding:0;text-align:left;font-size:1rem}
+.fiche-head span{font-size:1.3rem;color:#8c6257}
+.fiche-pt{margin:0;line-height:1.5;padding-left:12px;border-left:2px solid #f2e2dc}
+.affirm{font-style:italic;color:#6a4d44}
+.reframe-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 8px 0; border-bottom: 1px solid var(--line, rgba(0,0,0,.08)); }
+.reframe-from { color: var(--muted, #8a7f78); text-decoration: line-through; font-size: .92rem; }
+.reframe-to { grid-column: 1; font-weight: 600; }
+.reframe-row .icon-btn { grid-row: 1 / span 2; grid-column: 2; align-self: center; }
