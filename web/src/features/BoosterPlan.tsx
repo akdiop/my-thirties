@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check } from 'lucide-react';
 import type { Entry } from '../lib/cloud';
-import { boosterDay } from '../lib/boosterDays';
+import { boosterDay, questByTitle } from '../lib/boosterDays';
 
 export function BoosterPlan({ entry, onUpdate }: {
   entry: Entry;
   onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>;
 }) {
-  const days = [7, 14, 30].includes(Number(entry.data.days)) ? Number(entry.data.days) : 30;
+  const days = [7, 14, 28, 30].includes(Number(entry.data.days)) ? Number(entry.data.days) : 30;
   const axis = String(entry.data.axis || 'Mon équilibre');
   const progress = (entry.data.progress && typeof entry.data.progress === 'object'
     ? entry.data.progress : {}) as Record<string, boolean>;
@@ -71,6 +71,7 @@ export function BoosterPlan({ entry, onUpdate }: {
   const done = Boolean(progress[String(day)]);
   const p = boosterDay(axis, day);
   const week = Math.ceil(day / 7);
+  const quest = questByTitle(axis);
 
   return <div className="booster-panel">
     <p className="muted">Programme : {axis} · {days} jours</p>
@@ -85,7 +86,7 @@ export function BoosterPlan({ entry, onUpdate }: {
     })}</div>
 
     <section className="booster-today">
-      <span className="eyebrow">JOUR {day}{days > 7 ? ' · SEMAINE ' + week : ''}</span>
+      <span className="eyebrow">JOUR {day}{days > 7 ? ' · SEMAINE ' + week : ''}{quest ? ' · ' + quest.weeks[Math.min(3, week - 1)]!.theme.toUpperCase() : ''}</span>
       <h3>{p.titre}</h3>
       <p className="booster-advice">{p.conseil}</p>
       <label className="booster-write">

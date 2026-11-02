@@ -2,6 +2,8 @@ import { Glyph, MoodIcon } from '../ui/Glyph';
 import { useMemo, useState } from 'react';
 import { ArrowLeft, Flame, Plus, Search, Trash2 } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
+import { NoteMedia } from '../features/NoteMedia';
+import { deleteMedia, mediaOf, type Media } from '../lib/media';
 import { DAILY_KIND, MOODS, NOTE_FOLDERS, NOTE_KIND, NOTE_TYPES, noteType, type NoteType } from '../lib/rituals';
 import { saveLabel, useAutosave } from '../lib/autosave';
 import { OneYearAgo } from './Review';
@@ -90,26 +92,28 @@ function NoteEditor({ noteId, type, entry, onCreate, onEdit, onRemove, onClose }
   const [body, setBody] = useState(String(entry?.data.body ?? ''));
   const [folder, setFolder] = useState(String(entry?.data.folder ?? type.folder));
   const [mood, setMood] = useState(String(entry?.data.mood ?? ''));
+  const [media, setMedia] = useState<Media[]>(mediaOf(entry?.data.media));
   const [touched, setTouched] = useState(false);
   const [burning, setBurning] = useState(false);
   const heading = (title.trim() || type.label).slice(0, 170);
-  const draft = useMemo(() => touched && (body.trim() || title.trim()) ? { noteId, type: type.id, heading, body, folder, mood } : null, [touched, noteId, type.id, heading, body, folder, mood, title]);
+  const draft = useMemo(() => touched && (body.trim() || title.trim() || media.length) ? { noteId, type: type.id, heading, body, folder, mood, media } : null, [touched, noteId, type.id, heading, body, folder, mood, title, media]);
   const state = useAutosave(entry, draft,
     () => onCreate({ module: 'equilibre', kind: NOTE_KIND, title: heading, entry_date: new Date().toLocaleDateString('en-CA'), data: { ...draft!, updated: new Date().toISOString() } }),
     (e, d) => onEdit(e.id, { title: heading, data: { ...d, updated: new Date().toISOString() } }));
   const t = <A,>(f: (v: A) => void) => (v: A) => { f(v); setTouched(true); };
   const burn = async () => {
     if (!entry || !confirm('Brûler cette note ? Elle sera supprimée définitivement.')) return;
-    setBurning(true); setTimeout(() => void onRemove(entry), 900);
+    setBurning(true); setTimeout(() => { void deleteMedia(mediaOf(entry.data.media).map((m) => m.path)).catch(() => undefined); void onRemove(entry); }, 900);
   };
   return <div className={'screen note-editor' + (burning ? ' burning' : '')}>
     <header className="screen-header"><button className="icon-btn back" onClick={onClose} aria-label="Retour"><ArrowLeft size={22} /></button>
       <span className="note-type"><Glyph name={type.icon} tint={type.tint} /> {type.label}</span>
-      {entry && type.id !== 'anger' && <button className="icon-btn" aria-label="Supprimer la note" onClick={() => { if (confirm('Supprimer cette note ?')) void onRemove(entry); }}><Trash2 size={18} /></button>}
+      {entry && type.id !== 'anger' && <button className="icon-btn" aria-label="Supprimer la note" onClick={() => { if (confirm('Supprimer cette note ?')) { void deleteMedia(mediaOf(entry.data.media).map((m) => m.path)).catch(() => undefined); void onRemove(entry); } }}><Trash2 size={18} /></button>}
     </header>
     <p className="muted note-date">{when(entry?.created_at ?? new Date().toISOString())}</p>
     <input className="note-title" value={title} placeholder={type.label} maxLength={170} onChange={(e) => t(setTitle)(e.target.value)} />
     <textarea className="note-body" autoFocus={!entry} value={body} placeholder={type.prompt} onChange={(e) => t(setBody)(e.target.value)} />
+    <NoteMedia folder={noteId} media={media} onChange={t(setMedia)} />
     <div className="note-meta">
       <div className="mood5 small">{MOODS.map((m) => <button key={m.value} className={mood === m.value ? 'on' : ''} aria-label={m.value} onClick={() => t(setMood)(mood === m.value ? '' : m.value)}><Glyph name={m.icon} tint={m.tint} size={18} badge={34} /></button>)}</div>
       <select value={folder} aria-label="Dossier" onChange={(e) => t(setFolder)(e.target.value)}>{NOTE_FOLDERS.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}</select>
