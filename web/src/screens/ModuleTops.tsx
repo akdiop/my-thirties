@@ -134,7 +134,7 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onRemove }: { tab: Sp
     {tab !== 'home' && <button className="link-btn back-link" onClick={() => onTab('home')}>‹ Ma spiritualité</button>}
     {tab === 'dhikr' && <div className="dhikr">
       <div className="chip-row">{DHIKR.map((d) => <button key={d} className={'chip' + (d === phrase ? ' on' : '')} onClick={() => { setPhrase(d); setCount(0); }}>{d}</button>)}</div>
-      <button className="dhikr-btn" onClick={() => setCount((c) => c + 1)} aria-label={'Compter ' + phrase}><strong>{count}</strong><small>{phrase}</small><span className="dhikr-ring" style={{ background: `conic-gradient(#5E7A5F ${Math.min(1, count / 33) * 360}deg, #E3E8DB 0)` }} /></button>
+      <button className="dhikr-btn" onClick={() => setCount((c) => c + 1)} aria-label={'Compter ' + phrase}><strong>{count}</strong><small>{phrase}</small><span className="dhikr-ring" style={{ background: `conic-gradient(#6F8A80 ${Math.min(1, count / 33) * 360}deg, #DFE8E3 0)` }} /></button>
       <p className="muted center">{count >= 33 ? '33 atteints · continue librement' : `${33 - count} pour atteindre 33`}</p>
       <div className="two-btn"><button className="button ghost" onClick={() => setCount(0)}>Remettre à zéro</button>
         <button className="button primary" disabled={!count || saving} onClick={async () => { setSaving(true); try { await onCreate({ module: 'spiritualite', kind: 'dhikr', title: `${phrase} · ${count}`, entry_date: day, data: { date: day, phrase, count: String(count) } }); setCount(0); } finally { setSaving(false); } }}>Enregistrer</button></div>

@@ -6,7 +6,7 @@ export const currencyOf = (e: Entry) => (typeof e.data.currency === 'string' && 
 export const fmt = (n: number, c: string) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: c === 'XOF' ? 0 : 2 }).format(n).replace(/ | /g, ' ') + ' ' + c;
 export const XOF_PER_EUR = 655.957;
 
-export const CATEGORY_COLORS = ['#6B3F2E', '#8F9F7A', '#B68F72', '#D4B483', '#5E7A5F', '#CDBBAA', '#3C2116'];
+export const CATEGORY_COLORS = ['#8C6257', '#9FB5AA', '#C9A08C', '#D8B69F', '#6F8A80', '#CDBBAA', '#4B342C'];
 
 /** Bilan du mois dans une devise : dépenses par catégorie, revenus, budget prévu et reste. */
 export function monthReport(entries: Entry[], month: string, currency: string) {

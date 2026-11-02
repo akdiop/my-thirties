@@ -7,9 +7,9 @@ import type { ModuleId } from '../lib/cloud';
 
 export type Tone = 'sable' | 'sauge' | 'creme';
 export const TILE: Record<Tone, { bg: string; fg: string }> = {
-  sable: { bg: '#E9DCCF', fg: '#6B3F2E' },
-  sauge: { bg: '#E3E8DB', fg: '#4A6350' },
-  creme: { bg: '#F3E9DF', fg: '#6B3F2E' },
+  sable: { bg: '#E8DCD6', fg: '#8C6257' },
+  sauge: { bg: '#DFE8E3', fg: '#5A7369' },
+  creme: { bg: '#F5ECE8', fg: '#8C6257' },
 };
 
 /** Icône et teinte de chaque espace, comme sur la maquette « Mes espaces ». */

@@ -5,7 +5,7 @@
 const FONDS = ['#F1E6D8', '#EFE3D3', '#F4E9DF', '#EDE1D2'];
 const PALETTES = [
   ['#C9744E', '#D9B48F', '#8A5A3C'],
-  ['#B5603F', '#E2C3A3', '#5A3A2A'],
+  ['#C38380', '#E2C3A3', '#6A4D44'],
   ['#C48A5A', '#E8CDB5', '#9A5A3E'],
   ['#D08A68', '#CDB197', '#6E4430'],
   ['#B97A55', '#E6C9A8', '#A0583A'],
