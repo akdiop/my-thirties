@@ -75,11 +75,11 @@ export const DUAS: Dua[] = [
     ref: 'Coran 9:128-129', source: 'daaraserignemordiop.net',
     uses: [
       { title: 'Après les prières (1 fois)', items: [
-        'Soubh : préserve le cœur et la foi.', 'Tisbaar (Zohr) : un cœur vivifié par la foi, dans cette vie et après.',
-        'Takussaan : préservation d’une mort subite.', 'Timis (Maghrib) : droiture de tous les membres (istiqâma).',
-        'Guéé (Ichaa) : préservation des grands péchés.', 'Witr : facilite les ressources et libère de la crainte des gens.',
+        'Soubh (prière du matin) : préserve le cœur et la foi.', 'Dhohr : un cœur vivifié par la foi, dans cette vie et après.',
+        'Asr : préservation d’une mort subite.', 'Maghrib : droiture de tous les membres (istiqâma).',
+        'Ichaa : préservation des grands péchés.', 'Witr : facilite les ressources et libère de la crainte des gens.',
         'Fajr : voir sa demeure au Paradis.', 'Après l’istikhâra : le soutien des anges dans ses actions.',
-        'Après toute prière surérogatoire (nâfila) : goûter la douceur de la foi.', '99 fois après la prière du vendredi : des ressources préservées de l’illicite.'] },
+        'Après toute prière surérogatoire (nâfila) : goûter la douceur de la foi.', '99 fois après la prière du vendredi (Joumou‘a) : des ressources préservées de l’illicite.'] },
       { title: 'Au quotidien', items: [
         '1 fois matin et soir : préservée de tout désagrément.', '1 fois au coucher : préservée de tout maléfice.',
         '1 fois (ou 7) en sortant de chez soi, la main sur la tête : protégée de ce qui nuit et des mal intentionnés.',
@@ -92,7 +92,7 @@ export const DUAS: Dua[] = [
         '7 fois sur un mal ou une douleur (récité ou en saafara) : soulagement et guérison.',
         '100 fois sur une maladie dite incurable, en persévérant.', '66 fois sur une morsure ou une piqûre venimeuse.'] },
       { title: 'Jours particuliers', items: [
-        '7 fois le jour de la Korité : préservée de la surdité toute l’année.', '21 fois le jour de la Tabaski : préservée de la perte de la vue.',
+        '7 fois le jour de l’Aïd al-Fitr : préservée de la surdité toute l’année.', '21 fois le jour de l’Aïd al-Adha : préservée de la perte de la vue.',
         '360 fois le jour d’Arafat : Allah te tient par la main et satisfait tes besoins.', '1000 fois le jour d’Achoura : facilité dans toutes tes entreprises.',
         '500 fois la nuit du 15 Chaabane (Nisfou Chaabane).', '66 fois un jour d’éclipse solaire : guérison.'] },
     ] },
