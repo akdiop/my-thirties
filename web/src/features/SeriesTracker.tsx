@@ -79,6 +79,7 @@ export function SeriesTracker({ entries, onUpdate, onAdd, onCreate }: { entries:
   const markNext = (e: Entry, show: ShowData, ep: Episode) => { const w = watchedOf(e, show); w.add(ep.id); return saveWatched(e, show, w, onUpdate); };
 
   return <section className="series tvtime">
+    <img className="screen-cover" src="/modules/series.webp" alt="Soirée séries : popcorn et plaid" loading="lazy" />
     <div className="title-row"><h3 className="board-subtitle" style={{ margin: 0 }}>Mes séries</h3><button className="link-btn" onClick={onAdd}>Saisie libre</button></div>
     <SeriesSearch existing={series} onCreate={onCreate} />
     <div className="tv-stats">
