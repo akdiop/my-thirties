@@ -54,3 +54,7 @@ Le panda en situation, environ 1024 × 530 px (format paysage ≈ 2:1). Affiché
 | `banner_organisation` | Défis et habitudes |
 | `banner_voyages` | Voyages |
 | `banner_objectifs` | Mon projet personnel |
+
+## 6. Livré par planches (déjà intégré)
+- **Pièces** (`bg_salon`, `bg_chambre`, `bg_lecture`, `bg_jardin`) : salon le jour, chambre quand il dort, coin lecture quand il lit, jardin zen à partir du niveau 4. Elles remplacent `bg_maison_<saison>` (les feuilles ou flocons de saison restent animés par-dessus).
+- **Objets** (`icon_<nom>`, fond transparent) : bambou, lunettes, chapeau, sac, livre, thé, coussin, panier, plante, lanterne, écharpe, cœur. Vignettes de la boutique et objets posés dans la pièce quand le panda les possède.

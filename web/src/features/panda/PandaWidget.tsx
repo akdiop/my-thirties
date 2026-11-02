@@ -6,6 +6,7 @@ import { Bar } from '../../ui/kit';
 import { MESSAGES, PANDA_KIND, pick } from './data';
 import { eventsFrom, progress, readState } from './engine';
 import { PandaCharacter } from './PandaCharacter';
+import { assetUrl } from './assets';
 
 /** Le panda calculé à partir de mes données (lecture seule, aucune écriture ici). */
 export function usePanda(entries: Entry[]) {
@@ -26,7 +27,7 @@ export function PandaWidget({ entries, onOpen }: { entries: Entry[]; onOpen: () 
     <span className="panda-card-body">
       <small className="eyebrow">MON COMPAGNON</small>
       <strong>{entry ? s.name + ' · ' + pr.level.name : 'Adopte ton bébé panda'}</strong>
-      {entry && <span className="panda-card-bar"><Heart size={14} /><Bar value={pr.span ? pr.into / pr.span : 1} tone="caramel" /><small>Niv. {pr.level.n}</small></span>}
+      {entry && <span className="panda-card-bar">{assetUrl('icon_coeur') ? <img src={assetUrl('icon_coeur')} alt="" className="pill-icon" /> : <Heart size={14} />}<Bar value={pr.span ? pr.into / pr.span : 1} tone="caramel" /><small>Niv. {pr.level.n}</small></span>}
       <small className="panda-bubble-mini">{entry ? pick(MESSAGES.hello, Number(today.replace(/-/g, ''))) : 'Un compagnon doux qui grandit avec toi.'}</small>
     </span>
   </button>;

@@ -15,6 +15,12 @@ import type { PandaMood, PandaState, Room } from './types';
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 type Tab = 'panda' | 'evolution' | 'deco';
 const LOW = ['Épuisée', 'Fatiguée', 'Stressée'];
+/** Objets illustrés (icônes de la planche) : nom de l'icône et place dans la scène 400×300 (x, y, taille). */
+const ICON_SPOT: Partial<Record<string, [string, number, number, number]>> = {
+  plante: ['plante', 4, 150, 70], coussin: ['coussin', 18, 236, 64], panier: ['panier', 300, 214, 84], theiere: ['the', 254, 254, 40],
+  etagere: ['livre', 92, 256, 38], valise: ['sac', 356, 168, 42], lanterne: ['lanterne', 316, 150, 66],
+};
+const OUTFIT_ICON: Record<string, string> = { chapeau: 'chapeau', lunettes: 'lunettes', echarpe: 'echarpe' };
 const seasonOf = (d: Date) => { const m = d.getMonth() + 1; return m >= 9 && m <= 11 ? 'automne' : m === 12 || m <= 2 ? 'hiver' : m <= 5 ? 'printemps' : 'ete'; };
 const WALL: Record<string, string> = { automne: '#F6E7D8', hiver: '#EEF0F2', printemps: '#F7EEEA', ete: '#FBF1DF' };
 
@@ -76,6 +82,8 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
     memories: [...s.memories, { date: today, text: 'Nouveau : ' + (ITEMS.find((i) => i.id === id)?.name ?? OUTFITS.find((o) => 'tenue:' + o.id === id)?.name ?? id) + '.' }] });
   const season = seasonOf(now);
   const shown = ITEMS.filter((i) => unlocked.has(i.id) && equipped.has(i.id));
+  // Décor selon le moment : chambre quand il dort, coin lecture quand il lit, salon sinon ; jardin zen à partir du niveau 4.
+  const bgUrl = assetUrl(room === 'jardin' ? 'bg_jardin' : mood === 'sleepy' ? 'bg_chambre' : mood === 'reading' ? 'bg_lecture' : 'bg_salon') || assetUrl(room === 'jardin' ? 'bg_jardin' : 'bg_maison_' + season);
   const foods = foodsUnlocked(pr.counts);
   const latest = [...events].sort((a, b) => b.date.localeCompare(a.date))[0];
   const latestDomain = latest ? DOMAINS.find((d) => d.id === latest.domain) : undefined;
@@ -83,7 +91,7 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
   return <div className={'screen panda-screen' + (s.prefs.animationsEnabled ? '' : ' no-anim')}>
     <header className="panda-head">
       <div><small className="eyebrow">MY THIRTIES · MON COMPAGNON</small><h1>{s.name}</h1><p>{pr.level.name} · Niveau {pr.level.n}</p></div>
-      <span className="bamboo-pill" aria-label={pr.bamboo + ' bambous'}><Leaf size={16} /> {pr.bamboo}</span>
+      <span className="bamboo-pill" aria-label={pr.bamboo + ' bambous'}>{assetUrl('icon_bambou') ? <img src={assetUrl('icon_bambou')} alt="" className="pill-icon" /> : <Leaf size={16} />} {pr.bamboo}</span>
     </header>
     <div className="panda-xp"><Bar value={pr.span ? pr.into / pr.span : 1} tone="caramel" /><small className="muted">{pr.next ? pr.into + ' / ' + pr.span + ' XP vers ' + pr.next.name.toLowerCase() : pr.xp + ' XP · il continue d’apprendre'}</small></div>
     <Segmented label="Espace du panda" value={tab} onChange={setTab} options={[{ value: 'panda', label: 'Mon panda' }, { value: 'evolution', label: 'Évolution' }, { value: 'deco', label: 'Déco & tenues' }]} />
@@ -92,15 +100,18 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
       {pr.level.n >= 4 && <Segmented label="Pièce" value={room} onChange={(r) => void save({ room: r })} options={[{ value: 'maison', label: 'Maison' }, { value: 'jardin', label: 'Jardin' }]} />}
       <div className={'panda-scene room-' + room} style={{ background: room === 'jardin' ? '#E7F0E4' : WALL[season] }}>
         <svg className="scene-bg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-          {assetUrl(room === 'jardin' ? 'bg_jardin' : 'bg_maison_' + season) ? <image href={assetUrl(room === 'jardin' ? 'bg_jardin' : 'bg_maison_' + season)} x="0" y="0" width="400" height="300" />
+          {bgUrl ? <image href={bgUrl} x="0" y="0" width="400" height="300" preserveAspectRatio="xMidYMid slice" />
             : room === 'maison' ? <>
             <rect x="0" y="210" width="400" height="90" fill="#EAD9C7" />
             <rect x="130" y="40" width="140" height="110" rx="12" fill="#E9EEF0" stroke="#6B4433" strokeWidth="3" /><path d="M200 40 V150 M130 95 H270" stroke="#6B4433" strokeWidth="3" />
           </> : <>
             <rect x="0" y="0" width="400" height="300" fill="#DDEBDF" /><path d="M0 200 Q200 150 400 200 V300 H0Z" fill="#B9CFAE" />
           </>}
-          {shown.filter((i) => i.room === room).map((i) => assetUrl('item_' + i.id) ? <image key={i.id} href={assetUrl('item_' + i.id)} x="0" y="0" width="400" height="300" />
-            : i.room === 'maison' ? <ItemArt key={i.id} id={i.id} books={booksOnShelf(pr.counts)} /> : <g key={i.id} transform="translate(0 110)"><GardenArt id={i.id} /></g>)}
+          {shown.filter((i) => i.room === room).map((i) => {
+            if (assetUrl('item_' + i.id)) return <image key={i.id} href={assetUrl('item_' + i.id)} x="0" y="0" width="400" height="300" />;
+            // Décor illustré : les objets possédés sont posés sous forme d'icônes ; sans décor, dessin de secours.
+            if (bgUrl) { const spot = ICON_SPOT[i.id], icon = spot && assetUrl('icon_' + spot[0]); return icon ? <image key={i.id} href={icon} x={spot[1]} y={spot[2]} width={spot[3]} height={spot[3]} /> : null; }
+            return i.room === 'maison' ? <ItemArt key={i.id} id={i.id} books={booksOnShelf(pr.counts)} /> : <g key={i.id} transform="translate(0 110)"><GardenArt id={i.id} /></g>; })}
           {season === 'automne' && <g fill="#C98A55">{[40, 340, 90, 300].map((x, i) => <path key={x} className="leaf-fall" style={{ animationDelay: i * 1.2 + 's' }} d={`M${x} 20 q8 -8 14 0 q-6 10 -14 0Z`} />)}</g>}
           {season === 'hiver' && <g fill="#fff">{[60, 330, 110, 280].map((x, i) => <circle key={x} className="leaf-fall" style={{ animationDelay: i * 1.1 + 's' }} cx={x} cy="20" r="4" />)}</g>}
           {(myBirthday || pandaBirthday) && <g><rect x="320" y="226" width="44" height="26" rx="4" fill="#F7E3C3" stroke="#6B4433" strokeWidth="3" /><path d="M342 226 v-12" stroke="#6B4433" strokeWidth="3" /><circle cx="342" cy="210" r="4" fill="#FFB86B" /></g>}
@@ -151,7 +162,7 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
           onUnlock={(free) => unlock(it.id, free ? 0 : it.price)} onToggle={() => void save({ equipped: equipped.has(it.id) ? s.equipped.filter((x) => x !== it.id) : [...s.equipped, it.id] })} />)}</div></section>
       <section className="ritual-card"><p className="ritual-label">Tenues</p>
         <div className="shop-grid">{OUTFITS.map((o) => { const has = o.price === 0 || unlocked.has('tenue:' + o.id), locked = pr.level.n < o.level;
-          return <div key={o.id} className={'shop-item' + (has ? ' owned' : '') + (locked && !has ? ' locked' : '')}><strong>{o.name}</strong>
+          return <div key={o.id} className={'shop-item' + (has ? ' owned' : '') + (locked && !has ? ' locked' : '')}>{OUTFIT_ICON[o.id] && assetUrl('icon_' + OUTFIT_ICON[o.id]) && <img className="shop-icon" src={assetUrl('icon_' + OUTFIT_ICON[o.id])} alt="" loading="lazy" />}<strong>{o.name}</strong>
             {has ? <button className={'link-btn small' + (s.outfit === o.id ? ' on' : '')} onClick={() => void save({ outfit: o.id })}>{s.outfit === o.id ? 'Portée' : 'La porter'}</button>
               : locked ? <small className="muted"><Lock size={12} /> Niveau {o.level}</small>
               : <button className="button secondary small" disabled={pr.bamboo < o.price} onClick={() => unlock('tenue:' + o.id, o.price, false)}><Leaf size={12} /> {o.price}</button>}</div>; })}</div></section>
@@ -162,7 +173,9 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
 function ShopItem({ it, level, gift, owned, on, bamboo, onUnlock, onToggle }: { it: Item; level: number; gift: boolean; owned: boolean; on: boolean; bamboo: number; onUnlock: (free: boolean) => void; onToggle: () => void }) {
   const locked = level < it.level && !gift;
   const d = it.gift ? DOMAINS.find((x) => x.id === it.gift!.domain) : undefined;
+  const icon = ICON_SPOT[it.id] ? assetUrl('icon_' + ICON_SPOT[it.id]![0]) : '';
   return <div className={'shop-item' + (owned ? ' owned' : '') + (locked && !owned ? ' locked' : '')}>
+    {icon && <img className="shop-icon" src={icon} alt="" loading="lazy" />}
     <strong>{it.name}</strong><small className="muted">{it.room === 'jardin' ? 'Jardin' : 'Maison'}</small>
     {owned ? <button className="link-btn small" onClick={onToggle}>{on ? 'Le ranger' : 'Le sortir'}</button>
       : gift || it.price === 0 ? <button className="button primary small" onClick={() => onUnlock(true)}>Offert : le récupérer</button>

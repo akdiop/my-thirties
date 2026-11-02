@@ -8,5 +8,8 @@ export const PANDA_ASSETS = new Set<string>([
   'panda_surprised', 'panda_proud', 'panda_eating', 'panda_reading', 'panda_tea',
   'banner_lecture', 'banner_organisation', 'banner_cuisine', 'banner_bienetre', 'banner_objectifs',
   'banner_spiritualite', 'banner_sport', 'banner_voyages', 'banner_sommeil',
+  'bg_salon', 'bg_chambre', 'bg_lecture', 'bg_jardin',
+  'icon_bambou', 'icon_lunettes', 'icon_chapeau', 'icon_sac', 'icon_livre', 'icon_the', 'icon_coussin', 'icon_panier',
+  'icon_plante', 'icon_lanterne', 'icon_echarpe', 'icon_coeur',
 ]);
 export const assetUrl = (name: string) => (PANDA_ASSETS.has(name) ? '/panda/' + name + '.webp' : '');
