@@ -8,6 +8,7 @@ import { amountOf, currencyOf, fmt } from '../lib/money';
 import { addDays, DAILY_KIND, freqTarget, HABIT_KIND, habitDone, habitFreq, isoOf, MOODS, NOTE_KIND, weekStartOf } from '../lib/rituals';
 import { getIntegrationPrefs } from '../lib/integrations';
 import { Bar, Segmented } from '../ui/kit';
+import { fmtH, sleepHours } from './Sleep';
 
 const LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 const MOOD_COLOR: Record<string, string> = { 'Épuisée': '#C9A9A6', 'Fatiguée': '#E3CBB8', Neutre: '#E9E2D6', Bien: '#C6D6BF', Rayonnante: '#8FB08A',
@@ -50,7 +51,9 @@ function Week({ entries }: { entries: Entry[] }) {
     const spend = new Map<string, number>();
     for (const e of entries) if (e.module === 'finances' && e.kind === 'expense' && inWeek(e.entry_date)) spend.set(currencyOf(e), (spend.get(currencyOf(e)) ?? 0) + amountOf(e));
     const notes = entries.filter((e) => e.kind === NOTE_KIND && inWeek(e.entry_date)).length;
-    return { dailies, wins, grats, habits, tasks: tasks.length, doneTasks, spend, notes, moods: days.map((d) => moodOn(entries, d)) };
+    const nights = entries.filter((e) => e.kind === 'sommeil' && inWeek(e.entry_date)).map(sleepHours).filter((h) => h > 0);
+    const sleepAvg = nights.length ? nights.reduce((a, b) => a + b, 0) / nights.length : 0;
+    return { dailies, wins, grats, habits, tasks: tasks.length, doneTasks, spend, notes, moods: days.map((d) => moodOn(entries, d)), sleepAvg, nights: nights.length };
   }, [entries, start]);
 
   const [ai, setAi] = useState(''), [aiBusy, setAiBusy] = useState(false), [aiError, setAiError] = useState('');
@@ -86,6 +89,7 @@ function Week({ entries }: { entries: Entry[] }) {
       <div><strong>{s.dailies.length}/7</strong><small>jours notés</small></div>
       <div><strong>{s.doneTasks}/{s.tasks}</strong><small>tâches faites</small></div>
       <div><strong>{s.notes}</strong><small>notes écrites</small></div>
+      {s.nights > 0 && <div><strong>{fmtH(s.sleepAvg)}</strong><small>de sommeil en moyenne</small></div>}
     </div>
     {s.habits.length > 0 && <section className="ritual-card"><p className="ritual-label">Mes habitudes</p>
       {s.habits.map(({ e, count, target }) => <div key={e.id} className="habit-stat"><span className="inline-glyph"><Glyph name={String(e.data.icon || 'sprout')} tint={(e.data.tint as Tint) || 'sauge'} size={16} /> {e.title}</span><small>{count}/{target}</small><Bar value={Math.min(1, count / target)} /></div>)}</section>}

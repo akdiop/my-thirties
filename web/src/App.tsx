@@ -32,6 +32,10 @@ import { PhotoProvider } from './features/HeroPhoto';
 import { SportHub } from './features/SportHub';
 import { ChallengesBoard } from './features/ChallengesBoard';
 import { Home as HomeScreen } from './screens/Home';
+import { Compass } from './screens/Compass';
+import { Focus } from './screens/Focus';
+import { Sleep } from './screens/Sleep';
+import { Meditate } from './screens/Meditate';
 import { Agenda } from './screens/Agenda';
 import { Wellbeing } from './screens/Wellbeing';
 import { Spaces } from './screens/Spaces';
@@ -60,7 +64,7 @@ import { IphoneCalendar } from './features/IphoneCalendar';
 import { removeLock } from './lib/journalLock';
 import { Sparkles } from 'lucide-react';
 
-type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | ModuleId;
+type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
 const today = () => new Date().toLocaleDateString('en-CA');
 const value = (obj: Record<string, unknown>, key: string) => typeof obj[key] === 'string' ? obj[key] as string : '';
@@ -390,7 +394,7 @@ export default function App() {
   useEffect(() => {
     const q = new URLSearchParams(window.location.search), target = q.get('ecran');
     if (!target) return;
-    if (['myday', 'habits', 'bilan', 'agenda', 'notes'].includes(target)) {
+    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter'].includes(target)) {
       if (target === 'myday') setDayTarget((t) => ({ part: q.get('moment') === 'soir' ? 'soir' : 'matin', n: t.n + 1 }));
       setScreen(target as Screen);
     }
@@ -545,7 +549,7 @@ export default function App() {
     ) : <div className="empty-soft"><Coffee size={28} /><p>Un espace à remplir à ton rythme.</p><button className="button ghost" onClick={() => setEditor({ module: currentModule })}>Créer ma première entrée</button></div>}</div>
   </section>;
 
-  const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings', 'myday', 'habits', 'notes', 'bilan', 'parametres'] as Screen[]).includes(screen);
+  const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings', 'myday', 'habits', 'notes', 'bilan', 'parametres', 'boussole', 'focus', 'sommeil', 'mediter'] as Screen[]).includes(screen);
   const openDay = (date?: string, part?: 'matin' | 'soir') => { setDayTarget((t) => ({ date, part, n: t.n + 1 })); go('myday'); };
   const editFull = async (id: string, patch: { title: string; data: Record<string, unknown> }) => { await editEntry(id, patch); await refresh(); };
 
@@ -558,6 +562,10 @@ export default function App() {
       {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}
       {screen === 'notes' && <LockGate><Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={removeQuiet} onOpenDay={openDay} /></LockGate>}
       {screen === 'bilan' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><Review entries={ritualEntries} /></LockGate>}
+      {screen === 'boussole' && <><ScreenHeader title="" onBack={() => go('home')} /><Compass entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} onEditProfile={() => go('settings')} /></>}
+      {screen === 'focus' && <><ScreenHeader title="" onBack={() => go('home')} /><Focus entries={ritualEntries} onCreate={createFromTool} /></>}
+      {screen === 'sommeil' && <><ScreenHeader title="" onBack={() => go('home')} /><Sleep entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} /></>}
+      {screen === 'mediter' && <><ScreenHeader title="" onBack={() => go('home')} /><Meditate entries={ritualEntries} onCreate={createFromTool} /></>}
       {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onImported={() => void refresh()} />}
       {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
       {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}
@@ -587,6 +595,7 @@ export default function App() {
           {travelTab === 'voyage' && <><TravelPlanner entries={allModuleEntries} onUpdate={updateData} /><TravelTools entries={allModuleEntries} onGenerate={createGroceries} /></>}</>}
         {currentModule.id === 'equilibre' && <><EquilibreTop tab={equilibreTab} onTab={setEquilibreTab} entries={allModuleEntries}
             onAxis={(axis) => { const b = allModuleEntries.find((e) => e.kind === 'booster' && String(e.data.axis) === axis); if (b) { setEquilibreTab('booster'); } else addIn('equilibre', 'booster', { axis, days: '14' }, 'Booster · ' + axis); }}
+            onQuest={(title) => void createFromTool({ module: 'equilibre', kind: 'booster', title, entry_date: today(), data: { axis: title, days: '28', progress: {} } }).then(() => setEquilibreTab('booster'))}
             booster={<div className="entries">{allModuleEntries.filter((e) => e.kind === 'booster').map((e) => <EntryCard key={e.id} entry={e} module={currentModule} onEdit={openEntry} onDelete={(x) => void remove(x)} onUpdate={updateData} />)}</div>} />
           {equilibreTab === 'journal' && <><EquilibriumInsights entries={allModuleEntries} /><BalanceReview entries={allModuleEntries} onCreate={createFromTool} /></>}
           <button className="calm-pill" onClick={() => go('calme')}>J’ai besoin de me calmer</button></>}

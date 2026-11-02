@@ -5,6 +5,7 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { isDoneOn, toggledData } from '../lib/day';
 import { addDays, affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, isoOf, MOODS } from '../lib/rituals';
 import { saveLabel, useAutosave } from '../lib/autosave';
+import { eveningQuestion } from '../lib/growth';
 import { Check22, Segmented } from '../ui/kit';
 
 type Part = 'matin' | 'soir';
@@ -45,11 +46,13 @@ function DayForm({ date, part, entry, entries, onCreate, onUpdate }: { date: str
   const [different, setDifferent] = useState(String(init('different') ?? ''));
   const [letgo, setLetgo] = useState(String(init('letgo') ?? ''));
   const [tomorrow, setTomorrow] = useState(String(init('tomorrow') ?? ''));
+  const [answer, setAnswer] = useState(String(init('answer') ?? ''));
+  const question = typeof entry?.data.question === 'string' && entry.data.question ? entry.data.question : eveningQuestion(date);
   const [touched, setTouched] = useState(false);
   const t = <A,>(f: (v: A) => void) => (v: A) => { f(v); setTouched(true); };
 
-  const draft = useMemo(() => touched ? { date, mood, intention, priorities: prios, gratitudes: grats, selfcare, win, different, letgo, tomorrow } : null,
-    [touched, date, mood, intention, prios, grats, selfcare, win, different, letgo, tomorrow]);
+  const draft = useMemo(() => touched ? { date, mood, intention, priorities: prios, gratitudes: grats, selfcare, win, different, letgo, tomorrow, ...(answer ? { question, answer } : {}) } : null,
+    [touched, date, mood, intention, prios, grats, selfcare, win, different, letgo, tomorrow, answer, question]);
   const state = useAutosave(entry, draft,
     () => onCreate({ module: 'equilibre', kind: DAILY_KIND, title: 'Mon jour · ' + date, entry_date: date, data: draft! }), onUpdate);
 
@@ -83,6 +86,9 @@ function DayForm({ date, part, entry, entries, onCreate, onUpdate }: { date: str
         <textarea className="soft-input" rows={3} value={win} placeholder="Même un petit pas compte…" onChange={(e) => t(setWin)(e.target.value)} /></section>
       <section><p className="ritual-label">Ce que je ferais autrement</p>
         <textarea className="soft-input" rows={3} value={different} placeholder="Sans jugement, juste une leçon…" onChange={(e) => t(setDifferent)(e.target.value)} /></section>
+      <section className="ritual-card question-card"><p className="ritual-label">La question du soir</p>
+        <p className="evening-q">{question}</p>
+        <textarea className="soft-input" rows={3} value={answer} placeholder="Réponds librement…" onChange={(e) => t(setAnswer)(e.target.value)} /></section>
       <section><p className="ritual-label">Ce que je dépose ce soir</p>
         <textarea className="soft-input" rows={3} value={letgo} placeholder="Je le pose ici pour ne plus y penser…" onChange={(e) => t(setLetgo)(e.target.value)} /></section>
       <HabitsOfDay date={date} entries={entries} onUpdate={onUpdate} />

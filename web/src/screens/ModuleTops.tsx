@@ -1,3 +1,4 @@
+import { QUESTS } from '../lib/boosterDays';
 import { useState, type ReactNode } from 'react';
 import { BookHeart, CalendarDays, Check, CloudSun, HandCoins, Heart, Lightbulb, MapPin, Mountain, Star, Sun, Waves, Zap, Shield, Smile, Scale, Feather } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
@@ -77,12 +78,17 @@ const AXES: { t: string; s: string; icon: typeof Heart; tone: Tone }[] = [
   { t: 'Lâcher-prise', s: 'Distinguer ce qui dépend de moi', icon: Feather, tone: 'sable' },
   { t: 'Affirmation de soi', s: 'Oser exprimer mes besoins', icon: Shield, tone: 'sauge' },
 ];
-export type EquilibreTab = 'axes' | 'booster' | 'journal';
-export function EquilibreTop({ tab, onTab, entries, onAxis, booster }: { tab: EquilibreTab; onTab: (t: EquilibreTab) => void; entries: Entry[]; onAxis: (axis: string) => void; booster: ReactNode }) {
+export type EquilibreTab = 'axes' | 'quetes' | 'booster' | 'journal';
+export function EquilibreTop({ tab, onTab, entries, onAxis, onQuest, booster }: { tab: EquilibreTab; onTab: (t: EquilibreTab) => void; entries: Entry[]; onAxis: (axis: string) => void; onQuest: (title: string) => void; booster: ReactNode }) {
   const active = entries.filter((e) => e.kind === 'booster');
   return <div className="module-top">
-    <Segmented label="Équilibre" value={tab} onChange={onTab} options={[{ value: 'axes', label: 'Axes' }, { value: 'booster', label: 'Booster' }, { value: 'journal', label: 'Journal' }]} />
-    {tab === 'booster' && (active.length ? booster : <div className="empty-soft"><Smile size={28} /><p>Choisis un axe pour lancer un programme Booster de 7, 14 ou 30 jours.</p><button className="button ghost" onClick={() => onTab('axes')}>Voir les axes</button></div>)}
+    <Segmented label="Équilibre" value={tab} onChange={onTab} options={[{ value: 'axes', label: 'Axes' }, { value: 'quetes', label: 'Quêtes' }, { value: 'booster', label: 'En cours' }, { value: 'journal', label: 'Journal' }]} />
+    {tab === 'quetes' && <><SectionTitle>Quêtes de 4 semaines</SectionTitle>
+      <p className="muted">Un thème par semaine, une pratique par jour, un bilan chaque dimanche.</p>
+      <div className="stack-8">{QUESTS.map((q) => { const on = active.some((b) => str(b, 'axis') === q.title);
+        return <article key={q.id} className="habit-lib"><div className="habit-body"><strong>{q.title.replace('Quête · ', '')}</strong><small>{q.why}</small><small className="muted">{q.weeks.map((w) => w.theme).join(' · ')}</small></div>
+          <button className="button ghost small" onClick={() => on ? onTab('booster') : onQuest(q.title)}>{on ? 'Continuer' : 'Commencer'}</button></article>; })}</div></>}
+    {tab === 'booster' && (active.length ? booster : <div className="empty-soft"><Smile size={28} /><p>Choisis un axe ou une quête pour lancer un programme.</p><button className="button ghost" onClick={() => onTab('axes')}>Voir les axes</button></div>)}
     {tab === 'axes' && <><SectionTitle>Mes axes</SectionTitle>
       <div className="rows">{AXES.map((a) => <RowLink key={a.t} icon={a.icon} tone={a.tone} title={a.t}
         sub={active.some((b) => str(b, 'axis') === a.t) ? a.s + ' · en cours' : a.s} onClick={() => onAxis(a.t)} />)}</div></>}

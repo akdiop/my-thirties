@@ -5,7 +5,7 @@ import type { GlyphName, Tint } from '../ui/Glyph';
 export const DAILY_KIND = 'daily';
 export const NOTE_KIND = 'note';
 export const HABIT_KIND = 'habit';
-export const RITUAL_KINDS = [DAILY_KIND, NOTE_KIND, HABIT_KIND];
+export const RITUAL_KINDS = [DAILY_KIND, NOTE_KIND, HABIT_KIND, 'vision', 'objectif', 'roue', 'parcours_progressif', 'meditation', 'focus', 'sommeil'];
 
 export const MOODS: { value: string; icon: GlyphName; tint: Tint }[] = [
   { value: 'Épuisée', icon: 'battery', tint: 'rose' }, { value: 'Fatiguée', icon: 'rain', tint: 'ardoise' }, { value: 'Neutre', icon: 'meh', tint: 'or' },
@@ -160,6 +160,12 @@ export const NOTE_TYPES: NoteType[] = [
   { id: 'idea', icon: 'idea', tint: 'or', label: 'Idée ou projet', hint: 'À ne pas oublier', folder: 'idees', prompt: 'Mon idée…' },
   { id: 'gratitude', icon: 'handHeart', tint: 'rose', label: 'Gratitude libre', hint: 'Ce qui me rend reconnaissante', folder: 'gratitude', prompt: 'Je suis reconnaissante pour…' },
   { id: 'anger', icon: 'flame', tint: 'terre', label: 'Note de colère', hint: 'Juste pour toi, à brûler ensuite si tu veux', folder: 'bienetre', prompt: 'Ce qui m’énerve, sans retenue…' },
+  { id: 'photo', icon: 'sun', tint: 'terre', label: 'Ma journée en photos', hint: 'Une photo, quelques mots', folder: 'journal', prompt: 'Ce que cette photo raconte de ma journée…' },
+  { id: 'vocal', icon: 'music', tint: 'lilas', label: 'Mémo vocal', hint: 'Parle plutôt qu’écrire', folder: 'journal', prompt: 'Quelques mots pour retrouver ce mémo…' },
+  { id: 'letter', icon: 'mail', tint: 'rose', label: 'Lettre à moi-même', hint: 'À la moi de dans un an', folder: 'journal', prompt: 'Chère moi de dans un an,…' },
+  { id: 'dream', icon: 'moon', tint: 'lilas', label: 'Rêve de la nuit', hint: 'Avant qu’il ne s’efface', folder: 'journal', prompt: 'Cette nuit, j’ai rêvé que…' },
+  { id: 'month', icon: 'calendar', tint: 'caramel', label: 'Bilan du mois', hint: 'Fiertés, leçons, envies', folder: 'journal', prompt: 'Ce mois-ci, je suis fière de… J’ai appris… Le mois prochain, j’ai envie de…' },
+  { id: 'proud', icon: 'trophy', tint: 'or', label: 'Fierté', hint: 'Une chose dont je suis fière', folder: 'gratitude', prompt: 'Aujourd’hui, je suis fière de moi parce que…' },
 ];
 export const noteType = (id: unknown) => NOTE_TYPES.find((t) => t.id === id) ?? NOTE_TYPES[3]!;
 

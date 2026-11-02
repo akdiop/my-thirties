@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { BookHeart, CalendarCheck, Heart, Leaf, Sparkles } from 'lucide-react';
+import { BookHeart, CalendarCheck, Compass, Flower2, Heart, Leaf, Moon, Sparkles, Timer } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, isoOf, NOTE_KIND } from '../lib/rituals';
 
-type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan';
+type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter';
 
 /** Accueil : carte « Mon jour », micro-rituels (respiration, affirmation) et raccourcis. */
 export function HomeRituals({ entries, onGo, onOpenDay, onCreate }: {
@@ -39,6 +39,10 @@ export function HomeRituals({ entries, onGo, onOpenDay, onCreate }: {
       <button className="shortcut" onClick={() => onGo('notes')}><span><BookHeart size={20} /></span><strong>Mon journal</strong><small>Notes et historique</small></button>
       <button className="shortcut" onClick={() => onGo('bienetre')}><span><Leaf size={20} /></span><strong>Bien-être</strong><small>Humeur, cycle, prière</small></button>
       <button className="shortcut" onClick={() => onGo('bilan')}><span><CalendarCheck size={20} /></span><strong>Bilan de la semaine</strong><small>Humeurs, habitudes, victoires</small></button>
+      <button className="shortcut" onClick={() => onGo('boussole')}><span><Compass size={20} /></span><strong>Ma boussole</strong><small>Vision, objectifs, roue de la vie</small></button>
+      <button className="shortcut" onClick={() => onGo('focus')}><span><Timer size={20} /></span><strong>Focus</strong><small>Une plante pousse quand tu te concentres</small></button>
+      <button className="shortcut" onClick={() => onGo('sommeil')}><span><Moon size={20} /></span><strong>Sommeil</strong><small>Routine du soir et nuits</small></button>
+      <button className="shortcut" onClick={() => onGo('mediter')}><span><Flower2 size={20} /></span><strong>Méditer</strong><small>Respirations, guidées, minuteur</small></button>
     </div>
   </>;
 }
