@@ -19,7 +19,7 @@ Un panda personnel grandit en parallèle des gestes d'attention à soi. Il accom
 - Aucune intelligence artificielle ni diagnostic nécessaire à son fonctionnement.
 
 ## Implémentation et confidentialité
-- **Web/PWA** : une entrée Supabase de type `panda-companion`, associée au module existant `equilibre`, sous le compte connecté. Les entrées du panda sont exclues des listes ordinaires et des journaux. La progression est calculée localement par le navigateur à partir des moments et, si l'option est activée, des **dates** d'autres entrées.
+- **Web/PWA** : une entrée Supabase de type `panda_companion`, associée au module existant `equilibre`, sous le compte connecté. Les entrées du panda sont exclues des listes ordinaires et des journaux. La progression est calculée localement par le navigateur à partir des moments et, si l'option est activée, des **dates** d'autres entrées.
 - **iPhone (Expo)** : préférences dans la base locale chiffrée existante (clé `panda`), sans nouvelle migration. Les dates du suivi d'humeur, du sommeil, de gratitude et du journal émotionnel ne sont consultées que lors du calcul opt-in. Le stockage existant et ses sauvegardes continuent de s'appliquer.
 - **Important** : les états du panda web et iPhone sont **distincts** pour ce MVP. Ils ne se synchronisent pas automatiquement. Une synchronisation inter-appareils demanderait un développement et une revue de confidentialité spécifiques.
 - Portraits : illustrations vectorielles dessinées dans les composants ; pas de service externe, photo personnelle ou pisteur.
