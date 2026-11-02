@@ -398,7 +398,7 @@ export default function App() {
   useEffect(() => {
     const q = new URLSearchParams(window.location.search), target = q.get('ecran');
     if (!target) return;
-    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements'].includes(target)) {
+    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'assistant'].includes(target)) {
       if (target === 'myday') setDayTarget((t) => ({ part: q.get('moment') === 'soir' ? 'soir' : 'matin', n: t.n + 1 }));
       setScreen(target as Screen);
     }
@@ -600,7 +600,7 @@ export default function App() {
       {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
       {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}
       {screen === 'calme' && <Calm onQuit={() => go('home')} onWrite={() => addIn('equilibre', 'emotion', { date: today() })} />}
-      {screen === 'assistant' && <div className="screen"><ScreenHeader title="Assistant" onBack={() => go('home')} /><PersonalBrief entries={entries} onGo={go} /><PersonalAssistant entries={entries} /></div>}
+      {screen === 'assistant' && <div className="screen"><ScreenHeader title="Assistant" onBack={() => go('home')} /><PersonalBrief entries={entries} onGo={go} /><PersonalAssistant entries={ritualEntries} onCreate={createFromTool} /></div>}
       {screen === 'settings' && <div className="screen"><Profile view="profile" onSettings={() => go('parametres')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); clearOffline(); await signOut(); setEntries([]); }} /></div>}
       {screen === 'parametres' && <div className="screen"><Profile view="settings" onSettings={() => go('settings')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); clearOffline(); await signOut(); setEntries([]); }} /></div>}
       {currentModule && <div className="screen">
