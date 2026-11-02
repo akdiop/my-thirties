@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { BookHeart, BookOpen, Cake, Gift, CalendarCheck, ChevronDown, ChevronUp, Compass, Flower2, Heart, Leaf, Moon, Pill, Settings2, Sparkles, Timer } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
+import { PandaWidget } from '../features/panda/PandaWidget';
 import { affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, isoOf, NOTE_KIND } from '../lib/rituals';
 
-type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies';
-type Shortcut = { id: Exclude<Target, 'myday'>; label: string; sub: string; icon: typeof Heart };
+type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda';
+type Shortcut = { id: Exclude<Target, 'myday' | 'panda'>; label: string; sub: string; icon: typeof Heart };
 const SHORTCUTS: Shortcut[] = [
   { id: 'habits', label: 'Habitudes', sub: 'Suivi quotidien', icon: Heart },
   { id: 'notes', label: 'Mon journal', sub: 'Notes et historique', icon: BookHeart },
@@ -61,6 +62,7 @@ export function HomeRituals({ entries, onGo, onOpenDay, onCreate, onUpdate }: {
         data: { noteId: crypto.randomUUID(), type: 'gratitude', heading: 'Affirmation', body: text, folder: 'bienetre', mood: '', updated: new Date().toISOString() } })} />
     </div>
 
+    <PandaWidget entries={entries} onOpen={() => onGo('panda')} />
     <div className="shortcut-head"><span className="ritual-label">Mes raccourcis</span><button className="link-btn small" onClick={() => setEditing(!editing)}><Settings2 size={14} /> {editing ? 'Terminé' : 'Personnaliser'}</button></div>
     {editing ? <div className="shortcut-edit">
       {order.map((id, i) => { const sc = SHORTCUTS.find((x) => x.id === id)!; const on = shown.includes(id);
