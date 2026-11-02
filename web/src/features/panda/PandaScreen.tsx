@@ -103,7 +103,7 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
           {(myBirthday || pandaBirthday) && <g><rect x="320" y="226" width="44" height="26" rx="4" fill="#F7E3C3" stroke="#6B4433" strokeWidth="3" /><path d="M342 226 v-12" stroke="#6B4433" strokeWidth="3" /><circle cx="342" cy="210" r="4" fill="#FFB86B" /></g>}
         </svg>
         <button className={'scene-panda' + (act ? ' acting' : '')} aria-label={'Caresser ' + s.name} onClick={() => react('happy', MESSAGES.pet, 'pet')}>
-          <PandaCharacter mood={mood} outfit={s.outfit} level={pr.level.n} size={170} party={myBirthday} /></button>
+          <PandaCharacter mood={mood} outfit={s.outfit} level={pr.level.n} size={210} party={myBirthday} /></button>
         {act?.mood === 'happy' && <span className="hearts" aria-hidden="true"><Heart size={18} /><Heart size={14} /><Heart size={16} /></span>}
       </div>
       <p className="panda-bubble" role="status">{message}</p>

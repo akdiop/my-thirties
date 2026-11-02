@@ -1442,7 +1442,7 @@ html.dark img,html.dark video,html.dark picture,html.dark canvas,html.dark ifram
 .panda-adopt{display:grid;place-items:center;margin:10px 0}
 .panda-scene{position:relative;height:330px;border-radius:26px;overflow:hidden;border:1px solid #efe3de;margin-top:12px}
 .scene-bg{position:absolute;inset:0;width:100%;height:100%}
-.scene-panda{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);background:none;border:0;padding:0;cursor:pointer}
+.scene-panda{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:none;border:0;padding:0;cursor:pointer}
 .panda-bubble{background:#fffcfa;border:1px solid #efe3de;border-radius:18px;padding:10px 14px;margin:12px 0;text-align:center;color:#6a4d44;position:relative}
 .panda-bubble::before{content:'';position:absolute;top:-8px;left:50%;width:14px;height:14px;background:#fffcfa;border-left:1px solid #efe3de;border-top:1px solid #efe3de;transform:translateX(-50%) rotate(45deg)}
 .panda-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
