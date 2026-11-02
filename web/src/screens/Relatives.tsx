@@ -39,6 +39,7 @@ export function Relatives({ entries, onCreate, onUpdate, onRemove }: { entries: 
 
   return <div className="screen relatives">
     <header className="tab-head"><h1>Mes proches</h1><p>{list.length ? (list[0]!.days === 0 ? 'C’est l’anniversaire de ' + list[0]!.e.title + ' aujourd’hui !' : 'Prochain : ' + list[0]!.e.title + ' dans ' + list[0]!.days + ' jour' + (list[0]!.days > 1 ? 's' : '')) : 'Anniversaires et idées de cadeaux'}</p></header>
+    <img className="screen-cover" src="/modules/proches.webp" alt="Deux tasses de café et des fleurs" loading="lazy" />
     <div className="stack-8">{list.map(({ e, days, age, date }) => {
       const isOpen = open === e.id;
       return <article key={e.id} className={'relative-card' + (days <= 7 ? ' soon' : '')}>
