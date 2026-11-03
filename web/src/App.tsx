@@ -8,6 +8,7 @@ import {
 import { cloud, configured, sendCreate, sendEdit, sendRemove, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
 import { downloadBackup, makeEncryptedBackup, parseEncryptedBackup } from './lib/backup';
 import { ensureMonthlyBackup, parsePlainBackup } from './lib/autoBackup';
+import { LIST_TEMPLATES, templateItems } from './lib/listTemplates';
 import { moduleById, modules, type Module } from './modules';
 import { newOnly, validateRestore } from './lib/restore';
 import { useThemeClock, useThemeMode, NIGHT_FROM, NIGHT_TO, type ThemeMode } from './lib/theme';
@@ -716,6 +717,9 @@ export default function App() {
           {passionTab === 'series' && <SeriesTracker entries={allModuleEntries} onUpdate={updateData} onCreate={createFromTool} onAdd={() => addIn('passions', 'series', { status: 'À voir', seasons: '1', episodes: '10' })} />}
           {passionTab === 'libre' && <PassionPath entries={allModuleEntries} onUpdate={updateData} />}
         </>}
+        {currentModule.id === 'listes' && <section className="list-templates"><p className="eyebrow-s">Modèles</p>
+          {LIST_TEMPLATES.map((t) => <button key={t.id} className="row-plain template-row" onClick={() => void createGroceries(t.title, templateItems(t))}>
+            <span><strong>{t.title}</strong><small className="muted">{t.hint} · {templateItems(t).length} articles</small></span><Plus size={18} /></button>)}</section>}
         {(currentModule.id !== 'spiritualite' || spiritTab === 'journal') && currentModule.id !== 'challenges' && !(currentModule.id === 'passions' && passionTab !== 'libre') && entryList}
       </div>}
     </main>

@@ -32,7 +32,12 @@ export function Duas({ entries, onCreate, onUpdate }: { entries: Entry[]; onCrea
   const streak = (() => { let n = 0; for (let i = 0; i < 365; i++) { const d = isoOf(new Date(Date.now() - i * 86_400_000)); if ((routine[d]?.length ?? 0) >= DHIKR_ROUTINE.length) n++; else if (i > 0) break; } return n; })();
 
   return <section className="duas">
-    <div className="chip-row">{(['Routine', 'Apprendre', 'Carnet', 'Favoris', ...DUA_CATEGORIES] as const).map((c) => <button key={c} className={'chip' + (cat === c ? ' on' : '')} onClick={() => { setCat(c); setStudying(null); }}>{c === 'Routine' ? 'Routine du jour' : c === 'Carnet' ? 'Carnet de foi' : c === 'Favoris' ? '♥ Favoris' : c === 'Apprendre' ? 'Apprendre par cœur' + (dueCount(learn, today) ? ' (' + dueCount(learn, today) + ')' : '') : c}</button>)}</div>
+    {/* Quatre modes en haut ; les catégories d'invocations défilent sur une seule ligne. */}
+    <div className="duas-modes" role="tablist">{([['Routine', 'Routine'], ['Invocations', 'Invocations'], ['Apprendre', 'Par cœur' + (dueCount(learn, today) ? ' · ' + dueCount(learn, today) : '')], ['Carnet', 'Carnet']] as const).map(([k, label]) => {
+      const on = k === 'Invocations' ? !['Routine', 'Apprendre', 'Carnet'].includes(cat) : cat === k;
+      return <button key={k} role="tab" aria-selected={on} className={'duas-mode' + (on ? ' on' : '')} onClick={() => { setCat(k === 'Invocations' ? (favs.length ? 'Favoris' : 'Pause dhikr') : k); setStudying(null); }}>{label}</button>; })}</div>
+    {!['Routine', 'Apprendre', 'Carnet'].includes(cat) && <div className="chip-scroll">{(['Favoris', ...DUA_CATEGORIES] as const).map((c) =>
+      <button key={c} className={'chip' + (cat === c ? ' on' : '')} onClick={() => setCat(c)}>{c === 'Favoris' ? '♥ Favoris' : c}</button>)}</div>}
 
     {cat === 'Apprendre' && (studying ? <Study key={studying} dua={DUAS.find((d) => d.id === studying)!} state={learn[studying]} today={today}
         onDone={(next) => { void save({ learn: { ...learn, [studying]: next } }); setStudying(null); }} onClose={() => setStudying(null)} />
@@ -40,6 +45,7 @@ export function Duas({ entries, onCreate, onUpdate }: { entries: Entry[]; onCrea
 
     {cat === 'Routine' && <div className="soft-card dhikr-routine">
       <div className="routine-head"><strong>Dhikr du jour</strong><small className="muted">{doneToday.size} / {DHIKR_ROUTINE.length}{streak > 1 ? ' · ' + streak + ' jours complets' : ''}</small></div>
+      <div className="routine-bar"><span style={{ width: Math.round(doneToday.size / DHIKR_ROUTINE.length * 100) + '%' }} /></div>
       {DHIKR_ROUTINE.map((d) => { const on = doneToday.has(d.id), c = counts[d.id] ?? 0;
         return <div key={d.id} className={'routine-row' + (on ? ' done' : '')}>
           <button className="habit-check" aria-pressed={on} aria-label={(on ? 'Décocher ' : 'Fait : ') + d.phonetic} onClick={() => toggleDone(d.id)}>{on ? <Check size={18} strokeWidth={3} /> : null}</button>

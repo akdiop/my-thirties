@@ -1655,3 +1655,29 @@ html.dark img,html.dark video,html.dark picture,html.dark canvas,html.dark ifram
 .quick-preview b{color:#3A2A24;text-transform:none}
 .backup-list{display:flex;flex-direction:column}.backup-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1e6e1}.backup-row:last-child{border-bottom:0}
 .quick-preview:not(.ok){display:block}
+/* Accueil : Daily Reset compact une fois fait */
+.reset-mini{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#F6EDE8;border:0;border-radius:18px;padding:12px 14px;color:inherit;font:inherit;margin-bottom:18px}
+.reset-icon.small{width:34px;height:34px;flex-shrink:0}
+.reset-mini-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.reset-mini-text strong{font-size:.95rem}
+.reset-mini-text small{color:#806A5F;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reset-mini-go{color:#8c6257;font-weight:600;font-size:.85rem;white-space:nowrap}
+/* Micro-rituels plus compacts */
+.ritual-mini .affirm{font-size:.98rem;line-height:1.4;font-style:normal}
+/* Invocations : modes + catégories sur une ligne */
+.duas-modes{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:#efe6e1;border-radius:14px;padding:4px;margin-bottom:10px}
+.duas-mode{border:0;background:none;border-radius:10px;padding:9px 4px;font:inherit;font-size:.85rem;font-weight:600;color:#806A5F;white-space:nowrap}
+.duas-mode.on{background:#fffcfa;color:#3A2A24;box-shadow:0 1px 3px #0001}
+.chip-scroll{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin:0 -16px 4px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+.chip-scroll::-webkit-scrollbar{display:none}
+.chip-scroll .chip{flex-shrink:0}
+/* Routine : coches et compteurs plus fins */
+.dhikr-routine .habit-check{width:30px;height:30px;font-size:1rem;border-width:2px}
+.dhikr-routine .routine-row.done .habit-check{background:#6F8A80;border-color:#6F8A80}
+.routine-row{padding:10px 0}
+.routine-text strong{font-size:.98rem}
+.routine-bar{height:6px;border-radius:999px;background:#efe6e1;overflow:hidden;margin:2px 0 6px}
+.routine-bar span{display:block;height:100%;background:#6F8A80;border-radius:999px;transition:width .3s}
+/* iPhone : le contenu ne passe plus sous l'heure et la batterie */
+body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:#FAF7F3;z-index:60;pointer-events:none}
+.list-templates{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}.template-row{display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;padding:12px 14px;border-radius:16px;background:#fffcfa;border:1px solid #efe3de;color:inherit;font:inherit}.template-row span{display:flex;flex-direction:column;gap:2px}.template-row small{font-size:.8rem}

@@ -47,13 +47,19 @@ export function HomeRituals({ entries, onGo, onOpenDay, onCreate, onUpdate }: {
   const part = evening && morningDone ? 'soir' : 'matin';
 
   return <>
-    <section className="reset-card">
+    {(part === 'soir' ? eveningDone : morningDone)
+      // Une fois fait : une ligne discrète au lieu de la grande carte.
+      ? <button className="reset-mini" onClick={() => onOpenDay(part)}>
+          <span className="reset-icon small"><Sparkles size={16} /></span>
+          <span className="reset-mini-text"><strong>{part === 'soir' ? 'Débriefing fait' : 'Intention du jour'}</strong>
+            <small>{part === 'soir' ? 'Repose-toi bien.' : typeof day?.data.intention === 'string' && day.data.intention.trim() ? '« ' + day.data.intention.trim().slice(0, 70) + ' »' : 'Posée ce matin.'}</small></span>
+          <span className="reset-mini-go">Revoir ›</span></button>
+      : <section className="reset-card">
       <span className="reset-icon"><Sparkles size={22} /></span>
       <h2 className="serif">{part === 'soir' ? 'Mon débriefing du soir' : 'Mon Daily Reset'}</h2>
-      <p>{part === 'soir' ? (eveningDone ? 'Fait ce soir. Repose-toi bien.' : 'Ta victoire, ce que tu déposes, ton intention pour demain.')
-        : morningDone ? 'Intention posée. Tu peux la relire à tout moment.' : '3 minutes pour t’aligner avec ta journée'}</p>
-      <button className="button reset-btn" onClick={() => onOpenDay(part)}>{(part === 'soir' ? eveningDone : morningDone) ? 'Revoir' : 'Commencer'} →</button>
-    </section>
+      <p>{part === 'soir' ? 'Ta victoire, ce que tu déposes, ton intention pour demain.' : '3 minutes pour t’aligner avec ta journée'}</p>
+      <button className="button reset-btn" onClick={() => onOpenDay(part)}>Commencer →</button>
+    </section>}
 
     <p className="eyebrow-s">Micro-rituels</p>
     <div className="ritual-grid">
