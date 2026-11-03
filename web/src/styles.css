@@ -1759,3 +1759,9 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area
 .icon-btn.tiny{width:24px;height:24px;min-height:24px;padding:0}
 .lang-ar{font-family:'Amiri','Scheherazade New','Geeza Pro','Noto Naskh Arabic',serif;font-size:1.25em;line-height:1.9;font-weight:400}
 .phrase strong.lang-ar{display:block;text-align:right}
+/* Coach du soir */
+.relances{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.coach-list{margin:4px 0 8px;padding-left:20px;display:flex;flex-direction:column;gap:10px}
+.coach-list li{line-height:1.45}
+.coach-actions{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:4px}
+.coach-follow{display:flex;flex-direction:column;gap:8px;border-top:1px solid #f2e6e0;padding-top:10px}

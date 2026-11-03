@@ -33,6 +33,7 @@ import { removeLock } from './lib/journalLock';
 import { applyOutbox, flushOutbox, pendingCount } from './lib/outbox';
 import { clearOffline, isNetworkError, knownOwner, loadOffline, rememberOwner, saveOffline } from './lib/offline';
 import { Sparkles } from 'lucide-react';
+import { useIntegrationCloudSync } from './lib/integrations';
 
 // Écrans chargés à la demande : l'app s'ouvre plus vite.
 const Agenda = lazy(() => import('./screens/Agenda').then((m) => ({ default: m.Agenda })));
@@ -491,12 +492,13 @@ export default function App() {
   }, []);
 
   const [offline, setOffline] = useState<string | null>(null);
+  const [synced, setSynced] = useState(false);
   const refresh = useCallback(async () => {
     setLoading(true); setError('');
     try {
       // Retour du réseau : on envoie d'abord ce qui a été écrit hors connexion.
       if (pendingCount()) await flushOutbox({ create: sendCreate, edit: sendEdit, remove: sendRemove });
-      const all = await readEntries(); saveOffline(all); setEntries(applyOutbox(all)); setOffline(null);
+      const all = await readEntries(); saveOffline(all); setEntries(applyOutbox(all)); setOffline(null); setSynced(true);
     }
     catch (e) {
       const copy = isNetworkError(e) ? loadOffline() : null;
@@ -617,6 +619,7 @@ export default function App() {
   // Raccourci « Ajouter une dépense » : ouvre directement le formulaire une fois connectée.
   useEffect(() => { if (pendingExpense && owner) { setPendingExpense(false); setScreen('finances'); setEditor({ module: moduleById('finances'), preset: { kind: 'expense', data: { date: today() } } }); } }, [pendingExpense, owner]);
   if (!configured) return <main className="auth-layout"><section className="auth-card"><h1>Configuration nécessaire</h1><p>Configure un projet Supabase dédié et les variables VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans Vercel. Aucune donnée personnelle n'est chargée.</p></section></main>;
+  useIntegrationCloudSync(allEntries, synced, createFromTool, updateData);
   if (!authReady) return <div className="loading">Chargement sécurisé…</div>;
   if (!session) return <Login onSignedIn={() => {}} />;
   if (owner === null) return <div className="loading">Vérification de l'accès…</div>;
