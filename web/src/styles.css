@@ -1798,3 +1798,16 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area
 .folder-idea span:last-child{display:flex;flex-direction:column}
 .folder-idea small{color:#8c7468;font-size:.78rem}
 .folder-more summary{cursor:pointer;color:#8c6257;font-weight:600;margin-bottom:8px}
+/* Minuteur des défis */
+.timer-card{background:#fffcfa;border:1px solid #efe3de;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;margin:10px 0;--ring:#c38380}
+.timer-card.running.rest{--ring:#6F8A80}
+.timer-ring{width:190px;height:190px;border-radius:50%;margin:4px auto;display:grid;place-items:center;background:#efe3de}
+.timer-ring>div{width:160px;height:160px;border-radius:50%;background:#fffcfa;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-ring strong{font-size:3rem;font-variant-numeric:tabular-nums;color:#5a3f36;line-height:1}
+.timer-ring span{color:#8c7468;font-size:.85rem;margin-top:4px}
+.timer-label{text-align:center;font-weight:700;color:#5a3f36;margin:0}
+.timer-actions{display:flex;justify-content:center;align-items:center;gap:10px}
+.timer-interval{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}
+.timer-interval input{width:100%}
+.timer-free summary{cursor:pointer;color:#8c6257;font-weight:600}
+.timer-done{text-align:center;font-size:1.1rem;color:#4f6a60}
