@@ -1,0 +1,371 @@
+/**
+ * « Mes cours » (Spiritualité) : fiches tirées des cours Almadrassa d'Aïda, reformulées et structurées
+ * sans changer le fond. Le texte arabe du Coran et des invocations est donné tel quel.
+ */
+export type LessonPart = {
+  title: string;
+  arabic?: string;
+  french?: string;
+  points?: string[];
+  avoid?: string[];
+  duas?: { arabic: string; french: string; note?: string }[];
+};
+export type Lesson = { id: string; title: string; sub: string; intro: string; parts: LessonPart[]; retain?: string[]; quiz?: { q: string; a: boolean }[] };
+
+export const LESSONS: Lesson[] = [
+  { id: 'tafsir-fatiha', title: 'Tafsir d’Al-Fâtiha', sub: 'l’Ouverture · amour, espoir, crainte, guidée',
+    intro: 'Al-Fâtiha fait connaître le Seigneur : Son unicité dans la Seigneurie et l’adoration, Ses noms, Ses attributs et Ses actes, et le chemin qui mène à Lui (L’adorer seul, comme Il aime, en demandant Son aide). Le bonheur passe par le droit chemin, qu’on ne suit que si Allah le veut. Elle décrit aussi les deux voies qui s’en écartent : celle qui attire la colère (intention et œuvres corrompues) et celle de l’égarement (science et croyance altérées). La réciter en méditant chaque verset fait grandir la foi et attendrit le cœur.',
+    parts: [
+      { title: 'Vocabulaire', points: [
+        'Al-hamd : décrire Celui qui est loué pour Sa perfection, avec amour et vénération.',
+        'Rabb : Celui à qui appartiennent la création, la royauté et la gestion de toute chose.',
+        'Al-‘âlamîn : tout ce qui existe en dehors d’Allah.',
+        'Ar-Rahmân : Celui dont la miséricorde est immense.',
+        'Ar-Rahîm : Celui qui fait parvenir Sa miséricorde à qui Il veut parmi Ses serviteurs.',
+        'Yawm ad-dîn : le Jour de la résurrection ; ad-dîn, c’est la rétribution.',
+        'As-sirât al-mustaqîm : le chemin sans aucune déviation.',
+        'Al-maghdûbi ‘alayhim : les juifs et tous ceux qui savent sans mettre en pratique.',
+        'Ad-dâllîn : les chrétiens et tous ceux qui agissent sans science.',
+      ] },
+      { title: 'Verset 1 · La Basmala', arabic: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ', french: 'Au nom d’Allah, le Tout Miséricordieux, le Très Miséricordieux.', points: [
+        'Dire la Basmala, c’est demander l’aide d’Allah, le seul qui puisse réellement aider.',
+        'On s’appuie sur tous Ses noms, pas seulement sur le nom « Allah ».',
+        'Ar-Rahmân : Celui dont la miséricorde immense englobe toute chose et toute créature.',
+        'Ar-Rahîm : Celui qui fait parvenir Sa miséricorde aux croyants.',
+        'Plus on connaît Allah, plus la foi grandit. Ibn al-Qayyim : celui qui connaît Allah par Ses noms, Ses attributs et Ses actes L’aimera forcément.',
+                '« Au nom » est au singulier mais englobe tous les plus beaux noms. « Allah » : Celui qui est adoré et mérite seul de l’être, car Il possède tous les attributs parfaits.',
+        'Sa miséricorde embrasse tout, mais Il l’a réservée dans sa totalité aux pieux qui suivent les prophètes ; les autres n’en reçoivent qu’une part.',
+      ] },
+      { title: 'Verset 2 · La louange', arabic: 'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ', french: 'Louange à Allah, Seigneur de l’univers.', points: [
+        'Ce verset ouvre la porte de l’amour d’Allah.',
+        'L’adoration repose sur trois piliers : l’amour, l’espoir et la crainte.',
+        'On loue Allah pour cinq raisons :',
+        '1. Il est seul dans la Seigneurie : seul Roi, seul à pourvoir, à faire vivre et à faire mourir.',
+        '2. Il est seul dans la Divinité : seul digne d’être adoré.',
+        '3. Il possède les plus beaux noms et les attributs les plus parfaits.',
+        '4. Il a fait descendre le Coran, ses ordres et ses interdits, utiles ici-bas et dans l’au-delà.',
+        '5. Il détient le destin et tous les bienfaits qu’Il nous a accordés.',
+        'En récitant, penser à au moins une de ces cinq raisons : c’est ce qui attendrit le cœur et augmente l’amour, la foi et la certitude.',
+        'La louange s’adresse à Ses attributs parfaits et à Ses actes, tous bienfaisance et justice : Il mérite l’éloge le plus complet.',
+        '« Seigneur de l’univers » : Celui qui prend soin de tout ce qui existe en le créant, en lui donnant ce dont il a besoin et en le comblant de bienfaits sans lesquels rien ne survivrait. Il est seul à créer, à gérer et à se suffire ; tout dépend de Lui.',
+      ] },
+      { title: 'Verset 3 · L’espoir', arabic: 'الرَّحْمَنِ الرَّحِيمِ', french: 'Le Tout Miséricordieux, le Très Miséricordieux.', points: [
+        'Ce verset porte l’espoir.',
+        'Allah n’aime pas que le musulman désespère de Sa miséricorde : c’est interdit. « Et ne désespérez pas de la miséricorde d’Allah. »',
+        'Le croyant espère entrer au Paradis et que ses péchés soient pardonnés, et il aime son Seigneur.',
+        'En résumé : le verset 2 porte l’amour, le verset 3 porte l’espoir.',
+      ] },
+      { title: 'Verset 4 · La crainte', arabic: 'مَالِكِ يَوْمِ الدِّينِ', french: 'Maître du Jour de la rétribution.', points: [
+        'Ce verset porte le troisième pilier : la crainte du Jour où chacun sera jugé et rétribué selon ce qu’il a avancé.',
+        '« Et craignez le jour où vous serez ramenés vers Allah. »',
+        'Face à une désobéissance : se rappeler ce Jour où l’on sera jugé et rétribué.',
+        '« Maître » : la royauté est l’un de Ses attributs ; elle se voit dans Ses ordres, Ses interdits, Sa récompense, Son châtiment et la façon dont Il gère ce qui Lui appartient.',
+        'Il est Maître de tous les jours, mais ce Jour-là Sa royauté, Sa justice et Sa sagesse apparaîtront pleinement : les rois seront détrônés, rois et peuples égaux, tous humbles, espérant Sa récompense et craignant Son châtiment.',
+        'Cette vie, avec ses épreuves, est éphémère. Le Jour venu, chacun espérera une balance lourde, le Paradis et la plus grande récompense : voir le visage d’Allah.',
+        'Les vraies questions : qu’ai-je avancé pour mon au-delà ? Est-ce que j’unifie Allah en toute circonstance ? Est-ce que je suis la Sunna avec la compréhension des pieux prédécesseurs ? Est-ce que je m’efforce de faire le bien ?',
+      ], duas: [
+        { arabic: 'وَجِيءَ يَوْمَئِذٍ بِجَهَنَّمَ ۚ يَوْمَئِذٍ يَتَذَكَّرُ الْإِنسَانُ وَأَنَّىٰ لَهُ الذِّكْرَىٰ ۝ يَقُولُ يَا لَيْتَنِي قَدَّمْتُ لِحَيَاتِي ۝ فَيَوْمَئِذٍ لَّا يُعَذِّبُ عَذَابَهُ أَحَدٌ ۝ وَلَا يُوثِقُ وَثَاقَهُ أَحَدٌ ۝ يَا أَيَّتُهَا النَّفْسُ الْمُطْمَئِنَّةُ ۝ ارْجِعِي إِلَىٰ رَبِّكِ رَاضِيَةً مَّرْضِيَّةً ۝ فَادْخُلِي فِي عِبَادِي ۝ وَادْخُلِي جَنَّتِي',
+          french: 'Ce jour-là, on amènera l’Enfer ; l’homme se souviendra, mais à quoi bon ? Il dira : « Hélas ! Si seulement j’avais œuvré pour ma vraie vie ! » Ce jour-là, nul ne châtiera comme Lui et nul ne liera comme Lui. « Ô toi, âme apaisée, retourne vers ton Seigneur, satisfaite et agréée ; entre parmi Mes serviteurs, et entre dans Mon Paradis. »',
+          note: 'Al-Fajr, 89:23-30' },
+        { arabic: 'وَالْعَصْرِ ۝ إِنَّ الْإِنسَانَ لَفِي خُسْرٍ ۝ إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ',
+          french: 'Par le Temps ! L’homme est certes en perdition, sauf ceux qui croient, accomplissent les bonnes œuvres, s’enjoignent la vérité et s’enjoignent l’endurance.',
+          note: 'Al-‘Asr · Allah jure par le Temps pour en montrer l’importance (nous, nous ne jurons que par Allah). Tout homme est perdant, sauf : la foi, qui grandit avec la science ; les bonnes œuvres, qui mettent cette science en pratique ; l’appel à la vérité (islam, Sunna, Coran) ; et la patience dans la science, la pratique et l’appel.' },
+      ] },
+      { title: 'Verset 5 · Adorer et demander l’aide', arabic: 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ', french: 'C’est Toi seul que nous adorons, et Toi seul dont nous implorons le secours.', points: [
+        '« Toi seul nous adorons » : on voue à Allah seul l’amour, l’espoir et la crainte, et l’on se désavoue de toute association, grande ou petite.',
+        '« Toi seul nous demandons l’aide » : pour accomplir le bien, pour Lui obéir et dans toutes nos affaires, de ce monde comme de l’au-delà. Il est le seul en qui placer sa confiance.',
+        'Définition de l’adoration (Ibn Taymiyya) : un nom qui englobe tout ce qu’Allah aime et agrée, en paroles et en actes, apparents comme intérieurs.',
+        'Une œuvre aimée d’Allah est : sincère, vouée à Lui seul ; conforme à la Sunna du Prophète ﷺ ; libre de toute innovation.',
+        'Demander l’aide (al-isti‘âna) : s’en remettre à Allah pour obtenir ce qui est bon et être préservée de ce qui nuit, avec certitude.',
+        'Ces deux choses ensemble mènent au bonheur éternel et protègent de tout mal : il n’y a pas de réussite sans elles.',
+        'L’aide vient après l’adoration car elle en fait partie : sans l’aide d’Allah, on ne peut ni obéir ni délaisser l’interdit.',
+        'Nous avons sans cesse besoin de Son aide pour L’adorer sans associé et suivre la Sunna.',
+      ] },
+      { title: 'Verset 6 · La guidée', arabic: 'اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ', french: 'Guide-nous sur le droit chemin.', points: [
+        'Montre-nous le droit chemin, conduis-nous vers lui et fais-nous y rester : le chemin clair qui mène à Allah et à Son Paradis, connaître la vérité et la mettre en pratique.',
+        'Être guidée vers le chemin : embrasser l’islam et délaisser toute autre religion.',
+        'Être guidée sur le chemin : être guidée dans tous les détails de la science et des œuvres.',
+        'C’est l’une des invocations les plus complètes et les plus utiles : d’où l’obligation de la dire à chaque unité de prière.',
+      ] },
+      { title: 'Verset 7 · Les deux voies à éviter', arabic: 'صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ', french: 'Le chemin de ceux que Tu as comblés de bienfaits, non de ceux qui ont encouru la colère, ni des égarés.', points: [
+        'Ceux qui ont été comblés : les prophètes, les véridiques, les martyrs et les pieux.',
+        'Ceux qui ont encouru la colère : ceux qui ont connu la vérité puis l’ont délaissée, comme les juifs et leurs semblables.',
+        'Les égarés : ceux qui ont délaissé la vérité par ignorance, comme les chrétiens et leurs semblables.',
+      ] },
+    ],
+    retain: [
+      'Les trois catégories de tawhîd y sont : la Seigneurie (« Seigneur de l’univers »), l’adoration (« Allah », « Toi seul nous adorons… ») et les noms et attributs (« la louange »), que l’on affirme sans les renier, les déformer ni les comparer.',
+      'Elle confirme la prophétie : « Guide-nous » n’a de sens qu’avec la révélation.',
+      'Elle confirme la rétribution des œuvres, en toute justice : ad-dîn, c’est la juste rétribution.',
+      'Elle répond à toute innovation et tout égarement : le droit chemin, c’est connaître la vérité puis l’appliquer.',
+    ],
+    quiz: [
+      { q: 'Le droit chemin consiste à savoir puis à mettre en pratique.', a: true },
+      { q: 'Le Seigneur est Celui qui prend soin de l’être humain seulement.', a: false },
+      { q: 'Le serviteur peut adorer Allah sans Son aide.', a: false },
+      { q: 'La miséricorde d’Allah est de deux sortes.', a: true },
+      { q: 'Les juifs ont connu la vérité et l’ont mise en pratique.', a: false },
+      { q: 'Les égarés sont ceux qui agissent sans science.', a: true },
+      { q: 'La louange se fait avec amour et vénération.', a: true },
+      { q: 'Cette sourate ne parle pas des noms et des attributs.', a: false },
+      { q: 'Allah est Maître du Jour de la rétribution seulement.', a: false },
+      { q: 'Le droit chemin est celui des insouciants et des ignorants.', a: false },
+    ] },
+
+  { id: 'tafsir-ikhlas', title: 'Tafsir d’Al-Ikhlâs', sub: 'le monothéisme pur · sourate 112',
+    intro: 'Sourate mecquoise consacrée aux attributs d’Allah : l’Unique, le Parfait, Celui vers qui toutes les créatures se tournent, sans égal ni semblable. Elle réfute la trinité, l’idolâtrie et ceux qui Lui attribuent un enfant.',
+    parts: [
+      { title: 'Pourquoi elle est descendue', points: [
+        'Les associateurs ont demandé au Prophète ﷺ : « Décris-nous ton Seigneur. » Allah a alors révélé cette sourate (hadith jugé bon par al-Albânî, Sahîh at-Tirmidhî 2680).',
+      ] },
+      { title: 'Vocabulaire', points: [
+        'As-Samad : Celui vers qui l’on se tourne pour toutes ses demandes.',
+        'Kufuwan : un égal, un semblable, un équivalent.',
+      ] },
+      { title: 'Verset 1', arabic: 'قُلْ هُوَ اللَّهُ أَحَدٌ', french: 'Dis : Il est Allah, l’Unique.', points: [
+        '« Dis » : avec fermeté, en y croyant et en comprenant ce que l’on dit.',
+        'L’unicité appartient à Allah seul : Il est unique dans Sa perfection, avec les plus beaux noms et les attributs les plus parfaits, sans égal ni semblable.',
+      ] },
+      { title: 'Verset 2', arabic: 'اللَّهُ الصَّمَدُ', french: 'Allah, Celui vers qui l’on se tourne pour tout.', points: [
+        'Toute créature, sur terre comme dans les cieux, dépend entièrement de Lui et Lui demande ce dont elle a besoin.',
+        'On se tourne vers Lui parce que chacun de Ses attributs atteint la perfection : Son savoir, Son indulgence, Sa miséricorde qui embrasse toute chose.',
+      ] },
+      { title: 'Verset 3', arabic: 'لَمْ يَلِدْ وَلَمْ يُولَدْ', french: 'Il n’a jamais engendré et n’a pas été engendré.', points: ['Cela fait partie de Sa perfection.'] },
+      { title: 'Verset 4', arabic: 'وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ', french: 'Et nul n’est égal à Lui.', points: ['Ni dans Ses noms, ni dans Ses attributs, ni dans Ses actes.'] },
+    ],
+    retain: [
+      'La sourate contient l’unicité des noms et des attributs : on affirme ce qu’Allah et Son Prophète ﷺ ont affirmé, on nie ce qu’ils ont nié, sans chercher le « comment », sans comparer, sans déformer ni renier.',
+      'Elle répond à tous ceux qui ont attribué un enfant à Allah ; Il en est bien au-dessus.',
+      'Allah mérite tous les attributs parfaits et Il est exempt de toute imperfection.',
+    ] },
+
+  { id: 'tafsir-falaq', title: 'Tafsir d’Al-Falaq', sub: 'l’aube naissante · sourate 113',
+    intro: 'Sourate mecquoise. Elle apprend à se réfugier auprès d’Allah, dans Sa grandeur et Sa souveraineté, contre le mal des créatures, de la nuit qui tombe (quand elle isole et que les malfaisants se répandent), des sorciers et des envieux. C’est l’une des deux sourates par lesquelles le Prophète ﷺ se protégeait.',
+    parts: [
+      { title: 'Vocabulaire', points: ['Al-falaq : l’aube.', 'Ghâsiq : la nuit (on a dit aussi : la lune).', 'An-naffâthât : les sorcières.'] },
+      { title: 'Verset 1', arabic: 'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ', french: 'Dis : je cherche protection auprès du Seigneur de l’aube naissante.', points: ['Je me réfugie et je demande secours auprès de Celui qui fait sortir la plante de la graine et du noyau, et l’aube de la nuit.'] },
+      { title: 'Verset 2', arabic: 'مِن شَرِّ مَا خَلَقَ', french: 'Contre le mal de ce qu’Il a créé.', points: ['Tout ce qu’Allah a créé : humains, djinns, animaux. On demande protection à leur Créateur contre le mal qui est en eux.'] },
+      { title: 'Verset 3', arabic: 'وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ', french: 'Et contre le mal de la nuit quand elle s’obscurcit.', points: ['Après le général, le particulier : la nuit couvre les gens et beaucoup de malfaisants et de bêtes nuisibles se répandent.'] },
+      { title: 'Verset 4', arabic: 'وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ', french: 'Et contre le mal de celles qui soufflent sur les nœuds.', points: ['Les sorcières, qui crachotent sur des nœuds de fil pour accomplir leur sorcellerie.'] },
+      { title: 'Verset 5', arabic: 'وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ', french: 'Et contre le mal de l’envieux quand il envie.', points: [
+        'L’envieux souhaite voir disparaître le bienfait de l’autre et s’y emploie par tous les moyens : on demande à Allah de nous protéger de son mal et de déjouer ses ruses.',
+        'Le mauvais œil en fait partie : il ne vient que d’un envieux au cœur mauvais.',
+      ] },
+    ],
+    retain: [
+      'Il faut chercher refuge auprès d’Allah contre tous les maux, en général comme en détail.',
+      'La sorcellerie est une réalité : on craint son mal et l’on demande la protection d’Allah contre elle et ceux qui la pratiquent.',
+      'L’envie (hasad) est l’un des pires défauts, le plus destructeur : la sourate se termine d’ailleurs par la protection contre les envieux.',
+    ] },
+
+  { id: 'tafsir-nas', title: 'Tafsir d’An-Nâs', sub: 'les gens · sourate 114',
+    intro: 'Sourate mecquoise, la seconde des deux sourates protectrices. On y demande secours au Seigneur des mondes contre le pire ennemi, Iblîs, et ses alliés parmi les diables des djinns et des hommes, qui égarent par leurs murmures.',
+    parts: [
+      { title: 'Vocabulaire', points: [
+        'Rabb an-nâs : Celui qui prend soin des gens par Ses bienfaits.',
+        'Malik an-nâs : leur Souverain, Celui qui les gouverne.',
+        'Ilâh an-nâs : Celui qu’ils adorent.',
+        'Al-waswâs : le diable.',
+        'Al-khannâs : celui qui recule dès que le serviteur évoque son Seigneur.',
+        'Yuwaswis : celui qui souffle de mauvaises pensées dans les poitrines.',
+      ] },
+      { title: 'La sourate', arabic: 'قُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝ مَلِكِ النَّاسِ ۝ إِلَٰهِ النَّاسِ ۝ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۝ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۝ مِنَ الْجِنَّةِ وَالنَّاسِ',
+        french: 'Dis : je cherche protection auprès du Seigneur des gens, le Roi des gens, le Dieu des gens, contre le mal du tentateur qui se dérobe, qui souffle le mal dans les poitrines des gens, qu’il soit djinn ou humain.' },
+      { title: 'Le sens', points: [
+        'On se protège auprès du Seigneur, du Roi et du Dieu des hommes contre le diable, source et essence de tout mal.',
+        'Son travail : murmurer dans les cœurs pour embellir le mal, le présenter sous un beau jour, y pousser et éloigner du bien, toujours par la tromperie.',
+        'Il insiste sans cesse, puis recule quand le serviteur se souvient de son Seigneur et Lui demande de le repousser.',
+        'On se réfugie dans Sa Seigneurie, qui englobe toute la création (le toupet de chaque être est dans Sa main), et dans Sa divinité : on a été créé pour L’adorer, ce qui demande de repousser l’ennemi qui veut nous en détourner et faire de nous ses compagnons du Feu.',
+        'Les murmures viennent des djinns comme des hommes.',
+      ] },
+    ],
+    retain: [
+      'Trois attributs du Seigneur : la Seigneurie, la Royauté et la Divinité.',
+      'Allah ordonne de chercher refuge auprès de Celui qui réunit ces trois attributs.',
+      'Il faut se protéger auprès d’Allah contre tous les diables, djinns et humains.',
+    ] },
+
+  { id: 'kursi', title: 'Ayat al-Kursî', sub: 'le plus immense verset du Coran · 2:255',
+    intro: 'Verset 255 d’Al-Baqara, sourate médinoise. Le plus immense et le plus noble verset du Coran : il réunit cinq noms d’Allah et plus de vingt de Ses attributs, et aucun autre verset ne concentre autant de tawhîd.',
+    parts: [
+      { title: 'Le verset', arabic: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ',
+        french: 'Allah ! Point de divinité digne d’adoration à part Lui, le Vivant, Celui qui subsiste par Lui-même. Ni somnolence ni sommeil ne Le saisissent. À Lui appartient ce qui est dans les cieux et sur la terre. Qui peut intercéder auprès de Lui sans Sa permission ? Il sait ce qui est devant eux et derrière eux, et ils n’embrassent de Sa science que ce qu’Il veut. Son Kursî s’étend sur les cieux et la terre, dont la garde ne Lui coûte aucune peine. Il est le Très-Haut, l’Immense.' },
+      { title: 'Ses mérites', points: [
+        'Le plus immense verset du Coran, d’après le hadith d’Ubayy ibn Ka‘b.',
+        'Il protège de Satan quand on le récite après les prières obligatoires, le matin, le soir et avant de dormir.',
+        'Le réciter régulièrement est une cause d’entrée au Paradis.',
+      ] },
+      { title: 'Les cinq noms', points: [
+        'Allah : le nom propre, qui englobe tous les autres.',
+        'Al-Hayy, le Vivant : une vie parfaite, sans début ni fin, sans fatigue ni faiblesse.',
+        'Al-Qayyûm : Il subsiste par Lui-même et fait subsister toute chose. Aucune créature ne peut l’être, toutes dépendent de Lui.',
+        'Al-‘Aliyy, le Très-Haut : élevé par Son essence, Sa domination et Ses attributs.',
+        'Al-‘Azîm, l’Immense : la grandeur absolue sous tous ses aspects.',
+        'Beaucoup de savants disent que le Nom suprême (al-ism al-a‘zam) se trouve dans « al-Hayy al-Qayyûm » : l’un dit la perfection de l’être, l’autre la souveraineté et la bienfaisance.',
+      ] },
+      { title: 'Ce que le verset affirme', points: [
+        'L’unicité : Allah est la seule divinité digne d’adoration.',
+        'Aucune imperfection : ni somnolence ni sommeil, signe de la perfection de Sa vie.',
+        'La royauté absolue : tout ce qui est dans les cieux et sur la terre Lui appartient et Lui revient.',
+        'L’intercession n’existe qu’avec Sa permission, ce qui réfute toute intercession non conforme.',
+        'Sa science englobe le passé, le présent et l’avenir ; personne n’en reçoit que ce qu’Il veut. On ne cherche donc pas le « comment » de Ses attributs : ce serait parler d’Allah sans science.',
+        'Sa volonté l’emporte sur toute autre : rien n’arrive sans elle.',
+        'L’immensité du Kursî, qui dépasse les cieux et la terre.',
+        'Sa puissance : garder toute la création ne Le fatigue pas, preuve de Sa force, de Sa sagesse et de Sa miséricorde.',
+        'Son élévation, de deux sortes : celle de Son être, au-dessus de toute chose (Coran, Sunna, consensus des Salaf, raison et nature saine), et celle de Ses attributs, tous parfaits.',
+      ] },
+      { title: 'Vocabulaire', points: [
+        'Ilâh : une divinité · al-Hayy : le Vivant · al-Qayyûm : Celui qui subsiste par Lui-même et fait tout subsister.',
+        'Ta’khudhuhu : Le saisit (akhadha, ya’khudhu) · sina : la somnolence · nawm : le sommeil.',
+        'As-samâwât : les cieux · al-ard : la terre.',
+        'Yashfa‘u : intercède (shafa‘a) · ‘indahu : auprès de Lui · bi-idhnihi : par Sa permission (bi- + idhn + hu).',
+        'Ya‘lamu : Il sait (‘alima) · ‘ilm : une science · aydîhim : ce qui est devant eux (aydî, les mains) · khalfahum : derrière eux.',
+        'Yuhîtûna : ils embrassent, ils cernent (ahâta) · shay’ : une chose.',
+        'Shâ’a : Il a voulu · kursiyy : le Kursî, le marchepied.',
+        'Ya’ûduhu : Le fatigue, Lui pèse (âda) · hifz : la garde, la préservation.',
+        'Al-‘Aliyy : le Très-Haut · al-‘Azîm : l’Immense.',
+      ] },
+    ] },
+
+  { id: 'priere', title: 'La prière pas à pas', sub: '24 étapes · gestes, paroles, erreurs à éviter',
+    intro: 'La prière du Prophète ﷺ, du wudû’ jusqu’au salut final. Pilier : la prière n’est pas valide sans lui. Sunna : recommandé, la prière reste valide si on l’oublie.',
+    parts: [
+      { title: '1 · Les ablutions', points: ['Faire le wudû’ correctement avant de prier.'] },
+      { title: '2 · La Qibla', points: ['Se tourner vers la Qibla.'] },
+      { title: '3 · Debout, le cœur présent', points: ['Se tenir debout en étant pleinement présente à ce que l’on fait.'] },
+      { title: '4 · La sutra', points: ['Sunna : prier devant une séparation (un mur, un pilier, un objet).'] },
+      { title: '5 · L’intention', points: ['Elle se fait dans le cœur. On ne la prononce pas à voix haute.'] },
+      { title: '6 · La posture debout', points: ['Pieds naturellement écartés, ni trop ni collés.'], avoid: ['Écarter les pieds exagérément.', 'Coller les pieds l’un contre l’autre.'] },
+      { title: '7 · Le takbîr d’ouverture', points: ['Pilier : dire « Allâhu akbar » pour entrer en prière.'] },
+      { title: '8 · Lever les mains', points: [
+        'Sunna : lever les mains à hauteur des épaules ou des oreilles.',
+        'Trois façons possibles : lever puis dire le takbîr, dire le takbîr puis lever, ou les faire ensemble.',
+      ], avoid: ['Lever les mains seulement à hauteur du ventre.', 'Mettre les pouces dans les oreilles.'] },
+      { title: '9 · Le regard', points: ['Regarder l’endroit de la prosternation.'], avoid: ['Tourner la tête à droite ou à gauche.', 'Baisser la tête jusqu’à coller le menton à la poitrine, ou la pencher.', 'Lever les yeux vers le ciel.'] },
+      { title: '10 · Les mains', points: [
+        'Trois descriptions : main droite posée sur la main gauche ; paume droite sur le dos de la main gauche, le poignet et l’avant-bras ; ou la main droite qui saisit l’avant-bras gauche.',
+        'Certaines écoles prient les bras le long du corps : il n’y a pas de mal, c’est un avis défendable.',
+      ], avoid: ['Placer les mains sur le cœur, décalées vers la gauche.', 'Poser une main ou les deux mains sur les hanches (le « takhassur », interdit).'] },
+      { title: '11 · L’invocation d’ouverture', points: ['Sunna, plusieurs formules : une seule suffit, on peut les alterner d’une prière à l’autre.'], duas: [
+        { arabic: 'سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ اسْمُكَ، وَتَعَالَى جَدُّكَ، وَلَا إِلَهَ غَيْرُكَ', french: 'Gloire et louange à Toi, ô Allah. Béni soit Ton nom, élevée soit Ta majesté ; il n’y a de divinité digne d’adoration que Toi.' },
+        { arabic: 'اللَّهُمَّ بَاعِدْ بَيْنِي وَبَيْنَ خَطَايَايَ كَمَا بَاعَدْتَ بَيْنَ الْمَشْرِقِ وَالْمَغْرِبِ، اللَّهُمَّ نَقِّنِي مِنْ خَطَايَايَ كَمَا يُنَقَّى الثَّوْبُ الْأَبْيَضُ مِنَ الدَّنَسِ، اللَّهُمَّ اغْسِلْنِي مِنْ خَطَايَايَ بِالثَّلْجِ وَالْمَاءِ وَالْبَرَدِ', french: 'Ô Allah, éloigne-moi de mes péchés comme Tu as éloigné l’Orient de l’Occident. Ô Allah, purifie-moi de mes péchés comme on nettoie le vêtement blanc de la saleté. Ô Allah, lave-moi de mes péchés par la neige, l’eau et la grêle.' },
+        { arabic: 'وَجَّهْتُ وَجْهِيَ لِلَّذِي فَطَرَ السَّمَاوَاتِ وَالْأَرْضَ حَنِيفًا وَمَا أَنَا مِنَ الْمُشْرِكِينَ، إِنَّ صَلَاتِي وَنُسُكِي وَمَحْيَايَ وَمَمَاتِي لِلَّهِ رَبِّ الْعَالَمِينَ، لَا شَرِيكَ لَهُ وَبِذَلِكَ أُمِرْتُ وَأَنَا مِنَ الْمُسْلِمِينَ', french: 'Je tourne mon visage vers Celui qui a créé les cieux et la terre, en monothéiste sincère, et je ne suis pas des associateurs. Ma prière, mes actes d’adoration, ma vie et ma mort appartiennent à Allah, Seigneur de l’univers, sans associé. Voilà ce qui m’a été ordonné, et je suis de ceux qui se soumettent.' },
+      ] },
+      { title: '12 · Chercher refuge contre Satan', points: ['Sunna, seulement dans la première unité. Si on l’oublie, la prière reste valide.'], duas: [
+        { arabic: 'أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ', french: 'Je cherche refuge auprès d’Allah contre Satan le maudit.' },
+        { arabic: 'أَعُوذُ بِاللَّهِ السَّمِيعِ الْعَلِيمِ مِنَ الشَّيْطَانِ الرَّجِيمِ', french: 'Je cherche refuge auprès d’Allah, l’Audient, l’Omniscient, contre Satan le maudit.' },
+      ] },
+      { title: '13 · La Basmala', arabic: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ', french: 'Au nom d’Allah, le Tout Miséricordieux, le Très Miséricordieux.', points: ['Sunna, dite à voix basse, même dans les prières récitées à voix haute.'] },
+      { title: '14 · Al-Fâtiha', arabic: 'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ۝ الرَّحْمَنِ الرَّحِيمِ ۝ مَالِكِ يَوْمِ الدِّينِ ۝ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ۝ اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ ۝ صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ',
+        french: 'Louange à Allah, Seigneur de l’univers, le Tout Miséricordieux, le Très Miséricordieux, Maître du Jour de la rétribution. C’est Toi seul que nous adorons et Toi seul dont nous implorons le secours. Guide-nous sur le droit chemin, le chemin de ceux que Tu as comblés de bienfaits, non de ceux qui ont encouru la colère, ni des égarés.', points: [
+          'La lire posément, en marquant un arrêt à la fin de chaque verset, comme le Prophète ﷺ.',
+          '« Âmîn » (« Ô Allah, exauce ») est une Sunna, ne fait pas partie de la sourate, et se dit à voix haute dans les prières à voix haute.',
+        ] },
+      { title: '15 · Une sourate', points: ['Réciter une sourate ou quelques versets (Basmala à voix basse si c’est le début d’une sourate), puis marquer un court silence pour reprendre son souffle.'] },
+      { title: '16 · L’inclinaison (rukû‘)', points: [
+        'Pilier. Commencer par « Allâhu akbar » en levant les mains.',
+        'Les mains atteignent les genoux, doigts écartés ; le dos droit au même niveau que la tête, le regard vers l’endroit de la prosternation, les bras écartés du corps et légèrement fléchis.',
+      ], duas: [
+        { arabic: 'سُبْحَانَ رَبِّيَ الْعَظِيمِ', french: 'Gloire à mon Seigneur, l’Immense.' },
+        { arabic: 'سُبْحَانَ رَبِّيَ الْعَظِيمِ وَبِحَمْدِهِ', french: 'Gloire et louange à mon Seigneur, l’Immense.' },
+      ], avoid: ['S’arrêter à mi-cuisses : ce n’est pas une vraie inclinaison.', 'Plier les genoux.', 'Baisser la tête plus bas que le dos.'] },
+      { title: '17 · Se relever', arabic: 'سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ', french: 'Allah entend celui qui Le loue.', points: [
+        'Pilier. La plupart des savants laissent ensuite les bras le long du corps.',
+        'Selon une parole connue de l’imam Ahmad, on peut aussi replacer les mains sur la poitrine comme en position debout.',
+      ] },
+      { title: '18 · La prosternation (sujûd)', points: [
+        'Le Prophète ﷺ a dit avoir reçu l’ordre de se prosterner sur sept os (al-Bukhârî et Muslim) : le front avec le nez, les deux mains, les deux genoux et le bout des deux pieds.',
+        'Deux avis pour descendre : les mains d’abord, ou les genoux d’abord.',
+        'Mains posées à hauteur des épaules ou à hauteur de la tête. Puis invoquer librement.',
+      ], duas: [{ arabic: 'سُبْحَانَ رَبِّيَ الْأَعْلَى', french: 'Gloire à mon Seigneur, le Très-Haut.', note: '3 fois' }],
+        avoid: ['Avancer les mains trop loin devant.', 'Poser les mains au niveau des genoux.', 'Coucher les avant-bras au sol (interdit par le Prophète ﷺ).', 'S’appuyer sur le bout des doigts.', 'Poser le dos des mains.'] },
+      { title: '19 · L’assise entre les deux prosternations', points: [
+        'Se relever en disant « Allâhu akbar » et s’asseoir posément, chaque articulation reprenant sa place.',
+        'S’asseoir sur le pied gauche, pied droit dressé.',
+        'Cette invocation est rapportée deux fois ; obligatoire pour certains savants, Sunna pour d’autres.',
+      ], duas: [{ arabic: 'رَبِّ اغْفِرْ لِي، رَبِّ اغْفِرْ لِي', french: 'Seigneur, pardonne-moi. Seigneur, pardonne-moi.' }],
+        avoid: ['Se précipiter dans cette assise : c’est un vrai danger pour la prière.', 'S’asseoir sur les talons (point de divergence).'] },
+      { title: '20 · La deuxième prosternation', arabic: 'سُبْحَانَ رَبِّيَ الْأَعْلَى', french: 'Gloire à mon Seigneur, le Très-Haut (3 fois).' },
+      { title: '21 · Le tashahhud', points: [
+        'Mains posées sur les cuisses, ou qui saisissent les genoux (le coude alors au bout de la cuisse).',
+        'Index droit pointé en le regardant : soit trois doigts repliés avec le pouce par-dessus, soit auriculaire et annulaire repliés et un cercle entre le pouce et le majeur.',
+        'Pieds comme entre les deux prosternations. Réciter at-tahiyyât, puis se lever.',
+      ] },
+      { title: '22 · Se relever pour la 3e unité', points: ['Deux manières : lever les mains en disant « Allâhu akbar » encore assise, puis se lever ; ou se lever en disant « Allâhu akbar », puis lever les mains.'] },
+      { title: '23 · Le dernier tashahhud (prières de 3 ou 4 unités)', points: [
+        'C’est le tawarruk, avec plusieurs descriptions rapportées :',
+        'Pied et tibia gauches glissés sous le tibia droit, pied droit dressé vers la Qibla.',
+        'Les deux pieds sortis d’un côté, le droit posé sur l’intérieur du gauche.',
+        'Une troisième position de la jambe droite existe, discutée par les savants.',
+      ], avoid: ['L’iq‘â’ (« posture du diable », interdite) : tibias relevés et mains posées au sol.', 'S’asseoir par terre jambes écartées.', 'Allonger les deux pieds et s’asseoir dessus.'] },
+      { title: '24 · Le salut final', arabic: 'السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ', french: 'Que la paix soit sur vous, ainsi que la miséricorde d’Allah.', points: ['Regarder l’endroit de la prosternation, puis tourner la tête à droite, puis à gauche, en le disant à chaque fois.'] },
+    ] },
+
+  { id: 'roqya', title: 'La roqya', sub: 'se soigner par le Coran et les invocations',
+    intro: 'Maladie et guérison viennent d’Allah. La roqya est un moyen de guérison légiféré : on peut la faire sur soi, sur ses proches, et même sur un non-musulman.',
+    parts: [
+      { title: 'Maladie et guérison viennent d’Allah', arabic: 'وَإِذَا مَرِضْتُ فَهُوَ يَشْفِينِ', french: 'Et quand je suis malade, c’est Lui qui me guérit.', points: [
+        'Ash-Shu‘arâ’, 26:80 · Ibrâhîm attribue la maladie à lui-même et la guérison à Allah : c’est la bonne attitude envers Allah, tout en sachant que les deux relèvent de Son décret.',
+        '« Pas de contagion ni de mauvais présage » (al-Bukhârî et Muslim) : la contagion n’agit que par la volonté d’Allah, et le Prophète ﷺ a tout de même demandé de ne pas mettre un malade au contact d’une personne saine.',
+        '« Allah n’a pas fait descendre de maladie sans faire descendre son remède » (al-Bukhârî), sauf la vieillesse. Certains le connaissent, d’autres l’ignorent.',
+      ] },
+      { title: 'La bonne nouvelle pour le malade', points: [
+        '« Les endurants recevront leur pleine récompense sans compter » (Az-Zumar, 39:10).',
+        'Quand le serviteur tombe malade ou voyage, Allah lui inscrit ce qu’il faisait en bonne santé (al-Bukhârî). D’où l’importance d’adorer Allah tant qu’on est jeune et forte.',
+        'L’affaire du croyant est étonnante : tout est bien pour lui. S’il reçoit un bien, il remercie ; s’il subit un mal, il patiente (Muslim).',
+        'Même l’épine qui le pique expie ses péchés (al-Bukhârî et Muslim).',
+        'Les plus éprouvés sont les prophètes, puis les pieux, puis ceux qui leur ressemblent : l’épreuve est à la mesure de la foi.',
+        'Ne pas insulter la fièvre : elle ôte les fautes des enfants d’Adam comme le soufflet ôte les impuretés du fer (Muslim).',
+        'Le malade qui loue Allah devant ses visiteurs : Allah lui remplace sa chair et son sang par meilleurs, et il ressort de ses péchés comme au jour de sa naissance.',
+        'Se soigner est permis : le Prophète ﷺ l’a dit et l’a fait.',
+      ] },
+      { title: 'La talbîna contre la tristesse', points: [
+        '« La talbîna apaise le cœur du malade et enlève une part de la tristesse » (al-Bukhârî et Muslim).',
+        'C’est une bouillie de farine d’orge, avec du lait et du miel. Utile aussi après un deuil ou une perte.',
+      ] },
+      { title: 'La roqya est permise', points: [
+        'Les savants sont unanimes : la roqya par les versets et les invocations est permise (ash-Shawkânî).',
+        '« Que celui qui peut être utile à son frère le soit » (Muslim) : faire la roqya à quelqu’un est récompensé, et on peut la demander.',
+        '« Il n’y a pas de mal dans la roqya tant qu’elle ne contient pas d’association » (Muslim).',
+        'Le mieux est de la faire sur soi-même : malade, le Prophète ﷺ récitait sur lui-même les sourates protectrices et soufflait ; quand la douleur s’intensifiait, ‘Âïsha récitait sur lui et passait la main du Prophète ﷺ sur son corps, en espérant sa bénédiction (al-Bukhârî et Muslim).',
+      ] },
+      { title: 'Les trois conditions', points: [
+        '1. Qu’elle vienne du Coran ou de la Sunna.',
+        '2. Qu’elle soit en langue arabe, ou dans ce qui se rattache à cette langue.',
+        '3. Être convaincue que la roqya n’est qu’un moyen : elle n’agit que par la permission d’Allah. Le cœur reste attaché à Lui.',
+      ], avoid: [
+        'Les talismans, les paroles incompréhensibles, les marmonnements de devin : à fuir comme le feu.',
+        'Aller voir un sorcier ou un devin : c’est renier ce qui a été révélé au Prophète ﷺ, et la prière n’est pas acceptée pendant quarante jours (Muslim).',
+      ] },
+      { title: 'Al-Fâtiha, une roqya', points: [
+        'Des Compagnons en voyage se voient refuser l’hospitalité. Le chef de la tribu est mordu par un serpent ; l’un d’eux récite seulement Al-Fâtiha sur lui et il se relève comme si de rien n’était. Le Prophète ﷺ approuve : « Qu’est-ce qui t’a appris que c’est une roqya ? » (al-Bukhârî).',
+        'Ibn al-Qayyim, malade à La Mekke sans médecin ni remède, se soignait avec Al-Fâtiha, en la récitant sur de l’eau de Zamzam qu’il buvait.',
+        'L’eau de Zamzam est une nourriture et une guérison.',
+        'À réciter souvent sur soi, son conjoint, ses enfants, tout malade.',
+      ] },
+      { title: 'Comment faire', points: [
+        'Le Prophète ﷺ soufflait dans ses mains, y récitait Al-Ikhlâs, Al-Falaq et An-Nâs trois fois, puis les passait sur le devant de son corps. Il faisait de même sur al-Hasan et al-Husayn.',
+        'On peut aussi réciter sur de l’eau, y souffler légèrement et la boire.',
+        'Poser la main droite sur l’endroit douloureux en invoquant : c’est réconfortant pour le malade et recommandé (Ibn Battâl, an-Nawawî).',
+        'Rappeler au malade que l’on n’est qu’un moyen : c’est Allah qui guérit.',
+        'Il est permis de recevoir une rémunération raisonnable, sans exploiter la détresse du malade ni tromper.',
+      ] },
+      { title: 'Les invocations de guérison', duas: [
+        { arabic: 'اللَّهُمَّ رَبَّ النَّاسِ، مُذْهِبَ الْبَأْسِ، اشْفِ أَنْتَ الشَّافِي، لَا شَافِيَ إِلَّا أَنْتَ، شِفَاءً لَا يُغَادِرُ سَقَمًا', french: 'Ô Allah, Seigneur des hommes, Toi qui enlèves le mal, guéris ! Tu es Celui qui guérit, il n’y a de guérisseur que Toi, d’une guérison qui ne laisse aucune maladie.', note: 'La roqya du Prophète ﷺ récitée par Anas · al-Bukhârî' },
+        { arabic: 'أَذْهِبِ الْبَأْسَ رَبَّ النَّاسِ، اشْفِ وَأَنْتَ الشَّافِي، لَا شِفَاءَ إِلَّا شِفَاؤُكَ، شِفَاءً لَا يُغَادِرُ سَقَمًا', french: 'Enlève le mal, Seigneur des hommes, guéris, Tu es Celui qui guérit ; il n’y a de guérison que la Tienne, une guérison qui ne laisse aucune maladie.', note: 'En passant la main droite sur le malade · al-Bukhârî et Muslim' },
+        { arabic: 'بِسْمِ اللَّهِ، تُرْبَةُ أَرْضِنَا، بِرِيقَةِ بَعْضِنَا، يُشْفَى سَقِيمُنَا، بِإِذْنِ رَبِّنَا', french: 'Au nom d’Allah, la terre de notre sol, avec un peu de notre salive, notre malade est guéri, par la permission de notre Seigneur.', note: 'Un peu de salive sur l’index posé sur la terre · al-Bukhârî et Muslim' },
+        { arabic: 'بِسْمِ اللَّهِ (٣) أَعُوذُ بِاللَّهِ وَقُدْرَتِهِ مِنْ شَرِّ مَا أَجِدُ وَأُحَاذِرُ (٧)', french: 'Au nom d’Allah (3 fois). Je cherche protection auprès d’Allah et de Sa puissance contre le mal que je ressens et que je redoute (7 fois).', note: 'Main posée sur l’endroit douloureux · conseil donné à ‘Uthmân ibn Abî al-‘Âs' },
+        { arabic: 'أَسْأَلُ اللَّهَ الْعَظِيمَ رَبَّ الْعَرْشِ الْعَظِيمِ أَنْ يَشْفِيَكَ', french: 'Je demande à Allah l’Immense, Seigneur du Trône immense, de te guérir.', note: '7 fois, en visitant un malade dont le terme n’est pas arrivé · jugé bon par al-Albânî' },
+        { arabic: 'بِسْمِ اللَّهِ أَرْقِيكَ، مِنْ كُلِّ شَيْءٍ يُؤْذِيكَ، مِنْ شَرِّ كُلِّ نَفْسٍ أَوْ عَيْنِ حَاسِدٍ، اللَّهُ يَشْفِيكَ، بِسْمِ اللَّهِ أَرْقِيكَ', french: 'Au nom d’Allah je te fais la roqya, contre tout ce qui te nuit, contre le mal de toute âme ou de l’œil d’un envieux. Qu’Allah te guérisse. Au nom d’Allah je te fais la roqya.', note: 'La roqya de Jibrîl sur le Prophète ﷺ · Muslim' },
+      ] },
+      { title: 'Les limites', points: [
+        'Celui qui fait la roqya ne touche pas une femme qui ne lui est pas permise, ni directement ni à travers un tissu : son travail est de réciter et de souffler, contrairement au médecin (Comité permanent, Ibn ‘Uthaymîn).',
+        'Pour une sœur, une épouse ou une fille malade, le mieux est de réciter soi-même Al-Fâtiha et ce qui est facile du Coran.',
+      ] },
+      { title: 'Ne pas délaisser le Coran', arabic: 'وَنُنَزِّلُ مِنَ الْقُرْآنِ مَا هُوَ شِفَاءٌ وَرَحْمَةٌ لِّلْمُؤْمِنِينَ', french: 'Nous faisons descendre du Coran ce qui est guérison et miséricorde pour les croyants.', points: [
+        'Al-Isrâ’, 17:82 · « Dis : pour ceux qui croient, il est guide et guérison » (Fussilat, 41:44). Guérison des corps et des cœurs, des maux visibles et invisibles.',
+        'Ibn al-Qayyim compte parmi les façons de délaisser le Coran le fait de ne pas s’en servir comme remède (Al-Furqân, 25:30).',
+        'Aller chez le médecin et prendre ses médicaments est un moyen voulu par Allah : on le fait, sans jamais délaisser le Coran. On consulte, puis on récite sur soi, abondamment.',
+      ] },
+    ] },
+];

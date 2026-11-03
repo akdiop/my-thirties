@@ -1730,3 +1730,16 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area
 .list-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px}
 .list-tools .link-btn{display:inline-flex;align-items:center;gap:4px}
 .list-tools-end{margin-left:auto;display:flex;gap:2px}
+/* Mes cours (Spiritualité) */
+.lesson-title{display:block;font-size:1.35rem;margin-bottom:4px}
+.lesson .soft-card p.muted{margin:0;line-height:1.55}
+.lesson-dua{display:flex;flex-direction:column;gap:6px;padding:10px 12px;background:#f8f1ec;border-radius:14px}
+.lesson-avoid{background:#f6ece6;border-radius:14px;padding:10px 12px}
+.lesson-avoid strong{color:#8c6257;font-size:.88rem}
+.lesson-avoid ul{margin:6px 0 0;padding-left:18px}
+.lesson-avoid li{margin:3px 0;line-height:1.45}
+.quiz-row{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-bottom:1px solid #f2e6e0}
+.quiz-row:last-of-type{border-bottom:0}
+.quiz-btns{display:flex;gap:6px;align-items:center}
+.quiz-row.ok .quiz-btns svg{color:#6F8A80}
+.quiz-row.ko .quiz-btns svg{color:#b5715f}
