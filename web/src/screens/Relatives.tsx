@@ -9,9 +9,9 @@ type EditFull = (id: string, patch: { title: string; data: Record<string, unknow
 export const RELATIVE_KIND = 'proche';
 const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
 const SHORT = ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
-const FAMILY = new Set(['Famille', 'Maman', 'Papa', 'Sœur', 'Frère', 'Cousine', 'Cousin', 'Tante', 'Oncle', 'Filleul·e']);
+const FAMILY = new Set(['Famille', 'Maman', 'Papa', 'Sœur', 'Frère', 'Fille', 'Fils', 'Nièce', 'Neveu', 'Cousine', 'Cousin', 'Tante', 'Oncle', 'Grand-mère', 'Grand-père', 'Petite-fille', 'Petit-fils', 'Belle-sœur', 'Beau-frère', 'Belle-mère', 'Beau-père', 'Mari', 'Filleul·e']);
 const toneOf = (rel: unknown) => FAMILY.has(String(rel)) ? 'fam' : rel === 'Amie' || rel === 'Ami' ? 'ami' : 'autre';
-const RELATIONS = ['Famille', 'Amie', 'Ami', 'Maman', 'Papa', 'Sœur', 'Frère', 'Cousine', 'Cousin', 'Tante', 'Oncle', 'Collègue', 'Filleul·e', 'Autre'];
+const RELATIONS = ['Famille', 'Amie', 'Ami', 'Maman', 'Papa', 'Sœur', 'Frère', 'Fille', 'Fils', 'Nièce', 'Neveu', 'Cousine', 'Cousin', 'Tante', 'Oncle', 'Grand-mère', 'Grand-père', 'Petite-fille', 'Petit-fils', 'Belle-sœur', 'Beau-frère', 'Belle-mère', 'Beau-père', 'Mari', 'Filleul·e', 'Collègue', 'Autre'];
 
 /** Jours avant le prochain anniversaire (0 = aujourd'hui) et âge atteint ce jour-là si l'année est connue. */
 export function nextBirthday(day: string, year: number, todayIso: string) {
