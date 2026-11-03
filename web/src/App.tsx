@@ -25,6 +25,7 @@ import { GuidedField } from './ui/fields';
 import { HIDDEN_KIND, HiddenProvider, readHidden, useHidden, type Hidden } from './lib/hidden';
 import { HABIT_KIND, RITUAL_KINDS } from './lib/rituals';
 import { TodayCard } from './features/TodayCard';
+import { ListCard } from './features/ListCard';
 import { togglePrayer } from './lib/wellbeing';
 import { HomeRituals } from './screens/HomeRituals';
 import { LockGate } from './features/LockGate';
@@ -282,6 +283,7 @@ function EntryCard({ entry, module, onEdit, onDelete, onUpdate }: {
   entry: Entry; module: Module; onEdit: (e: Entry) => void; onDelete: (e: Entry) => void;
   onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>;
 }) {
+  if (module.id === 'listes' && entry.kind === 'list') return <ListCard entry={entry} onUpdate={onUpdate} onEdit={onEdit} onDelete={onDelete} />;
   const kind = module.kinds.find((k) => k.id === entry.kind);
   const detail = kind?.fields.filter((f) => f.type !== 'textarea' && f.id !== 'date').slice(0, 3)
     .map((f) => value(entry.data, f.id)).filter(Boolean).join(' · ');
