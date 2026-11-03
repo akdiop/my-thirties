@@ -366,21 +366,28 @@ function RetroAi({ label, facts }: { label: string; facts: string }) {
 }
 
 /* ---------- 5. Coach ---------- */
-type Theme = 'point' | 'objectif' | 'roue' | 'semaine';
+type Theme = 'point' | 'objectif' | 'roue' | 'semaine' | 'love';
 const THEMES: { id: Theme; label: string; ask: string }[] = [
   { id: 'point', label: 'Faire le point', ask: 'Tu es une coach de vie bienveillante et très concrète. Voici ma vision, mes objectifs et ma roue de la vie. Dis-moi en 3 pistes ce qui avance bien, ce qui mérite mon attention, et la prochaine petite action la plus utile.' },
   { id: 'objectif', label: 'Débloquer un objectif', ask: 'Tu es une coach bienveillante et très concrète. Voici un de mes objectifs et où j’en suis. Propose 3 pistes pour avancer : ce qui bloque sans doute, comment contourner l’obstacle, et la toute prochaine action de 15 minutes.' },
   { id: 'roue', label: 'Mes domaines les plus bas', ask: 'Tu es une coach bienveillante et très concrète. Voici ma roue de la vie de ce mois (notes sur 10). Propose 3 petites actions faciles pour remonter mes domaines les plus bas, sans tout bouleverser.' },
+  { id: 'love', label: 'Coach love', ask: 'Tu es une coach amoureuse bienveillante, douce et franche, respectueuse de ma foi musulmane et de mes valeurs. Voici ma situation ou ma question. Aide-moi à y voir clair : 3 pistes concrètes (comment je me sens, ce dont j’ai besoin, ce que je peux faire ou dire), sans juger personne et sans me pousser à aller contre mes valeurs.' },
   { id: 'semaine', label: 'Aligner ma semaine', ask: 'Tu es une coach bienveillante et très concrète. Voici ma vision et mes objectifs. Propose 3 actions précises pour cette semaine qui me rapprochent de la femme que je veux devenir.' },
 ];
 const cut = (v: unknown, n: number) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, n);
 
 /** Faits envoyés au coach, uniquement ceux utiles au thème choisi. */
-export function compassFacts(theme: Theme, entries: Entry[], values: string[], goal?: Entry): string {
+export function compassFacts(theme: Theme, entries: Entry[], values: string[], goal?: Entry, situation = ''): string {
   const vision = entries.find((e) => e.kind === VISION_KIND)?.data ?? {};
   const goals = entries.filter((e) => e.kind === GOAL_KIND && goalProgress(e) < 1).slice(0, 6);
   const wheel = wheelScores(entries.filter((e) => e.kind === WHEEL_KIND).sort((a, b) => String(b.entry_date).localeCompare(String(a.entry_date)))[0]);
   const lines: string[] = [];
+  if (theme === 'love') {
+    if (values.length) lines.push('Mes valeurs : ' + values.join(', '));
+    if (wheel.Amour !== undefined) lines.push('Ma note « Amour » ce mois-ci : ' + wheel.Amour + '/10');
+    if (situation.trim()) lines.push('Ma situation : ' + cut(situation, 600));
+    return lines.join('\n');
+  }
   if (theme !== 'objectif' && theme !== 'roue') {
     if (values.length) lines.push('Mes valeurs : ' + values.join(', '));
     if (vision.words) lines.push('Mes 3 mots : ' + cut(vision.words, 80));
@@ -409,9 +416,10 @@ function CompassCoach({ entries, profileEntry, onCreate, onUpdate }: { entries: 
   const [coach, setCoach] = useState<Coach | null>(null);
   const [addedStep, setAddedStep] = useState<Set<string>>(new Set());
   const values = readProfile(profileEntry).values;
-  const facts = compassFacts(theme, entries, values, goal);
+  const [situation, setSituation] = useState('');
+  const facts = compassFacts(theme, entries, values, goal, situation);
   const t = THEMES.find((x) => x.id === theme)!;
-  const ready = theme === 'objectif' ? Boolean(goal) : facts.length > 0;
+  const ready = theme === 'objectif' ? Boolean(goal) : theme === 'love' ? situation.trim().length > 5 : facts.length > 0;
   const addStep = async (text: string) => {
     if (!goal) return;
     await onUpdate(goal, { ...goal.data, steps: [...goalSteps(goal), { id: crypto.randomUUID(), text: text.slice(0, 160), done: false }] });
@@ -423,9 +431,10 @@ function CompassCoach({ entries, profileEntry, onCreate, onUpdate }: { entries: 
     {theme === 'objectif' && (goals.length
       ? <label>Quel objectif ?<select value={goalId} onChange={(e) => { setGoalId(e.target.value); setCoach(null); }}>{goals.map((g) => <option key={g.id} value={g.id}>{g.title}</option>)}</select></label>
       : <p className="muted small">Crée d’abord un objectif dans l’onglet Objectifs.</p>)}
-    <CoachCard key={theme + goalId} title={'Mon coach · ' + t.label.toLowerCase()} coach={coach} onCoach={setCoach} ready={ready}
+    {theme === 'love' && <label>Ta situation ou ta question<textarea rows={4} maxLength={600} value={situation} placeholder="Célibataire, en couple, mariée, une rencontre, un doute, une dispute… raconte librement." onChange={(e) => { setSituation(e.target.value); setCoach(null); }} /></label>}
+    <CoachCard key={theme + goalId} title={theme === 'love' ? 'Mon coach love' : 'Mon coach · ' + t.label.toLowerCase()} coach={coach} onCoach={setCoach} ready={ready}
       intro="Seules les informations utiles à ce sujet sont envoyées à l’assistant, et seulement quand tu appuies."
-      startLabel={ready ? 'Demander des pistes' : theme === 'roue' ? 'Remplis d’abord ta roue' : 'Remplis d’abord ta vision ou un objectif'}
+      startLabel={ready ? 'Demander des pistes' : theme === 'love' ? 'Écris d’abord ta situation' : theme === 'roue' ? 'Remplis d’abord ta roue' : 'Remplis d’abord ta vision ou un objectif'}
       prompt={() => coachMessage(t.ask, facts)}
       actions={(p) => <>
         {theme === 'objectif' && goal && <button className="link-btn small" disabled={addedStep.has(p)} onClick={() => void addStep(p)}>{addedStep.has(p) ? <><Check size={14} /> Étape ajoutée</> : <><Plus size={14} /> Ajouter comme étape</>}</button>}

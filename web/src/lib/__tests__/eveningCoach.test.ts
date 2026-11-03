@@ -39,3 +39,13 @@ describe('coach de la boussole', () => {
     expect(f).toContain('Santé 4');
   });
 });
+
+describe('coach love', () => {
+  it('n’envoie que les valeurs, la note Amour et la situation écrite', () => {
+    const all = [entry('vision', 'Ma vision', { year1: 'secret' }), entry('roue', 'Roue', { scores: { Amour: 6 } }, '2026-11-01')];
+    const f = compassFacts('love', all, ['Foi'], undefined, 'Je me demande si je dois le rappeler');
+    expect(f).toContain('Ma note « Amour » ce mois-ci : 6/10');
+    expect(f).toContain('Ma situation : Je me demande');
+    expect(f).not.toContain('secret');
+  });
+});
