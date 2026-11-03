@@ -39,6 +39,7 @@ const CuisineTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ defa
 const EquilibreTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ default: m.EquilibreTop })));
 const SpiritTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ default: m.SpiritTop })));
 const TravelTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ default: m.TravelTop })));
+const Qibla = lazy(() => import('./features/Qibla').then((m) => ({ default: m.Qibla })));
 const PersonalProfile = lazy(() => import('./features/PersonalProfile').then((m) => ({ default: m.PersonalProfile })));
 const BoosterPlan = lazy(() => import('./features/BoosterPlan').then((m) => ({ default: m.BoosterPlan })));
 const RecipeView = lazy(() => import('./features/RecipeView').then((m) => ({ default: m.RecipeView })));
@@ -445,6 +446,7 @@ export default function App() {
       setScreen(target as Screen);
     }
     if (target === 'depense') setPendingExpense(true);
+    if (target === 'spiritualite') setScreen('spiritualite' as Screen);
     window.history.replaceState(null, '', window.location.pathname);
   }, []);
   const photoEntries = useMemo(() => allEntries.filter((e) => e.kind === PHOTO_KIND), [allEntries]);
@@ -682,6 +684,7 @@ export default function App() {
           <button className="calm-pill" onClick={() => go('calme')}>J’ai besoin de me calmer</button></>}
         {currentModule.id === 'spiritualite' && <><SpiritTop tab={spiritTab} onTab={setSpiritTab} entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />
           {spiritTab === 'invocations' && <Duas entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} />}
+          {spiritTab === 'qibla' && <Qibla entries={allModuleEntries} />}
           {spiritTab === 'horaires' && <AutomaticPrayerTimes entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}</>}
         {currentModule.id === 'passions' && <>
           <Segmented label="Passions" value={passionTab} onChange={setPassionTab} options={[{ value: 'parcours', label: 'Parcours' }, { value: 'series', label: 'Séries' }, { value: 'libre', label: 'Hobby libre' }]} />

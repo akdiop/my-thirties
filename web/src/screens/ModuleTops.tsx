@@ -1,11 +1,13 @@
 import { QUESTS } from '../lib/boosterDays';
 import { useState, type ReactNode } from 'react';
-import { BookHeart, CalendarDays, CloudSun, HandCoins, Heart, Lightbulb, MapPin, Mountain, Star, Sun, Waves, Zap, Shield, Smile, Scale, Feather } from 'lucide-react';
+import { BookHeart, CalendarDays, Compass, CloudSun, HandCoins, Heart, Lightbulb, MapPin, Mountain, Star, Sun, Waves, Zap, Shield, Smile, Scale, Feather } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { str, todayIso } from '../lib/day';
 import { amountOf, currencyOf, fmt } from '../lib/money';
 import { currentPrayer, PRAYERS, prayerDay, togglePrayer } from '../lib/wellbeing';
 import { usePrayerAutoLocation } from '../features/AutomaticPrayerTimes';
+import { SpiritStats } from '../features/SpiritStats';
+import { HIJRI_MONTHS, hijriLabel, hijriOf, spiritualDay, upcomingKeyDates } from '../lib/hijri';
 import { HeroPhoto } from '../features/HeroPhoto';
 import { Check22, RowLink, Segmented, SectionTitle, type Tone } from '../ui/kit';
 
@@ -98,7 +100,7 @@ export function EquilibreTop({ tab, onTab, entries, onAxis, onQuest, booster }: 
 /* ---------- Ma spiritualité ---------- */
 const hijri = (d = new Date()) => { try { return new Intl.DateTimeFormat('fr-FR-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric' }).format(d); } catch { return ''; } };
 const DHIKR = ['SubhanAllah', 'Alhamdulillah', 'Allahu akbar', 'Astaghfirullah', 'La ilaha illa Allah'];
-export type SpiritTab = 'home' | 'dhikr' | 'hijri' | 'journal' | 'horaires' | 'invocations';
+export type SpiritTab = 'home' | 'dhikr' | 'hijri' | 'journal' | 'horaires' | 'invocations' | 'qibla' | 'regularite';
 /** Compteur de dhikr : on touche le cercle, objectif 33, enregistrement du total du jour. */
 function DhikrCounter({ day, entries, onCreate }: { day: string; entries: Entry[]; onCreate: (i: EntryInput) => Promise<void> }) {
   const [count, setCount] = useState(0);
@@ -111,6 +113,27 @@ function DhikrCounter({ day, entries, onCreate }: { day: string; entries: Entry[
     <p className="muted center">{count >= 33 ? '33 atteints · continue librement' : `${33 - count} pour atteindre 33`}{todayTotal ? ` · ${todayTotal} enregistrés aujourd’hui` : ''}</p>
     <div className="two-btn"><button className="button ghost" onClick={() => setCount(0)}>Remettre à zéro</button>
       <button className="button primary" disabled={!count || saving} onClick={async () => { setSaving(true); try { await onCreate({ module: 'spiritualite', kind: 'dhikr', title: `${phrase} · ${count}`, entry_date: day, data: { date: day, phrase, count: String(count) } }); setCount(0); } finally { setSaving(false); } }}>Enregistrer</button></div>
+  </div>;
+}
+
+/** Calendrier spirituel : les 14 prochains jours (jeûnes recommandés) et les prochaines dates marquantes. */
+function SpiritCalendar() {
+  const today = todayIso();
+  const next = Array.from({ length: 14 }, (_, i) => { const d = new Date(today + 'T12:00:00'); d.setDate(d.getDate() + i); return d.toLocaleDateString('en-CA'); });
+  const h = hijriOf(today);
+  return <div className="stack-8">
+    <div className="soft-card hijri-today"><small className="muted">Aujourd’hui</small><strong className="serif">{h ? hijriLabel(h) : hijri()}</strong>
+      {h?.month === 9 && <span className="chip on">Ramadan</span>}</div>
+    <div className="soft-card"><strong>Les 14 prochains jours</strong>
+      {next.map((d) => { const s = spiritualDay(d); if (!s || (!s.fasts.length && !s.key)) return null;
+        return <div className="cal-row" key={d}><span className="cal-date">{new Date(d + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })}<small>{s.hijri.day} {HIJRI_MONTHS[s.hijri.month - 1]}</small></span>
+          <span className="cal-what">{s.key && <b>{s.key.name}</b>}{s.fasts.filter((f) => f !== s.key?.name).map((f) => <span key={f} className="fast-tag">{f}</span>)}</span></div>; })}
+    </div>
+    <div className="soft-card"><strong>Dates à venir</strong>
+      {upcomingKeyDates(today, 8).map((k) => <div className="cal-row" key={k.iso + k.name}><span className="cal-date">{new Date(k.iso + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}<small>{k.hijri}</small></span>
+        <span className="cal-what"><b>{k.name}</b>{k.note && <small className="muted">{k.note}</small>}</span></div>)}
+      <p className="fineprint">Calendrier calculé : le début du mois peut changer d’un jour selon l’annonce de la lune au Sénégal.</p>
+    </div>
   </div>;
 }
 
@@ -138,15 +161,16 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }:
       <DhikrCounter day={day} entries={entries} onCreate={onCreate} />
       <div className="rows">
         <RowLink icon={CalendarDays} title="Horaires des prières" sub={p?.city ? p.city + " · position, méthode" : "ma position, méthode de calcul"} onClick={() => onTab('horaires')} />
+        <RowLink icon={Star} title="Ma régularité" sub="prières, dhikr et Coran sur 30 jours" onClick={() => onTab('regularite')} />
+        <RowLink icon={Compass} title="Direction de la Qibla" sub="boussole" onClick={() => onTab('qibla')} />
         <RowLink icon={Heart} title="Mes invocations" sub="routine de dhikr, protection, pardon, réussite…" onClick={() => onTab('invocations')} />
-        <RowLink icon={Sun} title="Calendrier hégirien" onClick={() => onTab('hijri')} />
+        <RowLink icon={Sun} title="Calendrier spirituel" sub="jeûnes recommandés, dates importantes" onClick={() => onTab('hijri')} />
         <RowLink icon={BookHeart} title="Mon journal spirituel" onClick={() => onTab('journal')} />
       </div>
     </>}
     {tab !== 'home' && <button className="link-btn back-link" onClick={() => onTab('home')}>‹ Ma spiritualité</button>}
+    {tab === 'regularite' && <SpiritStats entries={entries} days={30} />}
     {tab === 'dhikr' && <DhikrCounter day={day} entries={entries} onCreate={onCreate} />}
-    {tab === 'hijri' && <div className="soft-card hijri-card">{Array.from({ length: 7 }, (_, i) => { const d = new Date(Date.now() + i * 86_400_000); return <div className="prio-row" key={i}>
-      <span>{d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'short' })}</span><small>{hijri(d)}</small></div>; })}
-      <p className="disclaimer">Calendrier Umm al-Qura calculé par le navigateur ; le début des mois peut différer d’un jour selon l’observation locale.</p></div>}
+    {tab === 'hijri' && <SpiritCalendar />}
   </div>;
 }
