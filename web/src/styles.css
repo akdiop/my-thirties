@@ -1757,3 +1757,5 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area
 .lang-pron{color:#8c6257;font-style:italic;overflow-wrap:anywhere}
 .phrase em.lang-pron{display:block;font-size:.85rem}
 .icon-btn.tiny{width:24px;height:24px;min-height:24px;padding:0}
+.lang-ar{font-family:'Amiri','Scheherazade New','Geeza Pro','Noto Naskh Arabic',serif;font-size:1.25em;line-height:1.9;font-weight:400}
+.phrase strong.lang-ar{display:block;text-align:right}

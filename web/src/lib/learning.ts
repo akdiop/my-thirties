@@ -99,11 +99,62 @@ const lang = (id: string, title: string, tone: LearningPath['tone']): LearningPa
   steps: LANG_STEPS.map((s, i) => ({ ...s, phrases: PHRASES[id]?.[i] })),
 });
 
+/* ---------- Arabe niveaux 2 (conversation) et 3 (aisance) ---------- */
+const LEVEL2_STEPS: { title: string; goal: string; tasks: string[]; minutes: number }[] = [
+  { title: 'Poser des questions', goal: 'Demander qui, quoi, où, quand, pourquoi, comment.', minutes: 25, tasks: ['Lis le dialogue à voix haute, puis joue les deux rôles.', 'Écris 10 questions à poser à une amie.'] },
+  { title: 'Parler de soi : goûts et loisirs', goal: 'Dire ce que tu aimes, ce que tu fais de ton temps libre.', minutes: 25, tasks: ['Lis le texte en entier sans regarder la traduction, puis vérifie.', 'Écris 6 phrases sur tes goûts.'] },
+  { title: 'La maison et le quotidien', goal: 'Décrire ton logement et les tâches de la maison.', minutes: 25, tasks: ['Nomme 10 objets de ta maison à voix haute.', 'Décris ta pièce préférée en 5 phrases.'] },
+  { title: 'Le temps, les jours et les mois', goal: 'Parler de la météo, des jours, des dates.', minutes: 20, tasks: ['Dis la date d’aujourd’hui et le temps qu’il fait.', 'Écris ton planning de la semaine.'] },
+  { title: 'La santé et le corps', goal: 'Dire où tu as mal, parler à un médecin.', minutes: 25, tasks: ['Montre et nomme 10 parties du corps.', 'Joue le dialogue chez le médecin.'] },
+  { title: 'Téléphoner, inviter, prendre rendez-vous', goal: 'Tenir une conversation au téléphone et fixer un moment.', minutes: 25, tasks: ['Lis le dialogue au téléphone à voix haute.', 'Écris un message pour inviter une amie.'] },
+  { title: 'Raconter une histoire', goal: 'Enchaîner plusieurs actions au passé.', minutes: 30, tasks: ['Lis le texte et raconte-le de mémoire.', 'Écris l’histoire d’un souvenir en 8 phrases.'] },
+  { title: 'Les émotions', goal: 'Dire comment tu te sens et pourquoi.', minutes: 20, tasks: ['Dis ton humeur du jour et sa raison.', 'Écris 5 phrases avec une émotion différente.'] },
+  { title: 'Le travail et les études', goal: 'Parler de ton métier, de ta journée de travail, de tes études.', minutes: 25, tasks: ['Présente ton travail en 1 minute.', 'Écris tes tâches de la semaine.'] },
+  { title: 'Voyager et régler un problème', goal: 'Se débrouiller à l’hôtel, à l’aéroport, en cas de souci.', minutes: 30, tasks: ['Joue le dialogue à l’hôtel.', 'Écris une réclamation polie.'] },
+];
+const LEVEL3_STEPS: { title: string; goal: string; tasks: string[]; minutes: number }[] = [
+  { title: 'Donner son avis et argumenter', goal: 'Être d’accord, pas d’accord, nuancer.', minutes: 30, tasks: ['Lis le débat et donne ton avis à voix haute.', 'Écris un paragraphe pour défendre une idée.'] },
+  { title: 'Comparer', goal: 'Dire plus, moins, autant, le plus.', minutes: 25, tasks: ['Compare deux villes que tu connais.', 'Écris 6 comparaisons.'] },
+  { title: 'Hypothèses et conditions', goal: 'Dire « si… alors… », imaginer.', minutes: 30, tasks: ['Réponds à voix haute : « Si tu gagnais beaucoup d’argent… ».', 'Écris 5 phrases avec « si ».'] },
+  { title: 'Conseiller et demander poliment', goal: 'Donner un conseil, une consigne, faire une demande.', minutes: 25, tasks: ['Donne 5 conseils à une amie stressée.', 'Écris une demande polie.'] },
+  { title: 'Souvenirs et habitudes passées', goal: 'Raconter ce que tu faisais avant, enfant.', minutes: 30, tasks: ['Lis le texte de souvenirs.', 'Écris ton enfance en 8 phrases.'] },
+  { title: 'Fêtes et vie religieuse', goal: 'Parler du Ramadan, de la Korité, de la Tabaski, des prières.', minutes: 30, tasks: ['Lis le texte sur le Ramadan.', 'Raconte ta dernière fête de Tabaski.'] },
+  { title: 'Cuisine et recettes', goal: 'Expliquer une recette pas à pas.', minutes: 30, tasks: ['Lis la recette à voix haute.', 'Écris ta recette préférée.'] },
+  { title: 'La ville, l’actualité, la société', goal: 'Parler de la vie en ville et d’une nouvelle.', minutes: 30, tasks: ['Lis le texte sur la ville.', 'Résume une nouvelle du jour en 5 phrases.'] },
+  { title: 'Relations et cérémonies', goal: 'Parler d’amitié, de mariage, de baptême, de condoléances.', minutes: 30, tasks: ['Apprends les formules de félicitations et de condoléances.', 'Écris un message de félicitations.'] },
+  { title: 'Conversation libre et lecture longue', goal: 'Lire un texte long seule et tenir une vraie conversation.', minutes: 40, tasks: ['Lis le texte long sans traduction, puis vérifie.', 'Tiens 15 minutes de conversation avec une personne qui parle la langue.'] },
+];
+const level = (id: string, title: string, n: 2 | 3, tone: LearningPath['tone']): LearningPath => ({
+  id: `lang-${id}-${n}`, category: 'Langues', title: `${title} · niveau ${n}`,
+  tagline: n === 2 ? 'Conversation · dialogues et lectures' : 'Aisance · textes longs et débats', tone, weeks: 10,
+  steps: (n === 2 ? LEVEL2_STEPS : LEVEL3_STEPS).map((s) => ({ ...s })),
+});
+
+/** Wolof : je le parle déjà un peu, ce parcours se concentre sur l'orthographe officielle et la lecture. */
+const WOLOF_WRITING: LearningPath = {
+  id: 'lang-wolof-2', category: 'Langues', title: 'Wolof · lire et écrire', tagline: 'Orthographe officielle, dictées et lectures', tone: 'sauge', weeks: 10,
+  steps: [
+    { title: 'Les voyelles et leur longueur', goal: 'Écrire a, à, e, é, ë, i, o, ó, u et les voyelles longues.', minutes: 20, tasks: ['Lis les paires de mots à voix haute.', 'Écris 10 mots que tu connais avec une voyelle longue.'] },
+    { title: 'Les consonnes propres au wolof', goal: 'Écrire c, j, x, ñ, ŋ et q sans les « franciser ».', minutes: 20, tasks: ['Réécris les mots « à la française » en orthographe officielle.', 'Écris 10 mots avec c, j ou x.'] },
+    { title: 'Les consonnes doubles et prénasales', goal: 'Écrire bb, dd, kk… et mb, nd, ng, nj, nc.', minutes: 20, tasks: ['Lis les paires simples / doubles.', 'Écris 10 mots avec mb, nd, ng ou nj.'] },
+    { title: 'Les pronoms et le verbe', goal: 'Écrire maa ngi, dama, dinaa, naa… attachés ou séparés.', minutes: 25, tasks: ['Conjugue « dem » à toutes les personnes.', 'Écris 6 phrases sur ta journée.'] },
+    { title: 'Les articles et les classes', goal: 'Écrire bi, gi, ji, wi, mi, si, li, ki et leurs pluriels.', minutes: 25, tasks: ['Mets l’article à 15 mots.', 'Écris la description de ta maison.'] },
+    { title: 'La négation et les questions', goal: 'Écrire -uma, -oo, -ul, et les mots interrogatifs.', minutes: 25, tasks: ['Mets 8 phrases à la forme négative.', 'Écris 10 questions.'] },
+    { title: 'Lire un message', goal: 'Lire et écrire des SMS et messages vocaux transcrits en bon wolof.', minutes: 25, tasks: ['Réécris le message « à la française » en orthographe officielle.', 'Écris un message d’invitation.'] },
+    { title: 'Lire un récit', goal: 'Lire un texte de plusieurs paragraphes sans traduction.', minutes: 30, tasks: ['Lis le texte deux fois, puis vérifie la traduction.', 'Résume-le en 5 phrases en wolof.'] },
+    { title: 'Proverbes et formules', goal: 'Lire et écrire des proverbes, salutations et vœux.', minutes: 25, tasks: ['Apprends 5 proverbes par cœur.', 'Écris un message de félicitations et un de condoléances.'] },
+    { title: 'Écrire un vrai texte', goal: 'Écrire une page entière en bon wolof, relue et corrigée.', minutes: 30, tasks: ['Lis le texte modèle.', 'Écris une page sur ta famille ou ta journée, puis relis-la avec la liste de contrôle.'] },
+  ],
+};
+
 export const PATHS: LearningPath[] = [
+  lang('arabe', 'Arabe', 'sable'),
+  level('arabe', 'Arabe', 2, 'sable'),
+  level('arabe', 'Arabe', 3, 'chocolat'),
+  WOLOF_WRITING,
+  lang('wolof', 'Wolof', 'caramel'),
   lang('espagnol', 'Espagnol', 'caramel'),
   lang('portugais', 'Portugais', 'sauge'),
-  lang('arabe', 'Arabe', 'sable'),
-  lang('wolof', 'Wolof', 'caramel'),
   lang('italien', 'Italien', 'caramel'),
   lang('allemand', 'Allemand', 'sable'),
   lang('japonais', 'Japonais', 'chocolat'),

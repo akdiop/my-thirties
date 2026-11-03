@@ -14,6 +14,6 @@ export type LangLesson = {
   reading?: { title: string; lines: Triple[] };
 };
 export type LangCourse = {
-  script: { title: string; points: string[]; table?: Triple[] };
+  script?: { title: string; points: string[]; table?: Triple[] };
   lessons: LangLesson[];
 };

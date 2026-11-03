@@ -19,7 +19,7 @@ function speak(text: string, lang: string) {
     window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
   } catch { /* synthèse vocale indisponible */ }
 }
-const LANG_CODE: Record<string, string> = { 'lang-espagnol': 'es-ES', 'lang-portugais': 'pt-PT', 'lang-arabe': 'ar-SA', 'lang-italien': 'it-IT', 'lang-allemand': 'de-DE', 'lang-japonais': 'ja-JP', 'lang-coreen': 'ko-KR' };
+const LANG_CODE: Record<string, string> = { 'lang-espagnol': 'es-ES', 'lang-portugais': 'pt-PT', 'lang-arabe': 'ar-SA', 'lang-arabe-2': 'ar-SA', 'lang-arabe-3': 'ar-SA', 'lang-italien': 'it-IT', 'lang-allemand': 'de-DE', 'lang-japonais': 'ja-JP', 'lang-coreen': 'ko-KR' };
 /** Nombre de suggestions visibles par catégorie : quand j'en retire une, la suivante prend sa place. */
 const VISIBLE = 5;
 
@@ -84,7 +84,7 @@ function ActivePath({ entry, onUpdate, onStop }: { entry: Entry; onUpdate: (e: E
     <div className="active-head"><span className="muted">{next === -1 ? 'Parcours terminé, bravo !' : `Étape ${next + 1} sur ${p.steps.length}`}</span><strong>{count}/{p.steps.length}</strong>
       <button className="icon-btn" aria-label={'Arrêter le parcours ' + p.title} title="Arrêter ce parcours" onClick={onStop}><Trash2 size={17} /></button></div>
     <Bar value={count / p.steps.length} />
-    {course && <details className="lang-script"><summary>{course.script.title}</summary>
+    {course?.script && <details className="lang-script"><summary>{course.script.title}</summary>
       {course.script.points.map((t) => <p key={t} className="fiche-pt">{t}</p>)}
       {course.script.table && <TripleTable rows={course.script.table} heads={['Lettre', 'Se prononce', 'Exemple']} />}
     </details>}
@@ -109,17 +109,19 @@ function ActivePath({ entry, onUpdate, onStop }: { entry: Entry; onUpdate: (e: E
   </article>;
 }
 
+const isAr = (t: string) => /[\u0600-\u06FF]/.test(t);
+
 function TripleTable({ rows, heads, speakIt }: { rows: Triple[]; heads: [string, string, string]; speakIt?: (t: string) => void }) {
   return <div className="lang-table" role="table">
     <div className="lang-row head" role="row">{heads.map((h) => <span key={h} role="columnheader">{h}</span>)}</div>
     {rows.map(([a, b, c]) => <div key={a + c} className="lang-row" role="row">
-      <span role="cell" className="lang-orig">{a}{speakIt && <button className="icon-btn tiny" aria-label={'Écouter ' + a} onClick={() => speakIt(a)}><Volume2 size={14} /></button>}</span>
+      <span role="cell" className={'lang-orig' + (isAr(a) ? ' lang-ar' : '')} dir="auto">{a}{speakIt && <button className="icon-btn tiny" aria-label={'Écouter ' + a} onClick={() => speakIt(a)}><Volume2 size={14} /></button>}</span>
       <span role="cell" className="lang-pron">{b}</span><span role="cell">{c}</span></div>)}
   </div>;
 }
 
 function Lines({ rows, speakIt }: { rows: Triple[]; speakIt?: (t: string) => void }) {
-  return <>{rows.map(([o, pr, fr]) => <div key={o + fr} className="phrase"><div><strong>{o}</strong><em className="lang-pron">{pr}</em><small>{fr}</small></div>
+  return <>{rows.map(([o, pr, fr]) => <div key={o + fr} className="phrase"><div><strong className={isAr(o) ? 'lang-ar' : undefined} dir="auto">{o}</strong><em className="lang-pron">{pr}</em><small>{fr}</small></div>
     {speakIt && <button className="icon-btn" aria-label={'Écouter ' + o} onClick={() => speakIt(o)}><Volume2 size={18} /></button>}</div>)}</>;
 }
 

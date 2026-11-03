@@ -1,0 +1,282 @@
+import type { LangCourse } from './types';
+
+/** Arabe standard, niveau 2 : conversation. Chaque leçon a un dialogue à jouer et un texte à lire. */
+export const COURSE: LangCourse = {
+  lessons: [
+    { lesson: [
+      'Les mots interrogatifs se placent en tête de phrase : مَنْ man (qui), ماذا mâdhâ (quoi, avec un verbe), ما mâ (quoi, sans verbe), أَيْنَ ayna (où), مَتى matâ (quand), لِماذا limâdhâ (pourquoi), كَيْفَ kayfa (comment), كَمْ kam (combien).',
+      'Pour une question fermée (oui / non), on commence par هَلْ hal : هَلْ أَنْتِ مَغْرِبِيَّة؟ hal anti maghribiyya ? (es-tu marocaine ?).',
+      'كَمْ kam est suivi d’un nom au singulier et à l’accusatif : كَمْ أَخًا لَكِ؟ kam akhan laki ? (combien de frères as-tu ?).',
+      'Pour répondre « parce que » : لِأَنَّ li-anna + nom ou pronom : لِأَنَّني مُتْعَبَة li-annanî mut‘aba (parce que je suis fatiguée).',
+    ], vocab: [
+      ['مَنْ', 'man', 'qui'], ['ماذا', 'mâdhâ', 'que, quoi (avec un verbe)'], ['ما', 'mâ', 'quoi, qu’est-ce que'], ['أَيْنَ', 'ayna', 'où'],
+      ['مِنْ أَيْنَ', 'min ayna', 'd’où'], ['مَتى', 'matâ', 'quand'], ['لِماذا', 'limâdhâ', 'pourquoi'], ['كَيْفَ', 'kayfa', 'comment'],
+      ['كَمْ', 'kam', 'combien'], ['هَلْ', 'hal', 'est-ce que'], ['لِأَنَّ', 'li-anna', 'parce que'], ['أَيّ', 'ayy', 'quel, quelle'],
+    ], writing: ['Écris les 10 mots interrogatifs, puis une question avec chacun.'],
+    phrases: [['مِنْ أَيْنَ أَنْتِ؟', 'min ayna anti ?', 'D’où viens-tu ? (à une femme)'], ['ماذا تَفْعَلينَ الآن؟', 'mâdhâ taf‘alîna l-ân ?', 'Que fais-tu maintenant ?'], ['مَتى تَبْدَأُ الحِصَّة؟', 'matâ tabda’u l-HiSSa ?', 'Quand commence le cours ?'], ['لِماذا تَتَعَلَّمينَ العَرَبِيَّة؟', 'limâdhâ tata‘allamîna l-‘arabiyya ?', 'Pourquoi apprends-tu l’arabe ?']],
+    dialogue: [
+      ['سارة: السَّلامُ عَلَيْكُم، أَنا سارة. ما اسْمُكِ؟', 'Sâra : as-salâmu ‘alaykum, anâ Sâra. mâ smuki ?', 'Sara : Bonjour, je suis Sara. Comment t’appelles-tu ?'],
+      ['عايدة: وَعَلَيْكُمُ السَّلام، اسْمي عايدة.', '‘Âyda : wa ‘alaykumu s-salâm, ismî ‘Âyda.', 'Aida : Bonjour, je m’appelle Aida.'],
+      ['سارة: مِنْ أَيْنَ أَنْتِ يا عايدة؟', 'Sâra : min ayna anti yâ ‘Âyda ?', 'Sara : D’où viens-tu, Aida ?'],
+      ['عايدة: أَنا مِنَ السِّنِغال، مِنْ داكار.', '‘Âyda : anâ mina s-Sinighâl, min Dâkâr.', 'Aida : Je viens du Sénégal, de Dakar.'],
+      ['سارة: لِماذا تَتَعَلَّمينَ العَرَبِيَّة؟', 'Sâra : limâdhâ tata‘allamîna l-‘arabiyya ?', 'Sara : Pourquoi apprends-tu l’arabe ?'],
+      ['عايدة: لِأَنَّني أُريدُ أَنْ أَفْهَمَ القُرْآن.', '‘Âyda : li-annanî urîdu an afhama l-qur’ân.', 'Aida : Parce que je veux comprendre le Coran.'],
+      ['سارة: ما شاءَ الله! مُنْذُ مَتى؟', 'Sâra : mâ shâ’a llâh ! mundhu matâ ?', 'Sara : Magnifique ! Depuis quand ?'],
+      ['عايدة: مُنْذُ شَهْرَيْن فَقَط.', '‘Âyda : mundhu shahrayn faqaT.', 'Aida : Depuis deux mois seulement.'],
+    ],
+    reading: { title: 'Une nouvelle amie', lines: [
+      ['في المَسْجِد تَعَرَّفَتْ عايدة عَلى سارة.', 'fi l-masjid ta‘arrafat ‘Âyda ‘alâ Sâra.', 'À la mosquée, Aida a fait la connaissance de Sara.'],
+      ['سارة مِنَ المَغْرِب وَتَسْكُنُ في داكار مُنْذُ سَنَة.', 'Sâra mina l-Maghrib wa taskunu fî Dâkâr mundhu sana.', 'Sara est marocaine et habite à Dakar depuis un an.'],
+      ['سَأَلَتْها عايدة: هَلْ تُحِبّينَ داكار؟', 'sa’alat-hâ ‘Âyda : hal tuHibbîna Dâkâr ?', 'Aida lui a demandé : aimes-tu Dakar ?'],
+      ['قالَتْ سارة: نَعَم، كَثيرًا، النّاسُ لُطَفاء.', 'qâlat Sâra : na‘am, kathîran, an-nâsu luTafâ’.', 'Sara a dit : oui, beaucoup, les gens sont gentils.'],
+      ['الآنَ تَتَكَلَّمانِ بِالعَرَبِيَّة كُلَّ جُمُعَة.', 'al-âna tatakallamâni bi-l-‘arabiyya kulla jumu‘a.', 'Maintenant, elles parlent arabe chaque vendredi.'],
+    ] } },
+
+    { lesson: [
+      'Aimer : أُحِبُّ uHibbu (j’aime) + nom défini : أُحِبُّ القِراءَة uHibbu l-qirâ’a (j’aime la lecture).',
+      'Aimer faire : أُحِبُّ أَنْ + verbe au subjonctif : أُحِبُّ أَنْ أَطْبُخَ uHibbu an aTbukha (j’aime cuisiner).',
+      'Ne pas aimer : لا أُحِبُّ lâ uHibbu. Préférer : أُفَضِّلُ ufaDDilu.',
+      'Fréquence : دائِمًا dâ’iman (toujours), غالِبًا ghâliban (souvent), أَحْيانًا aHyânan (parfois), أَبَدًا abadan (jamais, avec une négation).',
+      'La négation du présent : لا lâ devant le verbe : لا أَشْرَبُ القَهْوَة lâ ashrabu l-qahwa (je ne bois pas de café).',
+    ], vocab: [
+      ['هِوايَة', 'hiwâya', 'loisir, passion'], ['القِراءَة', 'al-qirâ’a', 'la lecture'], ['الرَّسْم', 'ar-rasm', 'le dessin, la peinture'], ['الرِّياضَة', 'ar-riyâDa', 'le sport'],
+      ['المَشْي', 'al-mashy', 'la marche'], ['السِّباحَة', 'as-sibâHa', 'la natation'], ['الطَّبْخ', 'aT-Tabkh', 'la cuisine'], ['السَّفَر', 'as-safar', 'le voyage'],
+      ['الموسيقى', 'al-mûsîqâ', 'la musique'], ['الأَفْلام', 'al-aflâm', 'les films'], ['وَقْت الفَراغ', 'waqt al-farâgh', 'le temps libre'], ['أُفَضِّلُ', 'ufaDDilu', 'je préfère'],
+    ], writing: ['Écris 6 phrases : 3 avec أُحِبُّ et 3 avec لا أُحِبُّ.'],
+    phrases: [['ما هِوايَتُكِ؟', 'mâ hiwâyatuki ?', 'Quel est ton loisir ?'], ['أُحِبُّ الرَّسْمَ وَالقِراءَة.', 'uHibbu r-rasma wa l-qirâ’a.', 'J’aime la peinture et la lecture.'], ['أُفَضِّلُ الشّايَ عَلى القَهْوَة.', 'ufaDDilu sh-shâya ‘ala l-qahwa.', 'Je préfère le thé au café.'], ['ماذا تَفْعَلينَ في وَقْتِ الفَراغ؟', 'mâdhâ taf‘alîna fî waqti l-farâgh ?', 'Que fais-tu pendant ton temps libre ?']],
+    dialogue: [
+      ['سارة: ماذا تَفْعَلينَ في نِهايَة الأُسْبوع؟', 'Sâra : mâdhâ taf‘alîna fî nihâyat al-usbû‘ ?', 'Sara : Que fais-tu le week-end ?'],
+      ['عايدة: أَمْشي عَلى الشّاطِئ وَأَرْسُم.', '‘Âyda : amshî ‘ala sh-shâTi’ wa arsum.', 'Aida : Je marche sur la plage et je peins.'],
+      ['سارة: تَرْسُمين؟ جَميل! ماذا تَرْسُمين؟', 'Sâra : tarsumîn ? jamîl ! mâdhâ tarsumîn ?', 'Sara : Tu peins ? Joli ! Que peins-tu ?'],
+      ['عايدة: أَرْسُمُ البَحْرَ وَالزُّهور. وَأَنْتِ؟', '‘Âyda : arsumu l-baHra wa z-zuhûr. wa anti ?', 'Aida : Je peins la mer et les fleurs. Et toi ?'],
+      ['سارة: أَنا أُحِبُّ الطَّبْخ، لكِنْ لا أُحِبُّ الرِّياضَة.', 'Sâra : anâ uHibbu T-Tabkh, lâkin lâ uHibbu r-riyâDa.', 'Sara : Moi j’aime cuisiner, mais je n’aime pas le sport.'],
+      ['عايدة: أَحْيانًا أَذْهَبُ إلى المَسْبَح، تَعالَي مَعي!', '‘Âyda : aHyânan adh-habu ila l-masbaH, ta‘âlay ma‘î !', 'Aida : Parfois je vais à la piscine, viens avec moi !'],
+    ],
+    reading: { title: 'Le samedi d’Aida', lines: [
+      ['يَوْمُ السَّبْتِ يَوْمٌ هادِئ.', 'yawmu s-sabti yawmun hâdi’.', 'Le samedi est un jour calme.'],
+      ['تَسْتَيْقِظُ عايدة مُتَأَخِّرَة وَتَشْرَبُ الشّاي.', 'tastayqiDHu ‘Âyda muta’akhkhira wa tashrabu sh-shây.', 'Aida se réveille tard et boit du thé.'],
+      ['بَعْدَ ذلِكَ تَمْشي ساعَة عَلى الكورنيش.', 'ba‘da dhâlika tamshî sâ‘a ‘ala l-kurnîsh.', 'Ensuite elle marche une heure sur la corniche.'],
+      ['في المَساءِ تَقْرَأُ كِتابًا أَوْ تَرْسُم.', 'fi l-masâ’i taqra’u kitâban aw tarsum.', 'Le soir, elle lit un livre ou elle peint.'],
+      ['هِيَ لا تُحِبُّ الضَّجيج، تُفَضِّلُ الهُدوء.', 'hiya lâ tuHibbu D-Dajîj, tufaDDilu l-hudû’.', 'Elle n’aime pas le bruit, elle préfère le calme.'],
+    ] } },
+
+    { lesson: [
+      'Il y a : هُناكَ hunâka, ou في البَيْت … fi l-bayt … (dans la maison il y a…).',
+      'Les noms de lieu : غُرْفَة ghurfa (pièce) + complément : غُرْفَة النَّوْم ghurfat an-nawm (la chambre, « pièce du sommeil »). C’est l’annexion (iḍâfa) : le premier mot n’a pas d’article.',
+      'Prépositions : في fî (dans), عَلى ‘alâ (sur), تَحْتَ taHta (sous), بِجانِب bi-jânib (à côté de), أَمامَ amâma (devant), وَراءَ warâ’a (derrière).',
+      'Pluriels irréguliers fréquents (pluriels « brisés ») : بَيْت bayt → بُيوت buyût ; غُرْفَة ghurfa → غُرَف ghuraf ; كِتاب kitâb → كُتُب kutub.',
+    ], vocab: [
+      ['بَيْت / شَقَّة', 'bayt / shaqqa', 'maison / appartement'], ['غُرْفَة النَّوْم', 'ghurfat an-nawm', 'la chambre'], ['المَطْبَخ', 'al-maTbakh', 'la cuisine (pièce)'], ['الحَمّام', 'al-Hammâm', 'la salle de bain'],
+      ['الصّالون', 'aS-Sâlûn', 'le salon'], ['سَرير', 'sarîr', 'lit'], ['طاوِلَة', 'Tâwila', 'table'], ['كُرْسِيّ', 'kursiyy', 'chaise'],
+      ['نافِذَة', 'nâfidha', 'fenêtre'], ['باب', 'bâb', 'porte'], ['أُنَظِّفُ', 'unaDHDHifu', 'je nettoie'], ['أَغْسِلُ', 'aghsilu', 'je lave'],
+    ], writing: ['Dessine le plan de ton logement et écris le nom arabe de chaque pièce.'],
+    phrases: [['أَسْكُنُ في شَقَّة صَغيرَة.', 'askunu fî shaqqa Saghîra.', 'J’habite dans un petit appartement.'], ['في الشَّقَّة غُرْفَتان وَصالون.', 'fi sh-shaqqa ghurfatâni wa Sâlûn.', 'Dans l’appartement il y a deux chambres et un salon.'], ['المِفْتاحُ عَلى الطّاوِلَة.', 'al-miftâHu ‘ala T-Tâwila.', 'La clé est sur la table.'], ['أُنَظِّفُ البَيْتَ يَوْمَ الأَحَد.', 'unaDHDHifu l-bayta yawma l-aHad.', 'Je nettoie la maison le dimanche.']],
+    dialogue: [
+      ['سارة: كَيْفَ بَيْتُكِ؟ كَبير؟', 'Sâra : kayfa baytuki ? kabîr ?', 'Sara : Comment est ta maison ? Grande ?'],
+      ['عايدة: لا، شَقَّتي صَغيرَة لكِنَّها مُريحَة.', '‘Âyda : lâ, shaqqatî Saghîra lâkinnahâ murîHa.', 'Aida : Non, mon appartement est petit mais confortable.'],
+      ['سارة: كَمْ غُرْفَة فيها؟', 'Sâra : kam ghurfa fîhâ ?', 'Sara : Combien de pièces y a-t-il ?'],
+      ['عايدة: غُرْفَتان، صالون، مَطْبَخ وَحَمّام.', '‘Âyda : ghurfatân, Sâlûn, maTbakh wa Hammâm.', 'Aida : Deux chambres, un salon, une cuisine et une salle de bain.'],
+      ['سارة: وَمَنْ يُنَظِّفُ البَيْت؟', 'Sâra : wa man yunaDHDHifu l-bayt ?', 'Sara : Et qui fait le ménage ?'],
+      ['عايدة: أَنا، كُلَّ يَوْمِ أَحَد! وَأَطْبُخُ لِلأُسْبوع.', '‘Âyda : anâ, kulla yawmi aHad ! wa aTbukhu li-l-usbû‘.', 'Aida : Moi, chaque dimanche ! Et je cuisine pour la semaine.'],
+    ],
+    reading: { title: 'Ma chambre', lines: [
+      ['غُرْفَتي هادِئَة وَمُضيئَة.', 'ghurfatî hâdi’a wa muDî’a.', 'Ma chambre est calme et lumineuse.'],
+      ['فيها سَريرٌ كَبيرٌ وَمَكْتَبٌ صَغير.', 'fîhâ sarîrun kabîrun wa maktabun Saghîr.', 'Il y a un grand lit et un petit bureau.'],
+      ['عَلى المَكْتَبِ كُتُبٌ وَدَفْتَرٌ وَمِصْباح.', '‘ala l-maktabi kutubun wa daftarun wa miSbâH.', 'Sur le bureau il y a des livres, un cahier et une lampe.'],
+      ['بِجانِبِ النّافِذَةِ سَجّادَةُ الصَّلاة.', 'bi-jânibi n-nâfidhati sajjâdatu S-Salâ.', 'À côté de la fenêtre, il y a le tapis de prière.'],
+      ['أُحِبُّ غُرْفَتي كَثيرًا.', 'uHibbu ghurfatî kathîran.', 'J’aime beaucoup ma chambre.'],
+    ] } },
+
+    { lesson: [
+      'Jours : الأَحَد al-aHad (dimanche), الاِثْنَيْن al-ithnayn, الثُّلاثاء ath-thulâthâ’, الأَرْبِعاء al-arbi‘â’, الخَميس al-khamîs, الجُمُعَة al-jumu‘a, السَّبْت as-sabt.',
+      'Les noms de jours viennent des nombres : al-aHad (le premier), al-ithnayn (le deuxième)…',
+      'Mois grégoriens : يَنايِر yanâyir, فِبْرايِر fibrâyir, مارِس mâris, أَبْريل abrîl, مايو mâyû, يونيو yûnyû, يوليو yûlyû, أَغُسْطُس aghusTus, سِبْتَمْبِر sibtambir, أُكْتوبَر uktûbar, نوفَمْبِر nûfambir, ديسَمْبِر dîsambir.',
+      'Météo : الجَوُّ … al-jawwu … (le temps est…) : حارّ Hârr (chaud), بارِد bârid (froid), مُمْطِر mumTir (pluvieux), مُشْمِس mushmis (ensoleillé).',
+    ], vocab: [
+      ['الأُسْبوع', 'al-usbû‘', 'la semaine'], ['الشَّهْر', 'ash-shahr', 'le mois'], ['السَّنَة', 'as-sana', 'l’année'], ['اليَوْم', 'al-yawm', 'aujourd’hui'],
+      ['غَدًا', 'ghadan', 'demain'], ['أَمْس', 'ams', 'hier'], ['الجَوّ', 'al-jaww', 'le temps (météo)'], ['حارّ', 'Hârr', 'chaud'],
+      ['بارِد', 'bârid', 'froid'], ['مَطَر', 'maTar', 'pluie'], ['شَمْس', 'shams', 'soleil'], ['رِياح', 'riyâH', 'vent'],
+    ], writing: ['Écris les 7 jours de la semaine en arabe, puis ton planning.'],
+    phrases: [['ما تاريخُ اليَوْم؟', 'mâ târîkhu l-yawm ?', 'Quelle est la date d’aujourd’hui ?'], ['اليَوْمَ الخَميس.', 'al-yawma l-khamîs.', 'Aujourd’hui c’est jeudi.'], ['الجَوُّ حارٌّ جِدًّا.', 'al-jawwu Hârrun jiddan.', 'Il fait très chaud.'], ['سَأُسافِرُ في شَهْرِ يوليو.', 'sa-usâfiru fî shahri yûlyû.', 'Je voyagerai en juillet.']],
+    dialogue: [
+      ['سارة: كَيْفَ الجَوُّ اليَوْم؟', 'Sâra : kayfa l-jawwu l-yawm ?', 'Sara : Quel temps fait-il aujourd’hui ?'],
+      ['عايدة: الجَوُّ حارٌّ وَمُشْمِس.', '‘Âyda : al-jawwu Hârrun wa mushmis.', 'Aida : Il fait chaud et ensoleillé.'],
+      ['سارة: نَذْهَبُ إلى البَحْرِ يَوْمَ السَّبْت؟', 'Sâra : nadh-habu ila l-baHri yawma s-sabt ?', 'Sara : On va à la mer samedi ?'],
+      ['عايدة: السَّبْتُ عِنْدي عَمَل. الأَحَدُ أَفْضَل.', '‘Âyda : as-sabtu ‘indî ‘amal. al-aHadu afDal.', 'Aida : Samedi je travaille. Dimanche c’est mieux.'],
+      ['سارة: اِتَّفَقْنا، الأَحَدُ صَباحًا.', 'Sâra : ittafaqnâ, al-aHadu SabâHan.', 'Sara : D’accord, dimanche matin.'],
+    ],
+    reading: { title: 'Les saisons à Dakar', lines: [
+      ['في داكار فَصْلانِ تَقْريبًا.', 'fî Dâkâr faSlâni taqrîban.', 'À Dakar il y a à peu près deux saisons.'],
+      ['مِنْ نوفَمْبِر إلى مايو الجَوُّ جافٌّ وَلَطيف.', 'min nûfambir ilâ mâyû al-jawwu jâffun wa laTîf.', 'De novembre à mai, le temps est sec et agréable.'],
+      ['مِنْ يوليو إلى أُكْتوبَر يَنْزِلُ المَطَر.', 'min yûlyû ilâ uktûbar yanzilu l-maTar.', 'De juillet à octobre, il pleut.'],
+      ['في الصَّيْفِ الجَوُّ حارٌّ وَرَطْب.', 'fi S-Sayfi l-jawwu Hârrun wa raTb.', 'En été, il fait chaud et humide.'],
+      ['أَنا أُحِبُّ شَهْرَ يَنايِر، لِأَنَّ الجَوَّ مُعْتَدِل.', 'anâ uHibbu shahra yanâyir, li-anna l-jawwa mu‘tadil.', 'J’aime le mois de janvier, parce que le temps est doux.'],
+    ] } },
+
+    { lesson: [
+      'J’ai mal à… : يُؤْلِمُني … yu’limunî … (mon … me fait mal) : يُؤْلِمُني رَأْسي yu’limunî ra’sî (j’ai mal à la tête). Pour un nom féminin : تُؤْلِمُني بَطْني tu’limunî baTnî.',
+      'Je suis malade : أَنا مَريضَة anâ marîDa. J’ai de la fièvre : عِنْدي حُمّى ‘indî Hummâ.',
+      'Depuis quand : مُنْذُ mundhu + durée : مُنْذُ يَوْمَيْن mundhu yawmayn (depuis deux jours).',
+      'Le duel (pour deux) : ـان -ân / ـَيْن -ayn : يَد yad → يَدان yadân (deux mains), يَوْم → يَوْمَيْن.',
+      'Formule pour un malade : شَفاكِ الله shafâki llâh (qu’Allah te guérisse) ; réponse : آمين âmîn.',
+    ], vocab: [
+      ['الرَّأْس', 'ar-ra’s', 'la tête'], ['البَطْن', 'al-baTn', 'le ventre'], ['الظَّهْر', 'aDH-DHahr', 'le dos'], ['الحَلْق', 'al-Halq', 'la gorge'],
+      ['اليَد', 'al-yad', 'la main'], ['الرِّجْل', 'ar-rijl', 'la jambe, le pied'], ['العَيْن', 'al-‘ayn', 'l’œil'], ['الأَسْنان', 'al-asnân', 'les dents'],
+      ['الطَّبيبَة', 'aT-Tabîba', 'la médecin'], ['الدَّواء', 'ad-dawâ’', 'le médicament'], ['حُمّى', 'Hummâ', 'fièvre'], ['مَريضَة', 'marîDa', 'malade (f.)'],
+    ], writing: ['Écris le nom de 10 parties du corps.', 'Écris trois phrases avec يُؤْلِمُني.'],
+    phrases: [['يُؤْلِمُني رَأْسي.', 'yu’limunî ra’sî.', 'J’ai mal à la tête.'], ['عِنْدي حُمّى مُنْذُ أَمْس.', '‘indî Hummâ mundhu ams.', 'J’ai de la fièvre depuis hier.'], ['أَيْنَ أَقْرَبُ صَيْدَلِيَّة؟', 'ayna aqrabu Saydaliyya ?', 'Où est la pharmacie la plus proche ?'], ['شَفاكِ الله.', 'shafâki llâh.', 'Qu’Allah te guérisse.']],
+    dialogue: [
+      ['الطَّبيبَة: ماذا بِكِ؟', 'aT-Tabîba : mâdhâ biki ?', 'La médecin : Qu’avez-vous ?'],
+      ['عايدة: يُؤْلِمُني حَلْقي وَعِنْدي حُمّى.', '‘Âyda : yu’limunî Halqî wa ‘indî Hummâ.', 'Aida : J’ai mal à la gorge et de la fièvre.'],
+      ['الطَّبيبَة: مُنْذُ مَتى؟', 'aT-Tabîba : mundhu matâ ?', 'La médecin : Depuis quand ?'],
+      ['عايدة: مُنْذُ يَوْمَيْن.', '‘Âyda : mundhu yawmayn.', 'Aida : Depuis deux jours.'],
+      ['الطَّبيبَة: خُذي هذا الدَّواءَ ثَلاثَ مَرّاتٍ في اليَوْم، وَاشْرَبي ماءً كَثيرًا.', 'aT-Tabîba : khudhî hâdha d-dawâ’a thalâtha marrâtin fi l-yawm, washrabî mâ’an kathîran.', 'La médecin : Prenez ce médicament trois fois par jour, et buvez beaucoup d’eau.'],
+      ['عايدة: شُكْرًا يا دُكْتورَة.', '‘Âyda : shukran yâ duktûra.', 'Aida : Merci, docteure.'],
+      ['الطَّبيبَة: شَفاكِ الله.', 'aT-Tabîba : shafâki llâh.', 'La médecin : Qu’Allah vous guérisse.'],
+    ],
+    reading: { title: 'Une journée au lit', lines: [
+      ['أَمْسِ كانَتْ عايدة مَريضَة.', 'amsi kânat ‘Âyda marîDa.', 'Hier, Aida était malade.'],
+      ['كانَ يُؤْلِمُها رَأْسُها وَظَهْرُها.', 'kâna yu’limuhâ ra’suhâ wa DHahruhâ.', 'Elle avait mal à la tête et au dos.'],
+      ['لَمْ تَذْهَبْ إلى العَمَل.', 'lam tadh-hab ila l-‘amal.', 'Elle n’est pas allée au travail.'],
+      ['شَرِبَتْ شايًا بِالعَسَلِ وَنامَتْ كَثيرًا.', 'sharibat shâyan bi-l-‘asali wa nâmat kathîran.', 'Elle a bu du thé au miel et a beaucoup dormi.'],
+      ['اليَوْمَ هِيَ أَحْسَن، الحَمْدُ لِله.', 'al-yawma hiya aHsan, al-Hamdu lillâh.', 'Aujourd’hui elle va mieux, Dieu merci.'],
+    ] } },
+
+    { lesson: [
+      'Au téléphone : أَلو alû (allô) ; مَنْ مَعي؟ man ma‘î ? (qui est à l’appareil ?) ; مَعَكِ عايدة ma‘aki ‘Âyda (c’est Aida).',
+      'Inviter : هَلْ تُريدينَ أَنْ…؟ hal turîdîna an… ? (veux-tu… ?). Accepter : بِكُلِّ سُرور bi-kulli surûr (avec plaisir). Refuser poliment : آسِفَة، عِنْدي مَوْعِد âsifa, ‘indî maw‘id (désolée, j’ai un rendez-vous).',
+      'Le subjonctif après أَنْ an : la dernière voyelle devient a : أَذْهَبُ adh-habu → أَنْ أَذْهَبَ an adh-haba.',
+      'Fixer l’heure : في السّاعَة الخامِسَة fi s-sâ‘a l-khâmisa (à cinq heures).',
+    ], vocab: [
+      ['الهاتِف', 'al-hâtif', 'le téléphone'], ['رَقْم', 'raqm', 'numéro'], ['رِسالَة', 'risâla', 'message, lettre'], ['اِتَّصَلَ', 'ittaSala', 'il a appelé'],
+      ['مَوْعِد', 'maw‘id', 'rendez-vous'], ['دَعْوَة', 'da‘wa', 'invitation'], ['بِكُلِّ سُرور', 'bi-kulli surûr', 'avec plaisir'], ['آسِفَة', 'âsifa', 'désolée'],
+      ['مَشْغولَة', 'mashghûla', 'occupée'], ['مُتَفَرِّغَة', 'mutafarrigha', 'libre, disponible'], ['اِنْتَظِري', 'intaDHirî', 'attends (à une femme)'], ['إلى اللِّقاء', 'ila l-liqâ’', 'à bientôt'],
+    ], writing: ['Écris un message pour inviter une amie à dîner (heure, lieu).'],
+    phrases: [['أَلو، مَنْ مَعي؟', 'alû, man ma‘î ?', 'Allô, qui est à l’appareil ?'], ['هَلْ أَنْتِ مُتَفَرِّغَة يَوْمَ الجُمُعَة؟', 'hal anti mutafarrigha yawma l-jumu‘a ?', 'Es-tu libre vendredi ?'], ['أُريدُ أَنْ آخُذَ مَوْعِدًا.', 'urîdu an âkhudha maw‘idan.', 'Je voudrais prendre rendez-vous.'], ['سَأَتَّصِلُ بِكِ لاحِقًا.', 'sa-attaSilu biki lâHiqan.', 'Je t’appellerai plus tard.']],
+    dialogue: [
+      ['عايدة: أَلو، السَّلامُ عَلَيْكُم، مَعَكِ عايدة.', '‘Âyda : alû, as-salâmu ‘alaykum, ma‘aki ‘Âyda.', 'Aida : Allô, bonjour, c’est Aida.'],
+      ['سارة: أَهْلًا عايدة! كَيْفَ حالُكِ؟', 'Sâra : ahlan ‘Âyda ! kayfa Hâluki ?', 'Sara : Salut Aida ! Comment vas-tu ?'],
+      ['عايدة: بِخَيْر. هَلْ تُريدينَ أَنْ تَتَعَشَّيْ عِنْدي يَوْمَ الجُمُعَة؟', '‘Âyda : bi-khayr. hal turîdîna an tata‘ashshay ‘indî yawma l-jumu‘a ?', 'Aida : Bien. Veux-tu dîner chez moi vendredi ?'],
+      ['سارة: بِكُلِّ سُرور! في أَيِّ ساعَة؟', 'Sâra : bi-kulli surûr ! fî ayyi sâ‘a ?', 'Sara : Avec plaisir ! À quelle heure ?'],
+      ['عايدة: بَعْدَ صَلاةِ المَغْرِب، حَوالَيْ السّاعَة الثّامِنَة.', '‘Âyda : ba‘da Salâti l-maghrib, Hawâlay as-sâ‘a th-thâmina.', 'Aida : Après la prière du maghrib, vers huit heures.'],
+      ['سارة: مُمْتاز، سَأُحْضِرُ الحَلْوى.', 'Sâra : mumtâz, sa-uHDiru l-Halwâ.', 'Sara : Parfait, j’apporterai le dessert.'],
+      ['عايدة: إلى اللِّقاء إِنْ شاءَ الله.', '‘Âyda : ila l-liqâ’ in shâ’a llâh.', 'Aida : À vendredi, si Dieu le veut.'],
+    ],
+    reading: { title: 'Un message', lines: [
+      ['السَّلامُ عَلَيْكُم يا سارة،', 'as-salâmu ‘alaykum yâ Sâra,', 'Bonjour Sara,'],
+      ['آسِفَة، لا أَسْتَطيعُ أَنْ آتِيَ اليَوْم.', 'âsifa, lâ astaTî‘u an âtiya l-yawm.', 'Désolée, je ne peux pas venir aujourd’hui.'],
+      ['عِنْدي مَوْعِدٌ عِنْدَ الطَّبيبَة.', '‘indî maw‘idun ‘inda T-Tabîba.', 'J’ai un rendez-vous chez la médecin.'],
+      ['هَلْ نَلْتَقي غَدًا بَعْدَ العَصْر؟', 'hal naltaqî ghadan ba‘da l-‘aSr ?', 'On se voit demain après le ‘asr ?'],
+      ['أَنْتَظِرُ رَدَّكِ. عايدة', 'antaDHiru raddaki. ‘Âyda', 'J’attends ta réponse. Aida'],
+    ] } },
+
+    { lesson: [
+      'Rappel du passé : ذَهَبْتُ dhahabtu (je), ذَهَبَتْ dhahabat (elle), ذَهَبْنا dhahabnâ (nous), ذَهَبوا dhahabû (ils).',
+      'Pour enchaîner : أَوَّلًا awwalan (d’abord), ثُمَّ thumma (puis), بَعْدَ ذلِك ba‘da dhâlik (après cela), وَفَجْأَةً wa faj’atan (et soudain), في النِّهايَة fi n-nihâya (à la fin).',
+      'Kâna (était) décrit le décor : كانَ الجَوُّ جَميلًا kâna l-jawwu jamîlan (il faisait beau). Après kâna, l’attribut prend -an.',
+      'Négation du passé : لَمْ lam + présent sans voyelle finale : لَمْ أَذْهَبْ lam adh-hab (je ne suis pas allée).',
+    ], vocab: [
+      ['أَوَّلًا', 'awwalan', 'd’abord'], ['ثُمَّ', 'thumma', 'puis'], ['فَجْأَةً', 'faj’atan', 'soudain'], ['في النِّهايَة', 'fi n-nihâya', 'à la fin'],
+      ['قِصَّة', 'qiSSa', 'histoire'], ['حَدَثَ', 'Hadatha', 'il s’est passé'], ['وَصَلْتُ', 'waSaltu', 'je suis arrivée'], ['رَجَعْتُ', 'raja‘tu', 'je suis rentrée'],
+      ['وَجَدْتُ', 'wajadtu', 'j’ai trouvé'], ['ضاعَ', 'Dâ‘a', 'il s’est perdu'], ['ضَحِكْنا', 'DaHiknâ', 'nous avons ri'], ['كانَ', 'kâna', 'il était'],
+    ], writing: ['Raconte un souvenir en 8 phrases avec أَوَّلًا، ثُمَّ، بَعْدَ ذلِك، في النِّهايَة.'],
+    phrases: [['ماذا حَدَثَ؟', 'mâdhâ Hadatha ?', 'Que s’est-il passé ?'], ['أَوَّلًا ذَهَبْنا إلى السّوق، ثُمَّ إلى البَحْر.', 'awwalan dhahabnâ ila s-sûq, thumma ila l-baHr.', 'D’abord nous sommes allées au marché, puis à la mer.'], ['لَمْ أَنَمْ جَيِّدًا.', 'lam anam jayyidan.', 'Je n’ai pas bien dormi.'], ['كانَ يَوْمًا لا يُنْسى.', 'kâna yawman lâ yunsâ.', 'C’était une journée inoubliable.']],
+    dialogue: [
+      ['سارة: ماذا حَدَثَ في السَّفَر؟', 'Sâra : mâdhâ Hadatha fi s-safar ?', 'Sara : Que s’est-il passé pendant le voyage ?'],
+      ['عايدة: وَصَلْنا إلى المَطار مُتَأَخِّرين!', '‘Âyda : waSalnâ ila l-maTâr muta’akhkhirîn !', 'Aida : Nous sommes arrivés en retard à l’aéroport !'],
+      ['سارة: يا إِلهي! وَبَعْدَ ذلِك؟', 'Sâra : yâ ilâhî ! wa ba‘da dhâlik ?', 'Sara : Mon Dieu ! Et ensuite ?'],
+      ['عايدة: رَكَضْنا، وَفَجْأَةً ضاعَتْ حَقيبَتي.', '‘Âyda : rakaDnâ, wa faj’atan Dâ‘at Haqîbatî.', 'Aida : On a couru, et soudain mon sac s’est perdu.'],
+      ['سارة: وَهَلْ وَجَدْتِها؟', 'Sâra : wa hal wajadtihâ ?', 'Sara : Et tu l’as retrouvé ?'],
+      ['عايدة: نَعَم، في النِّهايَة وَجَدْتُها، الحَمْدُ لِله!', '‘Âyda : na‘am, fi n-nihâya wajadtuhâ, al-Hamdu lillâh !', 'Aida : Oui, à la fin je l’ai retrouvé, Dieu merci !'],
+    ],
+    reading: { title: 'Le voyage à Saint-Louis', lines: [
+      ['في الشَّهْرِ الماضي سافَرَتْ عايدة إلى سان لويس.', 'fi sh-shahri l-mâDî sâfarat ‘Âyda ilâ Sân Lwî.', 'Le mois dernier, Aida est partie à Saint-Louis.'],
+      ['أَوَّلًا رَكِبَتِ الحافِلَة أَرْبَعَ ساعات.', 'awwalan rakibati l-Hâfila arba‘a sâ‘ât.', 'D’abord elle a pris le bus quatre heures.'],
+      ['ثُمَّ وَصَلَتْ إلى الفُنْدُق وَاسْتَراحَتْ.', 'thumma waSalat ila l-funduq wastarâHat.', 'Puis elle est arrivée à l’hôtel et s’est reposée.'],
+      ['في المَساءِ مَشَتْ عَلى الجِسْرِ القَديم.', 'fi l-masâ’i mashat ‘ala l-jisri l-qadîm.', 'Le soir, elle a marché sur le vieux pont.'],
+      ['كانَ الجَوُّ لَطيفًا وَالنَّهْرُ جَميلًا.', 'kâna l-jawwu laTîfan wa n-nahru jamîlan.', 'Le temps était doux et le fleuve beau.'],
+      ['في النِّهايَة قالَتْ: سَأَرْجِعُ إِنْ شاءَ الله.', 'fi n-nihâya qâlat : sa-arji‘u in shâ’a llâh.', 'À la fin, elle a dit : je reviendrai, si Dieu le veut.'],
+    ] } },
+
+    { lesson: [
+      'Je suis + émotion : أَنا سَعيدَة anâ sa‘îda (je suis heureuse). Les adjectifs prennent ة au féminin.',
+      'Je me sens : أَشْعُرُ بِـ ash‘uru bi- + nom : أَشْعُرُ بِالتَّعَب ash‘uru bi-t-ta‘ab (je me sens fatiguée).',
+      'Parce que / quand : لِأَنَّ li-anna, عِنْدَما ‘indamâ : أَكونُ سَعيدَة عِنْدَما… akûnu sa‘îda ‘indamâ… (je suis heureuse quand…).',
+      'Expressions de foi : الحَمْدُ لِله (louange à Allah), إِنْ شاءَ الله (si Dieu le veut), لا بَأْس lâ ba’s (ce n’est rien), صَبْرًا Sabran (patience).',
+    ], vocab: [
+      ['سَعيدَة', 'sa‘îda', 'heureuse'], ['حَزينَة', 'Hazîna', 'triste'], ['قَلِقَة', 'qaliqa', 'inquiète'], ['غاضِبَة', 'ghâDiba', 'en colère'],
+      ['مُتْعَبَة', 'mut‘aba', 'fatiguée'], ['مُتَحَمِّسَة', 'mutaHammisa', 'enthousiaste'], ['خائِفَة', 'khâ’ifa', 'effrayée'], ['مُرْتاحَة', 'murtâHa', 'détendue'],
+      ['أَشْعُرُ', 'ash‘uru', 'je ressens'], ['الفَرَح', 'al-faraH', 'la joie'], ['الحُزْن', 'al-Huzn', 'la tristesse'], ['الصَّبْر', 'aS-Sabr', 'la patience'],
+    ], writing: ['Écris ton humeur de la semaine, un jour par ligne, avec la raison.'],
+    phrases: [['كَيْفَ تَشْعُرينَ اليَوْم؟', 'kayfa tash‘urîna l-yawm ?', 'Comment te sens-tu aujourd’hui ?'], ['أَنا مُتْعَبَة قَليلًا لكِنْ سَعيدَة.', 'anâ mut‘aba qalîlan lâkin sa‘îda.', 'Je suis un peu fatiguée mais heureuse.'], ['لا تَقْلَقي، كُلُّ شَيْءٍ سَيَكونُ بِخَيْر.', 'lâ taqlaqî, kullu shay’in sa-yakûnu bi-khayr.', 'Ne t’inquiète pas, tout ira bien.'], ['أَكونُ سَعيدَة عِنْدَما أَرْسُم.', 'akûnu sa‘îda ‘indamâ arsum.', 'Je suis heureuse quand je peins.']],
+    dialogue: [
+      ['سارة: ما بِكِ؟ تَبْدينَ حَزينَة.', 'Sâra : mâ biki ? tabdîna Hazîna.', 'Sara : Qu’as-tu ? Tu as l’air triste.'],
+      ['عايدة: أَنا قَلِقَة بِسَبَبِ العَمَل.', '‘Âyda : anâ qaliqa bi-sababi l-‘amal.', 'Aida : Je suis inquiète à cause du travail.'],
+      ['سارة: ماذا حَدَثَ؟', 'Sâra : mâdhâ Hadatha ?', 'Sara : Que s’est-il passé ?'],
+      ['عايدة: عِنْدي مَشْروعٌ كَبيرٌ وَالوَقْتُ قَليل.', '‘Âyda : ‘indî mashrû‘un kabîrun wa l-waqtu qalîl.', 'Aida : J’ai un gros projet et peu de temps.'],
+      ['سارة: لا تَقْلَقي، أَنْتِ قَوِيَّة. تَوَكَّلي عَلى الله.', 'Sâra : lâ taqlaqî, anti qawiyya. tawakkalî ‘ala llâh.', 'Sara : Ne t’inquiète pas, tu es forte. Remets-toi à Allah.'],
+      ['عايدة: صَدَقْتِ. شُكْرًا، أَشْعُرُ بِالرّاحَة الآن.', '‘Âyda : Sadaqti. shukran, ash‘uru bi-r-râHa l-ân.', 'Aida : Tu as raison. Merci, je me sens soulagée maintenant.'],
+    ],
+    reading: { title: 'Le journal d’Aida', lines: [
+      ['اليَوْمَ اسْتَيْقَظْتُ مُتْعَبَة.', 'al-yawma staykaDHtu mut‘aba.', 'Aujourd’hui je me suis réveillée fatiguée.'],
+      ['كُنْتُ قَلِقَة مِنَ الاِجْتِماع.', 'kuntu qaliqa mina l-ijtimâ‘.', 'J’étais inquiète à cause de la réunion.'],
+      ['لكِنَّ الاِجْتِماعَ كانَ ناجِحًا.', 'lâkinna l-ijtimâ‘a kâna nâjiHan.', 'Mais la réunion a été un succès.'],
+      ['في المَساءِ صَلَّيْتُ وَشَعَرْتُ بِالسَّلام.', 'fi l-masâ’i Sallaytu wa sha‘artu bi-s-salâm.', 'Le soir, j’ai prié et je me suis sentie en paix.'],
+      ['الحَمْدُ لِله عَلى كُلِّ حال.', 'al-Hamdu lillâh ‘alâ kulli Hâl.', 'Louange à Allah en toute situation.'],
+    ] } },
+
+    { lesson: [
+      'Métiers au féminin avec ة : مُهَنْدِسَة muhandisa (ingénieure), طَبيبَة Tabîba (médecin), مُعَلِّمَة mu‘allima (enseignante), مُديرَة mudîra (directrice).',
+      'Je travaille comme : أَعْمَلُ … a‘malu … + métier à l’accusatif : أَعْمَلُ مُديرَةَ مَشاريع a‘malu mudîrata mashârî‘ (je travaille comme cheffe de projet).',
+      'Dans une entreprise : في شَرِكَة fî sharika ; à la maison : مِنَ البَيْت mina l-bayt.',
+      'Devoir : يَجِبُ عَلَيَّ أَنْ yajibu ‘alayya an (je dois) ; pouvoir : أَسْتَطيعُ أَنْ astaTî‘u an.',
+    ], vocab: [
+      ['العَمَل', 'al-‘amal', 'le travail'], ['شَرِكَة', 'sharika', 'entreprise'], ['مَكْتَب', 'maktab', 'bureau'], ['زَميلَة', 'zamîla', 'collègue (f.)'],
+      ['مُديرَة', 'mudîra', 'directrice, cheffe'], ['اِجْتِماع', 'ijtimâ‘', 'réunion'], ['راتِب', 'râtib', 'salaire'], ['عُطْلَة', '‘uTla', 'vacances, congé'],
+      ['جامِعَة', 'jâmi‘a', 'université'], ['دِراسَة', 'dirâsa', 'études'], ['شَهادَة', 'shahâda', 'diplôme'], ['يَجِبُ', 'yajibu', 'il faut'],
+    ], writing: ['Écris ta journée de travail en 6 phrases.'],
+    phrases: [['ما عَمَلُكِ؟', 'mâ ‘amaluki ?', 'Quel est ton travail ?'], ['أَعْمَلُ في شَرِكَة في داكار.', 'a‘malu fî sharika fî Dâkâr.', 'Je travaille dans une entreprise à Dakar.'], ['عِنْدي اِجْتِماعٌ في السّاعَة العاشِرَة.', '‘indî ijtimâ‘un fi s-sâ‘a l-‘âshira.', 'J’ai une réunion à dix heures.'], ['يَجِبُ عَلَيَّ أَنْ أُنْهِيَ التَّقْرير.', 'yajibu ‘alayya an unhiya t-taqrîr.', 'Je dois finir le rapport.']],
+    dialogue: [
+      ['سارة: ما عَمَلُكِ يا عايدة؟', 'Sâra : mâ ‘amaluki yâ ‘Âyda ?', 'Sara : Quel est ton travail, Aida ?'],
+      ['عايدة: أَعْمَلُ مُديرَةَ مَشاريع.', '‘Âyda : a‘malu mudîrata mashârî‘.', 'Aida : Je travaille comme cheffe de projet.'],
+      ['سارة: هَلْ تُحِبّينَ عَمَلَكِ؟', 'Sâra : hal tuHibbîna ‘amalaki ?', 'Sara : Aimes-tu ton travail ?'],
+      ['عايدة: نَعَم، لكِنَّهُ مُتْعِبٌ أَحْيانًا. وَأَنْتِ؟', '‘Âyda : na‘am, lâkinnahu mut‘ibun aHyânan. wa anti ?', 'Aida : Oui, mais il est parfois fatigant. Et toi ?'],
+      ['سارة: أَنا مُعَلِّمَة لُغَة عَرَبِيَّة.', 'Sâra : anâ mu‘allimat lugha ‘arabiyya.', 'Sara : Je suis professeure d’arabe.'],
+      ['عايدة: رائِع! هَلْ تَسْتَطيعينَ أَنْ تُساعِديني؟', '‘Âyda : râ’i‘ ! hal tastaTî‘îna an tusâ‘idînî ?', 'Aida : Génial ! Peux-tu m’aider ?'],
+    ],
+    reading: { title: 'Une journée au bureau', lines: [
+      ['تَصِلُ عايدة إلى المَكْتَبِ في السّاعَة الثّامِنَة.', 'taSilu ‘Âyda ila l-maktabi fi s-sâ‘a th-thâmina.', 'Aida arrive au bureau à huit heures.'],
+      ['تَقْرَأُ رَسائِلَها وَتُخَطِّطُ لِيَوْمِها.', 'taqra’u rasâ’ilahâ wa tukhaTTiTu li-yawmihâ.', 'Elle lit ses messages et planifie sa journée.'],
+      ['في العاشِرَة عِنْدَها اِجْتِماعٌ مَعَ الفَريق.', 'fi l-‘âshira ‘indahâ ijtimâ‘un ma‘a l-farîq.', 'À dix heures, elle a une réunion avec l’équipe.'],
+      ['بَعْدَ صَلاةِ الظُّهْرِ تَأْكُلُ مَعَ زَميلاتِها.', 'ba‘da Salâti DH-DHuhri ta’kulu ma‘a zamîlâtihâ.', 'Après la prière du dhuhr, elle mange avec ses collègues.'],
+      ['تَرْجِعُ إلى البَيْتِ في السّادِسَة، مُتْعَبَة لكِنْ راضِيَة.', 'tarji‘u ila l-bayti fi s-sâdisa, mut‘aba lâkin râDiya.', 'Elle rentre à six heures, fatiguée mais satisfaite.'],
+    ] } },
+
+    { lesson: [
+      'À l’hôtel : أُريدُ غُرْفَة لِشَخْصٍ واحِد urîdu ghurfa li-shakhSin wâHid (je voudrais une chambre pour une personne), لِلَيْلَتَيْن li-laylatayn (pour deux nuits).',
+      'Signaler un problème : هُناكَ مُشْكِلَة hunâka mushkila (il y a un problème) ; … لا يَعْمَل lâ ya‘mal (… ne marche pas).',
+      'Demander poliment : هَلْ يُمْكِنُ أَنْ…؟ hal yumkinu an… ? (est-il possible de… ?) ; لَوْ سَمَحْتِ law samaHti (s’il te plaît, si tu permets).',
+      'À l’aéroport : جَواز السَّفَر jawâz as-safar (passeport), الرِّحْلَة ar-riHla (le vol), البَوّابَة al-bawwâba (la porte d’embarquement).',
+    ], vocab: [
+      ['حَجْز', 'Hajz', 'réservation'], ['غُرْفَة', 'ghurfa', 'chambre'], ['لَيْلَة', 'layla', 'nuit'], ['مِفْتاح', 'miftâH', 'clé'],
+      ['مُكَيِّف', 'mukayyif', 'climatiseur'], ['مُشْكِلَة', 'mushkila', 'problème'], ['جَواز السَّفَر', 'jawâz as-safar', 'passeport'], ['حَقيبَة', 'Haqîba', 'valise, sac'],
+      ['الرِّحْلَة', 'ar-riHla', 'le vol, le voyage'], ['تَأْخير', 'ta’khîr', 'retard'], ['الاِسْتِقْبال', 'al-istiqbâl', 'la réception'], ['لَوْ سَمَحْتِ', 'law samaHti', 's’il te plaît'],
+    ], writing: ['Écris une réclamation polie à l’hôtel (3 phrases).'],
+    phrases: [['عِنْدي حَجْزٌ بِاسْمِ عايدة.', '‘indî Hajzun bi-smi ‘Âyda.', 'J’ai une réservation au nom d’Aida.'], ['المُكَيِّفُ لا يَعْمَل.', 'al-mukayyifu lâ ya‘mal.', 'La climatisation ne marche pas.'], ['هَلْ يُمْكِنُ أَنْ أُغَيِّرَ الغُرْفَة؟', 'hal yumkinu an ughayyira l-ghurfa ?', 'Est-il possible de changer de chambre ?'], ['أَيْنَ بَوّابَةُ الرِّحْلَة؟', 'ayna bawwâbatu r-riHla ?', 'Où est la porte du vol ?']],
+    dialogue: [
+      ['المُوَظَّف: أَهْلًا وَسَهْلًا، كَيْفَ أُساعِدُكِ؟', 'al-muwaDHDHaf : ahlan wa sahlan, kayfa usâ‘iduki ?', 'L’employé : Bienvenue, comment puis-je vous aider ?'],
+      ['عايدة: عِنْدي حَجْزٌ بِاسْمِ عايدة، لِثَلاثِ لَيالٍ.', '‘Âyda : ‘indî Hajzun bi-smi ‘Âyda, li-thalâthi layâlin.', 'Aida : J’ai une réservation au nom d’Aida, pour trois nuits.'],
+      ['المُوَظَّف: نَعَم، الغُرْفَة ٢١٤. هذا المِفْتاح.', 'al-muwaDHDHaf : na‘am, al-ghurfa mi’atân wa arba‘ata ‘ashar. hâdha l-miftâH.', 'L’employé : Oui, chambre 214. Voici la clé.'],
+      ['عايدة: (بَعْدَ قَليل) لَوْ سَمَحْت، المُكَيِّفُ لا يَعْمَل.', '‘Âyda : (ba‘da qalîl) law samaHt, al-mukayyifu lâ ya‘mal.', 'Aida : (un peu plus tard) Excusez-moi, la climatisation ne marche pas.'],
+      ['المُوَظَّف: آسِف جِدًّا، سَنُرْسِلُ شَخْصًا الآن.', 'al-muwaDHDHaf : âsif jiddan, sa-nursilu shakhSan al-ân.', 'L’employé : Vraiment désolé, nous envoyons quelqu’un tout de suite.'],
+      ['عايدة: شُكْرًا جَزيلًا.', '‘Âyda : shukran jazîlan.', 'Aida : Merci beaucoup.'],
+    ],
+    reading: { title: 'Un vol en retard', lines: [
+      ['كانَتْ رِحْلَةُ عايدة إلى القاهِرَة في السّاعَة التّاسِعَة.', 'kânat riHlatu ‘Âyda ila l-Qâhira fi s-sâ‘a t-tâsi‘a.', 'Le vol d’Aida pour Le Caire était à neuf heures.'],
+      ['لكِنْ كانَ هُناكَ تَأْخيرٌ ثَلاثَ ساعات.', 'lâkin kâna hunâka ta’khîrun thalâtha sâ‘ât.', 'Mais il y avait trois heures de retard.'],
+      ['ذَهَبَتْ إلى المَكْتَبِ وَسَأَلَتْ بِأَدَب.', 'dhahabat ila l-maktabi wa sa’alat bi-adab.', 'Elle est allée au comptoir et a demandé poliment.'],
+      ['أَعْطَوْها وَجْبَةً مَجّانِيَّة.', 'a‘Tawhâ wajbatan majjâniyya.', 'On lui a donné un repas gratuit.'],
+      ['قَرَأَتْ كِتابَها وَصَبَرَت. الصَّبْرُ مِفْتاحُ الفَرَج.', 'qara’at kitâbahâ wa Sabarat. aS-Sabru miftâHu l-faraj.', 'Elle a lu son livre et a patienté. La patience est la clé du soulagement.'],
+    ] } },
+  ],
+};
