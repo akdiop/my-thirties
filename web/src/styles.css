@@ -1765,3 +1765,21 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area
 .coach-list li{line-height:1.45}
 .coach-actions{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:4px}
 .coach-follow{display:flex;flex-direction:column;gap:8px;border-top:1px solid #f2e6e0;padding-top:10px}
+/* Mes proches : par mois, vignette date */
+.relatives-month{margin-bottom:14px}
+.relatives-month-title{display:flex;align-items:baseline;gap:8px;font-weight:700;color:#5a3f36;margin:0 4px 8px;font-size:.95rem}
+.relatives-month-title small{color:#a08a7e;font-weight:500}
+.relatives-list{background:#fffcfa;border:1px solid #efe3de;border-radius:18px;overflow:hidden}
+.relative-row{padding:10px 14px;border-top:1px solid #f4ebe6}
+.relative-row:first-child{border-top:0}
+.relative-row.soon{background:#fbf1ee}
+.relative-row.open{background:#fdf8f5}
+.relative-date{width:46px;height:50px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;line-height:1.05}
+.relative-date strong{font-size:1.2rem}
+.relative-date small{font-size:.66rem;text-transform:uppercase;letter-spacing:.06em}
+.relative-date.fam{background:#f2e2dc;color:#8c6257}
+.relative-date.ami{background:#e6eee9;color:#4f6a60}
+.relative-date.autre{background:#f3ead7;color:#9a7b3e}
+.relative-row .relative-days{background:#f8f1ec;border-radius:999px;padding:4px 10px;font-size:.78rem}
+.relative-row.soon .relative-days{background:#c38380;color:#fff}
+.relative-actions{display:flex;align-items:center;justify-content:space-between;gap:12px}

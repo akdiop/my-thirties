@@ -676,7 +676,7 @@ export default function App() {
       {screen === 'focus' && <><ScreenHeader title="" onBack={() => go('home')} /><Focus entries={ritualEntries} onCreate={createFromTool} /></>}
       {screen === 'sommeil' && <><ScreenHeader title="" onBack={() => go('home')} /><Sleep entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} /></>}
       {screen === 'complements' && <><ScreenHeader title="" onBack={() => go('home')} /><Supplements entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
-      {screen === 'proches' && <><ScreenHeader title="" onBack={() => go('home')} /><Relatives entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
+      {screen === 'proches' && <><ScreenHeader title="" onBack={() => go('home')} /><Relatives entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onEdit={editFull} onRemove={removeQuiet} /></>}
       {screen === 'lectures' && <><ScreenHeader title="" onBack={() => go('home')} /><Reading entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
       {screen === 'panda' && <><ScreenHeader title="" onBack={() => go('home')} /><PandaScreen entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onGo={(x) => go(x as Screen)} /></>}
       {screen === 'envies' && <><ScreenHeader title="" onBack={() => go('home')} /><Wishes entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
