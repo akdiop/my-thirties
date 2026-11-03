@@ -23,7 +23,9 @@ import type { CuisineTab, EquilibreTab, SpiritTab } from './screens/ModuleTops';
 import { ScreenHeader, SectionTitle, Segmented } from './ui/kit';
 import { GuidedField } from './ui/fields';
 import { HIDDEN_KIND, HiddenProvider, readHidden, useHidden, type Hidden } from './lib/hidden';
-import { RITUAL_KINDS } from './lib/rituals';
+import { HABIT_KIND, RITUAL_KINDS } from './lib/rituals';
+import { TodayCard } from './features/TodayCard';
+import { togglePrayer } from './lib/wellbeing';
 import { HomeRituals } from './screens/HomeRituals';
 import { LockGate } from './features/LockGate';
 import { removeLock } from './lib/journalLock';
@@ -660,7 +662,7 @@ export default function App() {
       {!offline && pending > 0 && <div className="offline-banner" role="status">{pending} changement{pending > 1 ? 's' : ''} en attente d’envoi…</div>}
       {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
       {loading && <div className="sync-status" role="status">Synchronisation…</div>}
-      {screen === 'home' && <HomeScreen rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} onUpdate={updateData} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} onQuickAdd={(title) => createFromTool({ module: 'quotidien', kind: 'task', title, entry_date: today(), data: { date: today(), priority: 'Haute' } })} />}
+      {screen === 'home' && <HomeScreen todayCard={<TodayCard entries={entries} habits={ritualEntries.filter((e) => e.kind === HABIT_KIND)} onUpdate={updateData} onTogglePrayer={(name, on) => void togglePrayer(entries, name, on, createFromTool, removeQuiet)} onOpenHabits={() => go('habits')} onOpenAgenda={() => go('agenda')} />} rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} onUpdate={updateData} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} onQuickAdd={(title) => createFromTool({ module: 'quotidien', kind: 'task', title, entry_date: today(), data: { date: today(), priority: 'Haute' } })} />}
       {screen === 'myday' && <LockGate><MyDay key={dayTarget.n} entries={ritualEntries} initialDate={dayTarget.date} initialPart={dayTarget.part} onCreate={createFromTool} onUpdate={updateData} /></LockGate>}
       {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}
       {screen === 'notes' && <LockGate><Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={removeQuiet} onOpenDay={openDay} /></LockGate>}

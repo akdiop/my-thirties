@@ -10,8 +10,8 @@ import { Bar, Check22, SectionTitle } from '../ui/kit';
 
 type Go = (screen: ModuleId | 'calme' | 'assistant' | 'settings' | 'agenda' | 'spaces') => void;
 
-export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd, rituals }: {
-  rituals?: ReactNode; entries: Entry[]; profileEntry: Entry | undefined; onGo: Go;
+export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd, rituals, todayCard }: {
+  rituals?: ReactNode; todayCard?: ReactNode; entries: Entry[]; profileEntry: Entry | undefined; onGo: Go;
   onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>; onAdd: () => void; onQuickAdd: (title: string) => Promise<void>;
 }) {
   const day = todayIso();
@@ -41,11 +41,7 @@ export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd,
 
     <button className="calm-pill" onClick={() => onGo('calme')}><Waves size={20} /> J’ai besoin de me calmer</button>
 
-    <section className="day-card">
-      <div className="day-card-head"><h2>Votre journée</h2><span>Briefing du matin</span></div>
-      {today.length ? today.map((t) => { const extra = t.sub.split(' · ').slice(1).join(' · '); return <div className="day-line" key={t.id}><span>{t.time || ''}</span><span>{t.title}{extra ? <small> · {extra}</small> : null}</span></div>; })
-        : <p className="day-empty">Rien de prévu pour l’instant. Une journée à ton rythme.</p>}
-    </section>
+    {todayCard}
 
     <section>
       <SectionTitle action="Tout voir" onAction={() => onGo('agenda')}>Mes 3 priorités</SectionTitle>
