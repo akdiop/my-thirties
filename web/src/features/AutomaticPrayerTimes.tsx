@@ -1,89 +1,85 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { LocateFixed, MapPin, Search } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
-import { useIntegrationPrefs } from '../lib/integrations';
+import { computeTimes, distanceKm, geoGranted, locate, METHODS, placeName, PRAYER_SETTINGS_KIND, readSettings, searchCity, type MethodId, type PrayerSettings } from '../lib/prayertimes';
 
-const names = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'] as const;
-const methods = [{ id: 3, label: 'Muslim World League' }, { id: 2, label: 'ISNA' },
-  { id: 4, label: 'Umm Al-Qura (Makkah)' }, { id: 5, label: 'Egyptian General Authority' },
-  { id: 12, label: 'Union des organisations islamiques de France' }] as const;
-const today = () => {
-  const d = new Date();
-  return [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
-};
-const timeOnly = (raw: unknown) => {
-  if (typeof raw !== 'string') return null;
-  const match = raw.match(/^([01]\d|2[0-3]):[0-5]\d/);
-  return match ? match[0] : null;
-};
+type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
+const LABELS: Record<string, string> = { Fajr: 'Fajr', Sunrise: 'Lever du soleil', Dhuhr: 'Dhuhr', Asr: 'Asr', Maghrib: 'Maghrib', Isha: 'Isha' };
 
-export function AutomaticPrayerTimes({ entries, onCreate }: {
-  entries: Entry[];
-  onCreate: (input: EntryInput) => Promise<void>;
-}) {
-  const { prefs } = useIntegrationPrefs();
-  const [city, setCity] = useState('');
-  const [country, setCountry] = useState('');
-  const [date, setDate] = useState(today);
-  const [method, setMethod] = useState(3);
-  const [preview, setPreview] = useState<Record<string, string> | null>(null);
-  const [hijri, setHijri] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState('');
-  const [timezone, setTimezone] = useState('');
-  const [controller] = useState(() => ({ current: null as AbortController | null }));
-  const lookup = async () => {
-    if (!prefs.prayer || !city.trim() || !country.trim() || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
-    controller.current?.abort();
-    const abort = new AbortController(); controller.current = abort;
-    setBusy(true); setPreview(null); setMessage('');
-    try {
-      const [year, month, day] = date.split('-');
-      const params = new URLSearchParams({ city: city.trim(), country: country.trim(), method: String(method) });
-      const response = await fetch('https://api.aladhan.com/v1/timingsByCity/' + day + '-' + month + '-' + year + '?' + params,
-        { signal: abort.signal, cache: 'no-store' });
-      if (!response.ok) throw new Error('Service temporairement indisponible.');
-      const json: unknown = await response.json();
-      if (!json || typeof json !== 'object' || !('data' in json)) throw new Error('Réponse invalide.');
-      const data = (json as { data?: { timings?: Record<string, unknown>; meta?: { timezone?: string }; date?: { hijri?: { date?: string } } } }).data;
-      const times = Object.fromEntries(names.map((name) => [name, timeOnly(data?.timings?.[name])]));
-      if (Object.values(times).some((value) => !value)) throw new Error('Horaires incomplets.');
-      setPreview(times as Record<string, string>);
-      setTimezone(data?.meta?.timezone ?? '');
-      setHijri(data?.date?.hijri?.date ?? '');
-    } catch (error) {
-      if (!abort.signal.aborted) setMessage(error instanceof Error ? error.message : 'Impossible de récupérer les horaires.');
-    } finally { if (!abort.signal.aborted) setBusy(false); }
+/** Enregistre (ou met à jour) les réglages de prière : une seule entrée, gardée d'un jour à l'autre. */
+function useSaveSettings(entries: Entry[], onCreate: (i: EntryInput) => Promise<void>, onUpdate: Save) {
+  return async (patch: Partial<PrayerSettings>) => {
+    const cur = readSettings(entries);
+    const next = { ...(cur?.settings ?? { method: 'mwl', hanafi: false, auto: true, place: '' }), ...patch };
+    if (cur) await onUpdate(cur.entry, { ...cur.entry.data, ...next });
+    else await onCreate({ module: 'spiritualite', kind: PRAYER_SETTINGS_KIND, title: 'Réglages des horaires de prière', entry_date: null, data: next });
   };
-  const save = async () => {
-    if (!preview) return;
-    if (entries.some((e) => e.kind === 'prayer_schedule' && e.entry_date === date && e.data.source === 'AlAdhan API' && e.data.city === city.trim())) {
-      setMessage('Un horaire automatique pour cette ville et cette date est déjà enregistré.'); return;
-    }
-    setBusy(true); setMessage('');
-    try {
-      await onCreate({ module: 'spiritualite', kind: 'prayer_schedule',
-        title: 'Horaires calculés · ' + city.trim(), entry_date: date,
-        data: { date, city: city.trim(), country: country.trim(), source: 'AlAdhan API',
-          method: String(method), timezone, hijri, ...preview } });
-      setMessage('Horaires enregistrés.'); setPreview(null);
-    } catch { setMessage('Impossible d’enregistrer les horaires.'); } finally { setBusy(false); }
+}
+
+/** En voyage : si la localisation est déjà autorisée, la ville se met à jour toute seule à l'ouverture (déplacement de plus de 25 km). */
+export function usePrayerAutoLocation(entries: Entry[], onCreate: (i: EntryInput) => Promise<void>, onUpdate: Save) {
+  const save = useSaveSettings(entries, onCreate, onUpdate);
+  const done = useRef(false);
+  const cur = readSettings(entries);
+  useEffect(() => {
+    if (done.current || !cur?.settings.auto) return;
+    done.current = true;
+    void (async () => {
+      if (!(await geoGranted())) return;
+      try {
+        const pos = await locate();
+        if (distanceKm(pos, cur.settings) < 25) return;
+        await save({ ...pos, place: (await placeName(pos.lat, pos.lon)) || cur.settings.place });
+      } catch { /* on garde la dernière position connue */ }
+    })();
+  }, [cur?.entry.id]); // eslint-disable-line react-hooks/exhaustive-deps
+}
+
+export function AutomaticPrayerTimes({ entries, onCreate, onUpdate }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save }) {
+  const cur = readSettings(entries);
+  const save = useSaveSettings(entries, onCreate, onUpdate);
+  const [busy, setBusy] = useState(false), [msg, setMsg] = useState('');
+  const [q, setQ] = useState(''), [results, setResults] = useState<{ name: string; lat: number; lon: number }[]>([]);
+  const [changing, setChanging] = useState(false);
+
+  const useMyPosition = async () => {
+    setBusy(true); setMsg('');
+    try { const pos = await locate(); await save({ ...pos, place: (await placeName(pos.lat, pos.lon)) || 'Ma position' }); setChanging(false); }
+    catch (e) { setMsg(e instanceof Error ? e.message : 'Position introuvable.'); } finally { setBusy(false); }
   };
-  return <section className="tool-card">
-    <h3>Horaires de prière automatiques</h3>
-    {!prefs.prayer && <p className="privacy-hint">Service désactivé. Active-le dans Profil → Centre de confidentialité.</p>}
-    <p className="muted">Calculs fournis par AlAdhan. La ville et le pays sont envoyés à ce service uniquement lorsque tu demandes les horaires. Aucune géolocalisation précise n'est demandée.</p>
-    <div className="planner-form"><label>Ville<input value={city} onChange={(e) => { setCity(e.target.value); setPreview(null); }} maxLength={80} placeholder="Dakar" /></label>
-      <label>Pays<input value={country} onChange={(e) => { setCountry(e.target.value); setPreview(null); }} maxLength={80} placeholder="Sénégal" /></label>
-      <label>Date<input type="date" value={date} onChange={(e) => { setDate(e.target.value); setPreview(null); }} /></label>
-      <label>Méthode de calcul<select value={method} onChange={(e) => { setMethod(Number(e.target.value)); setPreview(null); }}>
-        {methods.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}</select></label></div>
-    <button className="button secondary" disabled={!prefs.prayer || busy || !city.trim() || !country.trim() || !date} onClick={() => void lookup()}>
-      {busy ? 'Recherche…' : 'Calculer les horaires'}</button>
-    {preview && <div className="prayer-form">
-      <div className="prayer-times">{names.map((name) => <div className="prayer-item" key={name}><strong>{name}</strong><span>{preview[name]}</span></div>)}</div>
-      <p className="fineprint">Fuseau indiqué par le fournisseur : {timezone || 'non fourni'} · Date hégirienne : {hijri || 'non fournie'}. Vérifie auprès de ta mosquée locale, notamment pendant le Ramadan.</p>
-      <button className="button primary" disabled={busy} onClick={() => void save()}>Enregistrer ces horaires</button>
-    </div>}
-    {message && <p role="status">{message}</p>}
+  const search = async () => {
+    if (q.trim().length < 2) return;
+    setBusy(true); setMsg(''); setResults([]);
+    try { const r = await searchCity(q); setResults(r); if (!r.length) setMsg('Aucune ville trouvée.'); }
+    catch (e) { setMsg(e instanceof Error ? e.message : 'Recherche impossible.'); } finally { setBusy(false); }
+  };
+  const pickCity = async (c: { name: string; lat: number; lon: number }) => {
+    setBusy(true);
+    try { await save({ lat: c.lat, lon: c.lon, place: c.name, auto: false }); setResults([]); setQ(''); setChanging(false); setMsg(''); } finally { setBusy(false); }
+  };
+
+  const times = cur ? computeTimes(cur.settings) : null;
+  const choose = <div className="prayer-choose">
+    <button className="button primary wide" disabled={busy} onClick={() => void useMyPosition()}><LocateFixed size={16} /> {busy ? 'Localisation…' : 'Utiliser ma position'}</button>
+    <p className="muted small center">ou cherche une ville</p>
+    <div className="search-row"><input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') void search(); }} placeholder="Dakar, Paris, Casablanca…" maxLength={80} />
+      <button className="button secondary" disabled={busy || q.trim().length < 2} aria-label="Chercher la ville" onClick={() => void search()}><Search size={16} /></button></div>
+    {results.map((c) => <button key={c.name + c.lat} className="city-result" onClick={() => void pickCity(c)}><MapPin size={15} /> {c.name}</button>)}
+  </div>;
+
+  return <section className="soft-card prayer-settings">
+    <strong>Mes horaires de prière</strong>
+    {!cur ? <><p className="muted small">Indique ta position une seule fois : les horaires sont ensuite calculés chaque jour, directement sur ton téléphone.</p>{choose}</> : <>
+      <div className="prayer-place"><MapPin size={16} /><span><strong>{cur.settings.place || 'Ma position'}</strong>
+        <small className="muted">{cur.settings.auto ? 'Mise à jour automatique en voyage' : 'Ville fixe'}</small></span>
+        <button className="link-btn small" onClick={() => setChanging(!changing)}>{changing ? 'Annuler' : 'Changer'}</button></div>
+      {changing && choose}
+      <div className="prayer-today">{times && Object.entries(times).map(([k, v]) => <div key={k} className={'prayer-line' + (k === 'Sunrise' ? ' sun' : '')}><span>{LABELS[k]}</span><span className="num">{v}</span></div>)}</div>
+      <label className="field-label">Méthode de calcul
+        <select value={cur.settings.method} onChange={(e) => void save({ method: e.target.value as MethodId })}>{METHODS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}</select></label>
+      <label className="opt-row"><input type="checkbox" checked={cur.settings.hanafi} onChange={(e) => void save({ hanafi: e.target.checked })} /> Asr selon l’école hanafite (plus tard)</label>
+      <label className="opt-row"><input type="checkbox" checked={cur.settings.auto} onChange={(e) => void save({ auto: e.target.checked })} /> Suivre ma position quand je voyage</label>
+    </>}
+    {msg && <p role="status" className="fineprint">{msg}</p>}
   </section>;
 }

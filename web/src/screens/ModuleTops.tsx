@@ -5,6 +5,7 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { str, todayIso } from '../lib/day';
 import { amountOf, currencyOf, fmt } from '../lib/money';
 import { PRAYERS, prayerDay } from '../lib/wellbeing';
+import { usePrayerAutoLocation } from '../features/AutomaticPrayerTimes';
 import { HeroPhoto } from '../features/HeroPhoto';
 import { Check22, RowLink, Segmented, SectionTitle, type Tone } from '../ui/kit';
 
@@ -113,7 +114,8 @@ function DhikrCounter({ day, entries, onCreate }: { day: string; entries: Entry[
   </div>;
 }
 
-export function SpiritTop({ tab, onTab, entries, onCreate, onRemove }: { tab: SpiritTab; onTab: (t: SpiritTab) => void; entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onRemove: (e: Entry) => Promise<void> }) {
+export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }: { tab: SpiritTab; onTab: (t: SpiritTab) => void; entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void>; onRemove: (e: Entry) => Promise<void> }) {
+  usePrayerAutoLocation(entries, onCreate, onUpdate);
   const day = todayIso();
   const p = prayerDay(entries);
   const toggle = async (name: string, on: boolean) => {
@@ -126,7 +128,7 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onRemove }: { tab: Sp
       <div className="prayer-hero">
         <span className="eyebrow light">Prochaine prière</span>
         <strong className="serif">{p?.next ? `${p.next.name} · ${p.next.time}` : p ? 'Fajr · demain' : 'Horaires du jour'}</strong>
-        <span>{p?.next ? `${p.inText}${p.city ? ' · ' + p.city : ''}` : p ? `vers ${p.times[0]?.time ?? ''} (horaire d’aujourd’hui)${p.city ? ' · ' + p.city : ''}` : 'Récupère-les dans « Horaires des prières »'}</span>
+        <span>{p?.next ? `${p.inText}${p.city ? ' · ' + p.city : ''}` : p ? `vers ${p.times[0]?.time ?? ''} (horaire d’aujourd’hui)${p.city ? ' · ' + p.city : ''}` : 'Indique ta position une fois dans « Horaires des prières »'}</span>
         <small>{hijri()} · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</small>
       </div>
       <div className="soft-card list-card">{PRAYERS.map((name) => {
@@ -137,7 +139,7 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onRemove }: { tab: Sp
       })}</div>
       <DhikrCounter day={day} entries={entries} onCreate={onCreate} />
       <div className="rows">
-        <RowLink icon={CalendarDays} title="Horaires des prières" sub="ville, méthode de calcul" onClick={() => onTab('horaires')} />
+        <RowLink icon={CalendarDays} title="Horaires des prières" sub={p?.city ? p.city + " · position, méthode" : "ma position, méthode de calcul"} onClick={() => onTab('horaires')} />
         <RowLink icon={Heart} title="Mes invocations" sub="routine de dhikr, protection, pardon, réussite…" onClick={() => onTab('invocations')} />
         <RowLink icon={Sun} title="Calendrier hégirien" onClick={() => onTab('hijri')} />
         <RowLink icon={BookHeart} title="Mon journal spirituel" onClick={() => onTab('journal')} />

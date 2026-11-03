@@ -6,7 +6,7 @@ export const INTEGRATIONS: { id: IntegrationId; label: string; details: string; 
   { id: 'assistant', label: 'Assistant IA', details: 'Tes questions sont envoyées à l’assistant IA.', external: 'Google Gemini, uniquement quand tu poses une question' },
   { id: 'calendar', label: 'Calendriers externes', details: 'Autorise la création volontaire d’un fichier .ics à importer ailleurs. Pas de liaison automatique.', external: 'Aucun service contacté par My Thirties' },
   { id: 'notifications', label: 'Notifications', details: 'Autorise les rappels de la page ouverte, sous réserve de la permission du navigateur.', external: 'Aucun service de notification distant' },
-  { id: 'prayer', label: 'Horaires de prière', details: 'Autorise une recherche par ville et méthode à ta demande.', external: 'AlAdhan reçoit ville, pays, date et méthode' },
+  { id: 'prayer', label: 'Horaires de prière', details: 'Calculés sur ton téléphone à partir de ta position, enregistrée une fois.', external: 'La recherche de ville passe par Open-Meteo ; le nom de la ville par BigDataCloud' },
   { id: 'video', label: 'Analyse vidéo', details: 'Autorise le chargement du modèle de détection de posture ; les vidéos restent locales.', external: 'MediaPipe et hébergement des modèles' },
   { id: 'sync', label: 'Synchronisation iPhone/web', details: 'Préférence enregistrée, sans transfert pour le moment : moteur natif non déployé.', external: 'Aucun transfert natif actif' },
 ];

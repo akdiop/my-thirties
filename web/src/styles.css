@@ -1585,3 +1585,21 @@ html.dark img,html.dark video,html.dark picture,html.dark canvas,html.dark ifram
 .letter-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .letter-grid button{height:40px;border-radius:10px;border:1px solid #e8ddd5;background:#fffcfa;color:inherit;font-weight:600}
 .letter-grid button.ok{background:#cfdcd4}.letter-grid button.ko{background:#f1e6e2;color:#b9aaa3}
+.fold-head{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;padding:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.fold-head>span{flex:1;display:flex;flex-direction:column;gap:2px}
+.fold-head>span strong{font-size:1rem}
+.fold-head>span small{font-size:.8rem}
+.fold-head .flip{transform:rotate(180deg)}
+.iphone-cal.folded{margin-top:22px}
+.prayer-settings{display:flex;flex-direction:column;gap:12px}
+.prayer-choose{display:flex;flex-direction:column;gap:8px}
+.search-row{display:flex;gap:8px}.search-row input{flex:1;min-width:0}
+.city-result{display:flex;align-items:center;gap:8px;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid #efe3de;background:#fffcfa;color:inherit;font:inherit}
+.prayer-place{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#f6efea}
+.prayer-place>span{flex:1;display:flex;flex-direction:column}
+.prayer-today{display:flex;flex-direction:column}
+.prayer-line{display:flex;justify-content:space-between;padding:9px 2px;border-bottom:1px solid #f1e6e1}
+.prayer-line:last-child{border-bottom:0}
+.prayer-line.sun{color:#8a7a72;font-size:.9rem}
+.field-label{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:#806A5F}
+.opt-row{display:flex;flex-direction:row;align-items:center;gap:10px;font-size:.92rem;font-weight:500;color:#3A2A24;text-align:left}.opt-row input{width:20px;height:20px;flex-shrink:0;margin:0}
