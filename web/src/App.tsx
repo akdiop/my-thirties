@@ -12,18 +12,12 @@ import { newOnly, validateRestore } from './lib/restore';
 import { useThemeClock, useThemeMode, NIGHT_FROM, NIGHT_TO, type ThemeMode } from './lib/theme';
 import { consolidateIngredients, groceryTitle, mergeGroceryItems, weekGroceryItems, weekStart, type ListItem } from './lib/groceries';
 import { deleteEntryMedia } from './lib/mediaLibrary';
-import { PersonalProfile, ProfileAvatar } from './features/PersonalProfile';
+import { ProfileAvatar } from './features/PersonalProfile';
 import { birthdayLine, PROFILE_KIND, readProfile } from './lib/profile';
 import { PHOTO_KIND } from './lib/photos';
 import { PhotoProvider } from './features/HeroPhoto';
 import { Home as HomeScreen } from './screens/Home';
-import { Agenda } from './screens/Agenda';
-import { Wellbeing } from './screens/Wellbeing';
-import { Spaces } from './screens/Spaces';
-import { Calm } from './screens/Calm';
-import { HealthTop } from './screens/HealthTop';
-import { FinanceTop } from './screens/FinanceTop';
-import { CuisineTop, EquilibreTop, SpiritTop, TravelTop, type CuisineTab, type EquilibreTab, type SpiritTab } from './screens/ModuleTops';
+import type { CuisineTab, EquilibreTab, SpiritTab } from './screens/ModuleTops';
 import { ScreenHeader, SectionTitle, Segmented } from './ui/kit';
 import { GuidedField } from './ui/fields';
 import { HIDDEN_KIND, HiddenProvider, readHidden, useHidden, type Hidden } from './lib/hidden';
@@ -35,6 +29,17 @@ import { clearOffline, isNetworkError, knownOwner, loadOffline, rememberOwner, s
 import { Sparkles } from 'lucide-react';
 
 // Écrans chargés à la demande : l'app s'ouvre plus vite.
+const Agenda = lazy(() => import('./screens/Agenda').then((m) => ({ default: m.Agenda })));
+const Wellbeing = lazy(() => import('./screens/Wellbeing').then((m) => ({ default: m.Wellbeing })));
+const Spaces = lazy(() => import('./screens/Spaces').then((m) => ({ default: m.Spaces })));
+const Calm = lazy(() => import('./screens/Calm').then((m) => ({ default: m.Calm })));
+const HealthTop = lazy(() => import('./screens/HealthTop').then((m) => ({ default: m.HealthTop })));
+const FinanceTop = lazy(() => import('./screens/FinanceTop').then((m) => ({ default: m.FinanceTop })));
+const CuisineTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ default: m.CuisineTop })));
+const EquilibreTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ default: m.EquilibreTop })));
+const SpiritTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ default: m.SpiritTop })));
+const TravelTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ default: m.TravelTop })));
+const PersonalProfile = lazy(() => import('./features/PersonalProfile').then((m) => ({ default: m.PersonalProfile })));
 const BoosterPlan = lazy(() => import('./features/BoosterPlan').then((m) => ({ default: m.BoosterPlan })));
 const RecipeView = lazy(() => import('./features/RecipeView').then((m) => ({ default: m.RecipeView })));
 const TravelTools = lazy(() => import('./features/TravelTools').then((m) => ({ default: m.TravelTools })));
@@ -409,7 +414,15 @@ function Profile({ view, onSettings, email, entries, profileEntry, onSaveProfile
   </div>;
 }
 
+/** Après l'ouverture, on charge en arrière-plan les écrans principaux pour qu'ils s'ouvrent sans attente. */
+function preloadScreens() {
+  const run = () => { void import('./screens/Agenda'); void import('./screens/Wellbeing'); void import('./screens/Spaces'); void import('./screens/ModuleTops');
+    void import('./screens/HealthTop'); void import('./screens/FinanceTop'); void import('./features/PersonalProfile'); void import('./screens/Calm'); };
+  if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(run, { timeout: 4000 }); else setTimeout(run, 2500);
+}
+
 export default function App() {
+  useEffect(() => { preloadScreens(); }, []);
   useThemeClock();
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(false);
