@@ -1743,3 +1743,4 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area
 .quiz-btns{display:flex;gap:6px;align-items:center}
 .quiz-row.ok .quiz-btns svg{color:#6F8A80}
 .quiz-row.ko .quiz-btns svg{color:#b5715f}
+.row-text small::first-letter{text-transform:uppercase}
