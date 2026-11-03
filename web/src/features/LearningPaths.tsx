@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BookOpen, Brush, Check, ChevronDown, Languages, PenLine, Trash2, Volume2, X } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { PATH_CATEGORIES, PATHS, pathById, type PathCategory } from '../lib/learning';
 import { HeroPhoto } from './HeroPhoto';
 import { Bar, Segmented } from '../ui/kit';
 import { HiddenNote, useHidden } from '../lib/hidden';
+import { COURSE_LOADERS } from '../lib/langCourses';
+import type { LangCourse, LangLesson, Triple } from '../lib/langCourses/types';
 
 const ICON: Record<PathCategory, typeof Languages> = { Langues: Languages, 'Peinture & dessin': Brush, Écriture: PenLine };
 const doneOf = (e: Entry) => (e.data.done && typeof e.data.done === 'object' ? e.data.done as Record<string, boolean> : {});
@@ -17,7 +19,7 @@ function speak(text: string, lang: string) {
     window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
   } catch { /* synthèse vocale indisponible */ }
 }
-const LANG_CODE: Record<string, string> = { 'lang-espagnol': 'es-ES', 'lang-portugais': 'pt-PT', 'lang-arabe': 'ar-SA', 'lang-anglais': 'en-GB', 'lang-italien': 'it-IT', 'lang-allemand': 'de-DE', 'lang-japonais': 'ja-JP', 'lang-coreen': 'ko-KR' };
+const LANG_CODE: Record<string, string> = { 'lang-espagnol': 'es-ES', 'lang-portugais': 'pt-PT', 'lang-arabe': 'ar-SA', 'lang-arabe-2': 'ar-SA', 'lang-arabe-3': 'ar-SA', 'lang-italien': 'it-IT', 'lang-allemand': 'de-DE', 'lang-japonais': 'ja-JP', 'lang-coreen': 'ko-KR' };
 /** Nombre de suggestions visibles par catégorie : quand j'en retire une, la suivante prend sa place. */
 const VISIBLE = 5;
 
@@ -71,6 +73,9 @@ function ActivePath({ entry, onUpdate, onStop }: { entry: Entry; onUpdate: (e: E
   const [open, setOpen] = useState<number>(next === -1 ? p.steps.length - 1 : next);
   const toggle = (i: number) => void onUpdate(entry, { ...entry.data, done: { ...done, [i]: !done[i] } });
   const lang = LANG_CODE[p.id];
+  const [course, setCourse] = useState<LangCourse | null>(null);
+  useEffect(() => { let on = true; void COURSE_LOADERS[p.id]?.().then((c) => { if (on) setCourse(c); }); return () => { on = false; }; }, [p.id]);
+  const canSpeak = Boolean(lang) && typeof window !== 'undefined' && 'speechSynthesis' in window;
 
   return <article className="active-path">
     <HeroPhoto slot={'path-' + p.id} tone={p.tone} label={p.title}>
@@ -79,6 +84,10 @@ function ActivePath({ entry, onUpdate, onStop }: { entry: Entry; onUpdate: (e: E
     <div className="active-head"><span className="muted">{next === -1 ? 'Parcours terminé, bravo !' : `Étape ${next + 1} sur ${p.steps.length}`}</span><strong>{count}/{p.steps.length}</strong>
       <button className="icon-btn" aria-label={'Arrêter le parcours ' + p.title} title="Arrêter ce parcours" onClick={onStop}><Trash2 size={17} /></button></div>
     <Bar value={count / p.steps.length} />
+    {course?.script && <details className="lang-script"><summary>{course.script.title}</summary>
+      {course.script.points.map((t) => <p key={t} className="fiche-pt">{t}</p>)}
+      {course.script.table && <TripleTable rows={course.script.table} heads={['Lettre', 'Se prononce', 'Exemple']} />}
+    </details>}
     <ol className="steps">{p.steps.map((s, i) => <li key={i} className={'step' + (done[i] ? ' done' : '') + (i === next ? ' current' : '')}>
       <button className="step-head" aria-expanded={open === i} onClick={() => setOpen(open === i ? -1 : i)}>
         <span className="step-num">{done[i] ? <Check size={15} strokeWidth={3} /> : i + 1}</span>
@@ -86,8 +95,10 @@ function ActivePath({ entry, onUpdate, onStop }: { entry: Entry; onUpdate: (e: E
         <ChevronDown size={18} className="chev" />
       </button>
       {open === i && <div className="step-body">
+        {course?.lessons[i] && <LessonBody lesson={course.lessons[i]!} speakIt={canSpeak ? (t) => speak(t, lang!) : undefined} />}
+        <span className="eyebrow-s">À faire</span>
         <ul className="step-tasks">{s.tasks.map((t) => <li key={t}>{t}</li>)}</ul>
-        {s.phrases && <div className="phrases"><span className="eyebrow-s"><BookOpen size={14} /> Phrases modèles</span>
+        {!course?.lessons[i] && s.phrases && <div className="phrases"><span className="eyebrow-s"><BookOpen size={14} /> Phrases modèles</span>
           {s.phrases.map(([o, fr]) => <div key={o} className="phrase"><div><strong>{o}</strong><small>{fr}</small></div>
             {lang && 'speechSynthesis' in window && <button className="icon-btn" aria-label={'Écouter ' + o} onClick={() => speak(o, lang)}><Volume2 size={18} /></button>}</div>)}
         </div>}
@@ -96,4 +107,34 @@ function ActivePath({ entry, onUpdate, onStop }: { entry: Entry; onUpdate: (e: E
     </li>)}</ol>
     <p className="fineprint">Avance à ton rythme : une étape peut prendre plusieurs jours. Note tes séances avec « Séance de pratique ».</p>
   </article>;
+}
+
+const isAr = (t: string) => /[\u0600-\u06FF]/.test(t);
+
+function TripleTable({ rows, heads, speakIt }: { rows: Triple[]; heads: [string, string, string]; speakIt?: (t: string) => void }) {
+  return <div className="lang-table" role="table">
+    <div className="lang-row head" role="row">{heads.map((h) => <span key={h} role="columnheader">{h}</span>)}</div>
+    {rows.map(([a, b, c]) => <div key={a + c} className="lang-row" role="row">
+      <span role="cell" className={'lang-orig' + (isAr(a) ? ' lang-ar' : '')} dir="auto">{a}{speakIt && <button className="icon-btn tiny" aria-label={'Écouter ' + a} onClick={() => speakIt(a)}><Volume2 size={14} /></button>}</span>
+      <span role="cell" className="lang-pron">{b}</span><span role="cell">{c}</span></div>)}
+  </div>;
+}
+
+function Lines({ rows, speakIt }: { rows: Triple[]; speakIt?: (t: string) => void }) {
+  return <>{rows.map(([o, pr, fr]) => <div key={o + fr} className="phrase"><div><strong className={isAr(o) ? 'lang-ar' : undefined} dir="auto">{o}</strong><em className="lang-pron">{pr}</em><small>{fr}</small></div>
+    {speakIt && <button className="icon-btn" aria-label={'Écouter ' + o} onClick={() => speakIt(o)}><Volume2 size={18} /></button>}</div>)}</>;
+}
+
+/** Une leçon : explications, vocabulaire, écriture, phrases, dialogue et lecture. */
+function LessonBody({ lesson, speakIt }: { lesson: LangLesson; speakIt?: (t: string) => void }) {
+  return <div className="lang-lesson">
+    <span className="eyebrow-s"><BookOpen size={14} /> Le cours</span>
+    {lesson.lesson.map((t) => <p key={t} className="fiche-pt">{t}</p>)}
+    <span className="eyebrow-s">Vocabulaire</span>
+    <TripleTable rows={lesson.vocab} heads={['Mot', 'Se dit', 'Sens']} speakIt={speakIt} />
+    {lesson.writing && <><span className="eyebrow-s"><PenLine size={14} /> Écriture</span><ul className="step-tasks">{lesson.writing.map((t) => <li key={t}>{t}</li>)}</ul></>}
+    <div className="phrases"><span className="eyebrow-s">Phrases modèles</span><Lines rows={lesson.phrases} speakIt={speakIt} /></div>
+    {lesson.dialogue && <div className="phrases"><span className="eyebrow-s">Dialogue</span><Lines rows={lesson.dialogue} speakIt={speakIt} /></div>}
+    {lesson.reading && <div className="phrases"><span className="eyebrow-s">Lecture · {lesson.reading.title}</span><Lines rows={lesson.reading.lines} speakIt={speakIt} /></div>}
+  </div>;
 }
