@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Check, ChevronDown, Gift, Plus, Trash2, UserPlus } from 'lucide-react';
+import { Check, ChevronDown, Gift, Pencil, Plus, Trash2, UserPlus } from 'lucide-react';
+import { SwipeRow } from '../ui/SwipeRow';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { isoOf } from '../lib/rituals';
 import { VISION_KIND as VISION_KIND_ALIAS } from '../lib/growth';
@@ -60,12 +61,15 @@ export function Relatives({ entries, onCreate, onUpdate, onEdit, onRemove }: { e
       <div className="relatives-list">{g.items.map(({ e, days, age, date }) => {
         const isOpen = open === e.id;
         return <article key={e.id} className={'relative-row' + (days <= 7 ? ' soon' : '') + (isOpen ? ' open' : '')}>
-          <button className="relative-head" onClick={() => setOpen(isOpen ? null : e.id)} aria-expanded={isOpen}>
+          <SwipeRow className="relative-swipe" actions={[
+            { label: 'Modifier', icon: <Pencil size={18} />, onClick: () => setOpen(e.id) },
+            { label: 'Retirer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => { if (confirm('Retirer ' + e.title + ' ?')) void onRemove(e); } },
+          ]}><button className="relative-head" onClick={() => setOpen(isOpen ? null : e.id)} aria-expanded={isOpen}>
             <span className={'relative-date ' + toneOf(e.data.relation)}><strong>{date.getDate()}</strong><small>{SHORT[date.getMonth()]}</small></span>
             <span className="habit-body"><strong>{e.title}</strong><small>{[age ? (days === 0 ? age + ' ans aujourd’hui' : 'fêtera ses ' + age + ' ans') : '', e.data.relation ? String(e.data.relation) : ''].filter(Boolean).join(' · ')}</small></span>
             <span className="relative-days">{days === 0 ? 'Aujourd’hui' : days === 1 ? 'Demain' : 'J-' + days}</span>
             <ChevronDown size={16} className={'list-chev' + (isOpen ? ' flip' : '')} />
-          </button>
+          </button></SwipeRow>
           {isOpen && <RelativeDetails entry={e} onUpdate={onUpdate} onEdit={onEdit} onRemove={onRemove} />}
         </article>; })}</div>
     </section>)}

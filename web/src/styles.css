@@ -1811,3 +1811,19 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area
 .timer-interval input{width:100%}
 .timer-free summary{cursor:pointer;color:#8c6257;font-weight:600}
 .timer-done{text-align:center;font-size:1.1rem;color:#4f6a60}
+/* Glisser vers la gauche pour agir */
+.swipe{position:relative;overflow:hidden;border-radius:inherit}
+.swipe-actions{position:absolute;top:0;right:0;bottom:0;display:flex}
+.swipe-btn{flex:1;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:.72rem;font-weight:600;color:#fff;padding:0 4px}
+.swipe-btn.danger{background:#b5715f}
+.swipe-btn.accent{background:#c9a08c}
+.swipe-btn.neutral{background:#8c7468}
+.swipe-content{position:relative;transition:transform .22s ease;touch-action:pan-y;background:var(--swipe-bg,#fffcfa)}
+.swipe-content.dragging{transition:none}
+.tl-swipe{flex:1;border-radius:14px}
+.note-swipe{border-radius:16px;--swipe-bg:#fff}
+.note-swipe.quote{--swipe-bg:#f8f1ec}
+.pin-mark{color:#c9a08c;margin-right:4px;vertical-align:-1px}
+.list-swipe{border-radius:10px}
+.relative-swipe{--swipe-bg:transparent;margin:-10px -14px;padding:10px 14px}.relative-row.soon .relative-swipe{--swipe-bg:#fbf1ee}.relative-row:not(.soon) .relative-swipe{--swipe-bg:#fffcfa}
+.card-swipe{border-radius:18px;--swipe-bg:transparent}.card-swipe>.swipe-content>article{margin:0}

@@ -1,18 +1,20 @@
 import { useState } from 'react';
-import { Check, ExternalLink, PiggyBank, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { Check, ExternalLink, PiggyBank, Plus, Sparkles, Trash2, Pencil } from 'lucide-react';
+import { SwipeRow } from '../ui/SwipeRow';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { isoOf } from '../lib/rituals';
 import { EXPENSE_CATEGORIES } from '../modules';
 import { fmt, mainCurrency } from '../lib/money';
 import { Bar } from '../ui/kit';
 
+type EditFull = (id: string, patch: { title: string; data: Record<string, unknown> }) => Promise<void>;
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 export const WISH_KIND = 'envie';
 const CURRENCIES = ['XOF', 'EUR', 'USD'];
 const safeLink = (v: unknown) => (typeof v === 'string' && /^https:\/\/[^\s]+$/i.test(v) ? v : '');
 
 /** Mes envies : ce que je veux m'offrir, avec une jauge d'épargne pour chacune. */
-export function Wishes({ entries, onCreate, onUpdate, onRemove }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void> }) {
+export function Wishes({ entries, onCreate, onUpdate, onRemove, onEdit }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void>; onEdit?: EditFull }) {
   const all = entries.filter((e) => e.kind === WISH_KIND);
   const open = all.filter((e) => !e.data.bought), done = all.filter((e) => e.data.bought);
   const [adding, setAdding] = useState(!all.length);
@@ -37,7 +39,10 @@ export function Wishes({ entries, onCreate, onUpdate, onRemove }: { entries: Ent
     <img className="screen-cover" src="/modules/envies.webp" alt="Sac, parfum et vêtements" loading="lazy" />
     <div className="stack-8">{open.map((e) => {
       const p = Number(e.data.price) || 0, s = Number(e.data.saved) || 0, cur = String(e.data.currency || 'XOF'), url = safeLink(e.data.link);
-      return <article key={e.id} className="wish-card">
+      return <SwipeRow key={e.id} className="card-swipe" actions={[
+          { label: 'Renommer', icon: <Pencil size={18} />, onClick: () => { const v = window.prompt('Nouveau nom', e.title)?.trim(); if (v && onEdit) void onEdit(e.id, { title: v.slice(0, 80), data: e.data }); } },
+          { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => { if (confirm('Supprimer « ' + e.title + ' » ?')) void onRemove(e); } },
+        ]}><article className="wish-card">
         <div className="goal-head"><div><strong>{e.title}</strong><small className="muted">{p ? fmt(p, cur) : 'Prix à définir'}{e.data.category ? ' · ' + String(e.data.category) : ''}</small></div>
           <button className="icon-btn" aria-label={'Supprimer ' + e.title} onClick={() => { if (confirm('Supprimer « ' + e.title + ' » ?')) void onRemove(e); }}><Trash2 size={16} /></button></div>
         {p > 0 && <><Bar value={Math.min(1, s / p)} tone="caramel" /><small className="muted">{fmt(s, cur)} de côté{s >= p ? ' · c’est prêt !' : ' · reste ' + fmt(p - s, cur)}</small></>}
@@ -49,7 +54,7 @@ export function Wishes({ entries, onCreate, onUpdate, onRemove }: { entries: Ent
           <button className="button ghost small" onClick={() => void bought(e)}><Check size={14} /> Je me l’offre</button>
           {url && <a className="link-btn small" href={url} target="_blank" rel="noreferrer noopener"><ExternalLink size={14} /> Voir</a>}
         </div>
-      </article>; })}</div>
+      </article></SwipeRow>; })}</div>
 
     {adding ? <section className="ritual-card form-stack">
       <p className="ritual-label">Nouvelle envie</p>

@@ -1,6 +1,7 @@
 import { QuickAdd } from '../features/QuickAdd';
 import { useState } from 'react';
-import { ChevronDown, Plus, Search } from 'lucide-react';
+import { Check, ChevronDown, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { SwipeRow } from '../ui/SwipeRow';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { iso, parseDay, plusDays, timeline, todayIso, weekday, isDoneOn, toggledData } from '../lib/day';
 import { CalendarBoard } from '../features/CalendarBoard';
@@ -10,8 +11,8 @@ const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 const TONE_BG = { caramel: '#F3EBE2', chocolat: '#EFE3DA', sauge: '#E6ECE8', or: '#F3EBE2' } as const;
 const TONE_BAR = { caramel: '#C9A08C', chocolat: '#8C6257', sauge: '#6F8A80', or: '#D8B69F' } as const;
 
-export function Agenda({ entries, onAdd, onOpen, onUpdate, onCreate, embedded }: {
-  onImported?: () => void; embedded?: boolean; onCreate?: (i: EntryInput) => Promise<void>; entries: Entry[]; onAdd: () => void; onOpen: (e: Entry) => void; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>;
+export function Agenda({ entries, onAdd, onOpen, onUpdate, onCreate, onRemove, embedded }: {
+  onImported?: () => void; onRemove?: (e: Entry) => unknown; embedded?: boolean; onCreate?: (i: EntryInput) => Promise<void>; entries: Entry[]; onAdd: () => void; onOpen: (e: Entry) => void; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>;
 }) {
   const [mode, setMode] = useState<'day' | 'week' | 'month'>('week');
   const [selected, setSelected] = useState(todayIso());
@@ -50,13 +51,19 @@ export function Agenda({ entries, onAdd, onOpen, onUpdate, onCreate, embedded }:
         <div className="timeline">{items.length ? items.map((t) => {
           const task = t.entry.kind === 'task' || t.entry.kind === 'routine';
           const done = task && isDoneOn(t.entry, selected);
-          return <div className="tl-row" key={t.id}>
-            <span className="tl-time">{t.time || ''}</span>
-            <div className="tl-block" style={{ background: TONE_BG[t.tone] }}>
+          const own = t.entry.module === 'quotidien' && ['event', 'task', 'routine'].includes(t.entry.kind);
+          const block = <div className="tl-block" style={{ background: TONE_BG[t.tone], ['--swipe-bg' as string]: TONE_BG[t.tone] }}>
               <span className="tl-bar" style={{ background: TONE_BAR[t.tone] }} />
               <button className="tl-text" onClick={() => onOpen(t.entry)}><strong className={done ? 'done' : ''}>{t.title}</strong><small>{t.sub}</small></button>
               {task && <Check22 checked={done} label={t.title} onChange={(v) => void onUpdate(t.entry, toggledData(t.entry, selected, v))} />}
-            </div>
+            </div>;
+          return <div className="tl-row" key={t.id}>
+            <span className="tl-time">{t.time || ''}</span>
+            {own && onRemove ? <SwipeRow className="tl-swipe" actions={[
+              ...(task ? [{ label: done ? 'À faire' : 'Fait', icon: <Check size={18} />, tone: 'accent' as const, onClick: () => void onUpdate(t.entry, toggledData(t.entry, selected, !done)) }] : []),
+              { label: 'Modifier', icon: <Pencil size={18} />, onClick: () => onOpen(t.entry) },
+              { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => void onRemove(t.entry) },
+            ]}>{block}</SwipeRow> : block}
           </div>;
         }) : <p className="muted center">Rien de prévu ce jour-là.</p>}</div>
       </>}

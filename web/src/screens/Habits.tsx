@@ -1,17 +1,19 @@
 import { Glyph, type GlyphName, type Tint } from '../ui/Glyph';
 import { useState } from 'react';
 import { Check, Flame, Link2, Pencil, Plus, Sparkles, Trash2, Trophy, X } from 'lucide-react';
+import { SwipeRow } from '../ui/SwipeRow';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { addDays, FREQ_LABEL, freqTarget, HABIT_GROUPS, HABIT_KIND, HABIT_LIBRARY, habitDone, habitFreq, habitStreak, isoOf, weekStartOf, type HabitFreq, type HabitLevel, type HabitTemplate } from '../lib/rituals';
 import { Bar, Segmented } from '../ui/kit';
 import { badgesOf, nextBadge } from '../lib/growth';
 import { JOURNEYS, JOURNEY_KIND, journeyWeek } from '../lib/journeys';
 
+type EditFull = (id: string, patch: { title: string; data: Record<string, unknown> }) => Promise<void>;
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 const LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
 /** Habitudes : bibliothèque d'idées, habitudes personnelles, coche du jour, série et semaine en cours. */
-export function Habits({ entries, onCreate, onUpdate, onRemove }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void> }) {
+export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void>; onEdit?: EditFull }) {
   const mine = entries.filter((e) => e.kind === HABIT_KIND);
   const [view, setView] = useState<'list' | 'library' | 'create'>('list');
   const [tab, setTab] = useState<'today' | 'parcours' | 'stats'>('today');
@@ -52,7 +54,10 @@ export function Habits({ entries, onCreate, onUpdate, onRemove }: { entries: Ent
         const weekCount = days.filter((d) => done[d]).length, streak = habitStreak(e, today);
         const total = Object.values(done).filter(Boolean).length, badges = badgesOf(total), next = nextBadge(total);
         const anchor = mine.find((x) => x.id === e.data.after);
-        return <article key={e.id} className={'habit-card' + (on ? ' on' : '')}>
+        return <SwipeRow key={e.id} className="card-swipe" actions={[
+          { label: 'Renommer', icon: <Pencil size={18} />, onClick: () => { const v = window.prompt('Nouveau nom', e.title)?.trim(); if (v && onEdit) void onEdit(e.id, { title: v.slice(0, 80), data: e.data }); } },
+          { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => { if (confirm('Arrêter l’habitude « ' + e.title + ' » ? Son historique sera supprimé.')) void onRemove(e); } },
+        ]}><article className={'habit-card' + (on ? ' on' : '')}>
           <button className="habit-check" aria-pressed={on} aria-label={(on ? 'Décocher ' : 'Fait aujourd’hui : ') + e.title}
             onClick={() => void onUpdate(e, { ...e.data, done: { ...done, [today]: !on } })}>{on ? <Check size={22} strokeWidth={3} /> : <Glyph name={String(e.data.icon || 'sprout')} tint={(e.data.tint as Tint) || 'sauge'} size={24} />}</button>
           <div className="habit-body">
@@ -71,7 +76,7 @@ export function Habits({ entries, onCreate, onUpdate, onRemove }: { entries: Ent
             </select>}
           </div>
           <button className="icon-btn" aria-label={'Supprimer ' + e.title} onClick={() => { if (confirm('Arrêter l’habitude « ' + e.title + ' » ? Son historique sera supprimé.')) void onRemove(e); }}><Trash2 size={16} /></button>
-        </article>;
+        </article></SwipeRow>;
         })}</div>
       </section>)}
       <div className="button-group">

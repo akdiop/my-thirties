@@ -1,6 +1,7 @@
 import { Glyph, MoodIcon, type GlyphName, type Tint } from '../ui/Glyph';
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Flame, Plus, Search, Trash2 } from 'lucide-react';
+import { ArrowLeft, Flame, Pin, PinOff, Plus, Search, Trash2 } from 'lucide-react';
+import { SwipeRow, type SwipeAction } from '../ui/SwipeRow';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { NoteMedia } from '../features/NoteMedia';
 import { fold, fullText } from '../lib/search';
@@ -56,9 +57,15 @@ export function Notes({ entries, onCreate, onEdit, onRemove, onOpenDay }: {
   const list = (items: Entry[]) => <div className="note-list">{items.map((e) => e.kind === DAILY_KIND
     ? <button key={e.id} className="note-row" onClick={() => open(e)}><span className="note-emoji">{e.data.mood ? <MoodIcon mood={e.data.mood} badge={36} /> : <Glyph name="calendar" tint="caramel" badge={36} />}</span>
       <span><strong>Mon jour · {when(String(e.entry_date) + 'T12:00:00')}</strong><small>{String(e.data.intention || e.data.win || 'Daily Reset')}</small></span></button>
-    : <button key={e.id} className="note-row" onClick={() => open(e)}><span className="note-emoji"><Glyph name={noteType(e.data.type).icon} tint={noteType(e.data.type).tint} badge={36} /></span>
-      <span><strong>{e.title}</strong><small>{String(e.data.body ?? '').slice(0, 90)}</small><small className="muted">{when(e.created_at)}</small></span></button>)}</div>;
+    : <SwipeRow key={e.id} className="note-swipe" actions={actions(e)}><button className="note-row" onClick={() => open(e)}><span className="note-emoji"><Glyph name={noteType(e.data.type).icon} tint={noteType(e.data.type).tint} badge={36} /></span>
+      <span><strong>{e.data.pinned ? <Pin size={13} className="pin-mark" /> : null}{e.title}</strong><small>{String(e.data.body ?? '').slice(0, 90)}</small><small className="muted">{when(e.created_at)}</small></span></button></SwipeRow>)}</div>;
 
+  // Glisser une note vers la gauche : l'épingler en haut ou la supprimer.
+  const actions = (e: Entry): SwipeAction[] => [
+    { label: e.data.pinned ? 'Détacher' : 'Épingler', icon: e.data.pinned ? <PinOff size={18} /> : <Pin size={18} />, tone: 'accent', onClick: () => void onEdit(e.id, { title: e.title, data: { ...e.data, pinned: !e.data.pinned } }) },
+    { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => { if (confirm('Supprimer « ' + e.title + ' » ?')) void onRemove(e); } },
+  ];
+  const pinned = notes.filter((n) => n.data.pinned);
   const current = NOTE_FOLDERS.find((f) => f.id === folder);
   return <div className="screen notes">
     <header className="tab-head notes-head">
@@ -75,7 +82,9 @@ export function Notes({ entries, onCreate, onEdit, onRemove, onOpenDay }: {
           <button className="folder" onClick={() => setFolder('daily')}><Glyph name="calendar" tint="caramel" size={22} badge={44} /><strong>Mes journées</strong><small>{days.length} jour(s)</small></button>
         </div>
         {yearAgoOn() && <OneYearAgo entries={entries} onOpenDay={(d) => onOpenDay(d)} onOpenNote={open} />}
-        {notes.length > 0 && <><p className="eyebrow-s">Récentes</p>{list(notes.slice(0, 5))}</>}
+        {pinned.length > 0 && <><p className="eyebrow-s"><Pin size={13} /> Épinglées</p>{list(pinned)}</>}
+        {notes.length > 0 && <><p className="eyebrow-s">Récentes</p>{list(notes.filter((n) => !n.data.pinned).slice(0, 5))}</>}
+        {notes.length > 0 && <p className="fineprint">Astuce : fais glisser une note vers la gauche pour l’épingler ou la supprimer.</p>}
         <section className="pdf-export"><p className="ritual-label"><FileDown size={16} /> Exporter un mois en PDF</p>
           <div className="todo-add"><input type="month" className="soft-input" value={pdfMonth} max={new Date().toLocaleDateString('en-CA').slice(0, 7)} onChange={(e) => setPdfMonth(e.target.value)} />
             <button className="button soft" disabled={!pdfMonth} onClick={() => setPrintMonth(pdfMonth)}>Exporter</button></div>
@@ -83,7 +92,7 @@ export function Notes({ entries, onCreate, onEdit, onRemove, onOpenDay }: {
       </>}
     </>}
     {folder === 'daily' && (days.length ? list(days) : <p className="muted">Tes journées remplies dans « Mon jour » apparaîtront ici.</p>)}
-    {current && <FolderView folder={current} notes={notes.filter((n) => (n.data.folder ?? 'journal') === current.id)} onOpen={open} onStart={start} />}
+    {current && <FolderView folder={current} notes={notes.filter((n) => (n.data.folder ?? 'journal') === current.id)} onOpen={open} onStart={start} actions={actions} />}
 
     {printMonth && <PrintJournal entries={entries} month={printMonth} onDone={() => setPrintMonth('')} />}
     {picker && <div className="modal-overlay sheet" role="dialog" aria-modal="true" aria-label="Nouvelle note" onClick={() => setPicker(false)}>
@@ -135,7 +144,7 @@ function NoteEditor({ noteId, type, entry, onCreate, onEdit, onRemove, onClose }
 }
 
 /** Un dossier ouvert : notes rangées par mois, affirmations en citations (sans doublons), et idées pour commencer. */
-function FolderView({ folder, notes, onOpen, onStart }: { folder: { id: string; icon: GlyphName; tint: Tint; label: string }; notes: Entry[]; onOpen: (e: Entry) => void; onStart: (t: NoteType) => void }) {
+function FolderView({ folder, notes, onOpen, onStart, actions }: { folder: { id: string; icon: GlyphName; tint: Tint; label: string }; notes: Entry[]; onOpen: (e: Entry) => void; onStart: (t: NoteType) => void; actions: (e: Entry) => SwipeAction[] }) {
   const ideas = NOTE_TYPES.filter((t) => t.folder === folder.id && !t.to);
   // Une même affirmation gardée plusieurs fois n'apparaît qu'une fois, avec le nombre de fois.
   const seen = new Map<string, number>();
@@ -146,8 +155,8 @@ function FolderView({ folder, notes, onOpen, onStart }: { folder: { id: string; 
     return seen.get(k) === 1;
   });
   const groups: { label: string; items: Entry[] }[] = [];
-  for (const n of items) {
-    const label = monthOf(String(n.data.updated ?? n.created_at));
+  for (const n of [...items.filter((x) => x.data.pinned), ...items.filter((x) => !x.data.pinned)]) {
+    const label = n.data.pinned ? 'Épinglées' : monthOf(String(n.data.updated ?? n.created_at));
     const g = groups.find((x) => x.label === label);
     if (g) g.items.push(n); else groups.push({ label, items: [n] });
   }
@@ -163,12 +172,12 @@ function FolderView({ folder, notes, onOpen, onStart }: { folder: { id: string; 
     {groups.map((g) => <section key={g.label}>
       <p className="relatives-month-title">{g.label}<small>{g.items.length}</small></p>
       <div className="note-list">{g.items.map((e) => e.title === 'Affirmation'
-        ? <button key={e.id} className="note-quote" onClick={() => onOpen(e)}>
+        ? <SwipeRow key={e.id} className="note-swipe quote" actions={actions(e)}><button className="note-quote" onClick={() => onOpen(e)}>
             <span className="quote-mark" aria-hidden="true">“</span>
-            <span><em>{String(e.data.body ?? '')}</em><small>{seen.get(String(e.data.body ?? ''))! > 1 ? 'Gardée ' + seen.get(String(e.data.body ?? '')) + ' fois · ' : ''}{when(e.created_at)}</small></span></button>
-        : <button key={e.id} className="note-row" onClick={() => onOpen(e)}>
+            <span><em>{String(e.data.body ?? '')}</em><small>{seen.get(String(e.data.body ?? ''))! > 1 ? 'Gardée ' + seen.get(String(e.data.body ?? '')) + ' fois · ' : ''}{when(e.created_at)}</small></span></button></SwipeRow>
+        : <SwipeRow key={e.id} className="note-swipe" actions={actions(e)}><button className="note-row" onClick={() => onOpen(e)}>
             <span className="note-emoji"><Glyph name={noteType(e.data.type).icon} tint={noteType(e.data.type).tint} badge={36} /></span>
-            <span><strong>{e.title}</strong><small>{String(e.data.body ?? '').slice(0, 120)}</small><small className="muted">{when(String(e.data.updated ?? e.created_at))}</small></span></button>)}</div>
+            <span><strong>{e.title}</strong><small>{String(e.data.body ?? '').slice(0, 120)}</small><small className="muted">{when(String(e.data.updated ?? e.created_at))}</small></span></button></SwipeRow>)}</div>
     </section>)}
     {ideas.length > 0 && <details className="folder-more"><summary>Écrire une nouvelle page</summary>{start}</details>}
   </div>;

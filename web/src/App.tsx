@@ -135,8 +135,8 @@ function Login({ onSignedIn }: { onSignedIn: () => void }) {
 
 type Preset = { kind: string; data: Record<string, string>; title?: string };
 
-function Editor({ module, initial, preset, entries, onSave, onCancel, busy }: {
-  module: Module; initial?: Entry; preset?: Preset; entries: Entry[]; onSave: (input: EntryInput, id?: string) => Promise<void>; onCancel: () => void; busy: boolean;
+function Editor({ module, initial, preset, entries, onSave, onCancel, onDelete, busy }: {
+  module: Module; initial?: Entry; preset?: Preset; entries: Entry[]; onSave: (input: EntryInput, id?: string) => Promise<void>; onCancel: () => void; onDelete?: (e: Entry) => Promise<void>; busy: boolean;
 }) {
   const [kindId, setKindId] = useState(initial?.kind ?? (preset && module.kinds.some((k) => k.id === preset.kind) ? preset.kind : module.kinds.find((k) => !k.hidden)!.id));
   const [title, setTitle] = useState(initial?.title ?? preset?.title ?? '');
@@ -188,7 +188,7 @@ function Editor({ module, initial, preset, entries, onSave, onCancel, busy }: {
             return <GuidedField key={kind.id + field.id} field={{ ...field, options }} value={String(form[field.id] ?? '')} onChange={(v) => update(field.id, v)} />;
           })}
           {error && <p role="alert" className="error">{error}</p>}
-          <div className="editor-actions"><button type="button" className="button ghost" onClick={onCancel}>Annuler</button><button className="button primary" type="submit" disabled={busy}><Save size={16} /> {busy ? 'Enregistrement…' : 'Enregistrer'}</button></div>
+          <div className="editor-actions">{initial && onDelete && <button type="button" className="button ghost danger editor-delete" onClick={() => void onDelete(initial)}><Trash2 size={16} /> Supprimer</button>}<button type="button" className="button ghost" onClick={onCancel}>Annuler</button><button className="button primary" type="submit" disabled={busy}><Save size={16} /> {busy ? 'Enregistrement…' : 'Enregistrer'}</button></div>
         </form>
       </section>
     </div>
@@ -601,10 +601,10 @@ export default function App() {
     try { await editEntry(entry.id, { data }); await refresh(); }
     catch (e) { setError(e instanceof Error ? e.message : 'Mise à jour impossible.'); }
   };
-  const remove = async (entry: Entry) => {
-    if (!window.confirm('Supprimer définitivement « ' + entry.title + ' » ?')) return;
-    try { await removeEntry(entry.id); await deleteEntryMedia(session!.user.id, entry.id).catch(() => setError('Entrée supprimée, mais ses médias locaux n’ont pas pu être nettoyés.')); if (isMeal(entry)) await syncGroceries([entry.entry_date]); await refresh(); }
-    catch (e) { setError(e instanceof Error ? e.message : 'Suppression impossible.'); }
+  const remove = async (entry: Entry): Promise<boolean> => {
+    if (!window.confirm('Supprimer définitivement « ' + entry.title + ' » ?')) return false;
+    try { await removeEntry(entry.id); await deleteEntryMedia(session!.user.id, entry.id).catch(() => setError('Entrée supprimée, mais ses médias locaux n’ont pas pu être nettoyés.')); if (isMeal(entry)) await syncGroceries([entry.entry_date]); await refresh(); return true; }
+    catch (e) { setError(e instanceof Error ? e.message : 'Suppression impossible.'); return false; }
   };
   const createGroceries = async (title: string, items: string[]) => {
     try {
@@ -669,19 +669,19 @@ export default function App() {
       {loading && <div className="sync-status" role="status">Synchronisation…</div>}
       {screen === 'home' && <HomeScreen todayCard={<TodayCard entries={entries} habits={ritualEntries.filter((e) => e.kind === HABIT_KIND)} onUpdate={updateData} onTogglePrayer={(name, on) => void togglePrayer(entries, name, on, createFromTool, removeQuiet)} onOpenHabits={() => go('habits')} onOpenAgenda={() => go('agenda')} />} rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} onUpdate={updateData} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} onQuickAdd={(title) => createFromTool({ module: 'quotidien', kind: 'task', title, entry_date: today(), data: { date: today(), priority: 'Haute' } })} />}
       {screen === 'myday' && <LockGate><MyDay key={dayTarget.n} entries={ritualEntries} initialDate={dayTarget.date} initialPart={dayTarget.part} onCreate={createFromTool} onUpdate={updateData} /></LockGate>}
-      {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}
+      {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} onEdit={editFull} />}
       {screen === 'notes' && <LockGate><Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={removeQuiet} onOpenDay={openDay} /></LockGate>}
       {screen === 'bilan' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><Review entries={ritualEntries} /></LockGate>}
       {screen === 'boussole' && <><ScreenHeader title="" onBack={() => go('home')} /><Compass entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} onEditProfile={() => go('settings')} /></>}
       {screen === 'focus' && <><ScreenHeader title="" onBack={() => go('home')} /><Focus entries={ritualEntries} onCreate={createFromTool} /></>}
-      {screen === 'sommeil' && <><ScreenHeader title="" onBack={() => go('home')} /><Sleep entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} /></>}
-      {screen === 'complements' && <><ScreenHeader title="" onBack={() => go('home')} /><Supplements entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
+      {screen === 'sommeil' && <><ScreenHeader title="" onBack={() => go('home')} /><Sleep entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={remove} /></>}
+      {screen === 'complements' && <><ScreenHeader title="" onBack={() => go('home')} /><Supplements entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} onEdit={editFull} /></>}
       {screen === 'proches' && <><ScreenHeader title="" onBack={() => go('home')} /><Relatives entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onEdit={editFull} onRemove={removeQuiet} /></>}
       {screen === 'lectures' && <><ScreenHeader title="" onBack={() => go('home')} /><Reading entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
       {screen === 'panda' && <><ScreenHeader title="" onBack={() => go('home')} /><PandaScreen entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onGo={(x) => go(x as Screen)} /></>}
-      {screen === 'envies' && <><ScreenHeader title="" onBack={() => go('home')} /><Wishes entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
+      {screen === 'envies' && <><ScreenHeader title="" onBack={() => go('home')} /><Wishes entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} onEdit={editFull} /></>}
       {screen === 'mediter' && <><ScreenHeader title="" onBack={() => go('home')} /><Meditate entries={ritualEntries} onCreate={createFromTool} /></>}
-      {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onCreate={createFromTool} onImported={() => void refresh()} />}
+      {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onCreate={createFromTool} onRemove={remove} onImported={() => void refresh()} />}
       {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
       {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}
       {screen === 'calme' && <Calm onQuit={() => go('home')} onWrite={() => addIn('equilibre', 'emotion', { date: today() })} />}
@@ -691,7 +691,7 @@ export default function App() {
       {currentModule && <div className="screen">
         <ScreenHeader title={currentModule.name} onBack={() => go('spaces')}
           right={<button className="icon-btn" aria-label="Ajouter" onClick={() => setEditor({ module: currentModule })}><Plus size={24} /></button>} />
-        {currentModule.id === 'quotidien' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'task', { date: today() })} onOpen={openEntry} onUpdate={updateData} onCreate={createFromTool} embedded />}
+        {currentModule.id === 'quotidien' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'task', { date: today() })} onOpen={openEntry} onUpdate={updateData} onCreate={createFromTool} onRemove={remove} embedded />}
         {currentModule.id === 'sante' && <HealthTop entries={allModuleEntries} onAdd={(kind) => addIn('sante', kind, { date: today() })} />}
         {currentModule.id === 'sport' && <SportHub entries={allModuleEntries} challengeEntries={entries.filter((e) => e.module === 'challenges')} onCreate={createFromTool} onGoChallenges={() => go('challenges')} />}
         {currentModule.id === 'challenges' && <ChallengesBoard entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onQuit={removeQuiet} />}
@@ -721,7 +721,7 @@ export default function App() {
         {currentModule.id === 'passions' && <>
           <Segmented label="Passions" value={passionTab} onChange={setPassionTab} options={[{ value: 'parcours', label: 'Parcours' }, { value: 'series', label: 'Séries' }, { value: 'libre', label: 'Hobby libre' }]} />
           {passionTab === 'parcours' && <LearningPaths entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}
-          {passionTab === 'series' && <SeriesTracker entries={allModuleEntries} onUpdate={updateData} onCreate={createFromTool} onAdd={() => addIn('passions', 'series', { status: 'À voir', seasons: '1', episodes: '10' })} />}
+          {passionTab === 'series' && <SeriesTracker entries={allModuleEntries} onUpdate={updateData} onCreate={createFromTool} onRemove={remove} onAdd={() => addIn('passions', 'series', { status: 'À voir', seasons: '1', episodes: '10' })} />}
           {passionTab === 'libre' && <PassionPath entries={allModuleEntries} onUpdate={updateData} />}
         </>}
         {currentModule.id === 'listes' && <section className="list-templates"><p className="eyebrow-s">Modèles</p>
@@ -734,6 +734,6 @@ export default function App() {
       const on = screen === id || (id === 'spaces' && Boolean(currentModule));
       return <button key={id} className={on ? 'on' : ''} aria-current={on ? 'page' : undefined} onClick={() => go(id)}><Icon size={24} strokeWidth={on ? 2.2 : 1.6} /><span>{label}</span></button>;
     })}</nav>}
-    {editor && <Editor key={(editor.initial?.id ?? editor.module.id) + (editor.preset?.kind ?? '')} module={editor.module} initial={editor.initial} preset={editor.preset} entries={entries} onSave={save} onCancel={() => setEditor(null)} busy={working} />}
+    {editor && <Editor key={(editor.initial?.id ?? editor.module.id) + (editor.preset?.kind ?? '')} module={editor.module} initial={editor.initial} preset={editor.preset} entries={entries} onSave={save} onCancel={() => setEditor(null)} onDelete={async (e) => { if (await remove(e)) setEditor(null); }} busy={working} />}
   </div></Suspense></PhotoProvider></HiddenProvider>;
 }
