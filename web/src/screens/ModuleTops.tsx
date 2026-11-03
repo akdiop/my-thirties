@@ -4,7 +4,7 @@ import { BookHeart, CalendarDays, CloudSun, HandCoins, Heart, Lightbulb, MapPin,
 import type { Entry, EntryInput } from '../lib/cloud';
 import { str, todayIso } from '../lib/day';
 import { amountOf, currencyOf, fmt } from '../lib/money';
-import { PRAYERS, prayerDay } from '../lib/wellbeing';
+import { currentPrayer, PRAYERS, prayerDay, togglePrayer } from '../lib/wellbeing';
 import { usePrayerAutoLocation } from '../features/AutomaticPrayerTimes';
 import { HeroPhoto } from '../features/HeroPhoto';
 import { Check22, RowLink, Segmented, SectionTitle, type Tone } from '../ui/kit';
@@ -118,11 +118,8 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }:
   usePrayerAutoLocation(entries, onCreate, onUpdate);
   const day = todayIso();
   const p = prayerDay(entries);
-  const toggle = async (name: string, on: boolean) => {
-    const existing = entries.find((e) => e.kind === 'prayer' && e.entry_date === day && str(e, 'prayer') === name);
-    if (on && !existing) await onCreate({ module: 'spiritualite', kind: 'prayer', title: name, entry_date: day, data: { date: day, prayer: name } });
-    if (!on && existing) await onRemove(existing);
-  };
+  const toggle = (name: string, on: boolean) => togglePrayer(entries, name, on, onCreate, onRemove);
+  const cur = p ? currentPrayer(p) : null;
   return <div className="module-top">
     {tab === 'home' && <>
       <div className="prayer-hero">
@@ -130,8 +127,9 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }:
         <strong className="serif">{p?.next ? `${p.next.name} · ${p.next.time}` : p ? 'Fajr · demain' : 'Horaires du jour'}</strong>
         <span>{p?.next ? `${p.inText}${p.city ? ' · ' + p.city : ''}` : p ? `vers ${p.times[0]?.time ?? ''} (horaire d’aujourd’hui)${p.city ? ' · ' + p.city : ''}` : 'Indique ta position une fois dans « Horaires des prières »'}</span>
         <small>{hijri()} · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</small>
+        {cur && <button className="prayer-done-btn" onClick={() => void toggle(cur.name, true)}>J’ai prié {cur.name}</button>}
       </div>
-      <div className="soft-card list-card">{PRAYERS.map((name) => {
+      <div className="soft-card list-card">{p && <div className="prayed-count">{p.prayed.size} / 5 aujourd’hui</div>}{PRAYERS.map((name) => {
         const t = p?.times.find((x) => x.name === name)?.time ?? '—';
         const done = p?.prayed.has(name) ?? entries.some((e) => e.kind === 'prayer' && e.entry_date === day && str(e, 'prayer') === name);
         return <div className={'prio-row' + (p?.next?.name === name ? ' strong' : '')} key={name}><span>{name}</span><small className="num">{t}</small>

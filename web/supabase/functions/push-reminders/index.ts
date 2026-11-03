@@ -72,7 +72,7 @@ Deno.serve(async (request) => {
     if (!me?.user) return json({ error: 'Session invalide.' }, 401);
     const { data: owner } = await user.rpc('is_app_owner');
     if (owner !== true) return json({ error: 'Accès refusé.' }, 403);
-    return json({ sent: await send(me.user.id, { title: 'My Thirties', body: 'Les notifications fonctionnent sur cet appareil.', url: '/', tag: 'test' }) });
+    return json({ sent: await send(me.user.id, { title: 'Notifications activées', body: 'Tes rappels arriveront bien sur cet appareil.', url: '/', tag: 'test' }) });
   }
 
   // Tournée du minuteur : chaque utilisatrice avec au moins un appareil abonné.

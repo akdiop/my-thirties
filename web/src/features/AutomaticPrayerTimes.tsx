@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { LocateFixed, MapPin, Search } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
+import { Check22 } from '../ui/kit';
+import { todayIso } from '../lib/day';
+import { togglePrayer } from '../lib/wellbeing';
 import { computeTimes, distanceKm, geoGranted, locate, METHODS, placeName, PRAYER_SETTINGS_KIND, readSettings, searchCity, type MethodId, type PrayerSettings } from '../lib/prayertimes';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
@@ -35,7 +38,7 @@ export function usePrayerAutoLocation(entries: Entry[], onCreate: (i: EntryInput
   }, [cur?.entry.id]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
-export function AutomaticPrayerTimes({ entries, onCreate, onUpdate }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save }) {
+export function AutomaticPrayerTimes({ entries, onCreate, onUpdate, onRemove }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void> }) {
   const cur = readSettings(entries);
   const save = useSaveSettings(entries, onCreate, onUpdate);
   const [busy, setBusy] = useState(false), [msg, setMsg] = useState('');
@@ -59,6 +62,8 @@ export function AutomaticPrayerTimes({ entries, onCreate, onUpdate }: { entries:
   };
 
   const times = cur ? computeTimes(cur.settings) : null;
+  const day = todayIso();
+  const prayed = new Set(entries.filter((e) => e.kind === 'prayer' && e.entry_date === day).map((e) => String(e.data.prayer)));
   const choose = <div className="prayer-choose">
     <button className="button primary wide" disabled={busy} onClick={() => void useMyPosition()}><LocateFixed size={16} /> {busy ? 'Localisation…' : 'Utiliser ma position'}</button>
     <p className="muted small center">ou cherche une ville</p>
@@ -74,7 +79,8 @@ export function AutomaticPrayerTimes({ entries, onCreate, onUpdate }: { entries:
         <small className="muted">{cur.settings.auto ? 'Mise à jour automatique en voyage' : 'Ville fixe'}</small></span>
         <button className="link-btn small" onClick={() => setChanging(!changing)}>{changing ? 'Annuler' : 'Changer'}</button></div>
       {changing && choose}
-      <div className="prayer-today">{times && Object.entries(times).map(([k, v]) => <div key={k} className={'prayer-line' + (k === 'Sunrise' ? ' sun' : '')}><span>{LABELS[k]}</span><span className="num">{v}</span></div>)}</div>
+      <div className="prayer-today">{times && Object.entries(times).map(([k, v]) => <div key={k} className={'prayer-line' + (k === 'Sunrise' ? ' sun' : '') + (prayed.has(k) ? ' done' : '')}><span>{LABELS[k]}</span><span className="num">{v}</span>
+        {k === 'Sunrise' ? <span className="check-spacer" /> : <Check22 checked={prayed.has(k)} label={LABELS[k] + ' accomplie'} onChange={(on) => void togglePrayer(entries, k, on, onCreate, onRemove)} />}</div>)}</div>
       <label className="field-label">Méthode de calcul
         <select value={cur.settings.method} onChange={(e) => void save({ method: e.target.value as MethodId })}>{METHODS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}</select></label>
       <label className="opt-row"><input type="checkbox" checked={cur.settings.hanafi} onChange={(e) => void save({ hanafi: e.target.checked })} /> Asr selon l’école hanafite (plus tard)</label>

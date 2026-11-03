@@ -1603,3 +1603,9 @@ html.dark img,html.dark video,html.dark picture,html.dark canvas,html.dark ifram
 .prayer-line.sun{color:#8a7a72;font-size:.9rem}
 .field-label{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:#806A5F}
 .opt-row{display:flex;flex-direction:row;align-items:center;gap:10px;font-size:.92rem;font-weight:500;color:#3A2A24;text-align:left}.opt-row input{width:20px;height:20px;flex-shrink:0;margin:0}
+.prayer-line{align-items:center;gap:12px}
+.prayer-line>span:first-child{flex:1}
+.prayer-line.done>span:first-child,.prayer-line.done .num{color:#8a9a92;text-decoration:line-through}
+.check-spacer{display:inline-block;width:22px}
+.prayer-done-btn{margin-top:12px;align-self:flex-start;border:0;border-radius:999px;padding:9px 16px;background:#fffcfa;color:#4f6a60;font:inherit;font-weight:600}
+.prayed-count{font-size:.8rem;color:#806A5F;padding:10px 0 2px}

@@ -1,4 +1,4 @@
-import type { Entry } from './cloud';
+import type { Entry, EntryInput } from './cloud';
 import { parseDay, todayIso } from './day';
 import { computeTimes, readSettings } from './prayertimes';
 
@@ -19,6 +19,22 @@ export function prayerDay(entries: Entry[], now = new Date()) {
   const prayed = new Set(entries.filter((e) => e.kind === 'prayer' && e.entry_date === day).map((e) => String(e.data.prayer)));
   const inText = next ? (() => { const d = toMin(next.time) - minutes; return d >= 60 ? `dans ${Math.floor(d / 60)} h ${String(d % 60).padStart(2, '0')}` : `dans ${d} min`; })() : '';
   return { times, next, inText, prayed, city: saved ? saved.settings.place.split(',')[0] ?? '' : typeof schedule!.data.city === 'string' ? schedule!.data.city : '', sunrise: saved ? computeTimes(saved.settings, now).Sunrise : '' };
+}
+
+/** Coche ou décoche une prière du jour (une entrée « prayer » par prière accomplie). */
+export async function togglePrayer(entries: Entry[], name: string, on: boolean, onCreate: (i: EntryInput) => Promise<void>, onRemove: (e: Entry) => Promise<void>) {
+  const day = todayIso();
+  const existing = entries.find((e) => e.kind === 'prayer' && e.entry_date === day && String(e.data.prayer) === name);
+  if (on && !existing) await onCreate({ module: 'spiritualite', kind: 'prayer', title: name, entry_date: day, data: { date: day, prayer: name } });
+  if (!on && existing) await onRemove(existing);
+}
+
+/** Dernière prière dont l'heure est passée et pas encore cochée (pour le bouton « C'est fait »). */
+export function currentPrayer(p: NonNullable<ReturnType<typeof prayerDay>>, now = new Date()) {
+  const m = now.getHours() * 60 + now.getMinutes();
+  const past = p.times.filter((t) => Number(t.time.slice(0, 2)) * 60 + Number(t.time.slice(3, 5)) <= m);
+  const last = past.at(-1);
+  return last && !p.prayed.has(last.name) ? last : null;
 }
 
 /** Jour du cycle et estimation des prochaines règles à partir des débuts notés (indicatif). */
