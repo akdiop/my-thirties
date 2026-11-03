@@ -1653,3 +1653,5 @@ html.dark img,html.dark video,html.dark picture,html.dark canvas,html.dark ifram
 .quick-preview{margin:0 4px;font-size:.85rem;color:#806A5F;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .quick-preview.ok{color:#4f6a60}
 .quick-preview b{color:#3A2A24;text-transform:none}
+.backup-list{display:flex;flex-direction:column}.backup-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1e6e1}.backup-row:last-child{border-bottom:0}
+.quick-preview:not(.ok){display:block}

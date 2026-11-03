@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { cloud, configured, sendCreate, sendEdit, sendRemove, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
 import { downloadBackup, makeEncryptedBackup, parseEncryptedBackup } from './lib/backup';
+import { ensureMonthlyBackup, parsePlainBackup } from './lib/autoBackup';
 import { moduleById, modules, type Module } from './modules';
 import { newOnly, validateRestore } from './lib/restore';
 import { useThemeClock, useThemeMode, NIGHT_FROM, NIGHT_TO, type ThemeMode } from './lib/theme';
@@ -40,6 +41,7 @@ const CuisineTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ defa
 const EquilibreTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ default: m.EquilibreTop })));
 const SpiritTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ default: m.SpiritTop })));
 const TravelTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ default: m.TravelTop })));
+const MonthlyBackups = lazy(() => import('./features/MonthlyBackups').then((m) => ({ default: m.MonthlyBackups })));
 const Qibla = lazy(() => import('./features/Qibla').then((m) => ({ default: m.Qibla })));
 const PersonalProfile = lazy(() => import('./features/PersonalProfile').then((m) => ({ default: m.PersonalProfile })));
 const BoosterPlan = lazy(() => import('./features/BoosterPlan').then((m) => ({ default: m.BoosterPlan })));
@@ -347,11 +349,13 @@ function Profile({ view, onSettings, email, entries, profileEntry, onSaveProfile
   const restoreFile = async (file: File | undefined) => {
     if (!file) return;
     setMessage('');
-    if (!password) return setMessage('Saisis d’abord la phrase secrète de la sauvegarde.');
+    const text = file.size <= 16_000_000 ? await file.text() : '';
+    const plain = parsePlainBackup(text);
+    if (!plain && !password) return setMessage('Saisis d’abord la phrase secrète de la sauvegarde.');
     setBusy(true);
     try {
-      if (file.size > 8_000_000) throw new Error('Fichier trop volumineux.');
-      const raw = await parseEncryptedBackup(await file.text(), password);
+      if (!text) throw new Error('Fichier trop volumineux.');
+      const raw = plain ?? await parseEncryptedBackup(text, password);
       const validated = validateRestore(raw);
       const fresh = newOnly(validated, entries);
       if (!fresh.length) { setMessage('Tout est déjà là : aucune entrée à restaurer.'); return; }
@@ -399,12 +403,13 @@ function Profile({ view, onSettings, email, entries, profileEntry, onSaveProfile
       <button className="button secondary" onClick={() => void onLogout()}><LogOut size={16} /> Se déconnecter</button>
     </section>
     <p className="sec">Mes données</p>
+    <MonthlyBackups entries={entries} />
     <section className="panel form-stack">
       <h2>Sauvegarde chiffrée</h2><p>Un fichier AES-256-GCM, protégé par une phrase secrète, est généré sur ton appareil. Les données ne sont pas envoyées à un service d'export.</p>
       <label>Phrase secrète (12 caractères minimum)<input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
       <label>Confirmer la phrase secrète<input type="password" autoComplete="new-password" value={confirmation} onChange={(e) => setConfirmation(e.target.value)} /></label>
       <button className="button primary" disabled={busy || password.length < 12 || password !== confirmation} onClick={() => void exportData()}><Download size={17} /> {busy ? 'Chiffrement…' : 'Exporter mes données'}</button>
-      <label>Restaurer une sauvegarde chiffrée (même phrase secrète, saisie ci-dessus)
+      <label>Restaurer une sauvegarde (mensuelle, ou chiffrée avec la phrase secrète ci-dessus)
         <input type="file" accept=".json,application/json" disabled={busy} onChange={(e) => { const file = e.target.files?.[0]; void restoreFile(file); e.target.value = ''; }} />
       </label>
       <p className="fineprint">La restauration ajoute seulement ce qui manque : rien n’est supprimé, et ce qui existe déjà est ignoré (pas de doublons). Pratique pour passer sur un nouveau téléphone.</p>
@@ -497,6 +502,13 @@ export default function App() {
   }, []);
   // Retour du réseau : on recharge les données à jour.
   useEffect(() => { const on = () => { if (offline || pendingCount()) void refresh(); }; window.addEventListener('online', on); return () => window.removeEventListener('online', on); }, [offline, refresh]);
+  // Sauvegarde automatique du mois (une fois, en silence, dès que les données sont chargées en ligne).
+  const backedUp = useRef(false);
+  useEffect(() => {
+    if (backedUp.current || owner !== true || offline || allEntries.length < 5) return;
+    backedUp.current = true;
+    void ensureMonthlyBackup(allEntries.filter((e) => e.kind !== PHOTO_KIND && !e.id.startsWith('local-')));
+  }, [owner, offline, allEntries]);
   const [pending, setPending] = useState(pendingCount);
   useEffect(() => { const on = () => setPending(pendingCount()); window.addEventListener('mt-outbox', on); return () => window.removeEventListener('mt-outbox', on); }, []);
 

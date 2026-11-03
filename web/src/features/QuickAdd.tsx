@@ -22,7 +22,7 @@ export function QuickAdd({ onCreate }: { onCreate: (i: EntryInput) => Promise<vo
   return <form className="quick-add" onSubmit={(e) => { e.preventDefault(); void add(); }}>
     <div className="quick-row"><CalendarPlus size={18} aria-hidden="true" />
       <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Ajout rapide : dentiste jeudi 15h" aria-label="Ajout rapide" maxLength={160} enterKeyHint="done" />
-      <button className="button primary small" disabled={!p || busy}>Ajouter</button></div>
+      <button className="button primary small" aria-label="Ajouter à l’agenda" disabled={!p || busy}>Ajouter</button></div>
     {p && <p className="quick-preview"><b>{p.title}</b> · {when}{p.time ? ' · ' + p.time + (p.endTime ? '–' + p.endTime : '') : ''} · {p.kind === 'event' ? 'événement' : 'tâche'}</p>}
     {done && !p && <p className="quick-preview ok" role="status"><Check size={14} /> Ajouté : {done}</p>}
   </form>;
