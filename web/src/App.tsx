@@ -5,7 +5,7 @@ import {
   CalendarDays, LayoutGrid, ChevronRight, Coffee, Download, Heart,
   Home, LogOut, Plus, Save, Settings, ShieldCheck, Trash2, UserRound, X,
 } from 'lucide-react';
-import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
+import { cloud, configured, sendCreate, sendEdit, sendRemove, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
 import { downloadBackup, makeEncryptedBackup, parseEncryptedBackup } from './lib/backup';
 import { moduleById, modules, type Module } from './modules';
 import { newOnly, validateRestore } from './lib/restore';
@@ -25,6 +25,7 @@ import { RITUAL_KINDS } from './lib/rituals';
 import { HomeRituals } from './screens/HomeRituals';
 import { LockGate } from './features/LockGate';
 import { removeLock } from './lib/journalLock';
+import { applyOutbox, flushOutbox, pendingCount } from './lib/outbox';
 import { clearOffline, isNetworkError, knownOwner, loadOffline, rememberOwner, saveOffline } from './lib/offline';
 import { Sparkles } from 'lucide-react';
 
@@ -482,16 +483,22 @@ export default function App() {
   const [offline, setOffline] = useState<string | null>(null);
   const refresh = useCallback(async () => {
     setLoading(true); setError('');
-    try { const all = await readEntries(); setEntries(all); saveOffline(all); setOffline(null); }
+    try {
+      // Retour du réseau : on envoie d'abord ce qui a été écrit hors connexion.
+      if (pendingCount()) await flushOutbox({ create: sendCreate, edit: sendEdit, remove: sendRemove });
+      const all = await readEntries(); saveOffline(all); setEntries(applyOutbox(all)); setOffline(null);
+    }
     catch (e) {
       const copy = isNetworkError(e) ? loadOffline() : null;
-      if (copy) { setEntries(copy.entries); setOffline(copy.at); }
+      if (copy) { setEntries(applyOutbox(copy.entries)); setOffline(copy.at); }
       else setError(e instanceof Error ? e.message : 'Impossible de charger les données.');
     }
     finally { setLoading(false); }
   }, []);
   // Retour du réseau : on recharge les données à jour.
-  useEffect(() => { const on = () => { if (offline) void refresh(); }; window.addEventListener('online', on); return () => window.removeEventListener('online', on); }, [offline, refresh]);
+  useEffect(() => { const on = () => { if (offline || pendingCount()) void refresh(); }; window.addEventListener('online', on); return () => window.removeEventListener('online', on); }, [offline, refresh]);
+  const [pending, setPending] = useState(pendingCount);
+  useEffect(() => { const on = () => setPending(pendingCount()); window.addEventListener('mt-outbox', on); return () => window.removeEventListener('mt-outbox', on); }, []);
 
   useEffect(() => {
     if (!session) { setEntries([]); setOwner(null); return; }
@@ -618,13 +625,17 @@ export default function App() {
     } catch (e) { setError(e instanceof Error ? e.message : 'Photo impossible à enregistrer.'); throw e; }
   };
 
-  const entryList = currentModule && <section className="entries-section">
-    <SectionTitle>{currentModule.id === 'spiritualite' ? 'Mon journal spirituel' : 'Mes entrées'} <span className="count">{listedEntries.length}</span></SectionTitle>
+  // Liste brute : visible seulement là où elle est le contenu (listes, hobbies, journal spirituel) ; ailleurs, historique replié.
+  const listTitle = currentModule?.id === 'spiritualite' ? 'Mon journal spirituel' : currentModule?.id === 'listes' ? 'Mes listes' : currentModule?.id === 'passions' ? 'Mes hobbies' : '';
+  const listBody = currentModule && <>
     {listedEntries.length > 4 && <input className="search-field" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher dans cet espace…" />}
     <div className="entries">{moduleEntries.length ? moduleEntries.map((entry) =>
       <EntryCard key={entry.id} entry={entry} module={currentModule} onEdit={openEntry} onDelete={(e) => void remove(e)} onUpdate={updateData} />
-    ) : <div className="empty-soft"><Coffee size={28} /><p>Un espace à remplir à ton rythme.</p><button className="button ghost" onClick={() => setEditor({ module: currentModule })}>Créer ma première entrée</button></div>}</div>
-  </section>;
+    ) : <div className="empty-soft"><Coffee size={28} /><p>Un espace à remplir à ton rythme.</p><button className="button ghost" onClick={() => setEditor({ module: currentModule })}>Créer ma première entrée</button></div>}</div></>;
+  const entryList = currentModule && (listTitle
+    ? <section className="entries-section"><SectionTitle>{listTitle} <span className="count">{listedEntries.length}</span></SectionTitle>{listBody}</section>
+    : currentModule.id === 'quotidien' || !listedEntries.length ? null
+    : <details className="history-fold"><summary>Historique <span className="count">{listedEntries.length}</span></summary>{listBody}</details>);
 
   const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings', 'myday', 'habits', 'notes', 'bilan', 'parametres', 'boussole', 'focus', 'sommeil', 'mediter', 'complements'] as Screen[]).includes(screen);
   const openDay = (date?: string, part?: 'matin' | 'soir') => { setDayTarget((t) => ({ date, part, n: t.n + 1 })); go('myday'); };
@@ -632,7 +643,8 @@ export default function App() {
 
   return <HiddenProvider value={hidden}><PhotoProvider value={{ photos, save: savePhoto }}><Suspense fallback={<div className="screen-loading" aria-busy="true">Chargement…</div>}><div className={'app' + (screen === 'calme' ? ' calm-mode' : '')}>
     <main className="phone">
-      {offline && <div className="offline-banner" role="status">Hors connexion · tu consultes la copie du {new Date(offline).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}. Les modifications et ton journal reviendront avec le réseau.</div>}
+      {offline && <div className="offline-banner" role="status">Hors connexion · tu consultes la copie du {new Date(offline).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}. Tes ajouts sont gardés et partiront au retour du réseau ; le journal intime attend la connexion.</div>}
+      {!offline && pending > 0 && <div className="offline-banner" role="status">{pending} changement{pending > 1 ? 's' : ''} en attente d’envoi…</div>}
       {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
       {loading && <div className="sync-status" role="status">Synchronisation…</div>}
       {screen === 'home' && <HomeScreen rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} onUpdate={updateData} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} onQuickAdd={(title) => createFromTool({ module: 'quotidien', kind: 'task', title, entry_date: today(), data: { date: today(), priority: 'Haute' } })} />}
@@ -649,7 +661,7 @@ export default function App() {
       {screen === 'panda' && <><ScreenHeader title="" onBack={() => go('home')} /><PandaScreen entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onGo={(x) => go(x as Screen)} /></>}
       {screen === 'envies' && <><ScreenHeader title="" onBack={() => go('home')} /><Wishes entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
       {screen === 'mediter' && <><ScreenHeader title="" onBack={() => go('home')} /><Meditate entries={ritualEntries} onCreate={createFromTool} /></>}
-      {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onImported={() => void refresh()} />}
+      {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onCreate={createFromTool} onImported={() => void refresh()} />}
       {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
       {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}
       {screen === 'calme' && <Calm onQuit={() => go('home')} onWrite={() => addIn('equilibre', 'emotion', { date: today() })} />}
@@ -659,7 +671,7 @@ export default function App() {
       {currentModule && <div className="screen">
         <ScreenHeader title={currentModule.name} onBack={() => go('spaces')}
           right={<button className="icon-btn" aria-label="Ajouter" onClick={() => setEditor({ module: currentModule })}><Plus size={24} /></button>} />
-        {currentModule.id === 'quotidien' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'task', { date: today() })} onOpen={openEntry} onUpdate={updateData} embedded />}
+        {currentModule.id === 'quotidien' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'task', { date: today() })} onOpen={openEntry} onUpdate={updateData} onCreate={createFromTool} embedded />}
         {currentModule.id === 'sante' && <HealthTop entries={allModuleEntries} onAdd={(kind) => addIn('sante', kind, { date: today() })} />}
         {currentModule.id === 'sport' && <SportHub entries={allModuleEntries} challengeEntries={entries.filter((e) => e.module === 'challenges')} onCreate={createFromTool} onGoChallenges={() => go('challenges')} />}
         {currentModule.id === 'challenges' && <ChallengesBoard entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onQuit={removeQuiet} />}

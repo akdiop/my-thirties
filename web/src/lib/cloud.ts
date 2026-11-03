@@ -1,4 +1,6 @@
 import { createClient, type Session } from '@supabase/supabase-js';
+import { isTemp, queueCreate, queueEdit, queueRemove } from './outbox';
+import { isNetworkError, loadOffline } from './offline';
 
 const url = import.meta.env.VITE_SUPABASE_URL;
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -81,22 +83,36 @@ export async function readEntries(): Promise<Entry[]> {
   throw new Error('Limite de chargement atteinte : contactez le support avant de continuer.');
 }
 
-export async function createEntry(input: EntryInput) {
+// Envoi direct au serveur (utilisé aussi pour vider la file d'attente hors connexion).
+export const sendCreate = async (input: EntryInput) => {
   if (!cloud) throw new Error('Connexion non configurée.');
   const { error } = await cloud.from('entries').insert(input);
   if (error) throw error;
-}
-
-export async function editEntry(id: string, patch: Partial<Pick<Entry, 'title' | 'entry_date' | 'data'>>) {
+};
+export const sendEdit = async (id: string, patch: Partial<Pick<Entry, 'title' | 'entry_date' | 'data'>>) => {
   if (!cloud) throw new Error('Connexion non configurée.');
   const { error } = await cloud.from('entries').update(patch).eq('id', id);
   if (error) throw error;
-}
-
-export async function removeEntry(id: string) {
+};
+export const sendRemove = async (id: string) => {
   if (!cloud) throw new Error('Connexion non configurée.');
   const { error } = await cloud.from('entries').delete().eq('id', id);
   if (error) throw error;
+};
+
+/** Sans réseau, le changement est gardé sur le téléphone et envoyé au retour de la connexion (sauf le journal intime). */
+const offlineCopyHas = (id: string) => isTemp(id) || Boolean(loadOffline()?.entries.some((e) => e.id === id));
+export async function createEntry(input: EntryInput) {
+  if (!navigator.onLine && queueCreate(input)) return;
+  try { await sendCreate(input); } catch (e) { if (isNetworkError(e) && queueCreate(input)) return; throw e; }
+}
+export async function editEntry(id: string, patch: Partial<Pick<Entry, 'title' | 'entry_date' | 'data'>>) {
+  if ((isTemp(id) || !navigator.onLine) && offlineCopyHas(id) && queueEdit(id, patch)) return;
+  try { await sendEdit(id, patch); } catch (e) { if (isNetworkError(e) && offlineCopyHas(id) && queueEdit(id, patch)) return; throw e; }
+}
+export async function removeEntry(id: string) {
+  if ((isTemp(id) || !navigator.onLine) && offlineCopyHas(id) && queueRemove(id)) return;
+  try { await sendRemove(id); } catch (e) { if (isNetworkError(e) && offlineCopyHas(id) && queueRemove(id)) return; throw e; }
 }
 
 export async function restoreEntries(inputs: EntryInput[], onProgress?: (done: number) => void) {

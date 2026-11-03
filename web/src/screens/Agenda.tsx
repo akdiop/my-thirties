@@ -1,6 +1,7 @@
+import { QuickAdd } from '../features/QuickAdd';
 import { useState } from 'react';
 import { ChevronDown, Plus, Search } from 'lucide-react';
-import type { Entry } from '../lib/cloud';
+import type { Entry, EntryInput } from '../lib/cloud';
 import { iso, parseDay, plusDays, timeline, todayIso, weekday, isDoneOn, toggledData } from '../lib/day';
 import { CalendarBoard } from '../features/CalendarBoard';
 import { Check22, Segmented } from '../ui/kit';
@@ -9,8 +10,8 @@ const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 const TONE_BG = { caramel: '#F3EBE2', chocolat: '#EFE3DA', sauge: '#E6ECE8', or: '#F3EBE2' } as const;
 const TONE_BAR = { caramel: '#C9A08C', chocolat: '#8C6257', sauge: '#6F8A80', or: '#D8B69F' } as const;
 
-export function Agenda({ entries, onAdd, onOpen, onUpdate, embedded }: {
-  onImported?: () => void; embedded?: boolean; entries: Entry[]; onAdd: () => void; onOpen: (e: Entry) => void; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>;
+export function Agenda({ entries, onAdd, onOpen, onUpdate, onCreate, embedded }: {
+  onImported?: () => void; embedded?: boolean; onCreate?: (i: EntryInput) => Promise<void>; entries: Entry[]; onAdd: () => void; onOpen: (e: Entry) => void; onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>;
 }) {
   const [mode, setMode] = useState<'day' | 'week' | 'month'>('week');
   const [selected, setSelected] = useState(todayIso());
@@ -30,6 +31,7 @@ export function Agenda({ entries, onAdd, onOpen, onUpdate, embedded }: {
         <button className="icon-btn" aria-label="Ajouter" onClick={onAdd}><Plus size={24} /></button>
       </div>
     </header>}
+    {onCreate && query === null && <QuickAdd onCreate={onCreate} />}
     {query !== null && <input className="search-field" autoFocus placeholder="Rechercher un événement, une tâche…" value={query} onChange={(e) => setQuery(e.target.value)} />}
     {query ? <div className="stack-8">{found.length ? found.map((e) => <button key={e.id} className="row-plain" onClick={() => onOpen(e)}>{e.title}<small>{e.entry_date ? new Date(e.entry_date + 'T12:00:00').toLocaleDateString('fr-FR') : ''}</small></button>) : <p className="muted">Aucun résultat.</p>}</div> : <>
       <label className="month-pick">{month.charAt(0).toUpperCase() + month.slice(1)} <ChevronDown size={16} />
