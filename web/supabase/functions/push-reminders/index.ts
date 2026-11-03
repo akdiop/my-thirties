@@ -152,19 +152,19 @@ Deno.serve(async (request) => {
     }
     // Prières : quelques minutes avant chaque heure (position enregistrée dans Ma spiritualité).
     const ps = list.filter((e) => e.kind === 'prayer_settings').sort((a, b) => String(b.data.updated ?? '').localeCompare(String(a.data.updated ?? '')))[0];
-    if (ps && p.prayers?.on !== false) {
+    if (ps && p.prayers?.on !== false) try {
       const before = Math.max(0, Math.min(30, Number(p.prayers?.minutes ?? 5)));
       for (const pr of prayerMinutes(ps.data, now.date, now.zone)) {
         if (due(now.minutes, mins(pr.time) - before)) queue.push({ key: 'prayer:' + pr.name + ':' + now.date, title: pr.name + ' · ' + pr.time,
           body: before ? 'L’heure de ' + pr.name + ' arrive dans ' + before + ' minutes.' : 'C’est l’heure de ' + pr.name + '.', url: '/?ecran=spiritualite' });
       }
-    }
+    } catch { /* réglages de prière illisibles : les autres rappels partent quand même */ }
     // Jeûnes recommandés : la veille au soir.
-    if (p.fasting?.on !== false && due(now.minutes, mins(p.fasting?.time ?? '20:30'))) {
+    if (p.fasting?.on !== false && due(now.minutes, mins(p.fasting?.time ?? '20:30'))) try {
       const tomorrow = new Date(Date.parse(now.date + 'T12:00:00Z') + 86_400_000).toISOString().slice(0, 10);
       const f = fastingFor(tomorrow);
       if (f) queue.push({ key: 'fast:' + tomorrow, title: 'Demain', body: f + '.', url: '/?ecran=spiritualite' });
-    }
+    } catch { /* calendrier hégirien indisponible */ }
     if (p.agenda?.on !== false) {
       const before = Math.max(0, Math.min(120, Number(p.agenda?.minutes ?? 15)));
       for (const e of list) {
