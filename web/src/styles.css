@@ -1744,3 +1744,16 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area
 .quiz-row.ok .quiz-btns svg{color:#6F8A80}
 .quiz-row.ko .quiz-btns svg{color:#b5715f}
 .row-text small::first-letter{text-transform:uppercase}
+/* Cours de langue */
+.lang-script{background:#fffcfa;border:1px solid #efe3de;border-radius:16px;padding:12px 14px;margin:10px 0}
+.lang-script summary{font-weight:600;cursor:pointer;color:#5a3f36}
+.lang-script[open] summary{margin-bottom:8px}
+.lang-lesson{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.lang-table{display:flex;flex-direction:column;border:1px solid #efe3de;border-radius:12px;overflow:hidden;font-size:.9rem}
+.lang-row{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:8px;padding:7px 10px;border-top:1px solid #f4ebe6;align-items:center}
+.lang-row:first-child{border-top:0}
+.lang-row.head{background:#f8f1ec;font-size:.72rem;font-weight:700;color:#8c6257;text-transform:uppercase;letter-spacing:.06em}
+.lang-orig{font-weight:600;display:flex;align-items:center;gap:4px;flex-wrap:wrap;overflow-wrap:anywhere}
+.lang-pron{color:#8c6257;font-style:italic;overflow-wrap:anywhere}
+.phrase em.lang-pron{display:block;font-size:.85rem}
+.icon-btn.tiny{width:24px;height:24px;min-height:24px;padding:0}

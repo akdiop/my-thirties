@@ -52,14 +52,6 @@ const PHRASES: Record<string, ([string, string][] | undefined)[]> = {
     [['أذهب إلى العمل — adhhabu ilā al-‘amal', 'Je vais au travail.']],
     [['أريد قهوة من فضلك — urīdu qahwa min faḍlik', 'Je voudrais un café, s’il te plaît.']],
   ],
-  anglais: [
-    [['Hello / Good morning', 'Bonjour'], ['Thank you', 'Merci'], ['Goodbye', 'Au revoir']],
-    [['My name is Aida.', 'Je m’appelle Aida.'], ['I’m from Senegal.', 'Je viens du Sénégal.'], ['I live in Dakar.', 'J’habite à Dakar.'], ['Nice to meet you.', 'Enchantée.']],
-    [['How much is it?', 'Combien ça coûte ?'], ['It’s ten o’clock.', 'Il est dix heures.'], ['Twenty, thirty, forty…', 'Vingt, trente, quarante…']],
-    [['This is my sister.', 'Voici ma sœur.'], ['She is tall and funny.', 'Elle est grande et drôle.']],
-    [['I wake up at seven.', 'Je me réveille à sept heures.'], ['I go to work.', 'Je vais au travail.']],
-    [['I’d like a coffee, please.', 'Je voudrais un café, s’il vous plaît.'], ['The bill, please.', 'L’addition, s’il vous plaît.']],
-  ],
   italien: [
     [['Ciao / Buongiorno', 'Salut / Bonjour'], ['Grazie', 'Merci'], ['Arrivederci', 'Au revoir']],
     [['Mi chiamo Aida.', 'Je m’appelle Aida.'], ['Vengo dal Senegal.', 'Je viens du Sénégal.'], ['Abito a Dakar.', 'J’habite à Dakar.'], ['Piacere.', 'Enchantée.']],
@@ -103,7 +95,7 @@ const PHRASES: Record<string, ([string, string][] | undefined)[]> = {
 };
 
 const lang = (id: string, title: string, tone: LearningPath['tone']): LearningPath => ({
-  id: 'lang-' + id, category: 'Langues', title, tagline: 'Débutante · 20 min par jour', tone, weeks: 10,
+  id: 'lang-' + id, category: 'Langues', title, tagline: 'Niveau 1 · bases, écriture, vocabulaire · 20 min par jour', tone, weeks: 10,
   steps: LANG_STEPS.map((s, i) => ({ ...s, phrases: PHRASES[id]?.[i] })),
 });
 
@@ -112,7 +104,6 @@ export const PATHS: LearningPath[] = [
   lang('portugais', 'Portugais', 'sauge'),
   lang('arabe', 'Arabe', 'sable'),
   lang('wolof', 'Wolof', 'caramel'),
-  lang('anglais', 'Anglais', 'sauge'),
   lang('italien', 'Italien', 'caramel'),
   lang('allemand', 'Allemand', 'sable'),
   lang('japonais', 'Japonais', 'chocolat'),
