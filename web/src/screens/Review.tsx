@@ -1,3 +1,4 @@
+import { SpiritStats } from '../features/SpiritStats';
 import { Glyph, MoodIcon, type Tint } from '../ui/Glyph';
 import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
@@ -93,6 +94,7 @@ function Week({ entries }: { entries: Entry[] }) {
     </div>
     {s.habits.length > 0 && <section className="ritual-card"><p className="ritual-label">Mes habitudes</p>
       {s.habits.map(({ e, count, target }) => <div key={e.id} className="habit-stat"><span className="inline-glyph"><Glyph name={String(e.data.icon || 'sprout')} tint={(e.data.tint as Tint) || 'sauge'} size={16} /> {e.title}</span><small>{count}/{target}</small><Bar value={Math.min(1, count / target)} /></div>)}</section>}
+    <SpiritStats entries={entries} days={7} end={days[6]! > today ? today : days[6]!} compact />
     <section className="ritual-card"><p className="ritual-label"><Glyph name="trophy" tint="or" /> Mes victoires</p>
       {s.wins.length ? <ul className="win-list">{s.wins.map((w) => <li key={w.day}><small>{short(w.day)}</small> {w.text}</li>)}</ul> : <p className="muted">Note ta victoire du jour dans le débriefing du soir.</p>}</section>
     {s.grats.length > 0 && <section className="ritual-card"><p className="ritual-label"><Glyph name="handHeart" tint="rose" /> {s.grats.length} gratitude(s)</p><p className="muted">{s.grats.slice(0, 8).join(' · ')}</p></section>}

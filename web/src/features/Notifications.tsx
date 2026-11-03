@@ -7,11 +7,13 @@ export type NotifPrefs = {
   morning: { on: boolean; time: string }; evening: { on: boolean; time: string }; habits: { on: boolean; time: string };
   agenda: { on: boolean; minutes: number }; weekly: { on: boolean; day: number; time: string }; supplements: { on: boolean };
   plan: { on: boolean; time: string }; birthdays: { on: boolean; time: string };
+  prayers: { on: boolean; minutes: number }; fasting: { on: boolean; time: string };
 };
 export const DEFAULT_PREFS: NotifPrefs = {
   morning: { on: true, time: '08:00' }, evening: { on: true, time: '21:00' }, habits: { on: true, time: '19:00' },
   agenda: { on: true, minutes: 15 }, weekly: { on: true, day: 0, time: '18:00' }, supplements: { on: true },
   plan: { on: true, time: '19:30' }, birthdays: { on: true, time: '09:00' },
+  prayers: { on: true, minutes: 5 }, fasting: { on: true, time: '20:30' },
 };
 const DAYS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 const pushSupported = () => typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window && typeof Notification !== 'undefined';
@@ -22,7 +24,8 @@ const merge = (v: unknown): NotifPrefs => {
   const p = (v && typeof v === 'object' ? v : {}) as Partial<NotifPrefs>;
   return { morning: { ...DEFAULT_PREFS.morning, ...p.morning }, evening: { ...DEFAULT_PREFS.evening, ...p.evening }, habits: { ...DEFAULT_PREFS.habits, ...p.habits },
     agenda: { ...DEFAULT_PREFS.agenda, ...p.agenda }, weekly: { ...DEFAULT_PREFS.weekly, ...p.weekly }, supplements: { ...DEFAULT_PREFS.supplements, ...p.supplements },
-    plan: { ...DEFAULT_PREFS.plan, ...p.plan }, birthdays: { ...DEFAULT_PREFS.birthdays, ...p.birthdays } };
+    plan: { ...DEFAULT_PREFS.plan, ...p.plan }, birthdays: { ...DEFAULT_PREFS.birthdays, ...p.birthdays },
+    prayers: { ...DEFAULT_PREFS.prayers, ...p.prayers }, fasting: { ...DEFAULT_PREFS.fasting, ...p.fasting } };
 };
 
 export function NotificationSettings() {
@@ -96,6 +99,11 @@ export function NotificationSettings() {
       : <button className="button primary wide" disabled={busy || device === 'unknown'} onClick={() => void enable()}>{busy ? 'Activation…' : 'Activer les notifications sur cet appareil'}</button>}
     {isIos() && !standalone() && device !== 'unsupported' && <p className="fineprint">Sur iPhone, les notifications ne marchent que depuis l’app ajoutée à l’écran d’accueil.</p>}
 
+    {row('Heures de prière', 'Avant chaque prière, selon ta position (Ma spiritualité › Horaires des prières).', prefs.prayers.on, (on) => void save({ ...prefs, prayers: { ...prefs.prayers, on } }),
+      <select value={prefs.prayers.minutes} onChange={(e) => void save({ ...prefs, prayers: { ...prefs.prayers, minutes: Number(e.target.value) } })}>
+        {[0, 5, 10, 15].map((m) => <option key={m} value={m}>{m ? m + ' min avant' : 'À l’heure'}</option>)}</select>)}
+    {row('Jeûnes recommandés', 'La veille au soir : lundi, jeudi, jours blancs, ‘Arafat, Achoura.', prefs.fasting.on, (on) => void save({ ...prefs, fasting: { ...prefs.fasting, on } }),
+      time(prefs.fasting.time, (v) => void save({ ...prefs, fasting: { ...prefs.fasting, time: v } })))}
     {row('Mon Daily Reset', 'Le matin, si ton intention n’est pas encore posée.', prefs.morning.on, (on) => void save({ ...prefs, morning: { ...prefs.morning, on } }),
       time(prefs.morning.time, (v) => void save({ ...prefs, morning: { ...prefs.morning, time: v } })))}
     {row('Débriefing du soir', 'Si tu ne l’as pas encore fait.', prefs.evening.on, (on) => void save({ ...prefs, evening: { ...prefs.evening, on } }),

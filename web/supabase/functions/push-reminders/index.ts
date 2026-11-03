@@ -6,10 +6,12 @@
 // Secrets : SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY (fournis par Supabase). Facultatif : PUSH_SUBJECT.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import webpush from 'npm:web-push@3.6.7';
+import { CalculationMethod, Coordinates, Madhab, PrayerTimes } from 'npm:adhan@4.4.3';
 
 type Prefs = { morning?: { on?: boolean; time?: string }; evening?: { on?: boolean; time?: string }; habits?: { on?: boolean; time?: string };
   agenda?: { on?: boolean; minutes?: number }; weekly?: { on?: boolean; day?: number; time?: string }; supplements?: { on?: boolean };
-  plan?: { on?: boolean; time?: string }; birthdays?: { on?: boolean; time?: string } };
+  plan?: { on?: boolean; time?: string }; birthdays?: { on?: boolean; time?: string };
+  prayers?: { on?: boolean; minutes?: number }; fasting?: { on?: boolean; time?: string } };
 type Row = { id: string; module: string; kind: string; title: string; entry_date: string | null; data: Record<string, unknown> };
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 const json = (d: unknown, status = 200) => new Response(JSON.stringify(d), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -23,8 +25,36 @@ function localNow(tz: string) {
   try { new Intl.DateTimeFormat('fr', { timeZone: tz }); zone = tz; } catch { /* fuseau par défaut */ }
   const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', weekday: 'short', hourCycle: 'h23' })
     .formatToParts(new Date()).map((x) => [x.type, x.value]));
-  return { date: `${p.year}-${p.month}-${p.day}`, minutes: Number(p.hour) * 60 + Number(p.minute), weekday: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(p.weekday) };
+  return { date: `${p.year}-${p.month}-${p.day}`, minutes: Number(p.hour) * 60 + Number(p.minute), weekday: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(p.weekday), zone };
 }
+// Horaires de prière : même calcul que l'app (bibliothèque adhan), à partir de la position enregistrée une fois.
+const PRAYER_NAMES = [['fajr', 'Fajr'], ['dhuhr', 'Dhuhr'], ['asr', 'Asr'], ['maghrib', 'Maghrib'], ['isha', 'Isha']] as const;
+function prayerMinutes(d: Record<string, unknown>, date: string, zone: string) {
+  const lat = Number(d.lat), lon = Number(d.lon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return [];
+  const m = String(d.method ?? 'mwl');
+  const p = m === 'egypt' ? CalculationMethod.Egyptian() : m === 'makkah' ? CalculationMethod.UmmAlQura() : m === 'isna' ? CalculationMethod.NorthAmerica()
+    : m === 'karachi' ? CalculationMethod.Karachi() : m === 'france' ? Object.assign(CalculationMethod.Other(), { fajrAngle: 12, ishaAngle: 12 }) : CalculationMethod.MuslimWorldLeague();
+  p.madhab = d.hanafi === true || d.hanafi === 'true' ? Madhab.Hanafi : Madhab.Shafi;
+  const [y, mo, da] = date.split('-').map(Number);
+  const t = new PrayerTimes(new Coordinates(lat, lon), new Date(Date.UTC(y!, mo! - 1, da!, 12)), p);
+  const hm = (x: Date) => { const q = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: zone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(x).map((z) => [z.type, z.value])); return q.hour + ':' + q.minute; };
+  return PRAYER_NAMES.map(([k, name]) => ({ name, time: hm(t[k]) }));
+}
+// Jeûnes recommandés et dates marquantes (calendrier Umm al-Qura), rappelés la veille au soir.
+const hijri = (iso: string) => { const q = Object.fromEntries(new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { day: 'numeric', month: 'numeric', timeZone: 'UTC' }).formatToParts(new Date(iso + 'T12:00:00Z')).map((x) => [x.type, x.value])); return { day: parseInt(q.day!, 10), month: parseInt(q.month!, 10) }; };
+function fastingFor(iso: string) {
+  const h = hijri(iso), wd = new Date(iso + 'T12:00:00Z').getUTCDay();
+  const special: Record<string, string> = { '9-12': 'Jour de ‘Arafat : jeûne recommandé', '10-1': 'Achoura : jeûne recommandé', '9-1': 'Tassou‘a (veille d’Achoura) : jeûne recommandé', '1-9': 'Début du Ramadan', '1-10': 'Aïd al-Fitr (Korité)', '10-12': 'Aïd al-Adha (Tabaski)' };
+  const key = special[h.day + '-' + h.month];
+  if (key) return key;
+  if (h.month === 9 || (h.month === 10 && h.day === 1) || (h.month === 12 && h.day >= 10 && h.day <= 13)) return '';
+  if (h.day >= 13 && h.day <= 15) return 'Jour blanc (' + h.day + ') : jeûne recommandé';
+  if (wd === 1) return 'Jeûne du lundi (sunna)';
+  if (wd === 4) return 'Jeûne du jeudi (sunna)';
+  return '';
+}
+
 const recurring = (e: Row) => e.kind === 'routine' || ['Quotidienne', 'Hebdomadaire'].includes(String(e.data.frequency));
 const doneOn = (e: Row, d: string) => recurring(e) ? Boolean((e.data.completions as Record<string, boolean> | undefined)?.[d]) : e.data.completed === true;
 function occursOn(e: Row, d: string, weekday: number) {
@@ -84,7 +114,7 @@ Deno.serve(async (request) => {
     const p = (u.prefs ?? {}) as Prefs, now = localNow(u.tz);
     const queue: { key: string; title: string; body: string; url: string }[] = [];
     const { data: rows } = await db.from('entries').select('id,module,kind,title,entry_date,data').eq('user_id', u.user_id)
-      .in('kind', ['daily', 'habit', 'task', 'event', 'appointment', 'routine', 'complement', 'proche']);
+      .in('kind', ['daily', 'habit', 'task', 'event', 'appointment', 'routine', 'complement', 'proche', 'prayer_settings']);
     const list = (rows ?? []) as Row[];
     const today = list.find((e) => e.kind === 'daily' && e.entry_date === now.date);
 
@@ -120,6 +150,21 @@ Deno.serve(async (request) => {
         else if (day === in3) queue.push({ key: 'bday3:' + e.id + ':' + now.date, title: 'Anniversaire dans 3 jours', body: e.title.slice(0, 60) + (e.data.gifts ? ' · tes idées de cadeaux t’attendent' : ' · pense au cadeau'), url: '/?ecran=proches' });
       }
     }
+    // Prières : quelques minutes avant chaque heure (position enregistrée dans Ma spiritualité).
+    const ps = list.filter((e) => e.kind === 'prayer_settings').sort((a, b) => String(b.data.updated ?? '').localeCompare(String(a.data.updated ?? '')))[0];
+    if (ps && p.prayers?.on !== false) try {
+      const before = Math.max(0, Math.min(30, Number(p.prayers?.minutes ?? 5)));
+      for (const pr of prayerMinutes(ps.data, now.date, now.zone)) {
+        if (due(now.minutes, mins(pr.time) - before)) queue.push({ key: 'prayer:' + pr.name + ':' + now.date, title: pr.name + ' · ' + pr.time,
+          body: before ? 'L’heure de ' + pr.name + ' arrive dans ' + before + ' minutes.' : 'C’est l’heure de ' + pr.name + '.', url: '/?ecran=spiritualite' });
+      }
+    } catch { /* réglages de prière illisibles : les autres rappels partent quand même */ }
+    // Jeûnes recommandés : la veille au soir.
+    if (p.fasting?.on !== false && due(now.minutes, mins(p.fasting?.time ?? '20:30'))) try {
+      const tomorrow = new Date(Date.parse(now.date + 'T12:00:00Z') + 86_400_000).toISOString().slice(0, 10);
+      const f = fastingFor(tomorrow);
+      if (f) queue.push({ key: 'fast:' + tomorrow, title: 'Demain', body: f + '.', url: '/?ecran=spiritualite' });
+    } catch { /* calendrier hégirien indisponible */ }
     if (p.agenda?.on !== false) {
       const before = Math.max(0, Math.min(120, Number(p.agenda?.minutes ?? 15)));
       for (const e of list) {

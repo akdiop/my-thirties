@@ -5,25 +5,21 @@ import {
   CalendarDays, LayoutGrid, ChevronRight, Coffee, Download, Heart,
   Home, LogOut, Plus, Save, Settings, ShieldCheck, Trash2, UserRound, X,
 } from 'lucide-react';
-import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
+import { cloud, configured, sendCreate, sendEdit, sendRemove, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
 import { downloadBackup, makeEncryptedBackup, parseEncryptedBackup } from './lib/backup';
+import { ensureMonthlyBackup, parsePlainBackup } from './lib/autoBackup';
+import { LIST_TEMPLATES, templateItems } from './lib/listTemplates';
 import { moduleById, modules, type Module } from './modules';
 import { newOnly, validateRestore } from './lib/restore';
 import { useThemeClock, useThemeMode, NIGHT_FROM, NIGHT_TO, type ThemeMode } from './lib/theme';
 import { consolidateIngredients, groceryTitle, mergeGroceryItems, weekGroceryItems, weekStart, type ListItem } from './lib/groceries';
 import { deleteEntryMedia } from './lib/mediaLibrary';
-import { PersonalProfile, ProfileAvatar } from './features/PersonalProfile';
+import { ProfileAvatar } from './features/PersonalProfile';
 import { birthdayLine, PROFILE_KIND, readProfile } from './lib/profile';
 import { PHOTO_KIND } from './lib/photos';
 import { PhotoProvider } from './features/HeroPhoto';
 import { Home as HomeScreen } from './screens/Home';
-import { Agenda } from './screens/Agenda';
-import { Wellbeing } from './screens/Wellbeing';
-import { Spaces } from './screens/Spaces';
-import { Calm } from './screens/Calm';
-import { HealthTop } from './screens/HealthTop';
-import { FinanceTop } from './screens/FinanceTop';
-import { CuisineTop, EquilibreTop, SpiritTop, TravelTop, type CuisineTab, type EquilibreTab, type SpiritTab } from './screens/ModuleTops';
+import type { CuisineTab, EquilibreTab, SpiritTab } from './screens/ModuleTops';
 import { ScreenHeader, SectionTitle, Segmented } from './ui/kit';
 import { GuidedField } from './ui/fields';
 import { HIDDEN_KIND, HiddenProvider, readHidden, useHidden, type Hidden } from './lib/hidden';
@@ -31,10 +27,24 @@ import { RITUAL_KINDS } from './lib/rituals';
 import { HomeRituals } from './screens/HomeRituals';
 import { LockGate } from './features/LockGate';
 import { removeLock } from './lib/journalLock';
+import { applyOutbox, flushOutbox, pendingCount } from './lib/outbox';
 import { clearOffline, isNetworkError, knownOwner, loadOffline, rememberOwner, saveOffline } from './lib/offline';
 import { Sparkles } from 'lucide-react';
 
 // Écrans chargés à la demande : l'app s'ouvre plus vite.
+const Agenda = lazy(() => import('./screens/Agenda').then((m) => ({ default: m.Agenda })));
+const Wellbeing = lazy(() => import('./screens/Wellbeing').then((m) => ({ default: m.Wellbeing })));
+const Spaces = lazy(() => import('./screens/Spaces').then((m) => ({ default: m.Spaces })));
+const Calm = lazy(() => import('./screens/Calm').then((m) => ({ default: m.Calm })));
+const HealthTop = lazy(() => import('./screens/HealthTop').then((m) => ({ default: m.HealthTop })));
+const FinanceTop = lazy(() => import('./screens/FinanceTop').then((m) => ({ default: m.FinanceTop })));
+const CuisineTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ default: m.CuisineTop })));
+const EquilibreTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ default: m.EquilibreTop })));
+const SpiritTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ default: m.SpiritTop })));
+const TravelTop = lazy(() => import('./screens/ModuleTops').then((m) => ({ default: m.TravelTop })));
+const MonthlyBackups = lazy(() => import('./features/MonthlyBackups').then((m) => ({ default: m.MonthlyBackups })));
+const Qibla = lazy(() => import('./features/Qibla').then((m) => ({ default: m.Qibla })));
+const PersonalProfile = lazy(() => import('./features/PersonalProfile').then((m) => ({ default: m.PersonalProfile })));
 const BoosterPlan = lazy(() => import('./features/BoosterPlan').then((m) => ({ default: m.BoosterPlan })));
 const RecipeView = lazy(() => import('./features/RecipeView').then((m) => ({ default: m.RecipeView })));
 const TravelTools = lazy(() => import('./features/TravelTools').then((m) => ({ default: m.TravelTools })));
@@ -340,11 +350,13 @@ function Profile({ view, onSettings, email, entries, profileEntry, onSaveProfile
   const restoreFile = async (file: File | undefined) => {
     if (!file) return;
     setMessage('');
-    if (!password) return setMessage('Saisis d’abord la phrase secrète de la sauvegarde.');
+    const text = file.size <= 16_000_000 ? await file.text() : '';
+    const plain = parsePlainBackup(text);
+    if (!plain && !password) return setMessage('Saisis d’abord la phrase secrète de la sauvegarde.');
     setBusy(true);
     try {
-      if (file.size > 8_000_000) throw new Error('Fichier trop volumineux.');
-      const raw = await parseEncryptedBackup(await file.text(), password);
+      if (!text) throw new Error('Fichier trop volumineux.');
+      const raw = plain ?? await parseEncryptedBackup(text, password);
       const validated = validateRestore(raw);
       const fresh = newOnly(validated, entries);
       if (!fresh.length) { setMessage('Tout est déjà là : aucune entrée à restaurer.'); return; }
@@ -392,12 +404,13 @@ function Profile({ view, onSettings, email, entries, profileEntry, onSaveProfile
       <button className="button secondary" onClick={() => void onLogout()}><LogOut size={16} /> Se déconnecter</button>
     </section>
     <p className="sec">Mes données</p>
+    <MonthlyBackups entries={entries} />
     <section className="panel form-stack">
       <h2>Sauvegarde chiffrée</h2><p>Un fichier AES-256-GCM, protégé par une phrase secrète, est généré sur ton appareil. Les données ne sont pas envoyées à un service d'export.</p>
       <label>Phrase secrète (12 caractères minimum)<input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
       <label>Confirmer la phrase secrète<input type="password" autoComplete="new-password" value={confirmation} onChange={(e) => setConfirmation(e.target.value)} /></label>
       <button className="button primary" disabled={busy || password.length < 12 || password !== confirmation} onClick={() => void exportData()}><Download size={17} /> {busy ? 'Chiffrement…' : 'Exporter mes données'}</button>
-      <label>Restaurer une sauvegarde chiffrée (même phrase secrète, saisie ci-dessus)
+      <label>Restaurer une sauvegarde (mensuelle, ou chiffrée avec la phrase secrète ci-dessus)
         <input type="file" accept=".json,application/json" disabled={busy} onChange={(e) => { const file = e.target.files?.[0]; void restoreFile(file); e.target.value = ''; }} />
       </label>
       <p className="fineprint">La restauration ajoute seulement ce qui manque : rien n’est supprimé, et ce qui existe déjà est ignoré (pas de doublons). Pratique pour passer sur un nouveau téléphone.</p>
@@ -409,7 +422,15 @@ function Profile({ view, onSettings, email, entries, profileEntry, onSaveProfile
   </div>;
 }
 
+/** Après l'ouverture, on charge en arrière-plan les écrans principaux pour qu'ils s'ouvrent sans attente. */
+function preloadScreens() {
+  const run = () => { void import('./screens/Agenda'); void import('./screens/Wellbeing'); void import('./screens/Spaces'); void import('./screens/ModuleTops');
+    void import('./screens/HealthTop'); void import('./screens/FinanceTop'); void import('./features/PersonalProfile'); void import('./screens/Calm'); };
+  if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(run, { timeout: 4000 }); else setTimeout(run, 2500);
+}
+
 export default function App() {
+  useEffect(() => { preloadScreens(); }, []);
   useThemeClock();
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(false);
@@ -432,6 +453,7 @@ export default function App() {
       setScreen(target as Screen);
     }
     if (target === 'depense') setPendingExpense(true);
+    if (target === 'spiritualite') setScreen('spiritualite' as Screen);
     window.history.replaceState(null, '', window.location.pathname);
   }, []);
   const photoEntries = useMemo(() => allEntries.filter((e) => e.kind === PHOTO_KIND), [allEntries]);
@@ -467,16 +489,29 @@ export default function App() {
   const [offline, setOffline] = useState<string | null>(null);
   const refresh = useCallback(async () => {
     setLoading(true); setError('');
-    try { const all = await readEntries(); setEntries(all); saveOffline(all); setOffline(null); }
+    try {
+      // Retour du réseau : on envoie d'abord ce qui a été écrit hors connexion.
+      if (pendingCount()) await flushOutbox({ create: sendCreate, edit: sendEdit, remove: sendRemove });
+      const all = await readEntries(); saveOffline(all); setEntries(applyOutbox(all)); setOffline(null);
+    }
     catch (e) {
       const copy = isNetworkError(e) ? loadOffline() : null;
-      if (copy) { setEntries(copy.entries); setOffline(copy.at); }
+      if (copy) { setEntries(applyOutbox(copy.entries)); setOffline(copy.at); }
       else setError(e instanceof Error ? e.message : 'Impossible de charger les données.');
     }
     finally { setLoading(false); }
   }, []);
   // Retour du réseau : on recharge les données à jour.
-  useEffect(() => { const on = () => { if (offline) void refresh(); }; window.addEventListener('online', on); return () => window.removeEventListener('online', on); }, [offline, refresh]);
+  useEffect(() => { const on = () => { if (offline || pendingCount()) void refresh(); }; window.addEventListener('online', on); return () => window.removeEventListener('online', on); }, [offline, refresh]);
+  // Sauvegarde automatique du mois (une fois, en silence, dès que les données sont chargées en ligne).
+  const backedUp = useRef(false);
+  useEffect(() => {
+    if (backedUp.current || owner !== true || offline || allEntries.length < 5) return;
+    backedUp.current = true;
+    void ensureMonthlyBackup(allEntries.filter((e) => e.kind !== PHOTO_KIND && !e.id.startsWith('local-')));
+  }, [owner, offline, allEntries]);
+  const [pending, setPending] = useState(pendingCount);
+  useEffect(() => { const on = () => setPending(pendingCount()); window.addEventListener('mt-outbox', on); return () => window.removeEventListener('mt-outbox', on); }, []);
 
   useEffect(() => {
     if (!session) { setEntries([]); setOwner(null); return; }
@@ -603,13 +638,17 @@ export default function App() {
     } catch (e) { setError(e instanceof Error ? e.message : 'Photo impossible à enregistrer.'); throw e; }
   };
 
-  const entryList = currentModule && <section className="entries-section">
-    <SectionTitle>{currentModule.id === 'spiritualite' ? 'Mon journal spirituel' : 'Mes entrées'} <span className="count">{listedEntries.length}</span></SectionTitle>
+  // Liste brute : visible seulement là où elle est le contenu (listes, hobbies, journal spirituel) ; ailleurs, historique replié.
+  const listTitle = currentModule?.id === 'spiritualite' ? 'Mon journal spirituel' : currentModule?.id === 'listes' ? 'Mes listes' : currentModule?.id === 'passions' ? 'Mes hobbies' : '';
+  const listBody = currentModule && <>
     {listedEntries.length > 4 && <input className="search-field" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher dans cet espace…" />}
     <div className="entries">{moduleEntries.length ? moduleEntries.map((entry) =>
       <EntryCard key={entry.id} entry={entry} module={currentModule} onEdit={openEntry} onDelete={(e) => void remove(e)} onUpdate={updateData} />
-    ) : <div className="empty-soft"><Coffee size={28} /><p>Un espace à remplir à ton rythme.</p><button className="button ghost" onClick={() => setEditor({ module: currentModule })}>Créer ma première entrée</button></div>}</div>
-  </section>;
+    ) : <div className="empty-soft"><Coffee size={28} /><p>Un espace à remplir à ton rythme.</p><button className="button ghost" onClick={() => setEditor({ module: currentModule })}>Créer ma première entrée</button></div>}</div></>;
+  const entryList = currentModule && (listTitle
+    ? <section className="entries-section"><SectionTitle>{listTitle} <span className="count">{listedEntries.length}</span></SectionTitle>{listBody}</section>
+    : currentModule.id === 'quotidien' || !listedEntries.length ? null
+    : <details className="history-fold"><summary>Historique <span className="count">{listedEntries.length}</span></summary>{listBody}</details>);
 
   const tabScreen = (['home', 'agenda', 'bienetre', 'spaces', 'settings', 'myday', 'habits', 'notes', 'bilan', 'parametres', 'boussole', 'focus', 'sommeil', 'mediter', 'complements'] as Screen[]).includes(screen);
   const openDay = (date?: string, part?: 'matin' | 'soir') => { setDayTarget((t) => ({ date, part, n: t.n + 1 })); go('myday'); };
@@ -617,7 +656,8 @@ export default function App() {
 
   return <HiddenProvider value={hidden}><PhotoProvider value={{ photos, save: savePhoto }}><Suspense fallback={<div className="screen-loading" aria-busy="true">Chargement…</div>}><div className={'app' + (screen === 'calme' ? ' calm-mode' : '')}>
     <main className="phone">
-      {offline && <div className="offline-banner" role="status">Hors connexion · tu consultes la copie du {new Date(offline).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}. Les modifications et ton journal reviendront avec le réseau.</div>}
+      {offline && <div className="offline-banner" role="status">Hors connexion · tu consultes la copie du {new Date(offline).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}. Tes ajouts sont gardés et partiront au retour du réseau ; le journal intime attend la connexion.</div>}
+      {!offline && pending > 0 && <div className="offline-banner" role="status">{pending} changement{pending > 1 ? 's' : ''} en attente d’envoi…</div>}
       {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
       {loading && <div className="sync-status" role="status">Synchronisation…</div>}
       {screen === 'home' && <HomeScreen rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} onUpdate={updateData} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} onQuickAdd={(title) => createFromTool({ module: 'quotidien', kind: 'task', title, entry_date: today(), data: { date: today(), priority: 'Haute' } })} />}
@@ -634,7 +674,7 @@ export default function App() {
       {screen === 'panda' && <><ScreenHeader title="" onBack={() => go('home')} /><PandaScreen entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onGo={(x) => go(x as Screen)} /></>}
       {screen === 'envies' && <><ScreenHeader title="" onBack={() => go('home')} /><Wishes entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
       {screen === 'mediter' && <><ScreenHeader title="" onBack={() => go('home')} /><Meditate entries={ritualEntries} onCreate={createFromTool} /></>}
-      {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onImported={() => void refresh()} />}
+      {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onCreate={createFromTool} onImported={() => void refresh()} />}
       {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
       {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}
       {screen === 'calme' && <Calm onQuit={() => go('home')} onWrite={() => addIn('equilibre', 'emotion', { date: today() })} />}
@@ -644,7 +684,7 @@ export default function App() {
       {currentModule && <div className="screen">
         <ScreenHeader title={currentModule.name} onBack={() => go('spaces')}
           right={<button className="icon-btn" aria-label="Ajouter" onClick={() => setEditor({ module: currentModule })}><Plus size={24} /></button>} />
-        {currentModule.id === 'quotidien' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'task', { date: today() })} onOpen={openEntry} onUpdate={updateData} embedded />}
+        {currentModule.id === 'quotidien' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'task', { date: today() })} onOpen={openEntry} onUpdate={updateData} onCreate={createFromTool} embedded />}
         {currentModule.id === 'sante' && <HealthTop entries={allModuleEntries} onAdd={(kind) => addIn('sante', kind, { date: today() })} />}
         {currentModule.id === 'sport' && <SportHub entries={allModuleEntries} challengeEntries={entries.filter((e) => e.module === 'challenges')} onCreate={createFromTool} onGoChallenges={() => go('challenges')} />}
         {currentModule.id === 'challenges' && <ChallengesBoard entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onQuit={removeQuiet} />}
@@ -669,6 +709,7 @@ export default function App() {
           <button className="calm-pill" onClick={() => go('calme')}>J’ai besoin de me calmer</button></>}
         {currentModule.id === 'spiritualite' && <><SpiritTop tab={spiritTab} onTab={setSpiritTab} entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />
           {spiritTab === 'invocations' && <Duas entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} />}
+          {spiritTab === 'qibla' && <Qibla entries={allModuleEntries} />}
           {spiritTab === 'horaires' && <AutomaticPrayerTimes entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}</>}
         {currentModule.id === 'passions' && <>
           <Segmented label="Passions" value={passionTab} onChange={setPassionTab} options={[{ value: 'parcours', label: 'Parcours' }, { value: 'series', label: 'Séries' }, { value: 'libre', label: 'Hobby libre' }]} />
@@ -676,6 +717,9 @@ export default function App() {
           {passionTab === 'series' && <SeriesTracker entries={allModuleEntries} onUpdate={updateData} onCreate={createFromTool} onAdd={() => addIn('passions', 'series', { status: 'À voir', seasons: '1', episodes: '10' })} />}
           {passionTab === 'libre' && <PassionPath entries={allModuleEntries} onUpdate={updateData} />}
         </>}
+        {currentModule.id === 'listes' && <section className="list-templates"><p className="eyebrow-s">Modèles</p>
+          {LIST_TEMPLATES.map((t) => <button key={t.id} className="row-plain template-row" onClick={() => void createGroceries(t.title, templateItems(t))}>
+            <span><strong>{t.title}</strong><small className="muted">{t.hint} · {templateItems(t).length} articles</small></span><Plus size={18} /></button>)}</section>}
         {(currentModule.id !== 'spiritualite' || spiritTab === 'journal') && currentModule.id !== 'challenges' && !(currentModule.id === 'passions' && passionTab !== 'libre') && entryList}
       </div>}
     </main>

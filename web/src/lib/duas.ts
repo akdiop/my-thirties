@@ -2,10 +2,10 @@
  * Invocations et sourates enregistrées par Aïda (publications Instagram), traduites en français.
  * Le texte arabe et la phonétique reprennent les publications ; la traduction suit leur sens.
  */
-export type DuaCategory = 'Réussite' | 'Protection' | 'Famille' | 'Pardon' | 'Détresse' | 'Coran';
+export type DuaCategory = 'Réussite' | 'Protection' | 'Famille' | 'Pardon' | 'Détresse' | 'Coran' | 'Pause dhikr';
 export type Dua = { id: string; category: DuaCategory; title: string; arabic: string; phonetic: string; french: string; ref?: string; source: string; repeat?: number; uses?: { title: string; items: string[] }[] };
 
-export const DUA_CATEGORIES: DuaCategory[] = ['Réussite', 'Protection', 'Famille', 'Pardon', 'Détresse', 'Coran'];
+export const DUA_CATEGORIES: DuaCategory[] = ['Pause dhikr', 'Réussite', 'Protection', 'Famille', 'Pardon', 'Détresse', 'Coran'];
 
 export const DUAS: Dua[] = [
   { id: 'reussite', category: 'Réussite', title: 'Invocation pour la réussite',
@@ -101,6 +101,22 @@ export const DUAS: Dua[] = [
     phonetic: 'Ḥasbunallāhu wa ni‘ma l-wakīl',
     french: 'Allah nous suffit, et quel excellent Garant !',
     ref: 'Coran 3:173', source: 'Muslima Mindset Reset' },
+  // « Have a break and read it! » : 5 formules à dire 3 fois pendant une pause.
+  { id: 'pause-hasbi', category: 'Pause dhikr', title: 'Allah me suffit', repeat: 3,
+    arabic: 'حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ', phonetic: 'Ḥasbunallāhu wa ni‘ma l-wakīl',
+    french: 'Allah nous suffit, et quel excellent Garant !', ref: 'Coran 3:173', source: 'Pause dhikr' },
+  { id: 'pause-nar', category: 'Pause dhikr', title: 'Protège-moi du Feu', repeat: 3,
+    arabic: 'اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ', phonetic: 'Allāhumma ajirnī mina n-nār',
+    french: 'Ô Allah, préserve-moi du Feu.', source: 'Pause dhikr' },
+  { id: 'pause-janna', category: 'Pause dhikr', title: 'Je Te demande le Paradis', repeat: 3,
+    arabic: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ', phonetic: 'Allāhumma innī as’aluka l-jannah',
+    french: 'Ô Allah, je Te demande le Paradis.', source: 'Pause dhikr' },
+  { id: 'pause-tawba', category: 'Pause dhikr', title: 'Pardon et repentir', repeat: 3,
+    arabic: 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ', phonetic: 'Astaghfirullāha wa atūbu ilayh',
+    french: 'Je demande pardon à Allah et je reviens vers Lui.', source: 'Pause dhikr' },
+  { id: 'pause-hawqala', category: 'Pause dhikr', title: 'Nulle force sauf par Allah', repeat: 3,
+    arabic: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ', phonetic: 'Lā ḥawla wa lā quwwata illā billāh',
+    french: 'Il n’y a de force ni de puissance qu’en Allah.', source: 'Pause dhikr' },
 ];
 
 /** Routine quotidienne de dhikr (liste « Ramadan daily Dhikr checklist » de @your._habibtii). */
