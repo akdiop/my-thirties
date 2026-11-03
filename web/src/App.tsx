@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type
 import { BrandLockup } from './ui/BrandMark';
 import type { Session } from '@supabase/supabase-js';
 import {
-  BookOpen, CalendarDays, LayoutGrid, ChevronRight, Coffee, Download, Heart,
+  CalendarDays, LayoutGrid, ChevronRight, Coffee, Download, Heart,
   Home, LogOut, Plus, Save, Settings, ShieldCheck, Trash2, UserRound, X,
 } from 'lucide-react';
 import { cloud, configured, createEntry, editEntry, getSession, isOwner, readEntries, removeEntry, restoreEntries, signIn, signOut, type Entry, type EntryInput, type ModuleId } from './lib/cloud';
@@ -42,7 +42,6 @@ const EquilibriumInsights = lazy(() => import('./features/EquilibriumInsights').
 const KitchenPlanner = lazy(() => import('./features/KitchenPlanner').then((m) => ({ default: m.KitchenPlanner })));
 const PassionPath = lazy(() => import('./features/PassionPath').then((m) => ({ default: m.PassionPath })));
 const TravelPlanner = lazy(() => import('./features/TravelPlanner').then((m) => ({ default: m.TravelPlanner })));
-const PrayerPlanner = lazy(() => import('./features/PrayerPlanner').then((m) => ({ default: m.PrayerPlanner })));
 const PersonalBrief = lazy(() => import('./features/PersonalBrief').then((m) => ({ default: m.PersonalBrief })));
 const RecipeIdeas = lazy(() => import('./features/RecipeIdeas').then((m) => ({ default: m.RecipeIdeas })));
 const BalanceReview = lazy(() => import('./features/BalanceReview').then((m) => ({ default: m.BalanceReview })));
@@ -585,9 +584,10 @@ export default function App() {
   if (!owner) return <main className="auth-layout"><section className="auth-card"><h1>Accès non autorisé</h1><p>Ce compte n'est pas enregistré comme propriétaire de l'application.</p><button className="button secondary" onClick={() => void signOut()}>Se déconnecter</button></section></main>;
 
   const currentModule = modules.find((m) => m.id === screen);
-  // En spiritualité, la liste ne garde que le journal (les prières cochées et les dhikr ont leurs propres écrans).
-  const allModuleEntries = currentModule ? entries.filter((e) => e.module === currentModule.id && !(e.module === 'spiritualite' && (e.kind === 'dhikr' || e.kind.startsWith('prayer')))) : [];
-  const moduleEntries = allModuleEntries.filter((e) => !search || e.title.toLowerCase().includes(search.toLowerCase()));
+  const allModuleEntries = currentModule ? entries.filter((e) => e.module === currentModule.id) : [];
+  // En spiritualité, la liste ne garde que le journal (prières cochées, horaires et dhikr ont leurs propres écrans).
+  const listedEntries = allModuleEntries.filter((e) => !(e.module === 'spiritualite' && (e.kind === 'dhikr' || e.kind.startsWith('prayer'))));
+  const moduleEntries = listedEntries.filter((e) => !search || e.title.toLowerCase().includes(search.toLowerCase()));
   const go = (next: Screen) => { setScreen(next); setSearch(''); window.scrollTo({ top: 0 }); };
   const openEntry = (e: Entry) => setEditor({ module: moduleById(e.module), initial: e });
   const addIn = (module: ModuleId, kind?: string, data?: Record<string, string>, title?: string) => setEditor({ module: moduleById(module), preset: kind ? { kind, data: data ?? {}, title } : undefined });
@@ -604,8 +604,8 @@ export default function App() {
   };
 
   const entryList = currentModule && <section className="entries-section">
-    <SectionTitle>{currentModule.id === 'spiritualite' ? 'Mon journal spirituel' : 'Mes entrées'} <span className="count">{allModuleEntries.length}</span></SectionTitle>
-    {allModuleEntries.length > 4 && <input className="search-field" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher dans cet espace…" />}
+    <SectionTitle>{currentModule.id === 'spiritualite' ? 'Mon journal spirituel' : 'Mes entrées'} <span className="count">{listedEntries.length}</span></SectionTitle>
+    {listedEntries.length > 4 && <input className="search-field" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher dans cet espace…" />}
     <div className="entries">{moduleEntries.length ? moduleEntries.map((entry) =>
       <EntryCard key={entry.id} entry={entry} module={currentModule} onEdit={openEntry} onDelete={(e) => void remove(e)} onUpdate={updateData} />
     ) : <div className="empty-soft"><Coffee size={28} /><p>Un espace à remplir à ton rythme.</p><button className="button ghost" onClick={() => setEditor({ module: currentModule })}>Créer ma première entrée</button></div>}</div>
@@ -667,10 +667,9 @@ export default function App() {
             booster={<div className="entries">{allModuleEntries.filter((e) => e.kind === 'booster').map((e) => <EntryCard key={e.id} entry={e} module={currentModule} onEdit={openEntry} onDelete={(x) => void remove(x)} onUpdate={updateData} />)}</div>} />
           {equilibreTab === 'journal' && <><EquilibriumInsights entries={allModuleEntries} /><BalanceReview entries={allModuleEntries} onCreate={createFromTool} /></>}
           <button className="calm-pill" onClick={() => go('calme')}>J’ai besoin de me calmer</button></>}
-        {currentModule.id === 'spiritualite' && <><SpiritTop tab={spiritTab} onTab={setSpiritTab} entries={allModuleEntries} onCreate={createFromTool} onRemove={removeQuiet} />
+        {currentModule.id === 'spiritualite' && <><SpiritTop tab={spiritTab} onTab={setSpiritTab} entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />
           {spiritTab === 'invocations' && <Duas entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} />}
-          {spiritTab === 'horaires' && <><AutomaticPrayerTimes entries={allModuleEntries} onCreate={createFromTool} /><PrayerPlanner entries={allModuleEntries} onCreate={createFromTool} />
-            <p className="disclaimer"><BookOpen size={14} /> Les horaires automatiques nécessitent une connexion et une ville choisie. Les calculs peuvent varier selon les sources locales.</p></>}</>}
+          {spiritTab === 'horaires' && <AutomaticPrayerTimes entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}</>}
         {currentModule.id === 'passions' && <>
           <Segmented label="Passions" value={passionTab} onChange={setPassionTab} options={[{ value: 'parcours', label: 'Parcours' }, { value: 'series', label: 'Séries' }, { value: 'libre', label: 'Hobby libre' }]} />
           {passionTab === 'parcours' && <LearningPaths entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}

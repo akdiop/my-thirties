@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { CalendarPlus, Copy, Download, RefreshCw } from 'lucide-react';
+import { CalendarPlus, ChevronDown, Copy, Download, RefreshCw } from 'lucide-react';
 import { cloud } from '../lib/cloud';
 
 const newToken = () => Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, '0')).join('');
@@ -14,6 +14,9 @@ export function IphoneCalendar({ onImported }: { onImported?: () => void }) {
   const [importStatus, setImportStatus] = useState('');
   const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
+  // Carte repliée par défaut : une fois réglée, on n'a plus besoin de la voir en entier.
+  const [open, setOpen] = useState(() => { try { return localStorage.getItem('mt-cal-open') === '1'; } catch { return false; } });
+  const toggle = () => { const v = !open; setOpen(v); try { localStorage.setItem('mt-cal-open', v ? '1' : '0'); } catch { /* sans stockage */ } };
 
   useEffect(() => {
     if (!cloud) return;
@@ -71,8 +74,13 @@ export function IphoneCalendar({ onImported }: { onImported?: () => void }) {
     try { await navigator.clipboard.writeText(feedUrl(token)); setStatus('Lien copié.'); } catch { setStatus(feedUrl(token)); }
   };
 
+  const state = [token ? 'synchronisé' : '', linked ? 'importé' : ''].filter(Boolean).join(' · ');
+  if (!open) return <section className="soft-card iphone-cal folded">
+    <button className="fold-head" aria-expanded={false} onClick={toggle}><CalendarPlus size={18} /><span><strong>Calendrier iPhone et Google</strong>{state && <small className="muted">{state}</small>}</span><ChevronDown size={18} /></button>
+    {importStatus && <p role="status" className="fineprint">{importStatus}</p>}
+  </section>;
   return <section className="soft-card iphone-cal">
-    <h3><CalendarPlus size={18} /> Calendrier iPhone et Google</h3>
+    <button className="fold-head" aria-expanded={true} onClick={toggle}><CalendarPlus size={18} /><span><strong>Calendrier iPhone et Google</strong>{state && <small className="muted">{state}</small>}</span><ChevronDown size={18} className="flip" /></button>
     {token ? <>
       <p className="muted">Ton agenda, tes rendez-vous et tes repas planifiés apparaissent dans l’app Calendrier et se mettent à jour automatiquement.</p>
       <a className="button primary wide" href={feedUrl(token).replace(/^https:/, 'webcal:')}>Ajouter à Calendrier</a>
