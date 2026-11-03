@@ -1,4 +1,5 @@
 import type { Entry } from './cloud';
+import { computeTimes, readSettings } from './prayertimes';
 
 export const iso = (d: Date) => [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
 export const todayIso = () => iso(new Date());
@@ -59,7 +60,11 @@ const DATED_KINDS = new Set(['session', 'appointment', 'meal', 'practice', 'trip
 export function timeline(entries: Entry[], date: Date): TimelineItem[] {
   const key = iso(date);
   const prayers: TimelineItem[] = [];
-  const schedule = entries.find((e) => e.kind === 'prayer_schedule' && e.entry_date === key);
+  // Position enregistrée une fois : horaires calculés pour ce jour ; sinon, ancien horaire saisi.
+  const saved = readSettings(entries);
+  if (saved) { const t = computeTimes(saved.settings, date) as Record<string, string>;
+    for (const name of ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']) prayers.push({ id: 'prayer-' + key + name, time: t[name]!, title: name, sub: 'Ma spiritualité', tone: 'sauge', entry: saved.entry }); }
+  const schedule = saved ? undefined : entries.find((e) => e.kind === 'prayer_schedule' && e.entry_date === key);
   if (schedule) for (const name of ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']) {
     const t = str(schedule, name);
     if (/^\d{2}:\d{2}/.test(t)) prayers.push({ id: schedule.id + name, time: t.slice(0, 5), title: name, sub: 'Ma spiritualité', tone: 'sauge', entry: schedule });
