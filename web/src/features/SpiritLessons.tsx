@@ -8,10 +8,12 @@ function Part({ part, open, onToggle }: { part: LessonPart; open: boolean; onTog
     <button className="fiche-head" aria-expanded={open} onClick={onToggle}><strong>{part.title}</strong><ChevronDown size={18} className={'list-chev' + (open ? ' flip' : '')} /></button>
     {open && <>
       {part.arabic && <p className="dua-ar" lang="ar" dir="rtl">{part.arabic}</p>}
+      {part.phonetic && <p className="dua-ph">{part.phonetic}</p>}
       {part.french && <p className="dua-fr">{part.french}</p>}
       {part.points?.map((p) => <p key={p} className="fiche-pt">{p}</p>)}
       {part.duas?.map((d) => <div key={d.arabic} className="lesson-dua">
         <p className="dua-ar" lang="ar" dir="rtl">{d.arabic}</p>
+        <p className="dua-ph">{d.phonetic}</p>
         <p className="dua-fr">{d.french}</p>
         {d.note && <small className="muted">{d.note}</small>}
       </div>)}
@@ -45,7 +47,8 @@ export function SpiritLessons({ onBack }: { onBack: () => void }) {
   if (!lesson) return <>
     <button className="link-btn back-link" onClick={onBack}>‹ Ma spiritualité</button>
     <div className="rows">{LESSONS.map((l) =>
-      <RowLink key={l.id} icon={BookOpen} title={l.title} sub={l.sub} onClick={() => { setId(l.id); setOpen(0); }} />)}</div></>;
+      <RowLink key={l.id} icon={BookOpen} title={l.title} sub={l.sub} onClick={() => { setId(l.id); setOpen(0); }} />)}</div>
+    <p className="fineprint">Lire la phonétique : â, î, û se prononcent longs ; ‘ est le son de gorge du ‘ayn ; ’ est un petit arrêt de voix ; une lettre doublée (bb, mm) se marque en appuyant ; kh comme la jota espagnole, gh comme un r grasseyé, dh comme le « th » anglais de « this », th comme « think ».</p></>;
   return <div className="stack-8 lesson">
     <button className="link-btn back-link" onClick={() => setId(null)}>‹ Mes cours</button>
     <div className="soft-card"><strong className="serif lesson-title">{lesson.title}</strong><p className="muted">{lesson.intro}</p></div>

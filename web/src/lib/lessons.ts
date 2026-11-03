@@ -5,10 +5,11 @@
 export type LessonPart = {
   title: string;
   arabic?: string;
+  phonetic?: string;
   french?: string;
   points?: string[];
   avoid?: string[];
-  duas?: { arabic: string; french: string; note?: string }[];
+  duas?: { arabic: string; phonetic: string; french: string; note?: string }[];
 };
 export type Lesson = { id: string; title: string; sub: string; intro: string; parts: LessonPart[]; retain?: string[]; quiz?: { q: string; a: boolean }[] };
 
@@ -27,7 +28,7 @@ export const LESSONS: Lesson[] = [
         'Al-maghdûbi ‘alayhim : les juifs et tous ceux qui savent sans mettre en pratique.',
         'Ad-dâllîn : les chrétiens et tous ceux qui agissent sans science.',
       ] },
-      { title: 'Verset 1 · La Basmala', arabic: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ', french: 'Au nom d’Allah, le Tout Miséricordieux, le Très Miséricordieux.', points: [
+      { title: 'Verset 1 · La Basmala', arabic: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ', phonetic: 'Bismillâhi r-rahmâni r-rahîm', french: 'Au nom d’Allah, le Tout Miséricordieux, le Très Miséricordieux.', points: [
         'Dire la Basmala, c’est demander l’aide d’Allah, le seul qui puisse réellement aider.',
         'On s’appuie sur tous Ses noms, pas seulement sur le nom « Allah ».',
         'Ar-Rahmân : Celui dont la miséricorde immense englobe toute chose et toute créature.',
@@ -36,7 +37,7 @@ export const LESSONS: Lesson[] = [
                 '« Au nom » est au singulier mais englobe tous les plus beaux noms. « Allah » : Celui qui est adoré et mérite seul de l’être, car Il possède tous les attributs parfaits.',
         'Sa miséricorde embrasse tout, mais Il l’a réservée dans sa totalité aux pieux qui suivent les prophètes ; les autres n’en reçoivent qu’une part.',
       ] },
-      { title: 'Verset 2 · La louange', arabic: 'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ', french: 'Louange à Allah, Seigneur de l’univers.', points: [
+      { title: 'Verset 2 · La louange', arabic: 'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ', phonetic: 'Al-hamdu lillâhi rabbi l-‘âlamîn', french: 'Louange à Allah, Seigneur de l’univers.', points: [
         'Ce verset ouvre la porte de l’amour d’Allah.',
         'L’adoration repose sur trois piliers : l’amour, l’espoir et la crainte.',
         'On loue Allah pour cinq raisons :',
@@ -49,13 +50,13 @@ export const LESSONS: Lesson[] = [
         'La louange s’adresse à Ses attributs parfaits et à Ses actes, tous bienfaisance et justice : Il mérite l’éloge le plus complet.',
         '« Seigneur de l’univers » : Celui qui prend soin de tout ce qui existe en le créant, en lui donnant ce dont il a besoin et en le comblant de bienfaits sans lesquels rien ne survivrait. Il est seul à créer, à gérer et à se suffire ; tout dépend de Lui.',
       ] },
-      { title: 'Verset 3 · L’espoir', arabic: 'الرَّحْمَنِ الرَّحِيمِ', french: 'Le Tout Miséricordieux, le Très Miséricordieux.', points: [
+      { title: 'Verset 3 · L’espoir', arabic: 'الرَّحْمَنِ الرَّحِيمِ', phonetic: 'Ar-rahmâni r-rahîm', french: 'Le Tout Miséricordieux, le Très Miséricordieux.', points: [
         'Ce verset porte l’espoir.',
         'Allah n’aime pas que le musulman désespère de Sa miséricorde : c’est interdit. « Et ne désespérez pas de la miséricorde d’Allah. »',
         'Le croyant espère entrer au Paradis et que ses péchés soient pardonnés, et il aime son Seigneur.',
         'En résumé : le verset 2 porte l’amour, le verset 3 porte l’espoir.',
       ] },
-      { title: 'Verset 4 · La crainte', arabic: 'مَالِكِ يَوْمِ الدِّينِ', french: 'Maître du Jour de la rétribution.', points: [
+      { title: 'Verset 4 · La crainte', arabic: 'مَالِكِ يَوْمِ الدِّينِ', phonetic: 'Mâliki yawmi d-dîn', french: 'Maître du Jour de la rétribution.', points: [
         'Ce verset porte le troisième pilier : la crainte du Jour où chacun sera jugé et rétribué selon ce qu’il a avancé.',
         '« Et craignez le jour où vous serez ramenés vers Allah. »',
         'Face à une désobéissance : se rappeler ce Jour où l’on sera jugé et rétribué.',
@@ -64,14 +65,14 @@ export const LESSONS: Lesson[] = [
         'Cette vie, avec ses épreuves, est éphémère. Le Jour venu, chacun espérera une balance lourde, le Paradis et la plus grande récompense : voir le visage d’Allah.',
         'Les vraies questions : qu’ai-je avancé pour mon au-delà ? Est-ce que j’unifie Allah en toute circonstance ? Est-ce que je suis la Sunna avec la compréhension des pieux prédécesseurs ? Est-ce que je m’efforce de faire le bien ?',
       ], duas: [
-        { arabic: 'وَجِيءَ يَوْمَئِذٍ بِجَهَنَّمَ ۚ يَوْمَئِذٍ يَتَذَكَّرُ الْإِنسَانُ وَأَنَّىٰ لَهُ الذِّكْرَىٰ ۝ يَقُولُ يَا لَيْتَنِي قَدَّمْتُ لِحَيَاتِي ۝ فَيَوْمَئِذٍ لَّا يُعَذِّبُ عَذَابَهُ أَحَدٌ ۝ وَلَا يُوثِقُ وَثَاقَهُ أَحَدٌ ۝ يَا أَيَّتُهَا النَّفْسُ الْمُطْمَئِنَّةُ ۝ ارْجِعِي إِلَىٰ رَبِّكِ رَاضِيَةً مَّرْضِيَّةً ۝ فَادْخُلِي فِي عِبَادِي ۝ وَادْخُلِي جَنَّتِي',
+        { arabic: 'وَجِيءَ يَوْمَئِذٍ بِجَهَنَّمَ ۚ يَوْمَئِذٍ يَتَذَكَّرُ الْإِنسَانُ وَأَنَّىٰ لَهُ الذِّكْرَىٰ ۝ يَقُولُ يَا لَيْتَنِي قَدَّمْتُ لِحَيَاتِي ۝ فَيَوْمَئِذٍ لَّا يُعَذِّبُ عَذَابَهُ أَحَدٌ ۝ وَلَا يُوثِقُ وَثَاقَهُ أَحَدٌ ۝ يَا أَيَّتُهَا النَّفْسُ الْمُطْمَئِنَّةُ ۝ ارْجِعِي إِلَىٰ رَبِّكِ رَاضِيَةً مَّرْضِيَّةً ۝ فَادْخُلِي فِي عِبَادِي ۝ وَادْخُلِي جَنَّتِي', phonetic: 'Wa jî’a yawma’idhim bi-jahannam, yawma’idhin yatadhakkaru l-insânu wa annâ lahu dh-dhikrâ. Yaqûlu yâ laytanî qaddamtu li-hayâtî. Fa-yawma’idhil-lâ yu‘adhdhibu ‘adhâbahû ahad. Wa lâ yûthiqu wathâqahû ahad. Yâ ayyatuha n-nafsu l-mutma’innah. Irji‘î ilâ rabbiki râdiyatam-mardiyyah. Fadkhulî fî ‘ibâdî. Wadkhulî jannatî.',
           french: 'Ce jour-là, on amènera l’Enfer ; l’homme se souviendra, mais à quoi bon ? Il dira : « Hélas ! Si seulement j’avais œuvré pour ma vraie vie ! » Ce jour-là, nul ne châtiera comme Lui et nul ne liera comme Lui. « Ô toi, âme apaisée, retourne vers ton Seigneur, satisfaite et agréée ; entre parmi Mes serviteurs, et entre dans Mon Paradis. »',
           note: 'Al-Fajr, 89:23-30' },
-        { arabic: 'وَالْعَصْرِ ۝ إِنَّ الْإِنسَانَ لَفِي خُسْرٍ ۝ إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ',
+        { arabic: 'وَالْعَصْرِ ۝ إِنَّ الْإِنسَانَ لَفِي خُسْرٍ ۝ إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ', phonetic: 'Wal-‘asr. Inna l-insâna lafî khusr. Illa lladhîna âmanû wa ‘amilu s-sâlihâti wa tawâsaw bil-haqqi wa tawâsaw bis-sabr.',
           french: 'Par le Temps ! L’homme est certes en perdition, sauf ceux qui croient, accomplissent les bonnes œuvres, s’enjoignent la vérité et s’enjoignent l’endurance.',
           note: 'Al-‘Asr · Allah jure par le Temps pour en montrer l’importance (nous, nous ne jurons que par Allah). Tout homme est perdant, sauf : la foi, qui grandit avec la science ; les bonnes œuvres, qui mettent cette science en pratique ; l’appel à la vérité (islam, Sunna, Coran) ; et la patience dans la science, la pratique et l’appel.' },
       ] },
-      { title: 'Verset 5 · Adorer et demander l’aide', arabic: 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ', french: 'C’est Toi seul que nous adorons, et Toi seul dont nous implorons le secours.', points: [
+      { title: 'Verset 5 · Adorer et demander l’aide', arabic: 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ', phonetic: 'Iyyâka na‘budu wa iyyâka nasta‘în', french: 'C’est Toi seul que nous adorons, et Toi seul dont nous implorons le secours.', points: [
         '« Toi seul nous adorons » : on voue à Allah seul l’amour, l’espoir et la crainte, et l’on se désavoue de toute association, grande ou petite.',
         '« Toi seul nous demandons l’aide » : pour accomplir le bien, pour Lui obéir et dans toutes nos affaires, de ce monde comme de l’au-delà. Il est le seul en qui placer sa confiance.',
         'Définition de l’adoration (Ibn Taymiyya) : un nom qui englobe tout ce qu’Allah aime et agrée, en paroles et en actes, apparents comme intérieurs.',
@@ -81,13 +82,13 @@ export const LESSONS: Lesson[] = [
         'L’aide vient après l’adoration car elle en fait partie : sans l’aide d’Allah, on ne peut ni obéir ni délaisser l’interdit.',
         'Nous avons sans cesse besoin de Son aide pour L’adorer sans associé et suivre la Sunna.',
       ] },
-      { title: 'Verset 6 · La guidée', arabic: 'اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ', french: 'Guide-nous sur le droit chemin.', points: [
+      { title: 'Verset 6 · La guidée', arabic: 'اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ', phonetic: 'Ihdina s-sirâta l-mustaqîm', french: 'Guide-nous sur le droit chemin.', points: [
         'Montre-nous le droit chemin, conduis-nous vers lui et fais-nous y rester : le chemin clair qui mène à Allah et à Son Paradis, connaître la vérité et la mettre en pratique.',
         'Être guidée vers le chemin : embrasser l’islam et délaisser toute autre religion.',
         'Être guidée sur le chemin : être guidée dans tous les détails de la science et des œuvres.',
         'C’est l’une des invocations les plus complètes et les plus utiles : d’où l’obligation de la dire à chaque unité de prière.',
       ] },
-      { title: 'Verset 7 · Les deux voies à éviter', arabic: 'صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ', french: 'Le chemin de ceux que Tu as comblés de bienfaits, non de ceux qui ont encouru la colère, ni des égarés.', points: [
+      { title: 'Verset 7 · Les deux voies à éviter', arabic: 'صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ', phonetic: 'Sirâta lladhîna an‘amta ‘alayhim, ghayri l-maghdûbi ‘alayhim wa la d-dâllîn', french: 'Le chemin de ceux que Tu as comblés de bienfaits, non de ceux qui ont encouru la colère, ni des égarés.', points: [
         'Ceux qui ont été comblés : les prophètes, les véridiques, les martyrs et les pieux.',
         'Ceux qui ont encouru la colère : ceux qui ont connu la vérité puis l’ont délaissée, comme les juifs et leurs semblables.',
         'Les égarés : ceux qui ont délaissé la vérité par ignorance, comme les chrétiens et leurs semblables.',
@@ -122,16 +123,16 @@ export const LESSONS: Lesson[] = [
         'As-Samad : Celui vers qui l’on se tourne pour toutes ses demandes.',
         'Kufuwan : un égal, un semblable, un équivalent.',
       ] },
-      { title: 'Verset 1', arabic: 'قُلْ هُوَ اللَّهُ أَحَدٌ', french: 'Dis : Il est Allah, l’Unique.', points: [
+      { title: 'Verset 1', arabic: 'قُلْ هُوَ اللَّهُ أَحَدٌ', phonetic: 'Qul huwa llâhu ahad', french: 'Dis : Il est Allah, l’Unique.', points: [
         '« Dis » : avec fermeté, en y croyant et en comprenant ce que l’on dit.',
         'L’unicité appartient à Allah seul : Il est unique dans Sa perfection, avec les plus beaux noms et les attributs les plus parfaits, sans égal ni semblable.',
       ] },
-      { title: 'Verset 2', arabic: 'اللَّهُ الصَّمَدُ', french: 'Allah, Celui vers qui l’on se tourne pour tout.', points: [
+      { title: 'Verset 2', arabic: 'اللَّهُ الصَّمَدُ', phonetic: 'Allâhu s-samad', french: 'Allah, Celui vers qui l’on se tourne pour tout.', points: [
         'Toute créature, sur terre comme dans les cieux, dépend entièrement de Lui et Lui demande ce dont elle a besoin.',
         'On se tourne vers Lui parce que chacun de Ses attributs atteint la perfection : Son savoir, Son indulgence, Sa miséricorde qui embrasse toute chose.',
       ] },
-      { title: 'Verset 3', arabic: 'لَمْ يَلِدْ وَلَمْ يُولَدْ', french: 'Il n’a jamais engendré et n’a pas été engendré.', points: ['Cela fait partie de Sa perfection.'] },
-      { title: 'Verset 4', arabic: 'وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ', french: 'Et nul n’est égal à Lui.', points: ['Ni dans Ses noms, ni dans Ses attributs, ni dans Ses actes.'] },
+      { title: 'Verset 3', arabic: 'لَمْ يَلِدْ وَلَمْ يُولَدْ', phonetic: 'Lam yalid wa lam yûlad', french: 'Il n’a jamais engendré et n’a pas été engendré.', points: ['Cela fait partie de Sa perfection.'] },
+      { title: 'Verset 4', arabic: 'وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ', phonetic: 'Wa lam yakul-lahû kufuwan ahad', french: 'Et nul n’est égal à Lui.', points: ['Ni dans Ses noms, ni dans Ses attributs, ni dans Ses actes.'] },
     ],
     retain: [
       'La sourate contient l’unicité des noms et des attributs : on affirme ce qu’Allah et Son Prophète ﷺ ont affirmé, on nie ce qu’ils ont nié, sans chercher le « comment », sans comparer, sans déformer ni renier.',
@@ -143,11 +144,11 @@ export const LESSONS: Lesson[] = [
     intro: 'Sourate mecquoise. Elle apprend à se réfugier auprès d’Allah, dans Sa grandeur et Sa souveraineté, contre le mal des créatures, de la nuit qui tombe (quand elle isole et que les malfaisants se répandent), des sorciers et des envieux. C’est l’une des deux sourates par lesquelles le Prophète ﷺ se protégeait.',
     parts: [
       { title: 'Vocabulaire', points: ['Al-falaq : l’aube.', 'Ghâsiq : la nuit (on a dit aussi : la lune).', 'An-naffâthât : les sorcières.'] },
-      { title: 'Verset 1', arabic: 'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ', french: 'Dis : je cherche protection auprès du Seigneur de l’aube naissante.', points: ['Je me réfugie et je demande secours auprès de Celui qui fait sortir la plante de la graine et du noyau, et l’aube de la nuit.'] },
-      { title: 'Verset 2', arabic: 'مِن شَرِّ مَا خَلَقَ', french: 'Contre le mal de ce qu’Il a créé.', points: ['Tout ce qu’Allah a créé : humains, djinns, animaux. On demande protection à leur Créateur contre le mal qui est en eux.'] },
-      { title: 'Verset 3', arabic: 'وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ', french: 'Et contre le mal de la nuit quand elle s’obscurcit.', points: ['Après le général, le particulier : la nuit couvre les gens et beaucoup de malfaisants et de bêtes nuisibles se répandent.'] },
-      { title: 'Verset 4', arabic: 'وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ', french: 'Et contre le mal de celles qui soufflent sur les nœuds.', points: ['Les sorcières, qui crachotent sur des nœuds de fil pour accomplir leur sorcellerie.'] },
-      { title: 'Verset 5', arabic: 'وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ', french: 'Et contre le mal de l’envieux quand il envie.', points: [
+      { title: 'Verset 1', arabic: 'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ', phonetic: 'Qul a‘ûdhu bi-rabbi l-falaq', french: 'Dis : je cherche protection auprès du Seigneur de l’aube naissante.', points: ['Je me réfugie et je demande secours auprès de Celui qui fait sortir la plante de la graine et du noyau, et l’aube de la nuit.'] },
+      { title: 'Verset 2', arabic: 'مِن شَرِّ مَا خَلَقَ', phonetic: 'Min sharri mâ khalaq', french: 'Contre le mal de ce qu’Il a créé.', points: ['Tout ce qu’Allah a créé : humains, djinns, animaux. On demande protection à leur Créateur contre le mal qui est en eux.'] },
+      { title: 'Verset 3', arabic: 'وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ', phonetic: 'Wa min sharri ghâsiqin idhâ waqab', french: 'Et contre le mal de la nuit quand elle s’obscurcit.', points: ['Après le général, le particulier : la nuit couvre les gens et beaucoup de malfaisants et de bêtes nuisibles se répandent.'] },
+      { title: 'Verset 4', arabic: 'وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ', phonetic: 'Wa min sharri n-naffâthâti fi l-‘uqad', french: 'Et contre le mal de celles qui soufflent sur les nœuds.', points: ['Les sorcières, qui crachotent sur des nœuds de fil pour accomplir leur sorcellerie.'] },
+      { title: 'Verset 5', arabic: 'وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ', phonetic: 'Wa min sharri hâsidin idhâ hasad', french: 'Et contre le mal de l’envieux quand il envie.', points: [
         'L’envieux souhaite voir disparaître le bienfait de l’autre et s’y emploie par tous les moyens : on demande à Allah de nous protéger de son mal et de déjouer ses ruses.',
         'Le mauvais œil en fait partie : il ne vient que d’un envieux au cœur mauvais.',
       ] },
@@ -169,7 +170,7 @@ export const LESSONS: Lesson[] = [
         'Al-khannâs : celui qui recule dès que le serviteur évoque son Seigneur.',
         'Yuwaswis : celui qui souffle de mauvaises pensées dans les poitrines.',
       ] },
-      { title: 'La sourate', arabic: 'قُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝ مَلِكِ النَّاسِ ۝ إِلَٰهِ النَّاسِ ۝ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۝ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۝ مِنَ الْجِنَّةِ وَالنَّاسِ',
+      { title: 'La sourate', arabic: 'قُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝ مَلِكِ النَّاسِ ۝ إِلَٰهِ النَّاسِ ۝ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۝ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۝ مِنَ الْجِنَّةِ وَالنَّاسِ', phonetic: 'Qul a‘ûdhu bi-rabbi n-nâs. Maliki n-nâs. Ilâhi n-nâs. Min sharri l-waswâsi l-khannâs. Alladhî yuwaswisu fî sudûri n-nâs. Mina l-jinnati wa n-nâs.',
         french: 'Dis : je cherche protection auprès du Seigneur des gens, le Roi des gens, le Dieu des gens, contre le mal du tentateur qui se dérobe, qui souffle le mal dans les poitrines des gens, qu’il soit djinn ou humain.' },
       { title: 'Le sens', points: [
         'On se protège auprès du Seigneur, du Roi et du Dieu des hommes contre le diable, source et essence de tout mal.',
@@ -188,7 +189,7 @@ export const LESSONS: Lesson[] = [
   { id: 'kursi', title: 'Ayat al-Kursî', sub: 'le plus immense verset du Coran · 2:255',
     intro: 'Verset 255 d’Al-Baqara, sourate médinoise. Le plus immense et le plus noble verset du Coran : il réunit cinq noms d’Allah et plus de vingt de Ses attributs, et aucun autre verset ne concentre autant de tawhîd.',
     parts: [
-      { title: 'Le verset', arabic: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ',
+      { title: 'Le verset', arabic: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ', phonetic: 'Allâhu lâ ilâha illâ huwa l-hayyu l-qayyûm. Lâ ta’khudhuhû sinatuw-wa lâ nawm. Lahû mâ fi s-samâwâti wa mâ fi l-ard. Man dha lladhî yashfa‘u ‘indahû illâ bi-idhnih. Ya‘lamu mâ bayna aydîhim wa mâ khalfahum. Wa lâ yuhîtûna bi-shay’im-min ‘ilmihî illâ bimâ shâ’. Wasi‘a kursiyyuhu s-samâwâti wal-ard. Wa lâ ya’ûduhû hifzuhumâ. Wa huwa l-‘aliyyu l-‘azîm.',
         french: 'Allah ! Point de divinité digne d’adoration à part Lui, le Vivant, Celui qui subsiste par Lui-même. Ni somnolence ni sommeil ne Le saisissent. À Lui appartient ce qui est dans les cieux et sur la terre. Qui peut intercéder auprès de Lui sans Sa permission ? Il sait ce qui est devant eux et derrière eux, et ils n’embrassent de Sa science que ce qu’Il veut. Son Kursî s’étend sur les cieux et la terre, dont la garde ne Lui coûte aucune peine. Il est le Très-Haut, l’Immense.' },
       { title: 'Ses mérites', points: [
         'Le plus immense verset du Coran, d’après le hadith d’Ubayy ibn Ka‘b.',
@@ -232,48 +233,48 @@ export const LESSONS: Lesson[] = [
     parts: [
       { title: 'Les lettres et leurs sorties (cours 1)', points: [
         'Le son d’une lettre dépend de son point de sortie (makhraj) et de ses qualités (sifât).',
-        '29 lettres : 19 toujours amincies, 7 toujours emphatiques (خ ص ض غ ط ق ظ), et 3 qui varient (ا ر ل).',
+        '29 lettres : 19 toujours amincies, 7 toujours emphatiques (khâ, Sâd, Dâd, ghayn, Tâ, qâf, Dhâ : خ ص ض غ ط ق ظ), et 3 qui varient (alif, râ, lâm : ا ر ل).',
         'Amincie : le son va vers l’avant de la bouche. Emphatique : le fond de la langue monte vers le palais, la langue se creuse et le son résonne.',
-        '5 sorties principales, 17 secondaires : la cavité de la bouche (les 3 lettres de prolongation), la gorge (ء ه au fond, ع ح au milieu, غ خ en haut), la langue (18 lettres), les lèvres (ف و ب م) et le nez (la ghunnah).',
-        'Pour trouver la sortie d’une lettre : dire une hamza avec fatha puis la lettre avec soukoûn (أَبْ : le son s’arrête sur les lèvres).',
-        'Langue : ق fond de la langue contre le palais mou ; ك un peu plus en avant ; ج ش ي milieu de la langue ; ض bord de la langue contre les molaires du haut ; ل bords de la langue ; ن bout de la langue au palais avec ghunnah ; ر bout de la langue au palais, en vibrant légèrement.',
-        'ت د ط : bout de la langue à la racine des incisives du haut. ز س ص : bout de la langue contre l’intérieur des incisives du bas. ث ذ ظ : bout de la langue au bord des incisives du haut, légèrement sortie.',
-        'ف : incisives du haut sur l’intérieur de la lèvre du bas. ب م : lèvres jointes (ghunnah pour le م). و : lèvres arrondies vers l’avant.',
-        'L’alif suit la lettre d’avant : aminci après une lettre amincie (تا), emphatique après une emphatique (صا). Le ل est aminci partout sauf parfois dans le nom d’Allah.',
-        'ج : si le milieu de la langue ne touche pas le palais, il glisse vers le ش. ر emphatique : la langue se creuse au milieu et la gorge se resserre.',
+        '5 sorties principales, 17 secondaires : la cavité de la bouche (les 3 lettres de prolongation), la gorge (hamza ء et hâ ه au fond, ‘ayn ع et Hâ ح au milieu, ghayn غ et khâ خ en haut), la langue (18 lettres), les lèvres (fâ ف, wâw و, bâ ب, mîm م) et le nez (la ghunnah).',
+        'Pour trouver la sortie d’une lettre : dire une hamza avec fatha puis la lettre avec soukoûn (« ab » أَبْ : le son s’arrête sur les lèvres).',
+        'Langue : qâf ق, fond de la langue contre le palais mou ; kâf ك, un peu plus en avant ; jîm ج, shîn ش et yâ ي, milieu de la langue ; Dâd ض, bord de la langue contre les molaires du haut ; lâm ل, bords de la langue ; noûn ن, bout de la langue au palais avec ghunnah ; râ ر, bout de la langue au palais, en vibrant légèrement.',
+        'tâ ت, dâl د, Tâ ط : bout de la langue à la racine des incisives du haut. zây ز, sîn س, Sâd ص : bout de la langue contre l’intérieur des incisives du bas. thâ ث, dhâl ذ, Dhâ ظ : bout de la langue au bord des incisives du haut, légèrement sortie.',
+        'fâ ف : incisives du haut sur l’intérieur de la lèvre du bas. bâ ب et mîm م : lèvres jointes (ghunnah pour le mîm). wâw و : lèvres arrondies vers l’avant.',
+        'L’alif suit la lettre d’avant : aminci après une lettre amincie (« tâ » تا), emphatique après une emphatique (« Sâ » صا). Le lâm ل est aminci partout sauf parfois dans le nom d’Allah.',
+        'jîm ج : si le milieu de la langue ne touche pas le palais, il glisse vers le shîn ش. râ ر emphatique : la langue se creuse au milieu et la gorge se resserre.',
       ] },
       { title: 'Les lettres attachées (cours 2)', points: [
         'Une lettre change de forme selon sa place : début, milieu ou fin de mot.',
-        '6 lettres ne s’attachent jamais à la suivante : ا د ذ ر ز و.',
-        'Le tâ a deux formes : ouvert (ت) et fermé, le tâ marbûta (ة), marque du féminin en fin de mot, toujours précédé d’une fatha. Ses deux points le distinguent du ه.',
-        'La hamza en début de mot : hamzat al-qat‘ (أ إ), écrite et lue ; hamzat al-wasl (ٱ), lue seulement en début de phrase.',
-        'Au milieu ou en fin de mot, la hamza s’écrit seule (ء) ou sur un support (ا و ى) qui ne se prononce jamais.',
+        '6 lettres ne s’attachent jamais à la suivante : alif ا, dâl د, dhâl ذ, râ ر, zây ز, wâw و.',
+        'Le tâ a deux formes : ouvert (ت) et fermé, le tâ marbûta (ة, prononcé « a » ou « at »), marque du féminin en fin de mot, toujours précédé d’une fatha. Ses deux points le distinguent du hâ ه.',
+        'La hamza en début de mot : hamzat al-qat‘ (« a » أ, « i » إ), écrite et lue ; hamzat al-wasl (ٱ), lue seulement en début de phrase.',
+        'Au milieu ou en fin de mot, la hamza s’écrit seule (ء) ou sur un support (alif, wâw ou yâ) qui ne se prononce jamais.',
         'Astuces : lire de droite à gauche ; pour des lettres superposées, celle du haut d’abord ; repérer les points et les lettres qui ne s’attachent pas.',
       ] },
       { title: 'Les lettres entrecoupées (cours 3)', points: [
-        'Les lettres isolées au début de 29 sourates ; Allah seul en connaît le sens exact. Il y en a 14, réunies dans « نَصٌّ حَكِيمٌ لَهُ سِرٌّ قَاطِعٌ ».',
+        'Les lettres isolées au début de 29 sourates ; Allah seul en connaît le sens exact. Il y en a 14, réunies dans « Nassun hakîmun lahû sirrun qâti‘ » (نَصٌّ حَكِيمٌ لَهُ سِرٌّ قَاطِعٌ).',
         'On les nomme une par une, avec la bonne durée : c’est al-madd al-lâzim al-harfî.',
         'L’alif ne s’allonge pas.',
-        'ح ي ط ه ر (« حَيٌّ طَهُرَ ») : 2 temps.',
-        'ن ق ص ع س ل ك م (« نَقَصَ عَسَلُكُمْ »), surmontées d’une vague : 6 temps obligatoires, sauf le ع : 4 ou 6 temps, 6 étant le mieux.',
-        'La ghunnah (son du nez qui accompagne naturellement le ن et le م) se fait aussi entre certaines de ces lettres, par idghâm ou par ikhfâ’.',
+        'Hâ, yâ, Tâ, hâ, râ (« Hayyun tahura », حَيٌّ طَهُرَ) : 2 temps.',
+        'Noûn, qâf, Sâd, ‘ayn, sîn, lâm, kâf, mîm (« Naqasa ‘asalukum », نَقَصَ عَسَلُكُمْ), surmontées d’une vague : 6 temps obligatoires, sauf le ‘ayn : 4 ou 6 temps, 6 étant le mieux.',
+        'La ghunnah (son du nez qui accompagne naturellement le noûn ن et le mîm م) se fait aussi entre certaines de ces lettres, par idghâm ou par ikhfâ’.',
       ] },
       { title: 'Les voyelles courtes (cours 4)', points: [
         'Fatha « a » : bouche ouverte d’au moins un centimètre, sinon la lettre devient emphatique ; ne pas étirer les lèvres comme un sourire (ce qui donnerait « è »).',
         'Kasra « i » : abaisser légèrement la mâchoire.',
         'Damma « ou » : lèvres bien arrondies, tirées vers l’avant.',
-        'Le ر est aminci avec une kasra, emphatique avec une fatha ou une damma.',
+        'Le râ ر est aminci avec une kasra, emphatique avec une fatha ou une damma.',
         'Sur une lettre emphatique, toujours penser à monter le fond de la langue.',
       ] },
       { title: 'Le tanwin (cours 5)', points: [
         'Le tanwin double la voyelle courte, toujours en fin de mot : fathatayn « an », kasratayn « in », dammatayn « oun ».',
         'Une fathatayn est toujours suivie d’un alif, sauf sur la hamza (ء) et le tâ marbûta (ة). Cet alif n’est pas un alif de prolongation.',
         'C’est en réalité un noûn sâkinah qu’on prononce sans l’écrire.',
-        'Les lettres se rangent en trois familles : gorge (ء ه ع ح غ خ), lèvres (ف و ب م) et langue (toutes les autres).',
+        'Les lettres se rangent en trois familles : gorge (hamza, hâ, ‘ayn, Hâ, ghayn, khâ), lèvres (fâ, wâw, bâ, mîm) et langue (toutes les autres).',
       ] },
       { title: 'Les petits signes (cours 6 et 9)', points: [
         'Le tahadji : nommer la lettre, sa voyelle, puis lire la syllabe, et enchaîner jusqu’au mot entier.',
-        'Aṣ-ṣifr al-mustatîl (rond ovale, comme un zéro) : uniquement sur un alif de prolongation. Il ne se lit pas en liaison mais se garde à l’arrêt (أَنَا).',
+        'Aṣ-ṣifr al-mustatîl (rond ovale, comme un zéro) : uniquement sur un alif de prolongation. Il ne se lit pas en liaison mais se garde à l’arrêt (أَنَا, « ana » en liaison, « anâ » à l’arrêt).',
         'Aṣ-ṣifr al-mustadîr (petit rond net) : sur une lettre de prolongation ou un alif de pluriel. Il ne se lit jamais, ni en liaison ni à l’arrêt : la prolongation s’annule.',
         'L’alif de pluriel suit un wâw de prolongation pour une raison grammaticale : il ne se prononce pas.',
         'Au tahadji, les lettres portant l’un de ces ronds ne sont pas nommées.',
@@ -286,36 +287,36 @@ export const LESSONS: Lesson[] = [
       ] },
       { title: 'Les prolongations (cours 8 à 16)', points: [
         'Al-madd at-tabî‘î, 2 temps : la prolongation de base, sans hamza ni soukoûn ni chaddah autour.',
-        'Al-madd al-lîn, 2, 4 ou 6 temps : seulement à l’arrêt, quand la dernière lettre est précédée d’une lettre de lîn (الْبَيْت, خَوْف).',
+        'Al-madd al-lîn, 2, 4 ou 6 temps : seulement à l’arrêt, quand la dernière lettre est précédée d’une lettre de lîn (« al-bayt » الْبَيْت, « khawf » خَوْف).',
         'Al-madd al-wâjib al-muttasil, 4 ou 5 temps : lettre de prolongation suivie d’une hamza dans le même mot (petite vague au-dessus). Au tahadji : 2 temps en nommant la lettre, puis 4 ou 5 en ajoutant la hamza.',
         'Al-madd al-jâ’iz al-munfasil, 4 ou 5 temps : la hamza est au début du mot suivant.',
-        'Al-madd al-‘iwad, 2 temps : à l’arrêt sur une fathatayn, qui devient un simple « â » (عَلِيمًا se lit عَلِيمَا).',
+        'Al-madd al-‘iwad, 2 temps : à l’arrêt sur une fathatayn, qui devient un simple « â » (« ‘alîman » عَلِيمًا se lit « ‘alîmâ »).',
         'Al-madd al-‘âridh li-s-sukûn : à l’arrêt, quand la dernière lettre suit une lettre de prolongation.',
-        'Al-madd al-lâzim al-kalimî al-muthaqqal, 6 temps obligatoires : lettre de prolongation suivie d’une lettre avec chaddah dans le même mot (الضَّالِّين, الصَّاخَّة, دَابَّة).',
-        'Al-madd al-lâzim al-kalimî al-mukhaffaf, 6 temps : lettre de prolongation suivie d’une lettre sâkinah dans le même mot. Seulement deux fois dans le Coran, le même mot (آلْآنَ), Yûnus 51 et 91.',
-        'Lettre de prolongation suivie d’une hamzat al-wasl : la prolongation tombe (وَفِي الْأَرْض se lit « wa fil-ard »).',
+        'Al-madd al-lâzim al-kalimî al-muthaqqal, 6 temps obligatoires : lettre de prolongation suivie d’une lettre avec chaddah dans le même mot (« ad-dââââl-lîn » الضَّالِّين, « as-sââââkh-khah » الصَّاخَّة, « dââââb-bah » دَابَّة).',
+        'Al-madd al-lâzim al-kalimî al-mukhaffaf, 6 temps : lettre de prolongation suivie d’une lettre sâkinah dans le même mot. Seulement deux fois dans le Coran, le même mot (« âââââl-âna » آلْآنَ), Yûnus 51 et 91.',
+        'Lettre de prolongation suivie d’une hamzat al-wasl : la prolongation tombe (« wa fî l-ard » وَفِي الْأَرْض se lit « wa fil-ard »).',
       ] },
       { title: 'L’article « al » (cours 8)', points: [
         '« Al » rend le mot défini (le livre, et non un livre). Il est formé d’une hamzat al-wasl et d’un lâm.',
-        '14 lettres lunaires (ء ب غ ح ج ك و خ ف ع ق ي م ه, retenues par « ابْغِ حَجَّكَ وَخَفْ عَقِيمَهُ ») : le lâm se prononce clairement avec soukoûn.',
-        '14 lettres solaires (ط ث ص ر ت ض ذ ن د س ظ ز ش ل) : le lâm ne se prononce pas et la lettre suivante prend une chaddah.',
+        '14 lettres lunaires, retenues par « Ibghi hajjaka wa khaf ‘aqîmah » (ابْغِ حَجَّكَ وَخَفْ عَقِيمَهُ) : le lâm se prononce clairement (« al-qamar »).',
+        '14 lettres solaires (Tâ, thâ, Sâd, râ, tâ, Dâd, dhâl, noûn, dâl, sîn, Dhâ, zây, shîn, lâm) : le lâm ne se prononce pas et la lettre suivante est doublée (« ash-shams », et non « al-shams »).',
       ] },
       { title: 'La soukoûn et les qualités des lettres (cours 9 à 11)', points: [
         'Soukoûn veut dire « apaisement » : elle arrête le mouvement. Son signe vient de la tête du khâ (khafîf, « léger »), choisi par al-Khalîl ibn Ahmad.',
         'Un mot ne commence jamais par une lettre sâkinah, et une lettre sâkinah se lit toujours liée à la précédente.',
-        'Ash-shidda (la force) : le son se bloque net. 8 lettres : أ ج د ق ط ب ك ت (« أَجِدْ قَطٍ بَكَتْ »).',
-        'Al-bayniyya (l’entre-deux) : le son coule à moitié. 5 lettres : ل ن ع م ر (« لِنْ عُمَر »).',
+        'Ash-shidda (la force) : le son se bloque net. 8 lettres, réunies dans « Ajid qatin bakat » (أَجِدْ قَطٍ بَكَتْ).',
+        'Al-bayniyya (l’entre-deux) : le son coule à moitié. 5 lettres, réunies dans « Lin ‘umar » (لِنْ عُمَر) : lâm, noûn, ‘ayn, mîm, râ.',
         'Ar-rakhâwa (la douceur) : le son coule entièrement. Les 16 autres lettres.',
-        'Al-qalqala (le rebond) sur ق ط ب ج د sâkinah (« قُطْبُ جَدٍّ ») : léger au milieu d’un mot, plus marqué à l’arrêt en fin de mot, le plus fort à l’arrêt sur une lettre avec chaddah (الْحَقّ).',
-        'Al-hams (le murmure) : l’air s’échappe sur ف ح ث ه ش خ ص س ك ت (« فَحَثَّهُ شَخْصٌ سَكَتْ »).',
-        'As-safîr (le sifflement) : ز س ص.',
-        'Al-itbâq : l’air est comprimé entre la langue et le palais sur ص ض ط ظ, d’où un son lourd.',
-        'Al-istitâla : le son du ض s’étire du fond vers l’avant de la bouche. Jamais de qalqala sur le ض.',
+        'Al-qalqala (le rebond) sur qâf, Tâ, bâ, jîm, dâl sâkinah (« Qutbu jadd », قُطْبُ جَدٍّ) : léger au milieu d’un mot, plus marqué à l’arrêt en fin de mot, le plus fort à l’arrêt sur une lettre avec chaddah (« al-haqq » الْحَقّ).',
+        'Al-hams (le murmure) : l’air s’échappe sur 10 lettres, réunies dans « Fahaththahu shakhsun sakat » (فَحَثَّهُ شَخْصٌ سَكَتْ).',
+        'As-safîr (le sifflement) : zây ز, sîn س, Sâd ص.',
+        'Al-itbâq : l’air est comprimé entre la langue et le palais sur Sâd ص, Dâd ض, Tâ ط, Dhâ ظ, d’où un son lourd.',
+        'Al-istitâla : le son du Dâd ض s’étire du fond vers l’avant de la bouche. Jamais de qalqala sur le Dâd.',
         'La hamza sâkinah : on coupe net le son en fermant les cordes vocales.',
       ], avoid: [
         'Vocaliser une lettre sâkinah (dire « qada aflaha » au lieu de « qad aflaha »).',
         'Détacher la lettre sâkinah de la précédente (‘i… b-ra au lieu de ‘ibra).',
-        'Oublier la qualité de la lettre, par exemple le souffle et l’écoulement du ذ dans تَذْكِرَة.',
+        'Oublier la qualité de la lettre, par exemple le souffle et l’écoulement du dhâl ذ dans « tadhkirah » تَذْكِرَة.',
       ] },
       { title: 'Le râ, aminci ou emphatique (cours 10)', points: [
         'Le râ peut être aminci ou emphatique selon ce qui l’entoure.',
@@ -325,36 +326,36 @@ export const LESSONS: Lesson[] = [
       { title: 'La chaddah et la hamzat al-wasl (cours 11 à 16)', points: [
         'La chaddah marque une lettre doublée : une première lettre sâkinah fondue dans une seconde vocalisée. On appuie dessus, et on la lie à la lettre d’avant.',
         'Noûn et mîm avec chaddah : toujours une ghunnah complète de 2 temps, en appuyant la lettre.',
-        'La hamzat al-wasl (ٱ) se lit seulement en début de phrase ; au milieu, on lie directement.',
-        'Sa voyelle : fatha devant « al » ; kasra au début d’un nom indéfini (اسْم، ابْن، اثْنَتَان) ; pour un verbe, kasra si la 3e lettre a une fatha ou une kasra, damma si elle a une damma (اكْتُبْ).',
+        'La hamzat al-wasl (ٱ, un alif avec un petit signe) se lit seulement en début de phrase ; au milieu, on lie directement.',
+        'Sa voyelle : fatha devant « al » ; kasra au début d’un nom indéfini (« ism » اسْم, « ibn » ابْن, « ithnatân » اثْنَتَان) ; pour un verbe, kasra si la 3e lettre a une fatha ou une kasra (« isma‘ »), damma si elle a une damma (« uktub » اكْتُبْ).',
       ] },
       { title: 'Noûn sâkinah et tanwin : 4 règles (cours 7.1)', points: [
         'Tout dépend de la lettre qui suit.',
-        'Al-izhâr (clarification) devant les 6 lettres de la gorge ء ه ع ح غ خ : le noûn est prononcé clairement, sans ghunnah ajoutée.',
-        'Al-idghâm bi-ghunna (fusion avec nasalisation) devant ي ن م و : le noûn disparaît, la lettre suivante est doublée avec une ghunnah de 2 temps.',
-        'Al-idghâm bilâ ghunna (fusion sans nasalisation) devant ر et ل : le noûn disparaît complètement (مِن رَّبِّهِمْ se lit « mir-rabbihim »).',
-        'Al-iqlâb (transformation) devant ب : le noûn devient un mîm avec une ghunnah de 2 temps, lèvres jointes sans appuyer. Un petit mîm l’indique dans le Mushaf.',
-        'Al-ikhfâ’ (dissimulation) devant les 15 autres lettres : ghunnah de 2 temps, la langue ne touche pas le palais et glisse vers la lettre suivante. Ghunnah emphatique devant ق ص ض ط ظ, amincie sinon.',
+        'Al-izhâr (clarification) devant les 6 lettres de la gorge (hamza, hâ, ‘ayn, Hâ, ghayn, khâ) : le noûn est prononcé clairement, sans ghunnah ajoutée.',
+        'Al-idghâm bi-ghunna (fusion avec nasalisation) devant yâ, noûn, mîm, wâw (« yanmû ») : le noûn disparaît, la lettre suivante est doublée avec une ghunnah de 2 temps.',
+        'Al-idghâm bilâ ghunna (fusion sans nasalisation) devant râ et lâm : le noûn disparaît complètement (« min rabbihim » مِن رَّبِّهِمْ se lit « mir-rabbihim »).',
+        'Al-iqlâb (transformation) devant bâ ب (« min ba‘di » se lit « mim-ba‘di ») : le noûn devient un mîm avec une ghunnah de 2 temps, lèvres jointes sans appuyer. Un petit mîm l’indique dans le Mushaf.',
+        'Al-ikhfâ’ (dissimulation) devant les 15 autres lettres : ghunnah de 2 temps, la langue ne touche pas le palais et glisse vers la lettre suivante. Ghunnah emphatique devant qâf, Sâd, Dâd, Tâ, Dhâ, amincie sinon.',
         'La ghunnah de l’ikhfâ’ se fait avant la lettre ; celle de l’idghâm, sur la lettre.',
         'Dans le Mushaf, des traits de tanwin superposés signalent l’izhâr ; décalés, l’idghâm ou l’ikhfâ’.',
       ] },
       { title: 'Mîm sâkinah : 3 règles (cours 17)', points: [
         'Al-idghâm ash-shafawî (ou idghâm saghîr) : mîm sâkinah suivi d’un mîm. Les deux fusionnent, avec une ghunnah de 2 temps ; le second mîm porte une chaddah.',
-        'Al-ikhfâ’ ash-shafawî : mîm sâkinah suivi d’un ب. Le mîm est dissimulé avec une ghunnah de 2 temps, lèvres jointes sans appuyer (sinon il sonne comme une chaddah).',
-        'Al-izhâr ash-shafawî : devant toutes les autres lettres, le mîm se prononce clairement, sans ghunnah. Attention devant و et ف, qui sortent aussi des lèvres.',
+        'Al-ikhfâ’ ash-shafawî : mîm sâkinah suivi d’un bâ ب. Le mîm est dissimulé avec une ghunnah de 2 temps, lèvres jointes sans appuyer (sinon il sonne comme une chaddah).',
+        'Al-izhâr ash-shafawî : devant toutes les autres lettres, le mîm se prononce clairement, sans ghunnah. Attention devant wâw و et fâ ف, qui sortent aussi des lèvres.',
         'Dans le Mushaf, pas de soukoûn visible sur le mîm pour l’idghâm et l’ikhfâ’ ; soukoûn visible pour l’izhâr.',
       ], duas: [
-        { arabic: 'إِن كُنتُم مُّؤْمِنِينَ · خَلَقَ لَكُم مَّا فِي الْأَرْضِ', french: 'Idghâm shafawî' },
-        { arabic: 'يَعْتَصِم بِاللَّهِ · فَاحْكُم بَيْنَهُم', french: 'Ikhfâ’ shafawî' },
-        { arabic: 'تَمْشُونَ · لَعَلَّكُمْ تَتَّقُونَ', french: 'Izhâr shafawî' },
+        { arabic: 'إِن كُنتُم مُّؤْمِنِينَ · خَلَقَ لَكُم مَّا فِي الْأَرْضِ', phonetic: 'In kuntum-mu’minîn · khalaqa lakum-mâ fi l-ard', french: 'Idghâm shafawî' },
+        { arabic: 'يَعْتَصِم بِاللَّهِ · فَاحْكُم بَيْنَهُم', phonetic: 'Ya‘tasim billâh · fahkum baynahum', french: 'Ikhfâ’ shafawî' },
+        { arabic: 'تَمْشُونَ · لَعَلَّكُمْ تَتَّقُونَ', phonetic: 'Tamshûn · la‘allakum tattaqûn', french: 'Izhâr shafawî' },
       ] },
       { title: 'S’arrêter sur un mot (cours 17)', points: [
-        'Voyelle courte, kasratayn ou dammatayn : la lettre prend une soukoûn (فَأَصْبَحَ → فَأَصْبَحْ).',
-        'Fathatayn : elle tombe et devient un « â » de 2 temps, le madd al-‘iwad (سَاجِدًا → سَاجِدَا).',
-        'Lettre déjà sâkinah : rien ne change (تَبَّتْ).',
-        'Lettre de prolongation : la prolongation est gardée (أَبْصَارُهَا).',
-        'Petite lettre de prolongation (saghîra) : elle tombe, la prolongation aussi (يَرَهُۥ → يَرَهْ).',
-        'Tâ marbûta : elle se lit comme un hâ sâkin (شَجَرَةٌ → شَجَرَهْ).',
+        'Voyelle courte, kasratayn ou dammatayn : la lettre prend une soukoûn (« fa-asbaha » فَأَصْبَحَ → « fa-asbah »).',
+        'Fathatayn : elle tombe et devient un « â » de 2 temps, le madd al-‘iwad (« sâjidan » سَاجِدًا → « sâjidâ »).',
+        'Lettre déjà sâkinah : rien ne change (« tabbat » تَبَّتْ).',
+        'Lettre de prolongation : la prolongation est gardée (« absâruhâ » أَبْصَارُهَا).',
+        'Petite lettre de prolongation (saghîra) : elle tombe, la prolongation aussi (« yarahû » يَرَهُۥ → « yarah »).',
+        'Tâ marbûta : elle se lit comme un hâ sâkin (« shajaratun » شَجَرَةٌ → « shajarah »).',
         'À l’arrêt sur une soukoûn, penser aux règles qui vont avec : qalqala, hams, état du râ, madd ‘âridh ou madd lîn.',
       ] },
     ],
@@ -363,18 +364,18 @@ export const LESSONS: Lesson[] = [
       { q: 'Al-madd al-lîn s’applique aussi en liaison, sans arrêt.', a: false },
       { q: 'Al-madd al-wâjib al-muttasil : la hamza est dans le même mot.', a: true },
       { q: 'Al-madd al-lâzim dure 4 temps.', a: false },
-      { q: 'Devant ر et ل, le noûn sâkinah fusionne avec une ghunnah.', a: false },
-      { q: 'Devant ب, le noûn sâkinah se transforme en mîm (iqlâb).', a: true },
-      { q: 'Le mîm sâkinah devant un ب se dissimule avec une ghunnah.', a: true },
+      { q: 'Devant râ et lâm, le noûn sâkinah fusionne avec une ghunnah.', a: false },
+      { q: 'Devant bâ, le noûn sâkinah se transforme en mîm (iqlâb).', a: true },
+      { q: 'Le mîm sâkinah devant un bâ se dissimule avec une ghunnah.', a: true },
       { q: 'À l’arrêt, le tâ marbûta se lit comme un hâ sâkin.', a: true },
-      { q: 'On peut faire une qalqala sur le ض.', a: false },
+      { q: 'On peut faire une qalqala sur le Dâd (ض).', a: false },
       { q: 'La hamzat al-wasl se prononce au milieu d’une phrase.', a: false },
       { q: 'Le lâm de « al » ne se prononce pas devant une lettre solaire.', a: true },
       { q: 'Aṣ-ṣifr al-mustadîr se lit à l’arrêt.', a: false },
       { q: 'Il y a 17 points de sortie secondaires.', a: true },
-      { q: 'Le ط est une lettre amincie.', a: false },
-      { q: 'Le د s’attache toujours à la lettre suivante.', a: false },
-      { q: 'Dans les lettres entrecoupées, le ع peut s’allonger de 4 ou 6 temps.', a: true },
+      { q: 'Le Tâ (ط) est une lettre amincie.', a: false },
+      { q: 'Le dâl (د) s’attache toujours à la lettre suivante.', a: false },
+      { q: 'Dans les lettres entrecoupées, le ‘ayn peut s’allonger de 4 ou 6 temps.', a: true },
     ] },
 
   { id: 'priere', title: 'La prière pas à pas', sub: '24 étapes · gestes, paroles, erreurs à éviter',
@@ -397,16 +398,16 @@ export const LESSONS: Lesson[] = [
         'Certaines écoles prient les bras le long du corps : il n’y a pas de mal, c’est un avis défendable.',
       ], avoid: ['Placer les mains sur le cœur, décalées vers la gauche.', 'Poser une main ou les deux mains sur les hanches (le « takhassur », interdit).'] },
       { title: '11 · L’invocation d’ouverture', points: ['Sunna, plusieurs formules : une seule suffit, on peut les alterner d’une prière à l’autre.'], duas: [
-        { arabic: 'سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ اسْمُكَ، وَتَعَالَى جَدُّكَ، وَلَا إِلَهَ غَيْرُكَ', french: 'Gloire et louange à Toi, ô Allah. Béni soit Ton nom, élevée soit Ta majesté ; il n’y a de divinité digne d’adoration que Toi.' },
-        { arabic: 'اللَّهُمَّ بَاعِدْ بَيْنِي وَبَيْنَ خَطَايَايَ كَمَا بَاعَدْتَ بَيْنَ الْمَشْرِقِ وَالْمَغْرِبِ، اللَّهُمَّ نَقِّنِي مِنْ خَطَايَايَ كَمَا يُنَقَّى الثَّوْبُ الْأَبْيَضُ مِنَ الدَّنَسِ، اللَّهُمَّ اغْسِلْنِي مِنْ خَطَايَايَ بِالثَّلْجِ وَالْمَاءِ وَالْبَرَدِ', french: 'Ô Allah, éloigne-moi de mes péchés comme Tu as éloigné l’Orient de l’Occident. Ô Allah, purifie-moi de mes péchés comme on nettoie le vêtement blanc de la saleté. Ô Allah, lave-moi de mes péchés par la neige, l’eau et la grêle.' },
-        { arabic: 'وَجَّهْتُ وَجْهِيَ لِلَّذِي فَطَرَ السَّمَاوَاتِ وَالْأَرْضَ حَنِيفًا وَمَا أَنَا مِنَ الْمُشْرِكِينَ، إِنَّ صَلَاتِي وَنُسُكِي وَمَحْيَايَ وَمَمَاتِي لِلَّهِ رَبِّ الْعَالَمِينَ، لَا شَرِيكَ لَهُ وَبِذَلِكَ أُمِرْتُ وَأَنَا مِنَ الْمُسْلِمِينَ', french: 'Je tourne mon visage vers Celui qui a créé les cieux et la terre, en monothéiste sincère, et je ne suis pas des associateurs. Ma prière, mes actes d’adoration, ma vie et ma mort appartiennent à Allah, Seigneur de l’univers, sans associé. Voilà ce qui m’a été ordonné, et je suis de ceux qui se soumettent.' },
+        { arabic: 'سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ اسْمُكَ، وَتَعَالَى جَدُّكَ، وَلَا إِلَهَ غَيْرُكَ', phonetic: 'Subhânaka llâhumma wa bi-hamdik, wa tabâraka smuk, wa ta‘âlâ jadduk, wa lâ ilâha ghayruk', french: 'Gloire et louange à Toi, ô Allah. Béni soit Ton nom, élevée soit Ta majesté ; il n’y a de divinité digne d’adoration que Toi.' },
+        { arabic: 'اللَّهُمَّ بَاعِدْ بَيْنِي وَبَيْنَ خَطَايَايَ كَمَا بَاعَدْتَ بَيْنَ الْمَشْرِقِ وَالْمَغْرِبِ، اللَّهُمَّ نَقِّنِي مِنْ خَطَايَايَ كَمَا يُنَقَّى الثَّوْبُ الْأَبْيَضُ مِنَ الدَّنَسِ، اللَّهُمَّ اغْسِلْنِي مِنْ خَطَايَايَ بِالثَّلْجِ وَالْمَاءِ وَالْبَرَدِ', phonetic: 'Allâhumma bâ‘id baynî wa bayna khatâyâya kamâ bâ‘adta bayna l-mashriqi wal-maghrib. Allâhumma naqqinî min khatâyâya kamâ yunaqqa th-thawbu l-abyadu mina d-danas. Allâhumma ghsilnî min khatâyâya bith-thalji wal-mâ’i wal-barad', french: 'Ô Allah, éloigne-moi de mes péchés comme Tu as éloigné l’Orient de l’Occident. Ô Allah, purifie-moi de mes péchés comme on nettoie le vêtement blanc de la saleté. Ô Allah, lave-moi de mes péchés par la neige, l’eau et la grêle.' },
+        { arabic: 'وَجَّهْتُ وَجْهِيَ لِلَّذِي فَطَرَ السَّمَاوَاتِ وَالْأَرْضَ حَنِيفًا وَمَا أَنَا مِنَ الْمُشْرِكِينَ، إِنَّ صَلَاتِي وَنُسُكِي وَمَحْيَايَ وَمَمَاتِي لِلَّهِ رَبِّ الْعَالَمِينَ، لَا شَرِيكَ لَهُ وَبِذَلِكَ أُمِرْتُ وَأَنَا مِنَ الْمُسْلِمِينَ', phonetic: 'Wajjahtu wajhiya lilladhî fatara s-samâwâti wal-arda hanîfan wa mâ ana mina l-mushrikîn. Inna salâtî wa nusukî wa mahyâya wa mamâtî lillâhi rabbi l-‘âlamîn. Lâ sharîka lah, wa bi-dhâlika umirtu wa ana mina l-muslimîn', french: 'Je tourne mon visage vers Celui qui a créé les cieux et la terre, en monothéiste sincère, et je ne suis pas des associateurs. Ma prière, mes actes d’adoration, ma vie et ma mort appartiennent à Allah, Seigneur de l’univers, sans associé. Voilà ce qui m’a été ordonné, et je suis de ceux qui se soumettent.' },
       ] },
       { title: '12 · Chercher refuge contre Satan', points: ['Sunna, seulement dans la première unité. Si on l’oublie, la prière reste valide.'], duas: [
-        { arabic: 'أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ', french: 'Je cherche refuge auprès d’Allah contre Satan le maudit.' },
-        { arabic: 'أَعُوذُ بِاللَّهِ السَّمِيعِ الْعَلِيمِ مِنَ الشَّيْطَانِ الرَّجِيمِ', french: 'Je cherche refuge auprès d’Allah, l’Audient, l’Omniscient, contre Satan le maudit.' },
+        { arabic: 'أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ', phonetic: 'A‘ûdhu billâhi mina sh-shaytâni r-rajîm', french: 'Je cherche refuge auprès d’Allah contre Satan le maudit.' },
+        { arabic: 'أَعُوذُ بِاللَّهِ السَّمِيعِ الْعَلِيمِ مِنَ الشَّيْطَانِ الرَّجِيمِ', phonetic: 'A‘ûdhu billâhi s-samî‘i l-‘alîmi mina sh-shaytâni r-rajîm', french: 'Je cherche refuge auprès d’Allah, l’Audient, l’Omniscient, contre Satan le maudit.' },
       ] },
-      { title: '13 · La Basmala', arabic: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ', french: 'Au nom d’Allah, le Tout Miséricordieux, le Très Miséricordieux.', points: ['Sunna, dite à voix basse, même dans les prières récitées à voix haute.'] },
-      { title: '14 · Al-Fâtiha', arabic: 'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ۝ الرَّحْمَنِ الرَّحِيمِ ۝ مَالِكِ يَوْمِ الدِّينِ ۝ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ۝ اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ ۝ صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ',
+      { title: '13 · La Basmala', arabic: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ', phonetic: 'Bismillâhi r-rahmâni r-rahîm', french: 'Au nom d’Allah, le Tout Miséricordieux, le Très Miséricordieux.', points: ['Sunna, dite à voix basse, même dans les prières récitées à voix haute.'] },
+      { title: '14 · Al-Fâtiha', arabic: 'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ۝ الرَّحْمَنِ الرَّحِيمِ ۝ مَالِكِ يَوْمِ الدِّينِ ۝ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ۝ اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ ۝ صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ', phonetic: 'Al-hamdu lillâhi rabbi l-‘âlamîn. Ar-rahmâni r-rahîm. Mâliki yawmi d-dîn. Iyyâka na‘budu wa iyyâka nasta‘în. Ihdina s-sirâta l-mustaqîm. Sirâta lladhîna an‘amta ‘alayhim, ghayri l-maghdûbi ‘alayhim wa la d-dâllîn. Âmîn.',
         french: 'Louange à Allah, Seigneur de l’univers, le Tout Miséricordieux, le Très Miséricordieux, Maître du Jour de la rétribution. C’est Toi seul que nous adorons et Toi seul dont nous implorons le secours. Guide-nous sur le droit chemin, le chemin de ceux que Tu as comblés de bienfaits, non de ceux qui ont encouru la colère, ni des égarés.', points: [
           'La lire posément, en marquant un arrêt à la fin de chaque verset, comme le Prophète ﷺ.',
           '« Âmîn » (« Ô Allah, exauce ») est une Sunna, ne fait pas partie de la sourate, et se dit à voix haute dans les prières à voix haute.',
@@ -416,10 +417,10 @@ export const LESSONS: Lesson[] = [
         'Pilier. Commencer par « Allâhu akbar » en levant les mains.',
         'Les mains atteignent les genoux, doigts écartés ; le dos droit au même niveau que la tête, le regard vers l’endroit de la prosternation, les bras écartés du corps et légèrement fléchis.',
       ], duas: [
-        { arabic: 'سُبْحَانَ رَبِّيَ الْعَظِيمِ', french: 'Gloire à mon Seigneur, l’Immense.' },
-        { arabic: 'سُبْحَانَ رَبِّيَ الْعَظِيمِ وَبِحَمْدِهِ', french: 'Gloire et louange à mon Seigneur, l’Immense.' },
+        { arabic: 'سُبْحَانَ رَبِّيَ الْعَظِيمِ', phonetic: 'Subhâna rabbiya l-‘azîm', french: 'Gloire à mon Seigneur, l’Immense.' },
+        { arabic: 'سُبْحَانَ رَبِّيَ الْعَظِيمِ وَبِحَمْدِهِ', phonetic: 'Subhâna rabbiya l-‘azîmi wa bi-hamdih', french: 'Gloire et louange à mon Seigneur, l’Immense.' },
       ], avoid: ['S’arrêter à mi-cuisses : ce n’est pas une vraie inclinaison.', 'Plier les genoux.', 'Baisser la tête plus bas que le dos.'] },
-      { title: '17 · Se relever', arabic: 'سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ', french: 'Allah entend celui qui Le loue.', points: [
+      { title: '17 · Se relever', arabic: 'سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ', phonetic: 'Sami‘a llâhu liman hamidah', french: 'Allah entend celui qui Le loue.', points: [
         'Pilier. La plupart des savants laissent ensuite les bras le long du corps.',
         'Selon une parole connue de l’imam Ahmad, on peut aussi replacer les mains sur la poitrine comme en position debout.',
       ] },
@@ -427,15 +428,15 @@ export const LESSONS: Lesson[] = [
         'Le Prophète ﷺ a dit avoir reçu l’ordre de se prosterner sur sept os (al-Bukhârî et Muslim) : le front avec le nez, les deux mains, les deux genoux et le bout des deux pieds.',
         'Deux avis pour descendre : les mains d’abord, ou les genoux d’abord.',
         'Mains posées à hauteur des épaules ou à hauteur de la tête. Puis invoquer librement.',
-      ], duas: [{ arabic: 'سُبْحَانَ رَبِّيَ الْأَعْلَى', french: 'Gloire à mon Seigneur, le Très-Haut.', note: '3 fois' }],
+      ], duas: [{ arabic: 'سُبْحَانَ رَبِّيَ الْأَعْلَى', phonetic: 'Subhâna rabbiya l-a‘lâ', french: 'Gloire à mon Seigneur, le Très-Haut.', note: '3 fois' }],
         avoid: ['Avancer les mains trop loin devant.', 'Poser les mains au niveau des genoux.', 'Coucher les avant-bras au sol (interdit par le Prophète ﷺ).', 'S’appuyer sur le bout des doigts.', 'Poser le dos des mains.'] },
       { title: '19 · L’assise entre les deux prosternations', points: [
         'Se relever en disant « Allâhu akbar » et s’asseoir posément, chaque articulation reprenant sa place.',
         'S’asseoir sur le pied gauche, pied droit dressé.',
         'Cette invocation est rapportée deux fois ; obligatoire pour certains savants, Sunna pour d’autres.',
-      ], duas: [{ arabic: 'رَبِّ اغْفِرْ لِي، رَبِّ اغْفِرْ لِي', french: 'Seigneur, pardonne-moi. Seigneur, pardonne-moi.' }],
+      ], duas: [{ arabic: 'رَبِّ اغْفِرْ لِي، رَبِّ اغْفِرْ لِي', phonetic: 'Rabbi ghfir lî, rabbi ghfir lî', french: 'Seigneur, pardonne-moi. Seigneur, pardonne-moi.' }],
         avoid: ['Se précipiter dans cette assise : c’est un vrai danger pour la prière.', 'S’asseoir sur les talons (point de divergence).'] },
-      { title: '20 · La deuxième prosternation', arabic: 'سُبْحَانَ رَبِّيَ الْأَعْلَى', french: 'Gloire à mon Seigneur, le Très-Haut (3 fois).' },
+      { title: '20 · La deuxième prosternation', arabic: 'سُبْحَانَ رَبِّيَ الْأَعْلَى', phonetic: 'Subhâna rabbiya l-a‘lâ', french: 'Gloire à mon Seigneur, le Très-Haut (3 fois).' },
       { title: '21 · Le tashahhud', points: [
         'Mains posées sur les cuisses, ou qui saisissent les genoux (le coude alors au bout de la cuisse).',
         'Index droit pointé en le regardant : soit trois doigts repliés avec le pouce par-dessus, soit auriculaire et annulaire repliés et un cercle entre le pouce et le majeur.',
@@ -448,13 +449,13 @@ export const LESSONS: Lesson[] = [
         'Les deux pieds sortis d’un côté, le droit posé sur l’intérieur du gauche.',
         'Une troisième position de la jambe droite existe, discutée par les savants.',
       ], avoid: ['L’iq‘â’ (« posture du diable », interdite) : tibias relevés et mains posées au sol.', 'S’asseoir par terre jambes écartées.', 'Allonger les deux pieds et s’asseoir dessus.'] },
-      { title: '24 · Le salut final', arabic: 'السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ', french: 'Que la paix soit sur vous, ainsi que la miséricorde d’Allah.', points: ['Regarder l’endroit de la prosternation, puis tourner la tête à droite, puis à gauche, en le disant à chaque fois.'] },
+      { title: '24 · Le salut final', arabic: 'السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ', phonetic: 'As-salâmu ‘alaykum wa rahmatu llâh', french: 'Que la paix soit sur vous, ainsi que la miséricorde d’Allah.', points: ['Regarder l’endroit de la prosternation, puis tourner la tête à droite, puis à gauche, en le disant à chaque fois.'] },
     ] },
 
   { id: 'roqya', title: 'La roqya', sub: 'se soigner par le Coran et les invocations',
     intro: 'Maladie et guérison viennent d’Allah. La roqya est un moyen de guérison légiféré : on peut la faire sur soi, sur ses proches, et même sur un non-musulman.',
     parts: [
-      { title: 'Maladie et guérison viennent d’Allah', arabic: 'وَإِذَا مَرِضْتُ فَهُوَ يَشْفِينِ', french: 'Et quand je suis malade, c’est Lui qui me guérit.', points: [
+      { title: 'Maladie et guérison viennent d’Allah', arabic: 'وَإِذَا مَرِضْتُ فَهُوَ يَشْفِينِ', phonetic: 'Wa idhâ maridtu fa-huwa yashfîn', french: 'Et quand je suis malade, c’est Lui qui me guérit.', points: [
         'Ash-Shu‘arâ’, 26:80 · Ibrâhîm attribue la maladie à lui-même et la guérison à Allah : c’est la bonne attitude envers Allah, tout en sachant que les deux relèvent de Son décret.',
         '« Pas de contagion ni de mauvais présage » (al-Bukhârî et Muslim) : la contagion n’agit que par la volonté d’Allah, et le Prophète ﷺ a tout de même demandé de ne pas mettre un malade au contact d’une personne saine.',
         '« Allah n’a pas fait descendre de maladie sans faire descendre son remède » (al-Bukhârî), sauf la vieillesse. Certains le connaissent, d’autres l’ignorent.',
@@ -501,18 +502,18 @@ export const LESSONS: Lesson[] = [
         'Il est permis de recevoir une rémunération raisonnable, sans exploiter la détresse du malade ni tromper.',
       ] },
       { title: 'Les invocations de guérison', duas: [
-        { arabic: 'اللَّهُمَّ رَبَّ النَّاسِ، مُذْهِبَ الْبَأْسِ، اشْفِ أَنْتَ الشَّافِي، لَا شَافِيَ إِلَّا أَنْتَ، شِفَاءً لَا يُغَادِرُ سَقَمًا', french: 'Ô Allah, Seigneur des hommes, Toi qui enlèves le mal, guéris ! Tu es Celui qui guérit, il n’y a de guérisseur que Toi, d’une guérison qui ne laisse aucune maladie.', note: 'La roqya du Prophète ﷺ récitée par Anas · al-Bukhârî' },
-        { arabic: 'أَذْهِبِ الْبَأْسَ رَبَّ النَّاسِ، اشْفِ وَأَنْتَ الشَّافِي، لَا شِفَاءَ إِلَّا شِفَاؤُكَ، شِفَاءً لَا يُغَادِرُ سَقَمًا', french: 'Enlève le mal, Seigneur des hommes, guéris, Tu es Celui qui guérit ; il n’y a de guérison que la Tienne, une guérison qui ne laisse aucune maladie.', note: 'En passant la main droite sur le malade · al-Bukhârî et Muslim' },
-        { arabic: 'بِسْمِ اللَّهِ، تُرْبَةُ أَرْضِنَا، بِرِيقَةِ بَعْضِنَا، يُشْفَى سَقِيمُنَا، بِإِذْنِ رَبِّنَا', french: 'Au nom d’Allah, la terre de notre sol, avec un peu de notre salive, notre malade est guéri, par la permission de notre Seigneur.', note: 'Un peu de salive sur l’index posé sur la terre · al-Bukhârî et Muslim' },
-        { arabic: 'بِسْمِ اللَّهِ (٣) أَعُوذُ بِاللَّهِ وَقُدْرَتِهِ مِنْ شَرِّ مَا أَجِدُ وَأُحَاذِرُ (٧)', french: 'Au nom d’Allah (3 fois). Je cherche protection auprès d’Allah et de Sa puissance contre le mal que je ressens et que je redoute (7 fois).', note: 'Main posée sur l’endroit douloureux · conseil donné à ‘Uthmân ibn Abî al-‘Âs' },
-        { arabic: 'أَسْأَلُ اللَّهَ الْعَظِيمَ رَبَّ الْعَرْشِ الْعَظِيمِ أَنْ يَشْفِيَكَ', french: 'Je demande à Allah l’Immense, Seigneur du Trône immense, de te guérir.', note: '7 fois, en visitant un malade dont le terme n’est pas arrivé · jugé bon par al-Albânî' },
-        { arabic: 'بِسْمِ اللَّهِ أَرْقِيكَ، مِنْ كُلِّ شَيْءٍ يُؤْذِيكَ، مِنْ شَرِّ كُلِّ نَفْسٍ أَوْ عَيْنِ حَاسِدٍ، اللَّهُ يَشْفِيكَ، بِسْمِ اللَّهِ أَرْقِيكَ', french: 'Au nom d’Allah je te fais la roqya, contre tout ce qui te nuit, contre le mal de toute âme ou de l’œil d’un envieux. Qu’Allah te guérisse. Au nom d’Allah je te fais la roqya.', note: 'La roqya de Jibrîl sur le Prophète ﷺ · Muslim' },
+        { arabic: 'اللَّهُمَّ رَبَّ النَّاسِ، مُذْهِبَ الْبَأْسِ، اشْفِ أَنْتَ الشَّافِي، لَا شَافِيَ إِلَّا أَنْتَ، شِفَاءً لَا يُغَادِرُ سَقَمًا', phonetic: 'Allâhumma rabba n-nâs, mudhhiba l-ba’s, ishfi anta sh-shâfî, lâ shâfiya illâ ant, shifâ’al-lâ yughâdiru saqamâ', french: 'Ô Allah, Seigneur des hommes, Toi qui enlèves le mal, guéris ! Tu es Celui qui guérit, il n’y a de guérisseur que Toi, d’une guérison qui ne laisse aucune maladie.', note: 'La roqya du Prophète ﷺ récitée par Anas · al-Bukhârî' },
+        { arabic: 'أَذْهِبِ الْبَأْسَ رَبَّ النَّاسِ، اشْفِ وَأَنْتَ الشَّافِي، لَا شِفَاءَ إِلَّا شِفَاؤُكَ، شِفَاءً لَا يُغَادِرُ سَقَمًا', phonetic: 'Adhhibi l-ba’sa rabba n-nâs, ishfi wa anta sh-shâfî, lâ shifâ’a illâ shifâ’uk, shifâ’al-lâ yughâdiru saqamâ', french: 'Enlève le mal, Seigneur des hommes, guéris, Tu es Celui qui guérit ; il n’y a de guérison que la Tienne, une guérison qui ne laisse aucune maladie.', note: 'En passant la main droite sur le malade · al-Bukhârî et Muslim' },
+        { arabic: 'بِسْمِ اللَّهِ، تُرْبَةُ أَرْضِنَا، بِرِيقَةِ بَعْضِنَا، يُشْفَى سَقِيمُنَا، بِإِذْنِ رَبِّنَا', phonetic: 'Bismillâh, turbatu ardinâ, bi-rîqati ba‘dinâ, yushfâ saqîmunâ, bi-idhni rabbinâ', french: 'Au nom d’Allah, la terre de notre sol, avec un peu de notre salive, notre malade est guéri, par la permission de notre Seigneur.', note: 'Un peu de salive sur l’index posé sur la terre · al-Bukhârî et Muslim' },
+        { arabic: 'بِسْمِ اللَّهِ (٣) أَعُوذُ بِاللَّهِ وَقُدْرَتِهِ مِنْ شَرِّ مَا أَجِدُ وَأُحَاذِرُ (٧)', phonetic: 'Bismillâh (3 fois). A‘ûdhu billâhi wa qudratihî min sharri mâ ajidu wa uhâdhir (7 fois)', french: 'Au nom d’Allah (3 fois). Je cherche protection auprès d’Allah et de Sa puissance contre le mal que je ressens et que je redoute (7 fois).', note: 'Main posée sur l’endroit douloureux · conseil donné à ‘Uthmân ibn Abî al-‘Âs' },
+        { arabic: 'أَسْأَلُ اللَّهَ الْعَظِيمَ رَبَّ الْعَرْشِ الْعَظِيمِ أَنْ يَشْفِيَكَ', phonetic: 'As’alu llâha l-‘azîm, rabba l-‘arshi l-‘azîm, an yashfiyak', french: 'Je demande à Allah l’Immense, Seigneur du Trône immense, de te guérir.', note: '7 fois, en visitant un malade dont le terme n’est pas arrivé · jugé bon par al-Albânî' },
+        { arabic: 'بِسْمِ اللَّهِ أَرْقِيكَ، مِنْ كُلِّ شَيْءٍ يُؤْذِيكَ، مِنْ شَرِّ كُلِّ نَفْسٍ أَوْ عَيْنِ حَاسِدٍ، اللَّهُ يَشْفِيكَ، بِسْمِ اللَّهِ أَرْقِيكَ', phonetic: 'Bismillâhi arqîk, min kulli shay’iy-yu’dhîk, min sharri kulli nafsin aw ‘ayni hâsid, Allâhu yashfîk, bismillâhi arqîk', french: 'Au nom d’Allah je te fais la roqya, contre tout ce qui te nuit, contre le mal de toute âme ou de l’œil d’un envieux. Qu’Allah te guérisse. Au nom d’Allah je te fais la roqya.', note: 'La roqya de Jibrîl sur le Prophète ﷺ · Muslim' },
       ] },
       { title: 'Les limites', points: [
         'Celui qui fait la roqya ne touche pas une femme qui ne lui est pas permise, ni directement ni à travers un tissu : son travail est de réciter et de souffler, contrairement au médecin (Comité permanent, Ibn ‘Uthaymîn).',
         'Pour une sœur, une épouse ou une fille malade, le mieux est de réciter soi-même Al-Fâtiha et ce qui est facile du Coran.',
       ] },
-      { title: 'Ne pas délaisser le Coran', arabic: 'وَنُنَزِّلُ مِنَ الْقُرْآنِ مَا هُوَ شِفَاءٌ وَرَحْمَةٌ لِّلْمُؤْمِنِينَ', french: 'Nous faisons descendre du Coran ce qui est guérison et miséricorde pour les croyants.', points: [
+      { title: 'Ne pas délaisser le Coran', arabic: 'وَنُنَزِّلُ مِنَ الْقُرْآنِ مَا هُوَ شِفَاءٌ وَرَحْمَةٌ لِّلْمُؤْمِنِينَ', phonetic: 'Wa nunazzilu mina l-qur’âni mâ huwa shifâ’un wa rahmatul-lil-mu’minîn', french: 'Nous faisons descendre du Coran ce qui est guérison et miséricorde pour les croyants.', points: [
         'Al-Isrâ’, 17:82 · « Dis : pour ceux qui croient, il est guide et guérison » (Fussilat, 41:44). Guérison des corps et des cœurs, des maux visibles et invisibles.',
         'Ibn al-Qayyim compte parmi les façons de délaisser le Coran le fait de ne pas s’en servir comme remède (Al-Furqân, 25:30).',
         'Aller chez le médecin et prendre ses médicaments est un moyen voulu par Allah : on le fait, sans jamais délaisser le Coran. On consulte, puis on récite sur soi, abondamment.',
