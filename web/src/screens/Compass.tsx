@@ -13,9 +13,10 @@ import { getIntegrationPrefs } from '../lib/integrations';
 import { askAssistant, parseSteps } from '../lib/assistant';
 import { Sparkles } from 'lucide-react';
 import { Bar, Segmented } from '../ui/kit';
+import { AddTomorrow, CoachCard, coachMessage, type Coach } from '../features/EveningCoach';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
-type Tab = 'vision' | 'objectifs' | 'roue' | 'retro';
+type Tab = 'vision' | 'objectifs' | 'roue' | 'retro' | 'coach';
 
 /** Ma boussole : ce qui compte, où je vais, comment je me sens dans chaque domaine, et le chemin parcouru. */
 export function Compass({ entries, profileEntry, onCreate, onUpdate, onRemove, onEditProfile }: {
@@ -26,11 +27,12 @@ export function Compass({ entries, profileEntry, onCreate, onUpdate, onRemove, o
   return <div className="screen compass">
     <header className="tab-head"><h1>Ma boussole</h1><p>Qui je veux devenir, et le chemin parcouru</p></header>
     <Segmented label="Boussole" value={tab} onChange={setTab} options={[
-      { value: 'vision', label: 'Vision' }, { value: 'objectifs', label: 'Objectifs' }, { value: 'roue', label: 'Roue' }, { value: 'retro', label: 'Rétro' }]} />
+      { value: 'vision', label: 'Vision' }, { value: 'objectifs', label: 'Objectifs' }, { value: 'roue', label: 'Roue' }, { value: 'retro', label: 'Rétro' }, { value: 'coach', label: 'Coach' }]} />
     {tab === 'vision' && <Vision entries={entries} profileEntry={profileEntry} onCreate={onCreate} onUpdate={onUpdate} onEditProfile={onEditProfile} />}
     {tab === 'objectifs' && <Goals entries={entries} onCreate={onCreate} onUpdate={onUpdate} onRemove={onRemove} />}
     {tab === 'roue' && <Wheel entries={entries} onCreate={onCreate} onUpdate={onUpdate} />}
     {tab === 'retro' && <Retro entries={entries} />}
+    {tab === 'coach' && <CompassCoach entries={entries} profileEntry={profileEntry} onCreate={onCreate} onUpdate={onUpdate} />}
   </div>;
 }
 
@@ -361,4 +363,82 @@ function RetroAi({ label, facts }: { label: string; facts: string }) {
       <button className="button soft" disabled={busy || !on} onClick={() => void run()}>{busy ? 'Résumé en cours…' : 'Résumer ' + label}</button></>}
     {err && <p className="error" role="alert">{err}</p>}
   </section>;
+}
+
+/* ---------- 5. Coach ---------- */
+type Theme = 'point' | 'objectif' | 'roue' | 'semaine' | 'love';
+const THEMES: { id: Theme; label: string; ask: string }[] = [
+  { id: 'point', label: 'Faire le point', ask: 'Tu es une coach de vie bienveillante et très concrète. Voici ma vision, mes objectifs et ma roue de la vie. Dis-moi en 3 pistes ce qui avance bien, ce qui mérite mon attention, et la prochaine petite action la plus utile.' },
+  { id: 'objectif', label: 'Débloquer un objectif', ask: 'Tu es une coach bienveillante et très concrète. Voici un de mes objectifs et où j’en suis. Propose 3 pistes pour avancer : ce qui bloque sans doute, comment contourner l’obstacle, et la toute prochaine action de 15 minutes.' },
+  { id: 'roue', label: 'Mes domaines les plus bas', ask: 'Tu es une coach bienveillante et très concrète. Voici ma roue de la vie de ce mois (notes sur 10). Propose 3 petites actions faciles pour remonter mes domaines les plus bas, sans tout bouleverser.' },
+  { id: 'love', label: 'Coach love', ask: 'Tu es une coach amoureuse bienveillante, douce et franche, respectueuse de ma foi musulmane et de mes valeurs. Voici ma situation ou ma question. Aide-moi à y voir clair : 3 pistes concrètes (comment je me sens, ce dont j’ai besoin, ce que je peux faire ou dire), sans juger personne et sans me pousser à aller contre mes valeurs.' },
+  { id: 'semaine', label: 'Aligner ma semaine', ask: 'Tu es une coach bienveillante et très concrète. Voici ma vision et mes objectifs. Propose 3 actions précises pour cette semaine qui me rapprochent de la femme que je veux devenir.' },
+];
+const cut = (v: unknown, n: number) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, n);
+
+/** Faits envoyés au coach, uniquement ceux utiles au thème choisi. */
+export function compassFacts(theme: Theme, entries: Entry[], values: string[], goal?: Entry, situation = ''): string {
+  const vision = entries.find((e) => e.kind === VISION_KIND)?.data ?? {};
+  const goals = entries.filter((e) => e.kind === GOAL_KIND && goalProgress(e) < 1).slice(0, 6);
+  const wheel = wheelScores(entries.filter((e) => e.kind === WHEEL_KIND).sort((a, b) => String(b.entry_date).localeCompare(String(a.entry_date)))[0]);
+  const lines: string[] = [];
+  if (theme === 'love') {
+    if (values.length) lines.push('Mes valeurs : ' + values.join(', '));
+    if (wheel.Amour !== undefined) lines.push('Ma note « Amour » ce mois-ci : ' + wheel.Amour + '/10');
+    if (situation.trim()) lines.push('Ma situation : ' + cut(situation, 600));
+    return lines.join('\n');
+  }
+  if (theme !== 'objectif' && theme !== 'roue') {
+    if (values.length) lines.push('Mes valeurs : ' + values.join(', '));
+    if (vision.words) lines.push('Mes 3 mots : ' + cut(vision.words, 80));
+    if (vision.year1) lines.push('Dans 1 an : ' + cut(vision.year1, 220));
+    if (vision.who) lines.push('La femme que je deviens : ' + cut(vision.who, 180));
+    if (vision.notList) lines.push('Ce que je ne veux plus : ' + cut(vision.notList, 120));
+    if (goals.length) lines.push('Objectifs : ' + goals.map((g) => cut(g.title, 60) + ' (' + Math.round(goalProgress(g) * 100) + ' %)').join(' ; '));
+  }
+  if (theme === 'objectif' && goal) {
+    const steps = goalSteps(goal);
+    lines.push('Objectif : ' + cut(goal.title, 120));
+    if (goal.data.why) lines.push('Pourquoi : ' + cut(goal.data.why, 200));
+    if (goal.data.deadline) lines.push('Échéance : ' + cut(goal.data.deadline, 10));
+    lines.push('Étapes faites : ' + (steps.filter((x) => x.done).map((x) => cut(x.text, 60)).join(' ; ') || 'aucune'));
+    lines.push('Étapes restantes : ' + (steps.filter((x) => !x.done).map((x) => cut(x.text, 60)).join(' ; ') || 'aucune'));
+  }
+  if ((theme === 'roue' || theme === 'point') && Object.keys(wheel).length) lines.push('Roue de la vie : ' + LIFE_DOMAINS.filter((d) => wheel[d] !== undefined).map((d) => d + ' ' + wheel[d]).join(', '));
+  return lines.join('\n');
+}
+
+function CompassCoach({ entries, profileEntry, onCreate, onUpdate }: { entries: Entry[]; profileEntry: Entry | undefined; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save }) {
+  const [theme, setTheme] = useState<Theme>('point');
+  const goals = entries.filter((e) => e.kind === GOAL_KIND && goalProgress(e) < 1);
+  const [goalId, setGoalId] = useState(goals[0]?.id ?? '');
+  const goal = goals.find((g) => g.id === goalId);
+  const [coach, setCoach] = useState<Coach | null>(null);
+  const [addedStep, setAddedStep] = useState<Set<string>>(new Set());
+  const values = readProfile(profileEntry).values;
+  const [situation, setSituation] = useState('');
+  const facts = compassFacts(theme, entries, values, goal, situation);
+  const t = THEMES.find((x) => x.id === theme)!;
+  const ready = theme === 'objectif' ? Boolean(goal) : theme === 'love' ? situation.trim().length > 5 : facts.length > 0;
+  const addStep = async (text: string) => {
+    if (!goal) return;
+    await onUpdate(goal, { ...goal.data, steps: [...goalSteps(goal), { id: crypto.randomUUID(), text: text.slice(0, 160), done: false }] });
+    setAddedStep(new Set([...addedStep, text]));
+  };
+  return <div className="compass-body">
+    <p className="muted">Choisis un sujet : ton coach s’appuie sur ta vision, tes objectifs et ta roue de la vie pour te proposer des pistes concrètes.</p>
+    <div className="chip-row">{THEMES.map((x) => <button key={x.id} className={'chip' + (theme === x.id ? ' on' : '')} onClick={() => { setTheme(x.id); setCoach(null); }}>{x.label}</button>)}</div>
+    {theme === 'objectif' && (goals.length
+      ? <label>Quel objectif ?<select value={goalId} onChange={(e) => { setGoalId(e.target.value); setCoach(null); }}>{goals.map((g) => <option key={g.id} value={g.id}>{g.title}</option>)}</select></label>
+      : <p className="muted small">Crée d’abord un objectif dans l’onglet Objectifs.</p>)}
+    {theme === 'love' && <label>Ta situation ou ta question<textarea rows={4} maxLength={600} value={situation} placeholder="Célibataire, en couple, mariée, une rencontre, un doute, une dispute… raconte librement." onChange={(e) => { setSituation(e.target.value); setCoach(null); }} /></label>}
+    <CoachCard key={theme + goalId} title={theme === 'love' ? 'Mon coach love' : 'Mon coach · ' + t.label.toLowerCase()} coach={coach} onCoach={setCoach} ready={ready}
+      intro="Seules les informations utiles à ce sujet sont envoyées à l’assistant, et seulement quand tu appuies."
+      startLabel={ready ? 'Demander des pistes' : theme === 'love' ? 'Écris d’abord ta situation' : theme === 'roue' ? 'Remplis d’abord ta roue' : 'Remplis d’abord ta vision ou un objectif'}
+      prompt={() => coachMessage(t.ask, facts)}
+      actions={(p) => <>
+        {theme === 'objectif' && goal && <button className="link-btn small" disabled={addedStep.has(p)} onClick={() => void addStep(p)}>{addedStep.has(p) ? <><Check size={14} /> Étape ajoutée</> : <><Plus size={14} /> Ajouter comme étape</>}</button>}
+        <AddTomorrow text={p} onCreate={onCreate} />
+      </>} />
+  </div>;
 }

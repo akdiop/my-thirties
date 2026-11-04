@@ -3,6 +3,8 @@ import { BookOpen, Check, ChevronRight, Eye, LogOut, X } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { CATEGORIES, dayNumber, templateById, templateLength, TEMPLATES, type ChallengeCategory, type ChallengeTemplate } from '../lib/challenges';
 import { STAY_ON_TRACK } from '../lib/challengePrograms';
+import { WorkoutTimer } from './WorkoutTimer';
+import { planFromText } from '../lib/workoutTimer';
 import { pathById } from '../lib/learning';
 import { HeroPhoto } from './HeroPhoto';
 import { HiddenNote, HideButton, useHidden } from '../lib/hidden';
@@ -149,6 +151,7 @@ function ActiveChallenge({ entry, onUpdate, onQuit }: { entry: Entry; onUpdate: 
       <p className="day-topic">{shownPlan ?? 'Jour de repos prévu : récupère, étire-toi doucement si tu en as envie.'}</p>
       {shownPlan && <><span className="eyebrow-s">COMMENT FAIRE</span>
         <ol className="how-list">{howFor(t).map((h) => <li key={h}>{h}</li>)}</ol></>}
+      {shownPlan && (t?.category === 'Sport' || planFromText(shownPlan).length > 0) && <WorkoutTimer key={shown} text={shownPlan} onFinish={() => void mark(shown, 'done')} />}
       {pathStep && <div className="path-in-challenge"><span className="eyebrow-s"><BookOpen size={14} /> PARCOURS · ÉTAPE {pathStep.index + 1} : {pathStep.step.title}</span>
         <p className="muted">{pathStep.step.goal}</p>
         <ul className="step-tasks">{pathStep.step.tasks.map((x) => <li key={x}>{x}</li>)}</ul>

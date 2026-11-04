@@ -64,7 +64,7 @@ export function HomeRituals({ entries, onGo, onOpenDay, onCreate, onUpdate }: {
     <p className="eyebrow-s">Micro-rituels</p>
     <div className="ritual-grid">
       <Breathing />
-      <Affirmation day={today} onKeep={(text) => onCreate({ module: 'equilibre', kind: NOTE_KIND, title: 'Affirmation', entry_date: today,
+      <Affirmation day={today} kept={(text) => entries.some((e) => e.kind === NOTE_KIND && e.data.body === text)} onKeep={(text) => onCreate({ module: 'equilibre', kind: NOTE_KIND, title: 'Affirmation', entry_date: today,
         data: { noteId: crypto.randomUUID(), type: 'gratitude', heading: 'Affirmation', body: text, folder: 'bienetre', mood: '', updated: new Date().toISOString() } })} />
     </div>
 
@@ -104,10 +104,11 @@ function Breathing() {
   </div>;
 }
 
-function Affirmation({ day, onKeep }: { day: string; onKeep: (text: string) => Promise<void> }) {
+function Affirmation({ day, kept: already, onKeep }: { day: string; kept: (text: string) => boolean; onKeep: (text: string) => Promise<void> }) {
   const [shift, setShift] = useState(0);
-  const [kept, setKept] = useState(false);
   const text = affirmationOf(day, shift);
+  const [keptNow, setKept] = useState(false);
+  const kept = keptNow || already(text);
   return <div className="ritual-mini">
     <span className="ritual-k">Affirmation</span>
     <p className="affirm">« {text} »</p>

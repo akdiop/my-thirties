@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { CalendarDays, Check, Minus, Plus, Search, Star, Tv, X } from 'lucide-react';
+import { CalendarDays, Check, Minus, Plus, Search, Star, Trash2, Tv, X } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { Bar, Segmented } from '../ui/kit';
 import { SERIES_PLATFORMS } from '../modules';
@@ -48,7 +48,7 @@ function saveWatched(entry: Entry, show: ShowData, watched: Set<number>, onUpdat
 }
 
 /** Suivi des séries façon TV Time : prochain épisode à regarder, sorties à venir, fiches épisode par épisode, statistiques. */
-export function SeriesTracker({ entries, onUpdate, onAdd, onCreate }: { entries: Entry[]; onUpdate: Save; onAdd: () => void; onCreate: (i: EntryInput) => Promise<void> }) {
+export function SeriesTracker({ entries, onUpdate, onAdd, onCreate, onRemove }: { entries: Entry[]; onUpdate: Save; onAdd: () => void; onCreate: (i: EntryInput) => Promise<void>; onRemove?: (e: Entry) => Promise<boolean> }) {
   const series = entries.filter((e) => e.kind === 'series');
   const shows = useShows(series);
   const [tab, setTab] = useState<Tab>('À regarder');
@@ -122,7 +122,8 @@ export function SeriesTracker({ entries, onUpdate, onAdd, onCreate }: { entries:
       </button>;
     })}</div>}
 
-    {opened && <ShowSheet entry={opened} show={shows[tvId(opened)]} onUpdate={onUpdate} onClose={() => setOpen(null)} />}
+    {opened && <ShowSheet entry={opened} show={shows[tvId(opened)]} onUpdate={onUpdate} onClose={() => setOpen(null)}
+      onRemove={onRemove && (async () => { if (await onRemove(opened)) setOpen(null); })} />}
   </section>;
 }
 
@@ -133,7 +134,7 @@ function Poster({ entry, big }: { entry: Entry; big?: boolean }) {
 }
 
 /** Fiche d'une série : résumé, statut, note et toutes les saisons, épisode par épisode. */
-function ShowSheet({ entry, show, onUpdate, onClose }: { entry: Entry; show: ShowData | undefined; onUpdate: Save; onClose: () => void }) {
+function ShowSheet({ entry, show, onUpdate, onClose, onRemove }: { entry: Entry; show: ShowData | undefined; onUpdate: Save; onClose: () => void; onRemove?: () => Promise<void> }) {
   const status = statusOf(entry);
   const rating = Number(entry.data.rating) || 0;
   const watched = watchedOf(entry, show);
@@ -175,6 +176,7 @@ function ShowSheet({ entry, show, onUpdate, onClose }: { entry: Entry; show: Sho
           </>;
         })()}
       </>}
+      {onRemove && <button className="link-btn small" onClick={() => void onRemove()}><Trash2 size={14} /> Retirer cette série</button>}
     </div>
   </div>;
 }

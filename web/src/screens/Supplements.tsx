@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Bell, Check, Pill, Plus, Trash2 } from 'lucide-react';
+import { Bell, Check, Pill, Plus, Trash2, Pencil } from 'lucide-react';
+import { SwipeRow } from '../ui/SwipeRow';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { addDays, isoOf } from '../lib/rituals';
 import { Bar } from '../ui/kit';
 
+type EditFull = (id: string, patch: { title: string; data: Record<string, unknown> }) => Promise<void>;
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 export const SUPPLEMENT_KIND = 'complement';
 
@@ -13,7 +15,7 @@ const MOMENTS = [{ label: 'Matin', time: '08:00' }, { label: 'Midi', time: '13:0
 const dayOf = (start: string, today: string) => Math.floor((new Date(today + 'T12:00:00').getTime() - new Date(start + 'T12:00:00').getTime()) / 86400000) + 1;
 
 /** Mes compléments : ce que je prends, quand, et où j'en suis de ma cure. Rappel par notification à l'heure choisie. */
-export function Supplements({ entries, onCreate, onUpdate, onRemove }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void> }) {
+export function Supplements({ entries, onCreate, onUpdate, onRemove, onEdit }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void>; onEdit?: EditFull }) {
   const today = isoOf(new Date());
   const list = entries.filter((e) => e.kind === SUPPLEMENT_KIND);
   const active = list.filter((e) => { const d = Number(e.data.days) || 0; return !d || dayOf(String(e.data.start ?? today), today) <= d; });
@@ -41,7 +43,10 @@ export function Supplements({ entries, onCreate, onUpdate, onRemove }: { entries
       const total = Number(e.data.days) || 0, n = Math.max(1, dayOf(String(e.data.start ?? today), today));
       const taken = Object.values(done).filter(Boolean).length;
       const week = Array.from({ length: 7 }, (_, i) => addDays(today, i - 6));
-      return <article key={e.id} className={'supp-card' + (on ? ' on' : '')}>
+      return <SwipeRow key={e.id} className="card-swipe" actions={[
+          { label: 'Renommer', icon: <Pencil size={18} />, onClick: () => { const v = window.prompt('Nouveau nom', e.title)?.trim(); if (v && onEdit) void onEdit(e.id, { title: v.slice(0, 80), data: e.data }); } },
+          { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => { if (confirm('Supprimer « ' + e.title + ' » ?')) void onRemove(e); } },
+        ]}><article className={'supp-card' + (on ? ' on' : '')}>
         <button className="habit-check" aria-pressed={on} aria-label={(on ? 'Décocher ' : 'Pris : ') + e.title} onClick={() => void onUpdate(e, { ...e.data, done: { ...done, [today]: !on } })}>
           {on ? <Check size={22} strokeWidth={3} /> : <Pill size={22} />}</button>
         <div className="habit-body">
@@ -53,7 +58,7 @@ export function Supplements({ entries, onCreate, onUpdate, onRemove }: { entries
           <button className="link-btn small" onClick={() => void onUpdate(e, { ...e.data, remind: e.data.remind === false })}><Bell size={12} /> {e.data.remind === false ? 'Rappel désactivé' : 'Rappel à ' + String(e.data.time || '08:00')}</button>
         </div>
         <button className="icon-btn" aria-label={'Supprimer ' + e.title} onClick={() => { if (confirm('Supprimer « ' + e.title + ' » ?')) void onRemove(e); }}><Trash2 size={16} /></button>
-      </article>; })}</div>
+      </article></SwipeRow>; })}</div>
 
     {adding ? <section className="ritual-card form-stack">
       <p className="ritual-label">Nouveau complément</p>

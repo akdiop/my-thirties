@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Check, ChevronDown, EyeOff, Plus, RotateCcw, Settings, Trash2 } from 'lucide-react';
+import { Check, ChevronDown, EyeOff, Pencil, Plus, RotateCcw, Settings, Trash2 } from 'lucide-react';
+import { SwipeRow } from '../ui/SwipeRow';
 import type { Entry } from '../lib/cloud';
 
 type Item = { id: string; text: string; checked: boolean };
@@ -45,8 +46,11 @@ export function ListCard({ entry, onUpdate, onEdit, onDelete }: { entry: Entry; 
         const gDone = g.items.filter((i) => i.checked).length;
         return <section key={g.name || '_'} className="list-group">
           {g.name && <p className="list-group-name">{g.name}<small>{gDone}/{g.items.length}</small></p>}
-          {shown.map((i) => <button key={i.id} className={'list-item' + (i.checked ? ' on' : '')} role="checkbox" aria-checked={i.checked} onClick={() => toggle(i.id)}>
-            <span className="list-tick">{i.checked && <Check size={14} strokeWidth={3} />}</span><span>{i.label}</span></button>)}
+          {shown.map((i) => <SwipeRow key={i.id} className="list-swipe" actions={[
+            { label: 'Modifier', icon: <Pencil size={16} />, onClick: () => { const v = window.prompt('Modifier l’article', i.label)?.trim(); if (v) void save(items.map((x) => x.id === i.id ? { ...x, text: (g.name ? g.name + ' · ' : '') + v.slice(0, 140) } : x)); } },
+            { label: 'Supprimer', icon: <Trash2 size={16} />, tone: 'danger', onClick: () => void save(items.filter((x) => x.id !== i.id)) },
+          ]}><button className={'list-item' + (i.checked ? ' on' : '')} role="checkbox" aria-checked={i.checked} onClick={() => toggle(i.id)}>
+            <span className="list-tick">{i.checked && <Check size={14} strokeWidth={3} />}</span><span>{i.label}</span></button></SwipeRow>)}
         </section>; })}
       {done === items.length && items.length > 0 && <p className="list-done">Tout est coché ✓</p>}
       <form className="list-add" onSubmit={(e) => { e.preventDefault(); add(); }}>

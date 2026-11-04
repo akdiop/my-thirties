@@ -1,6 +1,7 @@
-import { Glyph, MoodIcon } from '../ui/Glyph';
+import { Glyph, MoodIcon, type GlyphName, type Tint } from '../ui/Glyph';
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Flame, Plus, Search, Trash2 } from 'lucide-react';
+import { ArrowLeft, Flame, Pin, PinOff, Plus, Search, Trash2 } from 'lucide-react';
+import { SwipeRow, type SwipeAction } from '../ui/SwipeRow';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { NoteMedia } from '../features/NoteMedia';
 import { fold, fullText } from '../lib/search';
@@ -12,6 +13,14 @@ import { OneYearAgo } from './Review';
 import { yearAgoOn } from '../features/JournalSettings';
 import { PrintJournal } from '../features/PrintJournal';
 import { FileDown } from 'lucide-react';
+
+const FOLDER_INTRO: Record<string, string> = {
+  journal: 'Mes pages à moi : journées, lettres, rêves, prises de conscience.',
+  idees: 'Tout ce qui me passe par la tête et que je veux garder.',
+  bienetre: 'Mes affirmations gardées, vide-tête et notes de colère.',
+  gratitude: 'Ce qui me rend reconnaissante, et mes fiertés.',
+};
+const monthOf = (iso: string) => { const d = new Date(iso); const m = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }); return m[0]!.toUpperCase() + m.slice(1); };
 
 type Edit = (id: string, patch: { title: string; data: Record<string, unknown> }) => Promise<void>;
 const when = (iso: string) => new Date(iso).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
@@ -48,14 +57,20 @@ export function Notes({ entries, onCreate, onEdit, onRemove, onOpenDay }: {
   const list = (items: Entry[]) => <div className="note-list">{items.map((e) => e.kind === DAILY_KIND
     ? <button key={e.id} className="note-row" onClick={() => open(e)}><span className="note-emoji">{e.data.mood ? <MoodIcon mood={e.data.mood} badge={36} /> : <Glyph name="calendar" tint="caramel" badge={36} />}</span>
       <span><strong>Mon jour · {when(String(e.entry_date) + 'T12:00:00')}</strong><small>{String(e.data.intention || e.data.win || 'Daily Reset')}</small></span></button>
-    : <button key={e.id} className="note-row" onClick={() => open(e)}><span className="note-emoji"><Glyph name={noteType(e.data.type).icon} tint={noteType(e.data.type).tint} badge={36} /></span>
-      <span><strong>{e.title}</strong><small>{String(e.data.body ?? '').slice(0, 90)}</small><small className="muted">{when(e.created_at)}</small></span></button>)}</div>;
+    : <SwipeRow key={e.id} className="note-swipe" actions={actions(e)}><button className="note-row" onClick={() => open(e)}><span className="note-emoji"><Glyph name={noteType(e.data.type).icon} tint={noteType(e.data.type).tint} badge={36} /></span>
+      <span><strong>{e.data.pinned ? <Pin size={13} className="pin-mark" /> : null}{e.title}</strong><small>{String(e.data.body ?? '').slice(0, 90)}</small><small className="muted">{when(e.created_at)}</small></span></button></SwipeRow>)}</div>;
 
+  // Glisser une note vers la gauche : l'épingler en haut ou la supprimer.
+  const actions = (e: Entry): SwipeAction[] => [
+    { label: e.data.pinned ? 'Détacher' : 'Épingler', icon: e.data.pinned ? <PinOff size={18} /> : <Pin size={18} />, tone: 'accent', onClick: () => void onEdit(e.id, { title: e.title, data: { ...e.data, pinned: !e.data.pinned } }) },
+    { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => { if (confirm('Supprimer « ' + e.title + ' » ?')) void onRemove(e); } },
+  ];
+  const pinned = notes.filter((n) => n.data.pinned);
   const current = NOTE_FOLDERS.find((f) => f.id === folder);
   return <div className="screen notes">
     <header className="tab-head notes-head">
       {folder ? <button className="icon-btn back" onClick={() => setFolder(null)} aria-label="Retour"><ArrowLeft size={22} /></button> : null}
-      <div><h1>{folder === 'daily' ? 'Mes journées' : current ? current.label : 'Notes'}</h1><p>{folder ? '' : 'Mon journal, rien qu’à moi'}</p></div>
+      <div><h1>{folder === 'daily' ? 'Mes journées' : current ? current.label : 'Notes'}</h1><p>{folder ? (current ? FOLDER_INTRO[current.id] ?? '' : '') : 'Mon journal, rien qu’à moi'}</p></div>
       <button className="round-btn" aria-label="Nouvelle note" onClick={() => setPicker(true)}><Plus size={22} /></button>
     </header>
     {!folder && <>
@@ -67,7 +82,9 @@ export function Notes({ entries, onCreate, onEdit, onRemove, onOpenDay }: {
           <button className="folder" onClick={() => setFolder('daily')}><Glyph name="calendar" tint="caramel" size={22} badge={44} /><strong>Mes journées</strong><small>{days.length} jour(s)</small></button>
         </div>
         {yearAgoOn() && <OneYearAgo entries={entries} onOpenDay={(d) => onOpenDay(d)} onOpenNote={open} />}
-        {notes.length > 0 && <><p className="eyebrow-s">Récentes</p>{list(notes.slice(0, 5))}</>}
+        {pinned.length > 0 && <><p className="eyebrow-s"><Pin size={13} /> Épinglées</p>{list(pinned)}</>}
+        {notes.length > 0 && <><p className="eyebrow-s">Récentes</p>{list(notes.filter((n) => !n.data.pinned).slice(0, 5))}</>}
+        {notes.length > 0 && <p className="fineprint">Astuce : fais glisser une note vers la gauche pour l’épingler ou la supprimer.</p>}
         <section className="pdf-export"><p className="ritual-label"><FileDown size={16} /> Exporter un mois en PDF</p>
           <div className="todo-add"><input type="month" className="soft-input" value={pdfMonth} max={new Date().toLocaleDateString('en-CA').slice(0, 7)} onChange={(e) => setPdfMonth(e.target.value)} />
             <button className="button soft" disabled={!pdfMonth} onClick={() => setPrintMonth(pdfMonth)}>Exporter</button></div>
@@ -75,7 +92,7 @@ export function Notes({ entries, onCreate, onEdit, onRemove, onOpenDay }: {
       </>}
     </>}
     {folder === 'daily' && (days.length ? list(days) : <p className="muted">Tes journées remplies dans « Mon jour » apparaîtront ici.</p>)}
-    {current && (() => { const items = notes.filter((n) => (n.data.folder ?? 'journal') === current.id); return items.length ? list(items) : <p className="muted">Aucune note dans ce dossier pour l’instant.</p>; })()}
+    {current && <FolderView folder={current} notes={notes.filter((n) => (n.data.folder ?? 'journal') === current.id)} onOpen={open} onStart={start} actions={actions} />}
 
     {printMonth && <PrintJournal entries={entries} month={printMonth} onDone={() => setPrintMonth('')} />}
     {picker && <div className="modal-overlay sheet" role="dialog" aria-modal="true" aria-label="Nouvelle note" onClick={() => setPicker(false)}>
@@ -123,5 +140,45 @@ function NoteEditor({ noteId, type, entry, onCreate, onEdit, onRemove, onClose }
     </div>
     <p className="save-state" aria-live="polite">{saveLabel(state) || 'S’enregistre automatiquement.'}</p>
     {type.id === 'anger' && entry && <button className="button ghost wide burn" onClick={() => void burn()}><Flame size={16} /> Brûler cette note</button>}
+  </div>;
+}
+
+/** Un dossier ouvert : notes rangées par mois, affirmations en citations (sans doublons), et idées pour commencer. */
+function FolderView({ folder, notes, onOpen, onStart, actions }: { folder: { id: string; icon: GlyphName; tint: Tint; label: string }; notes: Entry[]; onOpen: (e: Entry) => void; onStart: (t: NoteType) => void; actions: (e: Entry) => SwipeAction[] }) {
+  const ideas = NOTE_TYPES.filter((t) => t.folder === folder.id && !t.to);
+  // Une même affirmation gardée plusieurs fois n'apparaît qu'une fois, avec le nombre de fois.
+  const seen = new Map<string, number>();
+  const items = notes.filter((n) => {
+    if (n.title !== 'Affirmation') return true;
+    const k = String(n.data.body ?? '');
+    seen.set(k, (seen.get(k) ?? 0) + 1);
+    return seen.get(k) === 1;
+  });
+  const groups: { label: string; items: Entry[] }[] = [];
+  for (const n of [...items.filter((x) => x.data.pinned), ...items.filter((x) => !x.data.pinned)]) {
+    const label = n.data.pinned ? 'Épinglées' : monthOf(String(n.data.updated ?? n.created_at));
+    const g = groups.find((x) => x.label === label);
+    if (g) g.items.push(n); else groups.push({ label, items: [n] });
+  }
+  const start = <div className="folder-ideas">{ideas.map((t) => <button key={t.id} className="folder-idea" onClick={() => onStart(t)}><Glyph name={t.icon} tint={t.tint} badge={32} /><span><strong>{t.label}</strong><small>{t.hint}</small></span></button>)}</div>;
+  if (!items.length) return <section className="folder-empty">
+    <Glyph name={folder.icon} tint={folder.tint} size={26} badge={56} />
+    <strong>Rien ici pour l’instant</strong>
+    <p className="muted">Commence par une de ces pages :</p>
+    {start}
+  </section>;
+  return <div className="folder-view">
+    <p className="folder-count">{items.length} note{items.length > 1 ? 's' : ''}</p>
+    {groups.map((g) => <section key={g.label}>
+      <p className="relatives-month-title">{g.label}<small>{g.items.length}</small></p>
+      <div className="note-list">{g.items.map((e) => e.title === 'Affirmation'
+        ? <SwipeRow key={e.id} className="note-swipe quote" actions={actions(e)}><button className="note-quote" onClick={() => onOpen(e)}>
+            <span className="quote-mark" aria-hidden="true">“</span>
+            <span><em>{String(e.data.body ?? '')}</em><small>{seen.get(String(e.data.body ?? ''))! > 1 ? 'Gardée ' + seen.get(String(e.data.body ?? '')) + ' fois · ' : ''}{when(e.created_at)}</small></span></button></SwipeRow>
+        : <SwipeRow key={e.id} className="note-swipe" actions={actions(e)}><button className="note-row" onClick={() => onOpen(e)}>
+            <span className="note-emoji"><Glyph name={noteType(e.data.type).icon} tint={noteType(e.data.type).tint} badge={36} /></span>
+            <span><strong>{e.title}</strong><small>{String(e.data.body ?? '').slice(0, 120)}</small><small className="muted">{when(String(e.data.updated ?? e.created_at))}</small></span></button></SwipeRow>)}</div>
+    </section>)}
+    {ideas.length > 0 && <details className="folder-more"><summary>Écrire une nouvelle page</summary>{start}</details>}
   </div>;
 }

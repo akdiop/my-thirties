@@ -23,7 +23,7 @@ export function sleepHours(e: Entry) {
 }
 
 /** Sommeil : la routine pour se préparer, une respiration du soir, et le suivi des nuits relié à l'humeur. */
-export function Sleep({ entries, onCreate, onUpdate }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save }) {
+export function Sleep({ entries, onCreate, onUpdate, onRemove }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove?: (e: Entry) => Promise<boolean> }) {
   const today = isoOf(new Date());
   const nights = entries.filter((e) => e.kind === SLEEP_KIND && e.entry_date);
   const tonight = nights.find((e) => e.entry_date === today);
@@ -84,6 +84,7 @@ export function Sleep({ entries, onCreate, onUpdate }: { entries: Entry[]; onCre
       <div><span className="label-strong">Qualité</span>
         <div className="chip-row">{QUALITY.map((q, i) => <button key={q} className={'chip' + (quality === i + 1 ? ' on' : '')} onClick={() => setQuality(i + 1)}>{q}</button>)}</div></div>
       <button className="button primary" disabled={busy} onClick={() => void saveNight()}>{tonight?.data.bed ? 'Mettre à jour' : 'Enregistrer ma nuit'}</button>
+      {tonight && onRemove && <button className="link-btn small" onClick={async () => { if (await onRemove(tonight)) { setBed('23:00'); setWake('07:00'); setQuality(0); } }}>Effacer cette nuit</button>}
     </section>
 
     <section className="ritual-card">
