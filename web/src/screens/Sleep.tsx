@@ -7,6 +7,8 @@ import { unlockSound } from '../lib/sound';
 import { BreathPlayer, GuidedPlayer } from '../features/MeditationPlayers';
 import { moodOn } from './Review';
 import { pendingNight, SleepNight, SleepReport } from '../features/SleepNight';
+import { HealthLink, HealthReport } from '../features/HealthLink';
+import type { HealthNight } from '../../supabase/functions/health-import/sleep';
 import type { NightAnalysis } from '../lib/sleepAnalysis';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
@@ -53,7 +55,7 @@ export function Sleep({ entries, onCreate, onUpdate, onRemove }: { entries: Entr
     else await onCreate({ module: 'sante', kind: SLEEP_KIND, title: 'Sommeil · ' + date, entry_date: date, data: { date, ...patch } });
     setBed(patch.bed); setWake(patch.wake);
   };
-  const lastAnalysis = [...nights].sort((a, b) => String(b.entry_date).localeCompare(String(a.entry_date))).find((e) => e.data.analysis && typeof e.data.analysis === 'object');
+  const lastAnalysis = [...nights].sort((a, b) => String(b.entry_date).localeCompare(String(a.entry_date))).find((e) => (e.data.analysis && typeof e.data.analysis === 'object') || (e.data.health && typeof e.data.health === 'object'));
   const last14 = Array.from({ length: 14 }, (_, i) => addDays(today, i - 13));
   const byDay = new Map(nights.map((e) => [String(e.entry_date), e]));
   const stats = useMemo(() => {
@@ -95,13 +97,16 @@ export function Sleep({ entries, onCreate, onUpdate, onRemove }: { entries: Entr
       <p className="ritual-label"><AlarmClock size={16} /> Analyse de ma nuit</p>
       {lastAnalysis && <>
         <small className="muted">Nuit du {new Date(String(lastAnalysis.entry_date) + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</small>
-        <SleepReport a={lastAnalysis.data.analysis as NightAnalysis} />
+        {Boolean(lastAnalysis.data.analysis) && <SleepReport a={lastAnalysis.data.analysis as NightAnalysis} />}
+        {Boolean(lastAnalysis.data.health) && <HealthReport n={lastAnalysis.data.health as HealthNight} />}
       </>}
       <p className="muted small">Le micro repère tes mouvements pendant la nuit pour estimer tes phases de sommeil et te réveiller en sommeil léger. Aucun son n’est enregistré : seuls des niveaux par minute sont gardés.</p>
       <label>Heure du réveil<input type="time" value={alarm} onChange={(e) => setAlarm(e.target.value)} /></label>
       <label className="check-line"><input type="checkbox" checked={smart} onChange={(e) => setSmart(e.target.checked)} /> Réveil intelligent : jusqu’à 30 min plus tôt, quand je suis en sommeil léger</label>
       <button className="button primary" onClick={() => { unlockSound(); setNight(true); }}><Moon size={16} /> Commencer ma nuit</button>
     </section>
+
+    <HealthLink />
 
     <section className="ritual-card form-stack">
       <p className="ritual-label">Ma nuit dernière</p>
