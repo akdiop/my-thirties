@@ -1,11 +1,15 @@
 import { useMemo, useState } from 'react';
-import { Check, Moon } from 'lucide-react';
+import { AlarmClock, Check, Moon } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { addDays, isoOf } from '../lib/rituals';
 import { BREATHS, GUIDED } from '../lib/meditation';
 import { unlockSound } from '../lib/sound';
 import { BreathPlayer, GuidedPlayer } from '../features/MeditationPlayers';
 import { moodOn } from './Review';
+import { pendingNight, SleepNight, SleepReport } from '../features/SleepNight';
+import { HealthLink, HealthReport } from '../features/HealthLink';
+import type { HealthNight } from '../../supabase/functions/health-import/sleep';
+import type { NightAnalysis } from '../lib/sleepAnalysis';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 export const SLEEP_KIND = 'sommeil';
@@ -32,6 +36,9 @@ export function Sleep({ entries, onCreate, onUpdate, onRemove }: { entries: Entr
   const [wake, setWake] = useState(String(tonight?.data.wake ?? '07:00'));
   const [quality, setQuality] = useState(Number(tonight?.data.quality) || 0);
   const [busy, setBusy] = useState(false);
+  const [night, setNight] = useState(pendingNight);
+  const [alarm, setAlarm] = useState(String(tonight?.data.wake ?? '07:00'));
+  const [smart, setSmart] = useState(true);
   const routine = (tonight?.data.routine && typeof tonight.data.routine === 'object' ? tonight.data.routine : {}) as Record<string, boolean>;
 
   const upsert = async (patch: Record<string, unknown>) => {
@@ -40,6 +47,15 @@ export function Sleep({ entries, onCreate, onUpdate, onRemove }: { entries: Entr
   };
   const saveNight = async () => { setBusy(true); try { await upsert({ bed, wake, quality }); } finally { setBusy(false); } };
 
+  const saveAnalysis = async (a: NightAnalysis) => {
+    const end = new Date(a.end), date = isoOf(end), at = (d: Date) => d.toTimeString().slice(0, 5);
+    const patch = { analysis: a, bed: at(new Date(a.start)), wake: at(end) };
+    const e = nights.find((x) => x.entry_date === date);
+    if (e) await onUpdate(e, { ...e.data, ...patch });
+    else await onCreate({ module: 'sante', kind: SLEEP_KIND, title: 'Sommeil · ' + date, entry_date: date, data: { date, ...patch } });
+    setBed(patch.bed); setWake(patch.wake);
+  };
+  const lastAnalysis = [...nights].sort((a, b) => String(b.entry_date).localeCompare(String(a.entry_date))).find((e) => (e.data.analysis && typeof e.data.analysis === 'object') || (e.data.health && typeof e.data.health === 'object'));
   const last14 = Array.from({ length: 14 }, (_, i) => addDays(today, i - 13));
   const byDay = new Map(nights.map((e) => [String(e.entry_date), e]));
   const stats = useMemo(() => {
@@ -53,6 +69,8 @@ export function Sleep({ entries, onCreate, onUpdate, onRemove }: { entries: Entr
     const pct = (l: Entry[]) => l.length ? Math.round(100 * l.filter((e) => good(String(e.entry_date))).length / l.length) : null;
     return { avg, nightsCount: hrs.length, longPct: pct(long), shortPct: pct(short) };
   }, [nights, entries, today]);
+
+  if (night) return <SleepNight wake={alarm} window={smart ? 30 : 0} onDone={saveAnalysis} onCancel={() => setNight(false)} />;
 
   if (play) return <div className="calm-screen">
     <div className="calm-top"><button className="quit-btn" onClick={() => setPlay(null)}>Terminer</button></div>
@@ -74,6 +92,21 @@ export function Sleep({ entries, onCreate, onUpdate, onRemove }: { entries: Entr
         <button className="button ghost" onClick={() => { unlockSound(); setPlay('scan'); }}>Scan du corps</button>
       </div>
     </section>
+
+    <section className="ritual-card form-stack">
+      <p className="ritual-label"><AlarmClock size={16} /> Analyse de ma nuit</p>
+      {lastAnalysis && <>
+        <small className="muted">Nuit du {new Date(String(lastAnalysis.entry_date) + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</small>
+        {Boolean(lastAnalysis.data.analysis) && <SleepReport a={lastAnalysis.data.analysis as NightAnalysis} />}
+        {Boolean(lastAnalysis.data.health) && <HealthReport n={lastAnalysis.data.health as HealthNight} />}
+      </>}
+      <p className="muted small">Le micro repère tes mouvements pendant la nuit pour estimer tes phases de sommeil et te réveiller en sommeil léger. Aucun son n’est enregistré : seuls des niveaux par minute sont gardés.</p>
+      <label>Heure du réveil<input type="time" value={alarm} onChange={(e) => setAlarm(e.target.value)} /></label>
+      <label className="check-line"><input type="checkbox" checked={smart} onChange={(e) => setSmart(e.target.checked)} /> Réveil intelligent : jusqu’à 30 min plus tôt, quand je suis en sommeil léger</label>
+      <button className="button primary" onClick={() => { unlockSound(); setNight(true); }}><Moon size={16} /> Commencer ma nuit</button>
+    </section>
+
+    <HealthLink />
 
     <section className="ritual-card form-stack">
       <p className="ritual-label">Ma nuit dernière</p>
