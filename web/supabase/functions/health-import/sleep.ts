@@ -15,7 +15,7 @@ export type HealthNight = {
 export const STAGE_LABEL: Record<Stage, string> = { lit: 'Au lit', eveil: 'Éveil', endormie: 'Endormie', leger: 'Sommeil léger', profond: 'Sommeil profond', paradoxal: 'Sommeil paradoxal' };
 const ASLEEP: Stage[] = ['endormie', 'leger', 'profond', 'paradoxal'];
 
-const plain = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+const plain = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 
 /** Valeur d'un échantillon (anglais, français ou code HealthKit 0-5) → phase. */
 export function stageOf(value: string): Stage | null {
