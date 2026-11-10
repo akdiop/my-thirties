@@ -56,7 +56,7 @@ export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit }: { entr
         const anchor = mine.find((x) => x.id === e.data.after);
         return <SwipeRow key={e.id} className="card-swipe" actions={[
           { label: 'Renommer', icon: <Pencil size={18} />, onClick: () => { const v = window.prompt('Nouveau nom', e.title)?.trim(); if (v && onEdit) void onEdit(e.id, { title: v.slice(0, 80), data: e.data }); } },
-          { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => { if (confirm('Arrêter l’habitude « ' + e.title + ' » ? Son historique sera supprimé.')) void onRemove(e); } },
+          { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => void onRemove(e) },
         ]}><article className={'habit-card' + (on ? ' on' : '')}>
           <button className="habit-check" aria-pressed={on} aria-label={(on ? 'Décocher ' : 'Fait aujourd’hui : ') + e.title}
             onClick={() => void onUpdate(e, { ...e.data, done: { ...done, [today]: !on } })}>{on ? <Check size={22} strokeWidth={3} /> : <Glyph name={String(e.data.icon || 'sprout')} tint={(e.data.tint as Tint) || 'sauge'} size={24} />}</button>
@@ -75,7 +75,7 @@ export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit }: { entr
               {mine.filter((x) => x.id !== e.id && x.data.after !== e.id).map((x) => <option key={x.id} value={x.id}>Après « {x.title} »</option>)}
             </select>}
           </div>
-          <button className="icon-btn" aria-label={'Supprimer ' + e.title} onClick={() => { if (confirm('Arrêter l’habitude « ' + e.title + ' » ? Son historique sera supprimé.')) void onRemove(e); }}><Trash2 size={16} /></button>
+          <button className="icon-btn" aria-label={'Supprimer ' + e.title} onClick={() => void onRemove(e)}><Trash2 size={16} /></button>
         </article></SwipeRow>;
         })}</div>
       </section>)}
@@ -177,7 +177,7 @@ function Journeys({ entries, onCreate, onUpdate, onRemove }: { entries: Entry[];
       const toggle = (i: number) => void onUpdate(e, { ...e.data, done: { ...done, [today]: todayDone.includes(i) ? todayDone.filter((x) => x !== i) : [...todayDone, i] } });
       return <article key={e.id} className="goal-card">
         <div className="goal-head"><div><span className="pill">Semaine {week}</span><h3>{j.title}</h3><small className="muted">{j.why}</small></div>
-          <button className="icon-btn" aria-label={'Arrêter ' + j.title} onClick={() => { if (confirm('Arrêter le parcours « ' + j.title + ' » ?')) void onRemove(e); }}><Trash2 size={16} /></button></div>
+          <button className="icon-btn" aria-label={'Arrêter ' + j.title} onClick={() => void onRemove(e)}><Trash2 size={16} /></button></div>
         <Bar value={unlocked ? todayDone.filter((i) => i < unlocked).length / unlocked : 0} tone="caramel" />
         <ul className="goal-steps">{j.steps.slice(0, unlocked).map((st, i) => <li key={st.text}>
           <button className={todayDone.includes(i) ? 'on' : ''} aria-pressed={todayDone.includes(i)} onClick={() => toggle(i)}>

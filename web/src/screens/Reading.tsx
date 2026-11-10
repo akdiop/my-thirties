@@ -47,7 +47,7 @@ export function Reading({ entries, onCreate, onUpdate, onRemove }: { entries: En
           <label>Une citation que j’aime<textarea rows={2} value={quote} maxLength={600} onChange={(e) => setQuote(e.target.value)} placeholder="Recopie la phrase qui t’a marquée…" /></label>
           <button className="button secondary" disabled={!quote.trim()} onClick={() => { void onUpdate(b, { ...b.data, quotes: [...quotes, quote.trim()].slice(-40) }); setQuote(''); }}><Plus size={14} /> Ajouter la citation</button>
           <label>Ce que j’en retiens<textarea rows={3} defaultValue={String(b.data.note ?? '')} maxLength={2000} onBlur={(e) => void onUpdate(b, { ...b.data, note: e.target.value })} /></label>
-          <button className="link-btn small danger" onClick={() => { if (confirm('Retirer « ' + b.title + ' » ?')) void onRemove(b); }}><Trash2 size={14} /> Retirer</button>
+          <button className="link-btn small danger" onClick={() => void onRemove(b)}><Trash2 size={14} /> Retirer</button>
         </div>}
       </article>; })}
       {!shown.length && <p className="muted">{tab === 'en_cours' ? 'Aucun livre en cours.' : tab === 'a_lire' ? 'Ta pile à lire est vide.' : 'Pas encore de livre terminé.'}</p>}

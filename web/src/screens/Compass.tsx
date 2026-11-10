@@ -205,7 +205,7 @@ function GoalCard({ goal, habits, onUpdate, onRemove }: { goal: Entry; habits: E
   const deadline = typeof goal.data.deadline === 'string' && goal.data.deadline ? new Date(goal.data.deadline + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
   return <article className="goal-card">
     <div className="goal-head"><div><span className="pill">{domain}</span><h3>{goal.title}</h3>{deadline && <small className="muted">Avant le {deadline}</small>}</div>
-      <button className="icon-btn" aria-label={'Supprimer ' + goal.title} onClick={() => { if (confirm('Supprimer l’objectif « ' + goal.title + ' » ?')) void onRemove(goal); }}><Trash2 size={16} /></button></div>
+      <button className="icon-btn" aria-label={'Supprimer ' + goal.title} onClick={() => void onRemove(goal)}><Trash2 size={16} /></button></div>
     {typeof goal.data.why === 'string' && goal.data.why && <p className="goal-why">« {goal.data.why} »</p>}
     <Bar value={goalProgress(goal)} tone="caramel" />
     <small className="muted">{steps.filter((s) => s.done).length} / {steps.length} étapes</small>

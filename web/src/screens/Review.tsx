@@ -9,6 +9,7 @@ import { amountOf, currencyOf, fmt } from '../lib/money';
 import { addDays, DAILY_KIND, freqTarget, HABIT_KIND, habitDone, habitFreq, isoOf, MOODS, NOTE_KIND, weekStartOf } from '../lib/rituals';
 import { getIntegrationPrefs } from '../lib/integrations';
 import { Bar, Segmented } from '../ui/kit';
+import { yearStats, yearWindow } from '../lib/yearStats';
 import { fmtH, sleepHours } from './Sleep';
 
 const LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
@@ -25,13 +26,45 @@ export function moodOn(entries: Entry[], day: string) {
 }
 
 /** Bilan : la semaine résumée automatiquement (humeurs, habitudes, victoires, gratitudes, tâches, dépenses) et le calendrier d'humeur. */
-export function Review({ entries }: { entries: Entry[] }) {
-  const [tab, setTab] = useState<'semaine' | 'humeurs'>('semaine');
+export function Review({ entries, birthDate = '' }: { entries: Entry[]; birthDate?: string }) {
+  const [tab, setTab] = useState<'semaine' | 'humeurs' | 'annee'>('semaine');
   return <div className="screen review">
-    <header className="tab-head"><h1>Mon bilan</h1><p>Ta semaine, en un coup d’œil</p></header>
-    <Segmented label="Bilan" value={tab} onChange={setTab} options={[{ value: 'semaine', label: 'Semaine' }, { value: 'humeurs', label: 'Calendrier d’humeur' }]} />
-    {tab === 'semaine' ? <Week entries={entries} /> : <MoodCalendar entries={entries} />}
+    <header className="tab-head"><h1>Mon bilan</h1><p>{tab === 'annee' ? 'Ma trentaine en chiffres' : 'Ta semaine, en un coup d’œil'}</p></header>
+    <Segmented label="Bilan" value={tab} onChange={setTab} options={[{ value: 'semaine', label: 'Semaine' }, { value: 'humeurs', label: 'Humeurs' }, { value: 'annee', label: 'Mon année' }]} />
+    {tab === 'semaine' ? <Week entries={entries} /> : tab === 'humeurs' ? <MoodCalendar entries={entries} /> : <YearInNumbers entries={entries} birthDate={birthDate} />}
   </div>;
+}
+
+/** Ma trentaine en chiffres : l'année écoulée depuis mon anniversaire, à garder ou à partager. */
+function YearInNumbers({ entries, birthDate }: { entries: Entry[]; birthDate: string }) {
+  const w = yearWindow(birthDate, new Date());
+  const s = yearStats(entries, w.from, w.to, sleepHours);
+  const n = (v: number) => v.toLocaleString('fr-FR');
+  const pl = (v: number, one: string, many: string) => (v > 1 ? many : one);
+  const tiles = [
+    s.nights && { k: pl(s.nights, 'nuit suivie', 'nuits suivies'), v: n(s.nights), sub: s.avgSleep ? 'en moyenne ' + fmtH(s.avgSleep) : '' },
+    s.habits && { k: pl(s.habits, 'habitude cochée', 'habitudes cochées'), v: n(s.habits) },
+    s.prayers && { k: pl(s.prayers, 'prière notée', 'prières notées'), v: n(s.prayers) },
+    s.fasts && { k: pl(s.fasts, 'jour de jeûne', 'jours de jeûne'), v: n(s.fasts) },
+    s.books && { k: pl(s.books, 'livre lu', 'livres lus'), v: n(s.books) },
+    s.trips && { k: pl(s.trips, 'voyage', 'voyages'), v: n(s.trips) },
+    s.sessions && { k: pl(s.sessions, 'séance de sport', 'séances de sport'), v: n(s.sessions) },
+    s.challengeDays && { k: pl(s.challengeDays, 'jour de défi réussi', 'jours de défi réussis'), v: n(s.challengeDays) },
+    s.notes && { k: pl(s.notes, 'page de journal', 'pages de journal'), v: n(s.notes) },
+    s.water && { k: pl(s.water, 'verre d’eau', 'verres d’eau'), v: n(s.water) },
+    s.steps && { k: 'pas', v: n(s.steps) },
+  ].filter(Boolean) as { k: string; v: string; sub?: string }[];
+  const share = async () => {
+    const txt = 'Ma trentaine en chiffres · ' + w.label.toLowerCase() + '\n' + tiles.map((t) => '• ' + t.v + ' ' + t.k).join('\n');
+    try { if (navigator.share) await navigator.share({ title: 'Ma trentaine en chiffres', text: txt }); else await navigator.clipboard.writeText(txt); } catch { /* partage annulé */ }
+  };
+  return <section className="year-numbers">
+    <p className="eyebrow-s">{w.label} · depuis le {new Date(w.from + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+    {tiles.length ? <div className="year-grid">{tiles.map((t) => <div key={t.k} className="year-tile"><strong>{t.v}</strong><span>{t.k}</span>{t.sub && <small>{t.sub}</small>}</div>)}</div>
+      : <p className="muted">Tes chiffres apparaîtront ici au fil des jours : nuits, habitudes, prières, lectures, voyages…</p>}
+    {!birthDate && <p className="muted small">Ajoute ta date de naissance dans ton profil pour compter d’un anniversaire à l’autre.</p>}
+    {tiles.length > 0 && <button className="button soft" onClick={() => void share()}>Partager mes chiffres</button>}
+  </section>;
 }
 
 function Week({ entries }: { entries: Entry[] }) {

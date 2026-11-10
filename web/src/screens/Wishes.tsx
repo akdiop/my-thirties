@@ -41,10 +41,10 @@ export function Wishes({ entries, onCreate, onUpdate, onRemove, onEdit }: { entr
       const p = Number(e.data.price) || 0, s = Number(e.data.saved) || 0, cur = String(e.data.currency || 'XOF'), url = safeLink(e.data.link);
       return <SwipeRow key={e.id} className="card-swipe" actions={[
           { label: 'Renommer', icon: <Pencil size={18} />, onClick: () => { const v = window.prompt('Nouveau nom', e.title)?.trim(); if (v && onEdit) void onEdit(e.id, { title: v.slice(0, 80), data: e.data }); } },
-          { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => { if (confirm('Supprimer « ' + e.title + ' » ?')) void onRemove(e); } },
+          { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => void onRemove(e) },
         ]}><article className="wish-card">
         <div className="goal-head"><div><strong>{e.title}</strong><small className="muted">{p ? fmt(p, cur) : 'Prix à définir'}{e.data.category ? ' · ' + String(e.data.category) : ''}</small></div>
-          <button className="icon-btn" aria-label={'Supprimer ' + e.title} onClick={() => { if (confirm('Supprimer « ' + e.title + ' » ?')) void onRemove(e); }}><Trash2 size={16} /></button></div>
+          <button className="icon-btn" aria-label={'Supprimer ' + e.title} onClick={() => void onRemove(e)}><Trash2 size={16} /></button></div>
         {p > 0 && <><Bar value={Math.min(1, s / p)} tone="caramel" /><small className="muted">{fmt(s, cur)} de côté{s >= p ? ' · c’est prêt !' : ' · reste ' + fmt(p - s, cur)}</small></>}
         <div className="chip-other">
           <input inputMode="decimal" placeholder="Montant" value={amounts[e.id] ?? ''} onChange={(ev) => setAmounts((a) => ({ ...a, [e.id]: ev.target.value.replace(',', '.').replace(/[^\d.]/g, '') }))} />

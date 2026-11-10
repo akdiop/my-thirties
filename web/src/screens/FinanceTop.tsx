@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Receipt, Repeat } from 'lucide-react';
-import type { Entry } from '../lib/cloud';
+import type { Entry, EntryInput } from '../lib/cloud';
+import { EXPENSE_CATEGORIES } from '../modules';
 import { str, todayIso } from '../lib/day';
-import { amountOf, currencyOf, fmt, mainCurrency, monthReport, num, XOF_PER_EUR } from '../lib/money';
-import { Segmented, SectionTitle } from '../ui/kit';
+import { amountOf, BUDGETS_KIND, categoryBudgets, currencyOf, fmt, limitsOf, mainCurrency, monthReport, num, XOF_PER_EUR } from '../lib/money';
+import { Bar, Segmented, SectionTitle } from '../ui/kit';
+import { MoneyLink } from '../features/MoneyLink';
 
 const CURRENCIES = ['XOF', 'EUR', 'USD'] as const;
 
@@ -20,7 +22,7 @@ function Donut({ parts, total, currency }: { parts: { share: number; color: stri
   </div>;
 }
 
-export function FinanceTop({ entries, onAdd, onOpen, onUpdate }: { entries: Entry[]; onAdd: (kind: string) => void; onOpen: (e: Entry) => void; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void> }) {
+export function FinanceTop({ entries, onAdd, onOpen, onUpdate, onCreate }: { entries: Entry[]; onAdd: (kind: string) => void; onOpen: (e: Entry) => void; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void>; onCreate: (i: EntryInput) => Promise<void> }) {
   const recurring = entries.filter((e) => e.kind === 'recurring').sort((a, b) => (num(a.data.day) || 1) - (num(b.data.day) || 1));
   const save = async () => { if (!goal) return; const v = window.prompt('Combien veux-tu ajouter à ton épargne ? (' + currencyOf(goal) + ')'); const n = Number(String(v ?? '').replace(/[^\d.,]/g, '').replace(',', '.')); if (n > 0) await onUpdate(goal, { ...goal.data, saved: (num(goal.data.saved) || 0) + n }); };
   const [currency, setCurrency] = useState<string>(() => mainCurrency(entries));
@@ -55,6 +57,7 @@ export function FinanceTop({ entries, onAdd, onOpen, onUpdate }: { entries: Entr
           <button className="link-btn small" onClick={() => void save()}>+ Épargner</button></>
           : <button className="link-btn small" onClick={() => onAdd('goal')}>+ Créer un objectif d’épargne</button>}</div>
     </div>
+    <CategoryBudgets entries={entries} month={month} currency={currency} onCreate={onCreate} onUpdate={onUpdate} />
     <SectionTitle action="Ajouter" onAction={() => onAdd('recurring')}>Dépenses récurrentes</SectionTitle>
     <div className="line-list">{recurring.length ? recurring.map((s) => <button key={s.id} className="line-row" onClick={() => onOpen(s)}>
       <span className="line-icon"><Repeat size={17} /></span>
@@ -73,5 +76,36 @@ export function FinanceTop({ entries, onAdd, onOpen, onUpdate }: { entries: Entr
       <span className={'line-amount' + (list === 'income' ? ' plus' : '')}>{list === 'expense' ? '−' : '+'}{fmt(amountOf(e), currency)}</span></button>)
       : <p className="muted">Rien ce mois-ci.</p>}</div>
     <button className="big-btn" onClick={() => onAdd(list)}>+ Ajouter {list === 'expense' ? 'une dépense' : 'un revenu'}</button>
+    <MoneyLink />
   </div>;
+}
+
+/** Budgets par catégorie : un plafond mensuel par catégorie et une alerte douce à 80 %. */
+function CategoryBudgets({ entries, month, currency, onCreate, onUpdate }: { entries: Entry[]; month: string; currency: string;
+  onCreate: (i: EntryInput) => Promise<void>; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void> }) {
+  const rows = categoryBudgets(entries, month, currency);
+  const limits = limitsOf(entries);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<Record<string, string>>({});
+  const open = () => { setDraft(Object.fromEntries(EXPENSE_CATEGORIES.map((c) => [c, limits[currency]?.[c] ? String(limits[currency]![c]) : '']))); setEditing(true); };
+  const save = async () => {
+    const mine = Object.fromEntries(Object.entries(draft).map(([k, v]) => [k, Number(v.replace(/\s/g, '').replace(',', '.')) || 0]).filter(([, v]) => Number(v) > 0));
+    const next = { ...limits, [currency]: mine }, cfg = entries.find((e) => e.kind === BUDGETS_KIND);
+    await (cfg ? onUpdate(cfg, { ...cfg.data, limits: next }) : onCreate({ module: 'finances', kind: BUDGETS_KIND, title: 'Budgets par catégorie', entry_date: null, data: { limits: next } }));
+    setEditing(false);
+  };
+  return <>
+    <SectionTitle action={editing ? undefined : rows.length ? 'Modifier' : 'Définir'} onAction={editing ? undefined : open}>Budgets par catégorie</SectionTitle>
+    {editing ? <div className="soft-card budget-edit">
+      <p className="muted small">Plafond mensuel en {currency}. Laisse vide pour ne pas suivre une catégorie.</p>
+      {EXPENSE_CATEGORIES.map((c) => <label key={c} className="budget-line"><span>{c}</span>
+        <input type="text" inputMode="decimal" placeholder="—" value={draft[c] ?? ''} onChange={(e) => setDraft({ ...draft, [c]: e.target.value })} /></label>)}
+      <div className="button-group"><button className="button primary" onClick={() => void save()}>Enregistrer</button><button className="button ghost" onClick={() => setEditing(false)}>Annuler</button></div>
+    </div> : rows.length ? <div className="soft-card budget-list">{rows.map((b) => <div key={b.name} className={'budget-row' + (b.share >= 1 ? ' over' : b.share >= 0.8 ? ' near' : '')}>
+      <div className="budget-head"><strong>{b.name}</strong><small>{fmt(b.spent, currency)} / {fmt(b.limit, currency)}</small></div>
+      <Bar value={b.share} tone={b.share >= 0.8 ? 'caramel' : 'sauge'} />
+      {b.share >= 1 ? <small className="budget-note">Plafond dépassé de {fmt(b.spent - b.limit, currency)}</small>
+        : b.share >= 0.8 ? <small className="budget-note">Plus que {fmt(b.limit - b.spent, currency)} ce mois-ci</small> : null}
+    </div>)}</div> : <p className="muted">Fixe un plafond pour les catégories que tu veux surveiller (shopping, sorties…).</p>}
+  </>;
 }

@@ -63,7 +63,7 @@ export function Relatives({ entries, onCreate, onUpdate, onEdit, onRemove }: { e
         return <article key={e.id} className={'relative-row' + (days <= 7 ? ' soon' : '') + (isOpen ? ' open' : '')}>
           <SwipeRow className="relative-swipe" actions={[
             { label: 'Modifier', icon: <Pencil size={18} />, onClick: () => setOpen(e.id) },
-            { label: 'Retirer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => { if (confirm('Retirer ' + e.title + ' ?')) void onRemove(e); } },
+            { label: 'Retirer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => void onRemove(e) },
           ]}><button className="relative-head" onClick={() => setOpen(isOpen ? null : e.id)} aria-expanded={isOpen}>
             <span className={'relative-date ' + toneOf(e.data.relation)}><strong>{date.getDate()}</strong><small>{SHORT[date.getMonth()]}</small></span>
             <span className="habit-body"><strong>{e.title}</strong><small>{[age ? (days === 0 ? age + ' ans aujourd’hui' : 'fêtera ses ' + age + ' ans') : '', e.data.relation ? String(e.data.relation) : ''].filter(Boolean).join(' · ')}</small></span>
@@ -123,7 +123,7 @@ function RelativeDetails({ entry: e, onUpdate, onEdit, onRemove }: { entry: Entr
     <label className="checklist-item"><input type="checkbox" checked={e.data.remind !== false} onChange={() => void onUpdate(e, { ...e.data, remind: e.data.remind === false })} /> Me prévenir 3 jours avant et le jour J</label>
     <div className="relative-actions">
       <button className="button primary" disabled={!dirty || !name.trim()} onClick={() => void save()}>{saved && !dirty ? <><Check size={16} /> Enregistré</> : 'Enregistrer'}</button>
-      <button className="link-btn small danger" onClick={() => { if (confirm('Retirer ' + e.title + ' ?')) void onRemove(e); }}><Trash2 size={14} /> Retirer</button>
+      <button className="link-btn small danger" onClick={() => void onRemove(e)}><Trash2 size={14} /> Retirer</button>
     </div>
   </div>;
 }

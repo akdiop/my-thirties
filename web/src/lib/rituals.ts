@@ -5,7 +5,7 @@ import type { GlyphName, Tint } from '../ui/Glyph';
 export const DAILY_KIND = 'daily';
 export const NOTE_KIND = 'note';
 export const HABIT_KIND = 'habit';
-export const RITUAL_KINDS = [DAILY_KIND, NOTE_KIND, HABIT_KIND, 'vision', 'objectif', 'roue', 'parcours_progressif', 'meditation', 'focus', 'sommeil', 'complement', 'reglages_accueil', 'reglages_integrations', 'proche', 'lecture', 'envie', 'panda', 'invocations'];
+export const RITUAL_KINDS = [DAILY_KIND, NOTE_KIND, HABIT_KIND, 'vision', 'objectif', 'roue', 'parcours_progressif', 'meditation', 'focus', 'sommeil', 'complement', 'reglages_accueil', 'reglages_integrations', 'proche', 'lecture', 'envie', 'panda', 'invocations', 'programme_3mois'];
 
 export const MOODS: { value: string; icon: GlyphName; tint: Tint }[] = [
   { value: 'Épuisée', icon: 'battery', tint: 'rose' }, { value: 'Fatiguée', icon: 'rain', tint: 'ardoise' }, { value: 'Neutre', icon: 'meh', tint: 'or' },
@@ -37,10 +37,26 @@ export type HabitTemplate = { id: string; group: string; icon: GlyphName; tint: 
 export const FREQ_LABEL: Record<HabitFreq, string> = { daily: 'Chaque jour', '3w': '3 fois par semaine', '1w': '1 fois par semaine' };
 export const freqTarget = (f: HabitFreq) => (f === 'daily' ? 7 : f === '3w' ? 3 : 1);
 
-export const HABIT_GROUPS = ['Bien-être & corps', 'Organisation & focus', 'Croissance & apprentissage', 'Relations & connexion', 'Spiritualité'];
-const GROUP_TINT: Record<string, Tint> = { 'Bien-être & corps': 'sauge', 'Organisation & focus': 'caramel', 'Croissance & apprentissage': 'lilas', 'Relations & connexion': 'rose', 'Spiritualité': 'or' };
+export const HABIT_GROUPS = ['Routine du matin', 'Routine du soir', 'Bien-être & corps', 'Organisation & focus', 'Croissance & apprentissage', 'Relations & connexion', 'Spiritualité'];
+const GROUP_TINT: Record<string, Tint> = { 'Routine du matin': 'or', 'Routine du soir': 'lilas', 'Bien-être & corps': 'sauge', 'Organisation & focus': 'caramel', 'Croissance & apprentissage': 'lilas', 'Relations & connexion': 'rose', 'Spiritualité': 'or' };
 const h = (group: string, id: string, icon: GlyphName, title: string, why: string, level: HabitLevel, freq: HabitFreq): HabitTemplate => ({ id, group, icon, tint: GROUP_TINT[group] ?? 'chocolat', title, why, level, freq });
 export const HABIT_LIBRARY: HabitTemplate[] = [
+  h('Routine du matin', 'm-reveil', 'sunrise', 'Me lever tôt', 'Prendre le temps de me réveiller en douceur et de dire merci.', 'Modérée', 'daily'),
+  h('Routine du matin', 'm-eau', 'drop', 'Un grand verre d’eau au réveil', 'Me réhydrater après la nuit et retrouver de l’énergie.', 'Douce', 'daily'),
+  h('Routine du matin', 'm-spi', 'sparkle', 'Mon moment spirituel du matin', '5 à 10 minutes : prière, méditation, Coran ou dou‘a.', 'Douce', 'daily'),
+  h('Routine du matin', 'm-bouger', 'stretch', 'Bouger mon corps le matin', 'Étirements, yoga ou sport pour réveiller corps et esprit.', 'Modérée', 'daily'),
+  h('Routine du matin', 'm-petitdej', 'croissant', 'Un petit-déjeuner sain', 'Un repas équilibré pour démarrer avec de l’énergie.', 'Douce', 'daily'),
+  h('Routine du matin', 'm-plan', 'calendar', 'Noter mes priorités du jour', 'Mes priorités et mes tâches, pour rester organisée.', 'Douce', 'daily'),
+  h('Routine du matin', 'm-soin', 'sparkles', 'Prendre soin de moi le matin', 'Skincare, une tenue où je me sens bien dans ma peau.', 'Douce', 'daily'),
+  h('Routine du matin', 'm-positive', 'heart', 'Une pensée positive', 'Confiance en moi : je suis capable de grandes choses.', 'Douce', 'daily'),
+  h('Routine du soir', 's-ecrans', 'phoneOff', 'Déconnecter 1 h avant de dormir', 'Loin des écrans pour préparer un vrai repos.', 'Engagée', 'daily'),
+  h('Routine du soir', 's-bilan', 'notebook', 'Le bilan de ma journée', 'Ce qui était positif, ce que je peux améliorer, ce dont je suis fière.', 'Douce', 'daily'),
+  h('Routine du soir', 's-spi', 'bookText', 'Mon moment spirituel du soir', 'Prière, Coran ou invocations, et remercier Allah pour la journée.', 'Douce', 'daily'),
+  h('Routine du soir', 's-lendemain', 'list', 'Préparer le lendemain', 'Mes affaires, ma tenue et ma to-do list, pour une matinée sans stress.', 'Douce', 'daily'),
+  h('Routine du soir', 's-soin', 'sparkles', 'Prendre soin de moi le soir', 'Skincare, douche chaude, soin des cheveux : un moment rien que pour moi.', 'Douce', 'daily'),
+  h('Routine du soir', 's-lecture', 'book', 'Lire ou apprendre le soir', 'Quelques pages d’un livre ou une chose nouvelle.', 'Douce', 'daily'),
+  h('Routine du soir', 's-detente', 'coffee', 'Préparer mon corps au sommeil', 'Infusion, étirements légers, respiration profonde.', 'Douce', 'daily'),
+  h('Routine du soir', 's-heure', 'moon', 'Dormir à heure fixe', 'Un bon sommeil, essentiel pour ma santé et mon énergie.', 'Modérée', 'daily'),
   h('Bien-être & corps', 'eau', 'drop', 'Boire 1,5 L d’eau', 'Un verre au réveil, une gourde à portée de main.', 'Douce', 'daily'),
   h('Bien-être & corps', 'bouger', 'steps', 'Bouger 20 minutes', 'Marche, danse, étirements : tout compte.', 'Modérée', 'daily'),
   h('Bien-être & corps', 'minuit', 'moon', 'Au lit avant minuit', 'Le sommeil répare tout le reste.', 'Modérée', 'daily'),

@@ -1,6 +1,6 @@
 import { QUESTS } from '../lib/boosterDays';
 import { useState, type ReactNode } from 'react';
-import { BookHeart, BookOpen, CalendarDays, Compass, CloudSun, HandCoins, Heart, Lightbulb, MapPin, Mountain, Star, Sun, Waves, Zap, Shield, Smile, Scale, Feather } from 'lucide-react';
+import { BookHeart, BookOpen, CalendarDays, Compass, CloudSun, HandCoins, Heart, Lightbulb, MapPin, Mountain, Star, Sun, Waves, Zap, Shield, Smile, Scale, Feather, Moon } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { str, todayIso } from '../lib/day';
 import { amountOf, currencyOf, fmt } from '../lib/money';
@@ -8,6 +8,10 @@ import { currentPrayer, PRAYERS, prayerDay, togglePrayer } from '../lib/wellbein
 import { usePrayerAutoLocation } from '../features/AutomaticPrayerTimes';
 import { SpiritStats } from '../features/SpiritStats';
 import { SpiritLessons } from '../features/SpiritLessons';
+import { Ramadan } from '../features/Ramadan';
+import { ramadanStatus } from '../lib/ramadan';
+
+const ramadanSub = (day: string) => { const r = ramadanStatus(day); return !r ? 'suhûr, iftar, jeûnes, Coran' : r.active ? 'jour ' + r.day + ' · suhûr, iftar, Coran' : 'dans ' + r.daysUntil + ' jours · suhûr, iftar, jeûnes, Coran'; };
 import { HIJRI_MONTHS, hijriLabel, hijriOf, spiritualDay, upcomingKeyDates } from '../lib/hijri';
 import { HeroPhoto } from '../features/HeroPhoto';
 import { Check22, RowLink, Segmented, SectionTitle, type Tone } from '../ui/kit';
@@ -101,7 +105,7 @@ export function EquilibreTop({ tab, onTab, entries, onAxis, onQuest, booster }: 
 /* ---------- Ma spiritualité ---------- */
 const hijri = (d = new Date()) => { try { return new Intl.DateTimeFormat('fr-FR-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric' }).format(d); } catch { return ''; } };
 const DHIKR = ['SubhanAllah', 'Alhamdulillah', 'Allahu akbar', 'Astaghfirullah', 'La ilaha illa Allah'];
-export type SpiritTab = 'home' | 'dhikr' | 'hijri' | 'journal' | 'horaires' | 'invocations' | 'qibla' | 'regularite' | 'cours';
+export type SpiritTab = 'home' | 'dhikr' | 'hijri' | 'journal' | 'horaires' | 'invocations' | 'qibla' | 'regularite' | 'cours' | 'ramadan';
 /** Compteur de dhikr : on touche le cercle, objectif 33, enregistrement du total du jour. */
 function DhikrCounter({ day, entries, onCreate }: { day: string; entries: Entry[]; onCreate: (i: EntryInput) => Promise<void> }) {
   const [count, setCount] = useState(0);
@@ -166,6 +170,7 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }:
         <RowLink icon={Compass} title="Direction de la Qibla" sub="boussole" onClick={() => onTab('qibla')} />
         <RowLink icon={Heart} title="Mes invocations" sub="routine de dhikr, protection, pardon, réussite…" onClick={() => onTab('invocations')} />
         <RowLink icon={BookOpen} title="Mes cours" sub="tafsir, Ayat al-Kursî, la prière, la roqya" onClick={() => onTab('cours')} />
+        <RowLink icon={Moon} title="Ramadan" sub={ramadanSub(day)} onClick={() => onTab('ramadan')} />
         <RowLink icon={Sun} title="Calendrier spirituel" sub="jeûnes recommandés, dates importantes" onClick={() => onTab('hijri')} />
         <RowLink icon={BookHeart} title="Mon journal spirituel" onClick={() => onTab('journal')} />
       </div>
@@ -175,5 +180,6 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }:
     {tab === 'dhikr' && <DhikrCounter day={day} entries={entries} onCreate={onCreate} />}
     {tab === 'hijri' && <SpiritCalendar />}
     {tab === 'cours' && <SpiritLessons onBack={() => onTab('home')} />}
+    {tab === 'ramadan' && <Ramadan entries={entries} onCreate={onCreate} onUpdate={onUpdate} />}
   </div>;
 }

@@ -20,7 +20,7 @@ export function Agenda({ entries, onAdd, onOpen, onUpdate, onCreate, onRemove, e
   const sel = parseDay(selected);
   const monday = plusDays(sel, -weekday(sel));
   const week = Array.from({ length: 7 }, (_, i) => plusDays(monday, i));
-  const items = timeline(entries, sel);
+  const items = timeline(entries, sel, { prayers: false });
   const found = query ? entries.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())).slice(0, 20) : [];
   const month = sel.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
 
@@ -42,7 +42,7 @@ export function Agenda({ entries, onAdd, onOpen, onUpdate, onCreate, onRemove, e
       {mode === 'month' ? <CalendarBoard entries={entries.filter((e) => e.module === 'quotidien')} onUpdate={onUpdate} /> : <>
         {mode === 'week' && <div className="week-strip">{week.map((d, i) => {
           const key = iso(d);
-          const has = timeline(entries, d).length > 0;
+          const has = timeline(entries, d, { prayers: false }).length > 0;
           return <button key={key} className={'week-day' + (key === selected ? ' on' : '') + (key === todayIso() ? ' today' : '')} onClick={() => setSelected(key)}>
             <span>{DAYS[i]}</span><strong>{d.getDate()}</strong><i style={{ background: has ? '#C9A08C' : 'transparent' }} />
           </button>;
