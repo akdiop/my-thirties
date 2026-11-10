@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, BookText, Check, Languages, Settings2, Trophy } from 'lucide-react';
+import { BookOpen, BookText, Check, Languages, Settings2, Sparkles, Trophy } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { pathById } from '../lib/learning';
 import { COURSE_LOADERS } from '../lib/langCourses';
 import type { LangCourse } from '../lib/langCourses/types';
 import { QURAN_PAGES } from '../lib/ramadan';
-import { challengesToday, QURAN_KIND, quranPlan, quranRead, tafsirOfDay, wordOfDay } from '../lib/todayLearning';
+import { allahNameOfDay, challengesToday, QURAN_KIND, quranPlan, quranRead, tafsirOfDay, wordOfDay } from '../lib/todayLearning';
 
 export type LearningTarget = 'passions' | 'challenges' | 'cours';
 
@@ -17,6 +17,7 @@ export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
   const challenges = challengesToday(entries, today);
   const paths = entries.filter((e) => e.kind === 'path' && pathById(e.data.pathId));
   const tafsir = tafsirOfDay(today);
+  const name = allahNameOfDay(today);
   const quran = entries.find((e) => e.kind === QURAN_KIND);
   const plan = quran ? quranPlan(quran.data, today) : null;
 
@@ -59,6 +60,14 @@ export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
           : <button className="dl-btn" onClick={() => void onUpdate(quran!, quranRead(quran!.data, today))}>Lu</button>)
           : <button className="dl-btn" aria-label="Régler ma lecture du Coran" onClick={() => void setupQuran()}><Settings2 size={16} /></button>}
       </div>
+
+      {name && <button className="dl-row" onClick={() => onOpen('cours')}>
+        <span className="dl-icon"><Sparkles size={18} /></span>
+        <span className="dl-text"><small>Nom d’Allah du jour · {name.n} sur 99</small>
+          <strong className="dl-word"><span lang="ar">{name.ar}</span> <em>{name.tr}</em></strong>
+          <span className="dl-point">{name.fr}</span>
+        </span>
+      </button>}
 
       {tafsir && <button className="dl-row tafsir" onClick={() => onOpen('cours')}>
         <span className="dl-icon"><BookOpen size={18} /></span>

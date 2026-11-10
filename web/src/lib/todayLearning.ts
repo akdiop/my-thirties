@@ -2,6 +2,7 @@
 import type { Entry } from './cloud';
 import type { LangCourse, Triple } from './langCourses/types';
 import { LESSONS } from './lessons';
+import { ALLAH_NAMES } from './asmaUlHusna';
 import { QURAN_PAGES } from './ramadan';
 import { dayNumber, templateById } from './challenges';
 
@@ -63,3 +64,6 @@ export function challengesToday(entries: Entry[], today: string): ChallengeToday
     return [{ entry, day, days, action: t ? t.day(day) : null, done: progress[String(day)]?.status === 'done' }];
   });
 }
+
+/** Nom d'Allah du jour : un des 99 noms, dans l'ordre de la liste. */
+export const allahNameOfDay = (iso: string) => pickOfDay(ALLAH_NAMES, iso);
