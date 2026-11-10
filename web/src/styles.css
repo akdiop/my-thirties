@@ -1930,3 +1930,15 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .dl-btn{flex:none;min-width:52px;height:36px;padding:0 14px;border-radius:18px;border:0;background:#7E7254;color:#fff;font:inherit;font-size:.85rem;font-weight:700;display:grid;place-items:center}
 .dl-done{flex:none;width:36px;height:36px;border-radius:18px;display:grid;place-items:center;background:#8FA08A;color:#fff}
 
+/* Les 10 jours de Dhu al-Hijja */
+.dhul-days{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}
+.dhul-days .ramadan-day{height:36px;padding:0;font-size:.85rem}
+.dhul-intro{font-size:.9rem;line-height:1.5;color:#55514a;margin:4px 0 12px}
+.dhul-acts{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin:12px 0}
+.dhul-act{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:10px;font-size:.92rem;font-weight:500;color:#3A3833;text-align:left}
+.chip.on{background:#5F7A59;color:#fff}
+.dhul-q{display:block;font-weight:700;margin-bottom:8px;line-height:1.4}
+.dhul-quote p{margin:6px 0;font-size:.95rem;line-height:1.5}.dhul-quote em{color:#6E6448;font-size:.88rem}.dhul-quote small{color:#6F6B63}
+.dhul-know summary{display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;list-style:none}
+.dhul-know .fiche-pt small{color:#6F6B63}
+
