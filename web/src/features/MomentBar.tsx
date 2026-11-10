@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Droplet, Minus, Moon, Pill, Shield, Sunrise, Sunset, Timer, Wallet } from 'lucide-react';
+import { Droplet, Footprints, Minus, Moon, Pill, Shield, Sunrise, Sunset, Timer, Wallet } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
-import { DAILY_KIND, isoOf } from '../lib/rituals';
+import { addDays, DAILY_KIND, isoOf } from '../lib/rituals';
 import { momentOf, WATER_GOAL, waterOf } from '../lib/moment';
 import { ProtectionSheet } from './ProtectionSheet';
 import { ramadanTimes } from './Ramadan';
@@ -19,6 +19,8 @@ export function MomentBar({ entries, onGo, onCreate, onUpdate, now = new Date() 
   const today = isoOf(now), moment = momentOf(now.getHours());
   const day = entries.find((e) => e.kind === DAILY_KIND && e.entry_date === today);
   const water = waterOf(day?.data);
+  const yesterday = entries.find((e) => e.kind === DAILY_KIND && e.entry_date === addDays(today, -1));
+  const steps = Number(yesterday?.data.steps) || 0;
   const supps = entries.filter((e) => e.kind === 'complement' && (() => { const d = Number(e.data.days) || 0; return !d || dayOf(String(e.data.start ?? today), today) <= d; })());
   const suppsDone = supps.filter((e) => (e.data.done as Record<string, boolean> | undefined)?.[today]).length;
 
@@ -37,6 +39,7 @@ export function MomentBar({ entries, onGo, onCreate, onUpdate, now = new Date() 
       <button className="moment-water" aria-label={'Ajouter un verre d’eau, ' + water + ' sur ' + WATER_GOAL} onClick={() => void setWater(water + 1)}><Droplet size={16} /> Eau {water}/{WATER_GOAL}</button>
       {water > 0 && <button className="moment-minus" aria-label="Retirer un verre" onClick={() => void setWater(water - 1)}><Minus size={14} /></button>}
     </span>}
+    {steps > 0 && moment === 'matin' && <span className="moment-chip info"><Footprints size={16} /> Hier : {steps.toLocaleString('fr-FR')} pas</span>}
     {moment === 'journee' && <button className="moment-chip" onClick={() => onGo('focus')}><Timer size={16} /> Focus</button>}
     {(moment === 'soir' || moment === 'nuit') && <button className="moment-chip" onClick={() => onGo('sommeil')}><Moon size={16} /> Ma nuit</button>}
     {budget && moment !== 'nuit' && <button className="moment-chip warn" onClick={() => onGo('finances')}><Wallet size={16} /> {budget.name} · {budget.share >= 1 ? 'budget dépassé' : Math.round(budget.share * 100) + ' % du budget'}</button>}

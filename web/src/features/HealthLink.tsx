@@ -7,7 +7,7 @@ import { STAGE_LABEL, type HealthNight, type Stage } from '../../supabase/functi
 const newToken = () => Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, '0')).join('');
 const importUrl = (token: string) => (import.meta.env.VITE_SUPABASE_URL as string).replace(/\/+$/, '') + '/functions/v1/health-import?token=' + token;
 
-/** Relier Sleep Cycle (ou une montre) : un raccourci iPhone lit l'app Santé chaque matin et envoie la nuit ici. */
+/** Relier l'app Santé : un raccourci iPhone envoie chaque matin la nuit (Sleep Cycle, montre), les pas, les séances et les règles. */
 export function HealthLink() {
   const [token, setToken] = useState<string | null>(null);
   const [importedAt, setImportedAt] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export function HealthLink() {
 
   return <section className="soft-card iphone-cal">
     <button className="fold-head" aria-expanded={open} onClick={() => setOpen(!open)}><HeartPulse size={18} />
-      <span><strong>Relier Sleep Cycle (via Santé)</strong><small className="muted">{importedAt ? 'Dernier import : ' + new Date(importedAt).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : token ? 'Lien créé' : 'Tes nuits Sleep Cycle dans My Thirties'}</small></span>
+      <span><strong>Relier l’app Santé</strong><small className="muted">{importedAt ? 'Dernier import : ' + new Date(importedAt).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : token ? 'Lien créé' : 'Sleep Cycle, pas, sport et cycle dans My Thirties'}</small></span>
       <ChevronDown size={18} className={open ? 'flip' : ''} /></button>
     {open && <>
       <ol className="how-list">
@@ -51,12 +51,13 @@ export function HealthLink() {
       </div> : <button className="button primary wide" disabled={busy} onClick={() => void create()}>Créer mon lien</button>}
       <ol className="how-list" start={3}>
         <li>Dans l’app Raccourcis : Automatisation › Nouvelle automatisation › Heure de la journée (par exemple 10:00, tous les jours) › Exécuter immédiatement.</li>
-        <li>Ajoute « Rechercher des échantillons de santé » : type Analyse du sommeil, date de début dans les 2 derniers jours.</li>
-        <li>Ajoute « Répéter avec chaque élément », et dedans un « Texte » : Date de début | Date de fin | Valeur | Source. Pour les deux dates, touche la variable et choisis le format ISO 8601.</li>
-        <li>Après la boucle, ajoute « Combiner le texte » avec « Nouvelle ligne ».</li>
-        <li>Ajoute « Obtenir le contenu de l’URL » : colle ton lien, méthode POST, corps Fichier, puis choisis le texte combiné.</li>
+        <li>Sommeil : « Rechercher des échantillons de santé », type Analyse du sommeil, date de début dans les 2 derniers jours. Puis « Répéter avec chaque élément », et dedans un « Texte » : Date de début | Date de fin | Valeur | Source (les deux dates au format ISO 8601), suivi de « Ajouter à la variable » Lignes.</li>
+        <li>Pas (facultatif) : « Rechercher des échantillons de santé », type Pas, 2 derniers jours, regroupés par Jour. Dans la boucle, le Texte : PAS | Date de début | Valeur, ajouté à Lignes.</li>
+        <li>Sport (facultatif) : « Rechercher des entraînements » des 2 derniers jours. Dans la boucle, le Texte : SPORT | Date de début | Date de fin | Type | Source, ajouté à Lignes.</li>
+        <li>Cycle (facultatif) : « Rechercher des échantillons de santé », type Règles, 7 derniers jours. Dans la boucle, le Texte : REGLES | Date de début | Valeur, ajouté à Lignes.</li>
+        <li>À la fin : « Combiner le texte » Lignes avec « Nouvelle ligne », puis « Obtenir le contenu de l’URL » : colle ton lien, méthode POST, corps Fichier, et choisis le texte combiné.</li>
       </ol>
-      <p className="fineprint">Lance le raccourci une fois à la main pour vérifier : il répond « My Thirties : 1 nuit importée ». Ce lien permet d’envoyer des nuits dans ton compte : ne le partage pas.</p>
+      <p className="fineprint">Lance le raccourci une fois à la main pour vérifier : il répond par exemple « My Thirties : 1 nuit, pas de 2 jours importés ». Ce lien permet d’envoyer des nuits dans ton compte : ne le partage pas.</p>
     </>}
     {status && <p role="status" className="fineprint">{status}</p>}
   </section>;
