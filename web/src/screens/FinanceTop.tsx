@@ -5,6 +5,7 @@ import { EXPENSE_CATEGORIES } from '../modules';
 import { str, todayIso } from '../lib/day';
 import { amountOf, BUDGETS_KIND, categoryBudgets, currencyOf, fmt, limitsOf, mainCurrency, monthReport, num, XOF_PER_EUR } from '../lib/money';
 import { Bar, Segmented, SectionTitle } from '../ui/kit';
+import { MoneyLink } from '../features/MoneyLink';
 
 const CURRENCIES = ['XOF', 'EUR', 'USD'] as const;
 
@@ -75,6 +76,7 @@ export function FinanceTop({ entries, onAdd, onOpen, onUpdate, onCreate }: { ent
       <span className={'line-amount' + (list === 'income' ? ' plus' : '')}>{list === 'expense' ? '−' : '+'}{fmt(amountOf(e), currency)}</span></button>)
       : <p className="muted">Rien ce mois-ci.</p>}</div>
     <button className="big-btn" onClick={() => onAdd(list)}>+ Ajouter {list === 'expense' ? 'une dépense' : 'un revenu'}</button>
+    <MoneyLink />
   </div>;
 }
 

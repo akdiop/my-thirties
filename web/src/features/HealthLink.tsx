@@ -5,21 +5,18 @@ import { fmtMin } from '../lib/sleepAnalysis';
 import { STAGE_LABEL, type HealthNight, type Stage } from '../../supabase/functions/health-import/sleep';
 
 const newToken = () => Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, '0')).join('');
-const importUrl = (token: string) => (import.meta.env.VITE_SUPABASE_URL as string).replace(/\/+$/, '') + '/functions/v1/health-import?token=' + token;
+const functionUrl = (fn: string, token: string) => (import.meta.env.VITE_SUPABASE_URL as string).replace(/\/+$/, '') + '/functions/v1/' + fn + '?token=' + token;
 
-/** Relier l'app Santé : un raccourci iPhone envoie chaque matin la nuit (Sleep Cycle, montre), les pas, les séances et les règles. */
-export function HealthLink() {
+/** Lien privé des raccourcis iPhone (Santé, paiements mobiles) : un seul jeton, régénérable. */
+export function useShortcutLink(fn: string) {
   const [token, setToken] = useState<string | null>(null);
   const [importedAt, setImportedAt] = useState<string | null>(null);
   const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
-  const [open, setOpen] = useState(false);
-
   useEffect(() => {
     if (!cloud) return;
     void cloud.from('health_imports').select('token,imported_at').maybeSingle().then(({ data }) => { setToken(data?.token ?? null); setImportedAt(data?.imported_at ?? null); });
   }, []);
-
   const create = async () => {
     if (!cloud) return;
     setBusy(true); setStatus('');
@@ -28,13 +25,20 @@ export function HealthLink() {
       const { error } = await cloud.from('health_imports').upsert({ token: next }, { onConflict: 'user_id' });
       if (error) throw error;
       setToken(next);
-    } catch { setStatus('Impossible de créer le lien : la table de l’import Santé n’est pas encore installée sur Supabase.'); }
+    } catch { setStatus('Impossible de créer le lien : la table des raccourcis n’est pas encore installée sur Supabase.'); }
     finally { setBusy(false); }
   };
   const copy = async () => {
     if (!token) return;
-    try { await navigator.clipboard.writeText(importUrl(token)); setStatus('Lien copié.'); } catch { setStatus(importUrl(token)); }
+    try { await navigator.clipboard.writeText(functionUrl(fn, token)); setStatus('Lien copié.'); } catch { setStatus(functionUrl(fn, token)); }
   };
+  return { token, importedAt, status, busy, create, copy };
+}
+
+/** Relier l'app Santé : un raccourci iPhone envoie chaque matin la nuit (Sleep Cycle, montre), les pas, les séances et les règles. */
+export function HealthLink() {
+  const { token, importedAt, status, busy, create, copy } = useShortcutLink('health-import');
+  const [open, setOpen] = useState(false);
 
   return <section className="soft-card iphone-cal">
     <button className="fold-head" aria-expanded={open} onClick={() => setOpen(!open)}><HeartPulse size={18} />
@@ -47,7 +51,7 @@ export function HealthLink() {
       </ol>
       {token ? <div className="button-group">
         <button className="button primary" onClick={() => void copy()}><Copy size={15} /> Copier le lien</button>
-        <button className="button ghost" disabled={busy} onClick={() => { if (window.confirm('Créer un nouveau lien ? Le raccourci devra utiliser le nouveau.')) void create(); }}><RefreshCw size={15} /> Nouveau lien</button>
+        <button className="button ghost" disabled={busy} onClick={() => { if (window.confirm('Créer un nouveau lien ? Tes raccourcis (Santé, paiements) devront utiliser le nouveau.')) void create(); }}><RefreshCw size={15} /> Nouveau lien</button>
       </div> : <button className="button primary wide" disabled={busy} onClick={() => void create()}>Créer mon lien</button>}
       <ol className="how-list" start={3}>
         <li>Dans l’app Raccourcis : Automatisation › Nouvelle automatisation › Heure de la journée (par exemple 10:00, tous les jours) › Exécuter immédiatement.</li>
