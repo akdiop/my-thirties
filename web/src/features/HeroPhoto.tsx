@@ -12,10 +12,10 @@ export const PhotoProvider = ({ value, children }: { value: Photos; children: Re
 
 /** Ambiances par défaut aux couleurs de la palette, utilisées tant qu'aucune photo n'a été choisie. */
 const TONES: Record<string, string> = {
-  caramel: 'linear-gradient(135deg,#d6b89f 0%,#c8988a 45%,#8c6257 100%)',
-  sauge: 'linear-gradient(135deg,#dfe3d3 0%,#9fb5aa 50%,#6f8a80 100%)',
-  sable: 'linear-gradient(135deg,#f3ebe7 0%,#e8dcd6 40%,#d8b69f 100%)',
-  chocolat: 'linear-gradient(135deg,#c8988a 0%,#8c6257 55%,#4b342c 100%)',
+  caramel: 'linear-gradient(135deg,#c6bfb0 0%,#b5ae9d 45%,#7e7254 100%)',
+  sauge: 'linear-gradient(135deg,#dfe3d3 0%,#a9b8a2 50%,#5f7a59 100%)',
+  sable: 'linear-gradient(135deg,#ebe8e1 0%,#e4e0d8 40%,#c7c0b0 100%)',
+  chocolat: 'linear-gradient(135deg,#b5ae9d 0%,#7e7254 55%,#3a3833 100%)',
 };
 
 export function HeroPhoto({ slot, label, children, compact }: { slot: string; tone?: keyof typeof TONES; label: string; children?: ReactNode; compact?: boolean }) {

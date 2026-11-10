@@ -14,7 +14,7 @@ function Donut({ parts, total, currency }: { parts: { share: number; color: stri
   let acc = 0;
   return <div className="donut">
     <svg viewBox="0 0 150 150" width="150" height="150" aria-hidden="true">
-      <circle cx="75" cy="75" r={r} fill="none" stroke="#EFE3DE" strokeWidth="18" />
+      <circle cx="75" cy="75" r={r} fill="none" stroke="#E2DCD0" strokeWidth="18" />
       {parts.map((p, i) => { const len = p.share * c; const el = <circle key={i} cx="75" cy="75" r={r} fill="none" stroke={p.color} strokeWidth="18"
         strokeDasharray={`${Math.max(0, len - 2)} ${c}`} strokeDashoffset={-acc} transform="rotate(-90 75 75)" />; acc += len; return el; })}
     </svg>

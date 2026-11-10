@@ -14,7 +14,7 @@ Application **personnelle et privée** d'Aïda (34 ans, Dakar) pour suivre sa tr
 ## Règles permanentes
 1. Ne jamais modifier une fonctionnalité existante sans autorisation explicite.
 2. Ne jamais changer silencieusement le comportement de l'app : chaque changement est annoncé.
-3. Préserver le design validé : crème/beige dominants, chocolat et caramel, sauge et olive, touches d'or ; doux, féminin, minimaliste. Pas de bleu, pas d'emojis dans l'interface, pas de nouveau style visuel. Réutiliser `web/src/ui/kit.tsx`, `Glyph.tsx` et les classes de `web/src/styles.css`.
+3. Préserver le design validé (DA « Pierre et verre », novembre 2026) : fond pierre en dégradé, cartes en verre blanc translucide, olive doré #7E7254, sauge #5F7A59, texte #3A3833, police Calibri (Carlito sur iPhone), barre du bas flottante ; doux, féminin, minimaliste. Pas de bleu, pas d'emojis dans l'interface, pas de nouveau style visuel. Réutiliser `web/src/ui/kit.tsx`, `Glyph.tsx` et les classes de `web/src/styles.css`.
 4. Réutiliser les composants et utilitaires existants avant d'en créer (chercher d'abord dans `web/src/lib`, `web/src/ui`, `web/src/features`).
 5. Pas de dépendance inutile ; toute nouvelle dépendance doit être justifiée.
 6. TypeScript propre, strict et maintenable ; nommage cohérent avec l'existant.

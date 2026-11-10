@@ -111,7 +111,7 @@ function Memory({ onEnd }: { onEnd: End }) {
 }
 
 /* 4. Suis le rythme (séquence à mémoriser). */
-const PADS = [{ c: '#cfdcd4', I: Leaf }, { c: '#efd6cf', I: Heart }, { c: '#dcd5ea', I: Moon }, { c: '#f3e3c3', I: Sun }];
+const PADS = [{ c: '#d4dad1', I: Leaf }, { c: '#e5e2d9', I: Heart }, { c: '#dcd5ea', I: Moon }, { c: '#e5dfd1', I: Sun }];
 function Simon({ onEnd }: { onEnd: End }) {
   const [seq, setSeq] = useState<number[]>(() => [Math.floor(Math.random() * 4)]);
   const [lit, setLit] = useState<number | null>(null), [pos, setPos] = useState(0), [showing, setShowing] = useState(true), [over, setOver] = useState(false);

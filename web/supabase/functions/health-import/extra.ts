@@ -8,7 +8,7 @@ export type Workout = { id: string; date: string; time: string; minutes: number;
 export type Period = { start: string; end: string; flow: string };
 
 const DAY = /^\d{4}-\d{2}-\d{2}/;
-const plain = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const plain = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 const FLOWS: [RegExp, string][] = [[/leger|light/, 'Léger'], [/moyen|medium/, 'Moyen'], [/abondant|heavy/, 'Abondant']];
 const SPORTS: [RegExp, string][] = [[/tennis/, 'Tennis'], [/padel/, 'Padel'], [/pilates/, 'Pilates'], [/yoga/, 'Yoga'], [/marche|walk/, 'Marche'],
   [/course|run/, 'Course'], [/natation|swim/, 'Natation'], [/velo|cycl/, 'Vélo'], [/danse|danc/, 'Danse'], [/fonctionnel|functional|hiit|renfo|strength|musculation/, 'Workout']];
@@ -24,7 +24,7 @@ export function parseExtra(body: string) {
     const [tag = '', a = '', b = '', c = '', d = ''] = line.split('|').map((x) => x.trim());
     const t = plain(tag);
     if (t === 'pas' && DAY.test(a)) {
-      const n = Math.round(Number(b.replace(/[\s  ]/g, '').replace(',', '.')));
+      const n = Math.round(Number(b.replace(/[\s\u202f\u00a0]/g, '').replace(',', '.')));
       if (Number.isFinite(n) && n >= 0 && n < 200000) steps.set(a.slice(0, 10), (steps.get(a.slice(0, 10)) ?? 0) + n);
     } else if (t === 'sport' && DAY.test(a) && DAY.test(b)) {
       const minutes = Math.round((Date.parse(b) - Date.parse(a)) / 60000);

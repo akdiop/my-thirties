@@ -72,7 +72,7 @@ export function WorkoutTimer({ text, onFinish }: { text: string | null; onFinish
 
   if (seg && cur) return <section className={'timer-card running ' + cur.kind}>
     <p className="ritual-label"><Timer size={16} /> Étape {seg.slice(0, idx + 1).filter((s) => s.kind !== 'rest').length} sur {seg.filter((s) => s.kind !== 'rest').length}</p>
-    <div className="timer-ring" style={{ background: cur.kind === 'manual' ? undefined : `conic-gradient(var(--ring) ${pct * 360}deg, #efe3de 0)` }}>
+    <div className="timer-ring" style={{ background: cur.kind === 'manual' ? undefined : `conic-gradient(var(--ring) ${pct * 360}deg, #e2dcd0 0)` }}>
       <div><strong>{cur.kind === 'manual' ? '' : fmtSec(left)}</strong><span>{cur.kind === 'rest' ? cur.label : cur.kind === 'manual' ? 'À ton rythme' : 'Effort'}</span></div>
     </div>
     <p className="timer-label">{cur.label}</p>

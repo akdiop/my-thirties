@@ -2,12 +2,12 @@
 // Seuls le montant, le sens, le bénéficiaire et l'opérateur sont gardés : le texte du SMS n'est pas enregistré.
 export type Tx = { kind: 'expense' | 'income'; amount: number; label: string; provider: string };
 
-const plain = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-const AMOUNT = /(\d{1,3}(?:[ .  ]\d{3})+|\d+)(?:,\d{1,2})?\s*(?:f\s?cfa|fcfa|xof|cfa|f)(?![a-z])/i;
+const plain = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+const AMOUNT = /(\d{1,3}(?:[ .\u202f\u00a0]\d{3})+|\d+)(?:,\d{1,2})?\s*(?:f\s?cfa|fcfa|xof|cfa|f)(?![a-z])/i;
 const INCOME = /\b(recu|reception|depot|credite|credit de|vous a envoye|transfert recu)\b/;
 const EXPENSE = /\b(paiement|paye|payee|achat|envoye|envoi|transfert|retrait|debite|facture|rechargement|recharge)\b/;
 
-const toNumber = (s: string) => Number(s.replace(/[ .  ]/g, '').replace(',', '.'));
+const toNumber = (s: string) => Number(s.replace(/[ .\u202f\u00a0]/g, '').replace(',', '.'));
 
 export function parseMoneySms(text: string): Tx | null {
   const t = text.slice(0, 1000).replace(/\s+/g, ' ').trim();

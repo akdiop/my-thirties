@@ -13,8 +13,8 @@ import { yearStats, yearWindow } from '../lib/yearStats';
 import { fmtH, sleepHours } from './Sleep';
 
 const LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-const MOOD_COLOR: Record<string, string> = { 'Épuisée': '#C9A9A6', 'Fatiguée': '#E3CBB8', Neutre: '#E9E2D6', Bien: '#C6D6BF', Rayonnante: '#8FB08A',
-  Stressée: '#C9A9A6', Sereine: '#C6D6BF', Joyeuse: '#8FB08A' };
+const MOOD_COLOR: Record<string, string> = { 'Épuisée': '#BEBAB1', 'Fatiguée': '#D6D1C5', Neutre: '#E3E1DC', Bien: '#C8D3C2', Rayonnante: '#98AB8F',
+  Stressée: '#BEBAB1', Sereine: '#C8D3C2', Joyeuse: '#98AB8F' };
 const short = (iso: string) => new Date(iso + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 
 /** Humeur d'un jour : celle de « Mon jour », sinon celle notée dans Bien-être. */
@@ -118,7 +118,7 @@ function Week({ entries }: { entries: Entry[] }) {
       <button className="icon-btn" aria-label="Semaine suivante" disabled={days[6]! >= today} onClick={() => { setStart(addDays(start, 7)); setAi(''); }}><ChevronRight size={20} /></button>
     </div>
     <section className="ritual-card"><p className="ritual-label">Mes humeurs</p>
-      <div className="mood-week">{days.map((d, i) => <div key={d}><span className="mood-pill" style={{ background: MOOD_COLOR[s.moods[i]!] ?? '#F3ECE5' }}><MoodIcon mood={s.moods[i]} size={18} /></span><small>{LETTERS[i]}</small></div>)}</div></section>
+      <div className="mood-week">{days.map((d, i) => <div key={d}><span className="mood-pill" style={{ background: MOOD_COLOR[s.moods[i]!] ?? '#EFEDE9' }}><MoodIcon mood={s.moods[i]} size={18} /></span><small>{LETTERS[i]}</small></div>)}</div></section>
     <div className="stat-row">
       <div><strong>{s.dailies.length}/7</strong><small>jours notés</small></div>
       <div><strong>{s.doneTasks}/{s.tasks}</strong><small>tâches faites</small></div>
@@ -160,7 +160,7 @@ function MoodCalendar({ entries }: { entries: Entry[] }) {
     </div>
     <div className="cal-grid">{LETTERS.map((l, i) => <span key={'h' + i} className="cal-h">{l}</span>)}
       {Array.from({ length: lead }, (_, i) => <span key={'b' + i} />)}
-      {days.map((d, i) => <span key={d} className={'cal-day' + (d === isoOf(now) ? ' today' : '')} style={{ background: MOOD_COLOR[moods[i]!] ?? '#F7F2EC' }} title={moods[i] || ''}>
+      {days.map((d, i) => <span key={d} className={'cal-day' + (d === isoOf(now) ? ' today' : '')} style={{ background: MOOD_COLOR[moods[i]!] ?? '#F4F2EF' }} title={moods[i] || ''}>
         <small>{i + 1}</small><MoodIcon mood={moods[i]} size={16} /></span>)}</div>
     <div className="cal-legend">{totals.map((t) => <span key={t.value}><i style={{ background: MOOD_COLOR[t.value] }} />{t.value} · {t.n}</span>)}</div>
   </div>;

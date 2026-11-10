@@ -23,7 +23,7 @@ const ICON_SPOT: Partial<Record<string, [string, number, number, number]>> = {
 };
 const OUTFIT_ICON: Record<string, string> = { chapeau: 'chapeau', lunettes: 'lunettes', echarpe: 'echarpe' };
 const seasonOf = (d: Date) => { const m = d.getMonth() + 1; return m >= 9 && m <= 11 ? 'automne' : m === 12 || m <= 2 ? 'hiver' : m <= 5 ? 'printemps' : 'ete'; };
-const WALL: Record<string, string> = { automne: '#F6E7D8', hiver: '#EEF0F2', printemps: '#F7EEEA', ete: '#FBF1DF' };
+const WALL: Record<string, string> = { automne: '#EDE9E1', hiver: '#EEF0F2', printemps: '#F3F2EE', ete: '#F3EFE7' };
 
 export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }: { entries: Entry[]; profileEntry?: Entry; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onGo: (s: string) => void }) {
   const { entry, s, pr, today, events } = usePanda(entries);
@@ -99,23 +99,23 @@ export function PandaScreen({ entries, profileEntry, onCreate, onUpdate, onGo }:
 
     {tab === 'panda' && <>
       {pr.level.n >= 4 && <Segmented label="Pièce" value={room} onChange={(r) => void save({ room: r })} options={[{ value: 'maison', label: 'Maison' }, { value: 'jardin', label: 'Jardin' }]} />}
-      <div className={'panda-scene room-' + room} style={{ background: room === 'jardin' ? '#E7F0E4' : WALL[season] }}>
+      <div className={'panda-scene room-' + room} style={{ background: room === 'jardin' ? '#E9EFE6' : WALL[season] }}>
         <svg className="scene-bg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
           {bgUrl ? <image href={bgUrl} x="0" y="0" width="400" height="300" preserveAspectRatio="xMidYMid slice" />
             : room === 'maison' ? <>
-            <rect x="0" y="210" width="400" height="90" fill="#EAD9C7" />
-            <rect x="130" y="40" width="140" height="110" rx="12" fill="#E9EEF0" stroke="#6B4433" strokeWidth="3" /><path d="M200 40 V150 M130 95 H270" stroke="#6B4433" strokeWidth="3" />
+            <rect x="0" y="210" width="400" height="90" fill="#E0DBD2" />
+            <rect x="130" y="40" width="140" height="110" rx="12" fill="#E9EEF0" stroke="#5A5344" strokeWidth="3" /><path d="M200 40 V150 M130 95 H270" stroke="#5A5344" strokeWidth="3" />
           </> : <>
-            <rect x="0" y="0" width="400" height="300" fill="#DDEBDF" /><path d="M0 200 Q200 150 400 200 V300 H0Z" fill="#B9CFAE" />
+            <rect x="0" y="0" width="400" height="300" fill="#E2E9DF" /><path d="M0 200 Q200 150 400 200 V300 H0Z" fill="#BACBB2" />
           </>}
           {shown.filter((i) => i.room === room).map((i) => {
             if (assetUrl('item_' + i.id)) return <image key={i.id} href={assetUrl('item_' + i.id)} x="0" y="0" width="400" height="300" />;
             // Décor illustré : les objets possédés sont posés sous forme d'icônes ; sans décor, dessin de secours.
             if (bgUrl) { const spot = ICON_SPOT[i.id], icon = spot && assetUrl('icon_' + spot[0]); return icon ? <image key={i.id} href={icon} x={spot[1]} y={spot[2]} width={spot[3]} height={spot[3]} /> : null; }
             return i.room === 'maison' ? <ItemArt key={i.id} id={i.id} books={booksOnShelf(pr.counts)} /> : <g key={i.id} transform="translate(0 110)"><GardenArt id={i.id} /></g>; })}
-          {season === 'automne' && <g fill="#C98A55">{[40, 340, 90, 300].map((x, i) => <path key={x} className="leaf-fall" style={{ animationDelay: i * 1.2 + 's' }} d={`M${x} 20 q8 -8 14 0 q-6 10 -14 0Z`} />)}</g>}
+          {season === 'automne' && <g fill="#A69878">{[40, 340, 90, 300].map((x, i) => <path key={x} className="leaf-fall" style={{ animationDelay: i * 1.2 + 's' }} d={`M${x} 20 q8 -8 14 0 q-6 10 -14 0Z`} />)}</g>}
           {season === 'hiver' && <g fill="#fff">{[60, 330, 110, 280].map((x, i) => <circle key={x} className="leaf-fall" style={{ animationDelay: i * 1.1 + 's' }} cx={x} cy="20" r="4" />)}</g>}
-          {(myBirthday || pandaBirthday) && <g><rect x="320" y="226" width="44" height="26" rx="4" fill="#F7E3C3" stroke="#6B4433" strokeWidth="3" /><path d="M342 226 v-12" stroke="#6B4433" strokeWidth="3" /><circle cx="342" cy="210" r="4" fill="#FFB86B" /></g>}
+          {(myBirthday || pandaBirthday) && <g><rect x="320" y="226" width="44" height="26" rx="4" fill="#E7E1D3" stroke="#5A5344" strokeWidth="3" /><path d="M342 226 v-12" stroke="#5A5344" strokeWidth="3" /><circle cx="342" cy="210" r="4" fill="#D3C197" /></g>}
         </svg>
         <button className={'scene-panda' + (act ? ' acting' : '')} aria-label={'Caresser ' + s.name} onClick={() => react('happy', MESSAGES.pet, 'pet')}>
           <PandaCharacter mood={mood} outfit={s.outfit} level={pr.level.n} size={210} party={myBirthday} /></button>
