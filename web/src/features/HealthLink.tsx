@@ -69,7 +69,7 @@ export function HealthLink() {
 
 const ROW: Stage[] = ['eveil', 'paradoxal', 'leger', 'endormie', 'profond'];
 const Y: Partial<Record<Stage, number>> = { eveil: 8, paradoxal: 22, leger: 36, endormie: 36, profond: 56 };
-const COLOR: Partial<Record<Stage, string>> = { eveil: '#D9B48F', paradoxal: '#C9A08C', leger: '#9FB5AA', endormie: '#9FB5AA', profond: '#6F8A80' };
+const COLOR: Partial<Record<Stage, string>> = { eveil: '#C3BAA5', paradoxal: '#B5A27A', leger: '#A9B8A2', endormie: '#A9B8A2', profond: '#5F7A59' };
 
 /** Nuit venue de Santé : durées et, si Sleep Cycle ou la montre les fournissent, les phases. */
 export function HealthReport({ n }: { n: HealthNight }) {
@@ -78,7 +78,7 @@ export function HealthReport({ n }: { n: HealthNight }) {
   return <div className="sleep-report">
     <div className="sleep-quality"><strong>{fmtMin(n.asleep)}</strong><span>de sommeil{n.sources.length ? ' · ' + n.sources.join(', ') : ''}</span></div>
     {n.segments.length > 0 && <svg className="hypno" viewBox={`0 0 ${W} 72`} role="img" aria-label="Phases de sommeil">
-      {n.segments.map(([s, d, st], i) => <rect key={i} x={x(s)} y={Y[st] ?? 36} width={Math.max(0.8, x(d))} height={68 - (Y[st] ?? 36)} rx={1} fill={COLOR[st] ?? '#9FB5AA'} />)}
+      {n.segments.map(([s, d, st], i) => <rect key={i} x={x(s)} y={Y[st] ?? 36} width={Math.max(0.8, x(d))} height={68 - (Y[st] ?? 36)} rx={1} fill={COLOR[st] ?? '#A9B8A2'} />)}
     </svg>}
     {stages.length > 0 && <div className="sleep-legend">{stages.map((s) => <span key={s}><i style={{ background: COLOR[s] }} />{STAGE_LABEL[s]} · {fmtMin(n.stages[s]!)}</span>)}</div>}
     <dl className="sleep-stats">

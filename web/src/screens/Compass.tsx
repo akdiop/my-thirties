@@ -276,11 +276,11 @@ function Radar({ now, before }: { now: Partial<Record<LifeDomain, number>>; befo
   const poly = (s: Partial<Record<LifeDomain, number>>) => LIFE_DOMAINS.map((d, i) => pt(i, s[d] ?? 0).join(',')).join(' ');
   const hasBefore = Object.keys(before).length > 0;
   return <svg className="radar" viewBox="-35 -5 370 310" role="img" aria-label="Roue de la vie">
-    {[2, 4, 6, 8, 10].map((v) => <polygon key={v} points={LIFE_DOMAINS.map((_, i) => pt(i, v).join(',')).join(' ')} fill="none" stroke="#E6D9CA" strokeWidth={1} />)}
+    {[2, 4, 6, 8, 10].map((v) => <polygon key={v} points={LIFE_DOMAINS.map((_, i) => pt(i, v).join(',')).join(' ')} fill="none" stroke="#DEDAD2" strokeWidth={1} />)}
     {LIFE_DOMAINS.map((d, i) => { const [x, y] = pt(i, 10); const [lx, ly] = pt(i, 12.6);
-      return <g key={d}><line x1={c} y1={c} x2={x} y2={y} stroke="#EFE3DE" /><text x={lx} y={ly} textAnchor="middle" dominantBaseline="middle" fontSize="10" fill="#806A5F">{d}</text></g>; })}
-    {hasBefore && <polygon points={poly(before)} fill="rgba(143,159,122,.18)" stroke="#9FB5AA" strokeDasharray="4 3" strokeWidth={1.5} />}
-    <polygon points={poly(now)} fill="rgba(181,96,63,.25)" stroke="#C38380" strokeWidth={2} />
+      return <g key={d}><line x1={c} y1={c} x2={x} y2={y} stroke="#E2DCD0" /><text x={lx} y={ly} textAnchor="middle" dominantBaseline="middle" fontSize="10" fill="#6F6B63">{d}</text></g>; })}
+    {hasBefore && <polygon points={poly(before)} fill="rgba(143,159,122,.18)" stroke="#A9B8A2" strokeDasharray="4 3" strokeWidth={1.5} />}
+    <polygon points={poly(now)} fill="rgba(181,96,63,.25)" stroke="#B08A6E" strokeWidth={2} />
   </svg>;
 }
 

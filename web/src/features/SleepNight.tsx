@@ -110,7 +110,7 @@ export function SleepNight({ wake, window: win, onDone, onCancel }: { wake: stri
 }
 
 const Y: Record<Phase, number> = { eveil: 8, leger: 34, profond: 60 };
-const COLOR: Record<Phase, string> = { eveil: '#D9B48F', leger: '#9FB5AA', profond: '#6F8A80' };
+const COLOR: Record<Phase, string> = { eveil: '#C3BAA5', leger: '#A9B8A2', profond: '#5F7A59' };
 
 /** Rapport du matin : courbe des phases, qualité, durées et réveils. */
 export function SleepReport({ a }: { a: NightAnalysis }) {
@@ -123,8 +123,8 @@ export function SleepReport({ a }: { a: NightAnalysis }) {
     <div className="sleep-quality"><strong>{a.quality} %</strong><span>Qualité de la nuit</span></div>
     <svg className="hypno" viewBox={`0 0 ${W} 80`} role="img" aria-label="Phases de sommeil estimées">
       {ph.map((p, i) => <rect key={i} x={x(i)} y={Y[p]} width={x(i + 1) - x(i) + 0.3} height={72 - Y[p]} fill={COLOR[p]} opacity={0.35} />)}
-      <path d={path} fill="none" stroke="#4b342c" strokeWidth={1.2} />
-      {hours.map((d) => { const i = (d.getTime() - start.getTime()) / 60000; if (i < 8 || i > n - 8) return null; return <text key={d.getTime()} x={x(i)} y={79} fontSize={7} fill="#8a7268" textAnchor="middle">{d.getHours()}h</text>; })}
+      <path d={path} fill="none" stroke="#3a3833" strokeWidth={1.2} />
+      {hours.map((d) => { const i = (d.getTime() - start.getTime()) / 60000; if (i < 8 || i > n - 8) return null; return <text key={d.getTime()} x={x(i)} y={79} fontSize={7} fill="#807c72" textAnchor="middle">{d.getHours()}h</text>; })}
     </svg>
     <div className="sleep-legend">{(['eveil', 'leger', 'profond'] as Phase[]).map((p) => <span key={p}><i style={{ background: COLOR[p] }} />{PHASE_LABEL[p]} · {fmtMin(a.phases[p])}</span>)}</div>
     <dl className="sleep-stats">

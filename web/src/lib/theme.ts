@@ -14,7 +14,7 @@ export function applyTheme() {
   const mode = readTheme();
   const dark = mode === 'nuit' || (mode === 'auto' && isNight());
   document.documentElement.classList.toggle('dark', dark);
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0A0C0E' : '#FAF7F3');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0A0C0E' : '#EFECE6');
 }
 
 /** À appeler une fois : applique le thème maintenant, chaque minute et quand le réglage change. */

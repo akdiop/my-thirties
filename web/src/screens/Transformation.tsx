@@ -48,7 +48,7 @@ export function Transformation({ entries, onCreate, onUpdate, onGo }: {
     <header className="tab-head"><h1>Ma meilleure version</h1>
       <p>{!p.started ? 'Départ le ' + fmtDate(d.start) : p.done ? 'Programme terminé, bravo !' : 'Jour ' + p.day + ' sur ' + p.total + ' · mois ' + p.month + ' · semaine ' + p.week}</p></header>
     <section className="transfo-hero">
-      <div className="transfo-ring" style={{ background: `conic-gradient(#7E7254 ${Math.round(all.share * 360)}deg, #E7E1D6 0)` }}><div><strong>{Math.round(all.share * 100)} %</strong><span>accompli</span></div></div>
+      <div className="transfo-ring" style={{ background: `conic-gradient(#7E7254 ${Math.round(all.share * 360)}deg, #E2E0DB 0)` }}><div><strong>{Math.round(all.share * 100)} %</strong><span>accompli</span></div></div>
       <div className="transfo-hero-text">
         <strong>{all.done} sur {all.total} engagements</strong>
         <span>Du {fmtDate(d.start)} au {fmtDate(end)}</span>
@@ -67,7 +67,7 @@ export function Transformation({ entries, onCreate, onUpdate, onGo }: {
       <div className="soft-card">
         <p className="ritual-label">Planning hebdomadaire</p>
         <p className="muted small">Touche une case pour la modifier.</p>
-        <div className="week-plan">{DAYS.map((day, i) => <div key={day} className="week-day"><strong>{day}</strong>
+        <div className="week-plan">{DAYS.map((day, i) => <div key={day} className="plan-day"><strong>{day}</strong>
           {SLOTS.map((slot, j) => { const v = d.week?.[i]?.[j] ?? DEFAULT_WEEK[i]![j]!;
             return <button key={slot} className="week-cell" aria-label={day + ' ' + slot + ' : ' + v} onClick={() => {
               const next = window.prompt(day + ' · ' + slot, v); if (next === null) return;

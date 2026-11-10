@@ -2,13 +2,13 @@
  * Visuels « formes organiques » : des formes douces superposées aux couleurs de l'app, avec un grain papier.
  * Générés à partir d'un identifiant (toujours le même dessin pour le même sujet), sans aucune photo.
  */
-const FONDS = ['#F1E6D8', '#EFE3D3', '#F4E9DF', '#EDE1D2'];
+const FONDS = ['#EAE6DF', '#E7E3DB', '#EEEBE5', '#E5E2DA'];
 const PALETTES = [
-  ['#C9744E', '#D9B48F', '#8A5A3C'],
-  ['#C38380', '#E2C3A3', '#6A4D44'],
-  ['#C48A5A', '#E8CDB5', '#9A5A3E'],
-  ['#D08A68', '#CDB197', '#6E4430'],
-  ['#B97A55', '#E6C9A8', '#A0583A'],
+  ['#A49573', '#C3BAA5', '#736953'],
+  ['#B08A6E', '#CFC8B6', '#5F5A4F'],
+  ['#A4977A', '#D9D3C4', '#7E735A'],
+  ['#B1A487', '#BDB6A7', '#5B5443'],
+  ['#9B8F73', '#D3CCBB', '#817559'],
 ];
 // Formes de base (dans un repère 0..100), déformées ensuite.
 const FORMES = [

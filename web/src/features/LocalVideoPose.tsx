@@ -55,7 +55,7 @@ export function LocalVideoPose() {
               try {
                 const result = model.current.detectForVideo(v, time);
                 for (const points of result.landmarks) {
-                  ctx.strokeStyle = '#91e0c4'; ctx.lineWidth = Math.max(3, c.width / 250);
+                  ctx.strokeStyle = '#afd69b'; ctx.lineWidth = Math.max(3, c.width / 250);
                   for (const [a,b] of pairs) {
                     if (!points[a] || !points[b] || (points[a].visibility ?? 1) < .45 || (points[b].visibility ?? 1) < .45) continue;
                     ctx.beginPath(); ctx.moveTo(points[a].x * c.width, points[a].y * c.height);
