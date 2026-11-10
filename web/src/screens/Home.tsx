@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { Lightbulb, Sparkles, Waves } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { Lightbulb, Shield, Sparkles, Waves } from 'lucide-react';
 import type { Entry, ModuleId } from '../lib/cloud';
 import { isDoneOn, longDate, priorities, str, timeline, todayIso, toggledData } from '../lib/day';
 import { fmt, mainCurrency, monthReport } from '../lib/money';
@@ -7,6 +7,7 @@ import { dayNumber } from '../lib/challenges';
 import { readProfile } from '../lib/profile';
 import { ProfileAvatar } from '../features/PersonalProfile';
 import { Bar, Check22, SectionTitle } from '../ui/kit';
+import { ProtectionSheet } from '../features/ProtectionSheet';
 
 type Go = (screen: ModuleId | 'calme' | 'assistant' | 'settings' | 'agenda' | 'spaces') => void;
 
@@ -15,6 +16,7 @@ export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd,
   onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>; onAdd: () => void; onQuickAdd: (title: string) => Promise<void>;
 }) {
   const day = todayIso();
+  const [protection, setProtection] = useState(false);
   const profile = readProfile(profileEntry);
   // Briefing : seulement les rendez-vous de l'agenda (pas les prières, tâches, repas planifiés ni séances).
   const today = timeline(entries, new Date()).filter((t) => t.entry.module === 'quotidien' && t.entry.kind === 'event').slice(0, 4);
@@ -34,8 +36,10 @@ export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd,
     <header className="home-head">
       <button className="avatar-btn" onClick={() => onGo('settings')} aria-label="Mon profil"><ProfileAvatar profile={profile} size={48} /></button>
       <div className="home-hello"><h1>Bonjour{profile.firstName ? ', ' + profile.firstName : ''}</h1><p>{longDate()}</p></div>
+      <button className="round-btn" onClick={() => setProtection(true)} aria-label="Invocations de protection"><Shield size={20} /></button>
       <button className="round-btn" onClick={() => onGo('assistant')} aria-label="Assistant"><Sparkles size={20} /></button>
     </header>
+    {protection && <ProtectionSheet onClose={() => setProtection(false)} />}
 
     {rituals}
 

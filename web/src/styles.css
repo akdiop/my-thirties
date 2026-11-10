@@ -1840,3 +1840,4 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area
 .hypno{width:100%;height:auto;background:#fffcfa;border:1px solid #efe3de;border-radius:14px}
 .sleep-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.8rem;color:#6b5249}.sleep-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .sleep-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:0}.sleep-stats div{background:#faf3ee;border-radius:12px;padding:8px 10px}.sleep-stats dt{font-size:.75rem;color:#8a7268}.sleep-stats dd{margin:2px 0 0;font-weight:600;color:#4b342c}
+.protection-sheet h2{margin:0 0 12px;font-size:1.3rem;color:#8C6257}
