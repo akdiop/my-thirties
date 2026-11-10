@@ -1859,3 +1859,10 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area
 .ramadan-day{height:38px;border-radius:12px;border:1px solid #EFE3DE;background:#FFFCFA;color:#6b4a40;font:inherit;font-weight:600}
 .ramadan-day.on{background:#6F8A80;border-color:#6F8A80;color:#FAF7F3}.ramadan-day.off{background:#F3E2D6;border-color:#D9B48F;color:#8C6257}
 .ramadan-makeup{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ramadan-makeup strong{font-size:1.8rem;color:#8C6257}.ramadan-makeup span{flex:1;min-width:120px}
+.budget-list{display:flex;flex-direction:column;gap:12px}
+.budget-row{display:flex;flex-direction:column;gap:6px}
+.budget-head{display:flex;justify-content:space-between;gap:8px;align-items:baseline}.budget-head small{color:#8a7268}
+.budget-note{color:#9b5a45}
+.budget-edit{display:flex;flex-direction:column;gap:8px}
+.budget-line{display:grid;grid-template-columns:1fr 140px;align-items:center;gap:10px}.budget-line input{text-align:right}
+.moment-chip.warn{background:#F3E2D6;border-color:#E8CDB8;color:#8C6257}

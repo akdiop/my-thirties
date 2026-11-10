@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { Droplet, Minus, Moon, Pill, Shield, Sunrise, Sunset, Timer } from 'lucide-react';
+import { Droplet, Minus, Moon, Pill, Shield, Sunrise, Sunset, Timer, Wallet } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { DAILY_KIND, isoOf } from '../lib/rituals';
 import { momentOf, WATER_GOAL, waterOf } from '../lib/moment';
 import { ProtectionSheet } from './ProtectionSheet';
 import { ramadanTimes } from './Ramadan';
 import { ramadanStatus } from '../lib/ramadan';
+import { categoryBudgets, mainCurrency } from '../lib/money';
 
-type Go = (t: 'sommeil' | 'complements' | 'focus') => void;
+type Go = (t: 'sommeil' | 'complements' | 'focus' | 'finances') => void;
 const dayOf = (start: string, today: string) => Math.floor((new Date(today + 'T12:00:00').getTime() - new Date(start + 'T12:00:00').getTime()) / 86400000) + 1;
 
 /** « En ce moment » : les gestes utiles selon l'heure (protection, compléments, eau, nuit), à portée de pouce. */
@@ -22,6 +23,7 @@ export function MomentBar({ entries, onGo, onCreate, onUpdate, now = new Date() 
   const suppsDone = supps.filter((e) => (e.data.done as Record<string, boolean> | undefined)?.[today]).length;
 
   const ramadan = ramadanStatus(today)?.active ? ramadanTimes(entries, now) : null;
+  const budget = categoryBudgets(entries, today.slice(0, 7), mainCurrency(entries)).find((b) => b.share >= 0.8);
   const hm = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
   const setWater = (n: number) => day ? onUpdate(day, { ...day.data, water: n })
     : onCreate({ module: 'equilibre', kind: DAILY_KIND, title: 'Mon jour · ' + today, entry_date: today, data: { date: today, water: n } });
@@ -37,6 +39,7 @@ export function MomentBar({ entries, onGo, onCreate, onUpdate, now = new Date() 
     </span>}
     {moment === 'journee' && <button className="moment-chip" onClick={() => onGo('focus')}><Timer size={16} /> Focus</button>}
     {(moment === 'soir' || moment === 'nuit') && <button className="moment-chip" onClick={() => onGo('sommeil')}><Moon size={16} /> Ma nuit</button>}
+    {budget && moment !== 'nuit' && <button className="moment-chip warn" onClick={() => onGo('finances')}><Wallet size={16} /> {budget.name} · {budget.share >= 1 ? 'budget dépassé' : Math.round(budget.share * 100) + ' % du budget'}</button>}
     {protection && <ProtectionSheet onClose={() => setProtection(false)} />}
   </section>;
 }

@@ -24,6 +24,7 @@ import { ScreenHeader, SectionTitle, Segmented } from './ui/kit';
 import { GuidedField } from './ui/fields';
 import { HIDDEN_KIND, HiddenProvider, readHidden, useHidden, type Hidden } from './lib/hidden';
 import { HABIT_KIND, RITUAL_KINDS } from './lib/rituals';
+import { BUDGETS_KIND } from './lib/money';
 import { TodayCard } from './features/TodayCard';
 import { ListCard } from './features/ListCard';
 import { togglePrayer } from './lib/wellbeing';
@@ -650,7 +651,7 @@ export default function App() {
   const currentModule = modules.find((m) => m.id === screen);
   const allModuleEntries = currentModule ? entries.filter((e) => e.module === currentModule.id) : [];
   // En spiritualité, la liste ne garde que le journal (prières cochées, horaires et dhikr ont leurs propres écrans).
-  const listedEntries = allModuleEntries.filter((e) => !(e.module === 'spiritualite' && (e.kind === 'dhikr' || e.kind === 'ramadan' || e.kind.startsWith('prayer'))));
+  const listedEntries = allModuleEntries.filter((e) => !(e.module === 'spiritualite' && (e.kind === 'dhikr' || e.kind === 'ramadan' || e.kind.startsWith('prayer'))) && e.kind !== BUDGETS_KIND);
   const moduleEntries = listedEntries.filter((e) => !search || e.title.toLowerCase().includes(search.toLowerCase()));
   const go = (next: Screen) => { setScreen(next); setSearch(''); window.scrollTo({ top: 0 }); };
   const openEntry = (e: Entry) => setEditor({ module: moduleById(e.module), initial: e });
@@ -718,7 +719,7 @@ export default function App() {
         {currentModule.id === 'sante' && <HealthTop entries={allModuleEntries} onAdd={(kind) => addIn('sante', kind, { date: today() })} />}
         {currentModule.id === 'sport' && <SportHub entries={allModuleEntries} challengeEntries={entries.filter((e) => e.module === 'challenges')} onCreate={createFromTool} onGoChallenges={() => go('challenges')} />}
         {currentModule.id === 'challenges' && <ChallengesBoard entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onQuit={removeQuiet} />}
-        {currentModule.id === 'finances' && <FinanceTop entries={allModuleEntries} onAdd={(kind) => addIn('finances', kind, { date: today() })} onOpen={openEntry} onUpdate={updateData} />}
+        {currentModule.id === 'finances' && <FinanceTop entries={allModuleEntries} onAdd={(kind) => addIn('finances', kind, { date: today() })} onOpen={openEntry} onUpdate={updateData} onCreate={createFromTool} />}
         {currentModule.id === 'cuisine' && <><CuisineTop tab={cuisineTab} onTab={setCuisineTab} entries={allModuleEntries} />
           {cuisineTab === 'recettes' && <RecipeIdeas entries={allModuleEntries} onCreate={createFromTool} />}
           {cuisineTab === 'semaine' && <><KitchenPlanner entries={allModuleEntries} onCreate={createFromTool} onRemove={removeQuiet} /><KitchenTools entries={allModuleEntries} onGenerate={createGroceries} /></>}

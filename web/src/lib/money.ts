@@ -32,3 +32,21 @@ export function mainCurrency(entries: Entry[]) {
   for (const e of entries) if (e.module === 'finances') counts.set(currencyOf(e), (counts.get(currencyOf(e)) ?? 0) + 1);
   return [...counts].sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'XOF';
 }
+
+/** Plafonds par catégorie de dépense, par devise (une entrée de réglages). */
+export const BUDGETS_KIND = 'budgets_categories';
+export type CategoryLimits = Record<string, Record<string, number>>;
+export const limitsOf = (entries: Entry[]): CategoryLimits => {
+  const v = entries.find((e) => e.kind === BUDGETS_KIND)?.data.limits;
+  return v && typeof v === 'object' ? v as CategoryLimits : {};
+};
+
+/** Dépenses du mois face au plafond de chaque catégorie, les plus avancées d'abord. */
+export function categoryBudgets(entries: Entry[], month: string, currency: string) {
+  const limits = limitsOf(entries)[currency] ?? {};
+  const r = monthReport(entries, month, currency);
+  return Object.entries(limits).filter(([, v]) => Number(v) > 0).map(([name, v]) => {
+    const limit = Number(v), spent = r.categories.find((c) => c.name === name)?.total ?? 0;
+    return { name, limit, spent, share: spent / limit };
+  }).sort((a, b) => b.share - a.share);
+}
