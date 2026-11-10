@@ -63,7 +63,7 @@ export function Notes({ entries, onCreate, onEdit, onRemove, onOpenDay }: {
   // Glisser une note vers la gauche : l'épingler en haut ou la supprimer.
   const actions = (e: Entry): SwipeAction[] => [
     { label: e.data.pinned ? 'Détacher' : 'Épingler', icon: e.data.pinned ? <PinOff size={18} /> : <Pin size={18} />, tone: 'accent', onClick: () => void onEdit(e.id, { title: e.title, data: { ...e.data, pinned: !e.data.pinned } }) },
-    { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => { if (confirm('Supprimer « ' + e.title + ' » ?')) void onRemove(e); } },
+    { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => void onRemove(e) },
   ];
   const pinned = notes.filter((n) => n.data.pinned);
   const current = NOTE_FOLDERS.find((f) => f.id === folder);

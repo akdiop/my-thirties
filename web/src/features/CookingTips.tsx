@@ -59,7 +59,7 @@ export function CookingTips({ entries, onAdd, onRemove }: { entries: Entry[]; on
           {typeof e.data.notes === 'string' && e.data.notes && <p>{e.data.notes}</p>}</div>
         <div className="button-group">
           {url && !id && <a className="button ghost" href={url} target="_blank" rel="noopener noreferrer"><ExternalLink size={15} /> Ouvrir</a>}
-          <button className="button ghost" onClick={() => { if (confirm('Supprimer « ' + e.title + ' » ?')) void onRemove(e); }}><Trash2 size={15} /> Supprimer</button>
+          <button className="button ghost" onClick={() => void onRemove(e)}><Trash2 size={15} /> Supprimer</button>
         </div>
       </article>;
     })}</div>

@@ -493,16 +493,20 @@ export default function App() {
 
   const [offline, setOffline] = useState<string | null>(null);
   const [synced, setSynced] = useState(false);
+  // Suppressions en attente d'« Annuler » : masquées tout de suite, effacées pour de bon 5 secondes plus tard.
+  const undoRef = useRef<{ entry: Entry; timer: number } | null>(null);
+  const [undoEntry, setUndoEntry] = useState<Entry | null>(null);
+  const visible = (list: Entry[]) => list.filter((e) => e.id !== undoRef.current?.entry.id);
   const refresh = useCallback(async () => {
     setLoading(true); setError('');
     try {
       // Retour du réseau : on envoie d'abord ce qui a été écrit hors connexion.
       if (pendingCount()) await flushOutbox({ create: sendCreate, edit: sendEdit, remove: sendRemove });
-      const all = await readEntries(); saveOffline(all); setEntries(applyOutbox(all)); setOffline(null); setSynced(true);
+      const all = await readEntries(); saveOffline(all); setEntries(visible(applyOutbox(all))); setOffline(null); setSynced(true);
     }
     catch (e) {
       const copy = isNetworkError(e) ? loadOffline() : null;
-      if (copy) { setEntries(applyOutbox(copy.entries)); setOffline(copy.at); }
+      if (copy) { setEntries(visible(applyOutbox(copy.entries))); setOffline(copy.at); }
       else setError(e instanceof Error ? e.message : 'Impossible de charger les données.');
     }
     finally { setLoading(false); }
@@ -602,10 +606,28 @@ export default function App() {
     catch (e) { setError(e instanceof Error ? e.message : 'Mise à jour impossible.'); }
   };
   const remove = async (entry: Entry): Promise<boolean> => {
-    if (!window.confirm('Supprimer définitivement « ' + entry.title + ' » ?')) return false;
+    if (undoRef.current) { window.clearTimeout(undoRef.current.timer); void erase(undoRef.current.entry); }
+    setEntries((list) => list.filter((e) => e.id !== entry.id));
+    const timer = window.setTimeout(() => { undoRef.current = null; setUndoEntry(null); void erase(entry); }, 5000);
+    undoRef.current = { entry, timer }; setUndoEntry(entry);
+    return true;
+  };
+  const drop = async (entry: Entry) => { await remove(entry); };
+  const undoRemove = () => {
+    if (!undoRef.current) return;
+    window.clearTimeout(undoRef.current.timer); undoRef.current = null; setUndoEntry(null); void refresh();
+  };
+  const erase = async (entry: Entry): Promise<boolean> => {
     try { await removeEntry(entry.id); await deleteEntryMedia(session!.user.id, entry.id).catch(() => setError('Entrée supprimée, mais ses médias locaux n’ont pas pu être nettoyés.')); if (isMeal(entry)) await syncGroceries([entry.entry_date]); await refresh(); return true; }
     catch (e) { setError(e instanceof Error ? e.message : 'Suppression impossible.'); return false; }
   };
+  // Si l'app passe en arrière-plan pendant le délai, la suppression est faite tout de suite.
+  const eraseRef = useRef(erase); eraseRef.current = erase;
+  useEffect(() => {
+    const flush = () => { if (document.visibilityState === 'hidden' && undoRef.current) { window.clearTimeout(undoRef.current.timer); void eraseRef.current(undoRef.current.entry); undoRef.current = null; setUndoEntry(null); } };
+    document.addEventListener('visibilitychange', flush);
+    return () => document.removeEventListener('visibilitychange', flush);
+  }, []);
   const createGroceries = async (title: string, items: string[]) => {
     try {
       await createEntry({ module: 'listes', kind: 'list', title, entry_date: null, data: {
@@ -665,21 +687,22 @@ export default function App() {
     <main className="phone">
       {offline && <div className="offline-banner" role="status">Hors connexion · tu consultes la copie du {new Date(offline).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}. Tes ajouts sont gardés et partiront au retour du réseau ; le journal intime attend la connexion.</div>}
       {!offline && pending > 0 && <div className="offline-banner" role="status">{pending} changement{pending > 1 ? 's' : ''} en attente d’envoi…</div>}
+      {undoEntry && <div className="undo-toast" role="status"><span>« {undoEntry.title.slice(0, 40)} » supprimé</span><button onClick={undoRemove}>Annuler</button></div>}
       {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
       {loading && <div className="sync-status" role="status">Synchronisation…</div>}
       {screen === 'home' && <HomeScreen todayCard={<TodayCard entries={entries} habits={ritualEntries.filter((e) => e.kind === HABIT_KIND)} onUpdate={updateData} onTogglePrayer={(name, on) => void togglePrayer(entries, name, on, createFromTool, removeQuiet)} onOpenHabits={() => go('habits')} onOpenAgenda={() => go('agenda')} />} rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} onUpdate={updateData} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} onQuickAdd={(title) => createFromTool({ module: 'quotidien', kind: 'task', title, entry_date: today(), data: { date: today(), priority: 'Haute' } })} />}
       {screen === 'myday' && <LockGate><MyDay key={dayTarget.n} entries={ritualEntries} initialDate={dayTarget.date} initialPart={dayTarget.part} onCreate={createFromTool} onUpdate={updateData} /></LockGate>}
-      {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} onEdit={editFull} />}
-      {screen === 'notes' && <LockGate><Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={removeQuiet} onOpenDay={openDay} /></LockGate>}
+      {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEdit={editFull} />}
+      {screen === 'notes' && <LockGate><Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={drop} onOpenDay={openDay} /></LockGate>}
       {screen === 'bilan' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><Review entries={ritualEntries} /></LockGate>}
-      {screen === 'boussole' && <><ScreenHeader title="" onBack={() => go('home')} /><Compass entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} onEditProfile={() => go('settings')} /></>}
+      {screen === 'boussole' && <><ScreenHeader title="" onBack={() => go('home')} /><Compass entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEditProfile={() => go('settings')} /></>}
       {screen === 'focus' && <><ScreenHeader title="" onBack={() => go('home')} /><Focus entries={ritualEntries} onCreate={createFromTool} /></>}
       {screen === 'sommeil' && <><ScreenHeader title="" onBack={() => go('home')} /><Sleep entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={remove} /></>}
-      {screen === 'complements' && <><ScreenHeader title="" onBack={() => go('home')} /><Supplements entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} onEdit={editFull} /></>}
-      {screen === 'proches' && <><ScreenHeader title="" onBack={() => go('home')} /><Relatives entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onEdit={editFull} onRemove={removeQuiet} /></>}
-      {screen === 'lectures' && <><ScreenHeader title="" onBack={() => go('home')} /><Reading entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} /></>}
+      {screen === 'complements' && <><ScreenHeader title="" onBack={() => go('home')} /><Supplements entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEdit={editFull} /></>}
+      {screen === 'proches' && <><ScreenHeader title="" onBack={() => go('home')} /><Relatives entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onEdit={editFull} onRemove={drop} /></>}
+      {screen === 'lectures' && <><ScreenHeader title="" onBack={() => go('home')} /><Reading entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} /></>}
       {screen === 'panda' && <><ScreenHeader title="" onBack={() => go('home')} /><PandaScreen entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onGo={(x) => go(x as Screen)} /></>}
-      {screen === 'envies' && <><ScreenHeader title="" onBack={() => go('home')} /><Wishes entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} onEdit={editFull} /></>}
+      {screen === 'envies' && <><ScreenHeader title="" onBack={() => go('home')} /><Wishes entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEdit={editFull} /></>}
       {screen === 'mediter' && <><ScreenHeader title="" onBack={() => go('home')} /><Meditate entries={ritualEntries} onCreate={createFromTool} /></>}
       {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onCreate={createFromTool} onRemove={remove} onImported={() => void refresh()} />}
       {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
@@ -700,7 +723,7 @@ export default function App() {
           {cuisineTab === 'recettes' && <RecipeIdeas entries={allModuleEntries} onCreate={createFromTool} />}
           {cuisineTab === 'semaine' && <><KitchenPlanner entries={allModuleEntries} onCreate={createFromTool} onRemove={removeQuiet} /><KitchenTools entries={allModuleEntries} onGenerate={createGroceries} /></>}
           {cuisineTab === 'midis' && <WeekLunches entries={entries} onCreate={createFromTool} />}
-          {cuisineTab === 'astuces' && <CookingTips entries={allModuleEntries} onAdd={() => addIn('cuisine', 'video', { theme: 'Cuissons' })} onRemove={removeQuiet} />}
+          {cuisineTab === 'astuces' && <CookingTips entries={allModuleEntries} onAdd={() => addIn('cuisine', 'video', { theme: 'Cuissons' })} onRemove={drop} />}
           {cuisineTab === 'courses' && <div className="entries">{entries.filter((e) => e.module === 'listes' && String(e.data.category) === 'Courses').map((e) =>
             <EntryCard key={e.id} entry={e} module={moduleById('listes')} onEdit={openEntry} onDelete={(x) => void remove(x)} onUpdate={updateData} />)}
             {!entries.some((e) => e.module === 'listes' && String(e.data.category) === 'Courses') && <p className="muted">Planifie ta semaine puis génère tes courses.</p>}</div>}
