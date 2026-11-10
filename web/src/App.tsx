@@ -56,6 +56,7 @@ const TravelTools = lazy(() => import('./features/TravelTools').then((m) => ({ d
 const EquilibriumInsights = lazy(() => import('./features/EquilibriumInsights').then((m) => ({ default: m.EquilibriumInsights })));
 const KitchenPlanner = lazy(() => import('./features/KitchenPlanner').then((m) => ({ default: m.KitchenPlanner })));
 const PassionPath = lazy(() => import('./features/PassionPath').then((m) => ({ default: m.PassionPath })));
+const PassionIdeas = lazy(() => import('./features/PassionIdeas').then((m) => ({ default: m.PassionIdeas })));
 const TravelPlanner = lazy(() => import('./features/TravelPlanner').then((m) => ({ default: m.TravelPlanner })));
 const PersonalBrief = lazy(() => import('./features/PersonalBrief').then((m) => ({ default: m.PersonalBrief })));
 const RecipeIdeas = lazy(() => import('./features/RecipeIdeas').then((m) => ({ default: m.RecipeIdeas })));
@@ -473,7 +474,7 @@ export default function App() {
   const [travelTab, setTravelTab] = useState<'destinations' | 'voyage'>('destinations');
   const [equilibreTab, setEquilibreTab] = useState<EquilibreTab>('axes');
   const [spiritTab, setSpiritTab] = useState<SpiritTab>('home');
-  const [passionTab, setPassionTab] = useState<'parcours' | 'series' | 'libre'>('parcours');
+  const [passionTab, setPassionTab] = useState<'parcours' | 'series' | 'libre' | 'idees'>('parcours');
   const [search, setSearch] = useState('');
   const userIdRef = useRef<string | undefined>(undefined);
 
@@ -743,10 +744,11 @@ export default function App() {
           {spiritTab === 'qibla' && <Qibla entries={allModuleEntries} />}
           {spiritTab === 'horaires' && <AutomaticPrayerTimes entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}</>}
         {currentModule.id === 'passions' && <>
-          <Segmented label="Passions" value={passionTab} onChange={setPassionTab} options={[{ value: 'parcours', label: 'Parcours' }, { value: 'series', label: 'Séries' }, { value: 'libre', label: 'Hobby libre' }]} />
+          <Segmented label="Passions" value={passionTab} onChange={setPassionTab} options={[{ value: 'parcours', label: 'Parcours' }, { value: 'series', label: 'Séries' }, { value: 'libre', label: 'Hobbies' }, { value: 'idees', label: 'Idées' }]} />
           {passionTab === 'parcours' && <LearningPaths entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}
           {passionTab === 'series' && <SeriesTracker entries={allModuleEntries} onUpdate={updateData} onCreate={createFromTool} onRemove={remove} onAdd={() => addIn('passions', 'series', { status: 'À voir', seasons: '1', episodes: '10' })} />}
           {passionTab === 'libre' && <PassionPath entries={allModuleEntries} onUpdate={updateData} />}
+          {passionTab === 'idees' && <PassionIdeas entries={allModuleEntries} onCreate={createFromTool} />}
         </>}
         {currentModule.id === 'listes' && <section className="list-templates"><p className="eyebrow-s">Modèles</p>
           {LIST_TEMPLATES.map((t) => <button key={t.id} className="row-plain template-row" onClick={() => void createGroceries(t.title, templateItems(t))}>

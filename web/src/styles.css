@@ -1871,3 +1871,6 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area
 .year-tile{background:#FFFCFA;border:1px solid #EFE3DE;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:2px}
 .year-tile strong{font-size:1.7rem;color:#8C6257;line-height:1.1}.year-tile span{color:#4b342c;font-weight:600;font-size:.9rem}.year-tile small{color:#8a7268}
 .year-tile:nth-child(3n+1){background:#F6EDE8}.year-tile:nth-child(3n+2){background:#E6EEE9;border-color:#d3e0d8}.year-tile:nth-child(3n+2) strong{color:#4F6A60}
+.idea-grid{display:flex;flex-wrap:wrap;gap:8px}
+.idea-chip{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:20px;border:1px solid #EFE3DE;background:#FFFCFA;color:#4b342c;font:inherit;font-size:.9rem}
+.idea-chip.on{background:#E6EEE9;border-color:#d3e0d8;color:#4F6A60}

@@ -28,7 +28,21 @@ const activeBefore = (n: number, every: number) => n - 1 - Math.floor((n - 1) / 
 const PILATES = ['The Hundred', 'Roll-up', 'Cercles de jambe', 'Pont (shoulder bridge)', 'Planche sur avant-bras', 'Swimming', 'Side kicks', 'Étirement de la colonne'];
 const YOGA = ['Salutation au soleil', 'Chien tête en bas', 'Guerrier II', 'Arbre', 'Posture de l’enfant', 'Torsion assise', 'Pigeon', 'Relaxation finale'];
 
+// Une petite action par jour pour un esprit plus serein (d'après le visuel « Challenge bien-être mental 30 jours » d'Aïda).
+const MENTAL = ['Écris comment tu te sens aujourd’hui.', 'Passe 1 heure sans téléphone.', 'Sors prendre l’air au moins 20 minutes.', 'Note 3 choses positives de ta journée.',
+  'Fais 5 minutes de respiration profonde.', 'Écoute une musique qui te fait du bien.', 'Fais une activité physique qui te plaît.', 'Écris 3 qualités que tu aimes chez toi.',
+  'Contacte quelqu’un qui te fait du bien.', 'Lis quelques pages d’un livre inspirant.', 'Fais quelque chose de créatif.', 'Couche-toi un peu plus tôt ce soir.',
+  'Range un petit espace autour de toi.', 'Passe une journée sans te comparer sur les réseaux.', 'Prends une vraie pause, sans culpabiliser.', 'Écris une inquiétude, puis ce que tu peux contrôler.',
+  'Passe du temps dans la nature.', 'Fais-toi un compliment.', 'Bois suffisamment d’eau aujourd’hui.', 'Étire ton corps pendant 10 minutes.',
+  'Note ce qui te rend vraiment heureuse.', 'Passe du temps avec une personne que tu aimes.', 'Essaie quelque chose de nouveau.', 'Concentre-toi sur le moment présent.',
+  'Fais une bonne action, même petite.', 'Rappelle-toi : tu fais de ton mieux et c’est suffisant.', 'Crée un moment sans écran avant de dormir.', 'Note 3 choses dont tu es fière.',
+  'Visualise la vie que tu veux et fais un petit pas vers elle.', 'Célèbre ces 30 jours et tout le chemin parcouru !'];
+
 export const TEMPLATES: ChallengeTemplate[] = [
+  {
+    id: 'mental-30', category: 'Bien-être', discipline: 'Bien-être mental', title: 'Défi 30 jours Bien-être mental', tagline: 'Calme · Confiance · Sérénité', tone: 'sauge',
+    day: (n) => MENTAL[(n - 1) % MENTAL.length]!,
+  },
   {
     id: 'squats-30', category: 'Sport', discipline: 'Squats', title: 'Défi 30 jours Squats', tagline: 'Jambes · Fessiers · Posture', tone: 'chocolat',
     day: (n) => restEvery(n, 4) ? null : `3 séries de ${Math.min(40, 10 + 2 * Math.floor(activeBefore(n, 4) / 2))} squats, 1 min de pause entre les séries. Genoux dans l’axe des pieds.`,
