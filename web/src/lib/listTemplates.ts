@@ -27,6 +27,16 @@ export const LIST_TEMPLATES: ListTemplate[] = [
     { name: 'Électronique', items: ['Ordinateur du boulot + souris et tapis', 'Casque', 'Téléphone du boulot', 'AirPods + chargeur', 'MacBook + chargeur', 'Enceinte',
       'Batterie externe + chargeur USB'] },
   ] },
+  { id: 'valise-omra', title: 'Valise · Omra', hint: 'Démarches, tenues, soins sans parfum, spiritualité, pratique', groups: [
+    { name: 'Démarches', items: ['Passeport', 'Visa et conditions d’entrée (à vérifier sur le site officiel)', 'Billets d’avion', 'Réservation d’hôtel', 'Assurance voyage',
+      'Copies des documents (papier et téléphone)', 'Cartes bancaires et un peu d’espèces'] },
+    { name: 'Tenues', items: ['Vêtements amples et couvrants', 'Abayas', 'Voiles', 'Tenue de prière', 'Chaussures de marche confortables (tawâf et sa‘y)', 'Sandales', 'Pyjama', 'Sous-vêtements'] },
+    { name: 'Soins sans parfum (ihram)', items: ['Savon sans parfum', 'Shampoing sans parfum', 'Déodorant sans parfum', 'Crème hydratante sans parfum', 'Brosse à dents et dentifrice',
+      'Petits ciseaux (pour la mèche du tahallul)', 'Mouchoirs et lingettes sans parfum'] },
+    { name: 'Spiritualité', items: ['Coran de poche ou application', 'Fiche « La Omra pas à pas » (Mes cours)', 'Chapelet', 'Liste de dou‘as pour mes proches'] },
+    { name: 'Pratique', items: ['Gourde (pour l’eau de Zamzam)', 'Petit sac à dos ou sacoche', 'Sac pour ranger les chaussures', 'Médicaments', 'Téléphone, chargeur et batterie externe',
+      'Adaptateur de prise', 'Ombrelle ou casquette', 'Lunettes de soleil'] },
+  ] },
 ];
 
 /** Éléments à créer : chaque article précédé de sa famille (« Protéines · Poulet ») pour garder les rayons lisibles. */

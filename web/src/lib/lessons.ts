@@ -598,6 +598,7 @@ export const LESSONS: Lesson[] = [
       'Ordre : ihram au miqât et talbiya, tawâf (7 tours, ablutions obligatoires), 2 rak‘a derrière le maqâm Ibrâhîm et Zamzam, sa‘y (7 trajets de Safâ à Marwa), coupe des cheveux.',
       'Le tawâf commence à la Pierre noire ; le sa‘y commence à Safâ et finit à Marwa.',
       'Femmes : vêtements habituels, et une petite mèche coupée à la fin.',
+      'Pour préparer le départ : le modèle « Valise · Omra » dans Mes listes › Modèles.',
     ] },
   { id: 'hajj', title: 'Le Hajj pas à pas', sub: 'ihram, rites, interdits et sunna · d’après Nusuk',
     intro: 'Le Hajj est l’un des cinq piliers de l’islam : tout musulman qui en a la capacité physique et financière l’accomplit au moins une fois dans sa vie. Fiche traduite et reformulée d’après Nusuk (hajj.nusuk.sa).',
