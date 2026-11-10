@@ -75,7 +75,7 @@ export function Duas({ entries, onCreate, onUpdate }: { entries: Entry[]; onCrea
   </section>;
 }
 
-function RepeatCounter({ total }: { total: number }) {
+export function RepeatCounter({ total }: { total: number }) {
   const [n, setN] = useState(0);
   return <div className="repeat-row">
     <button className="button secondary small" onClick={() => setN((x) => Math.min(total, x + 1))} disabled={n >= total}>{n >= total ? 'Terminé' : 'Récitée ' + n + '/' + total}</button>
