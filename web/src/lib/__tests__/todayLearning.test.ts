@@ -65,3 +65,26 @@ describe('les 99 noms d’Allah', () => {
     expect(allahNameOfDay('2026-11-11')!.n).not.toBe(allahNameOfDay('2026-11-10')!.n);
   });
 });
+
+import { actsDone, DH_ACTS, DH_DAYS, dhulHijjaStatus } from '../dhulHijja';
+
+describe('les 10 jours de Dhu al-Hijja', () => {
+  it('a dix jours complets et compte les actes faits', () => {
+    expect(DH_DAYS).toHaveLength(10);
+    expect(DH_DAYS.every((d) => d.theme && d.question && d.quote.ref)).toBe(true);
+    expect(actsDone({ days: { 3: { acts: { Fajr: true, Coran: true, Jeûne: true, Dhuhr: false } } } }, 3)).toBe(2);
+    expect(DH_ACTS).toHaveLength(8);
+  });
+  it('sait où on en est dans le calendrier', () => {
+    const s = dhulHijjaStatus('2026-11-10');
+    expect(s && 'daysUntil' in s ? s.daysUntil : 0).toBeGreaterThan(0);
+  });
+});
+
+describe('nouvelles fiches de Mes cours', () => {
+  it('contient la prière de consultation et Retour vers Allah', () => {
+    const ist = LESSONS.find((l) => l.id === 'istikhara');
+    expect(ist?.parts[0]?.duas?.[0]?.note).toBe('Sahîh al-Boukhârî n° 7390');
+    expect(LESSONS.find((l) => l.id === 'retour-allah')?.parts).toHaveLength(9);
+  });
+});

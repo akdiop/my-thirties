@@ -9,8 +9,11 @@ import { usePrayerAutoLocation } from '../features/AutomaticPrayerTimes';
 import { SpiritStats } from '../features/SpiritStats';
 import { SpiritLessons } from '../features/SpiritLessons';
 import { Ramadan } from '../features/Ramadan';
+import { DhulHijja } from '../features/DhulHijja';
+import { dhulHijjaStatus } from '../lib/dhulHijja';
 import { ramadanStatus } from '../lib/ramadan';
 
+const dhulSub = (day: string) => { const s = dhulHijjaStatus(day); return !s ? '10 jours, 10 occasions' : 'day' in s ? (s.day <= 10 ? 'jour ' + s.day + ' · ' : 'jours de Tashrîq · ') + 'actes, réflexion, citation' : 'dans ' + s.daysUntil + ' jours · 10 jours, 10 occasions'; };
 const ramadanSub = (day: string) => { const r = ramadanStatus(day); return !r ? 'suhûr, iftar, jeûnes, Coran' : r.active ? 'jour ' + r.day + ' · suhûr, iftar, Coran' : 'dans ' + r.daysUntil + ' jours · suhûr, iftar, jeûnes, Coran'; };
 import { HIJRI_MONTHS, hijriLabel, hijriOf, spiritualDay, upcomingKeyDates } from '../lib/hijri';
 import { HeroPhoto } from '../features/HeroPhoto';
@@ -105,7 +108,7 @@ export function EquilibreTop({ tab, onTab, entries, onAxis, onQuest, booster }: 
 /* ---------- Ma spiritualité ---------- */
 const hijri = (d = new Date()) => { try { return new Intl.DateTimeFormat('fr-FR-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric' }).format(d); } catch { return ''; } };
 const DHIKR = ['SubhanAllah', 'Alhamdulillah', 'Allahu akbar', 'Astaghfirullah', 'La ilaha illa Allah'];
-export type SpiritTab = 'home' | 'dhikr' | 'hijri' | 'journal' | 'horaires' | 'invocations' | 'qibla' | 'regularite' | 'cours' | 'ramadan';
+export type SpiritTab = 'home' | 'dhikr' | 'hijri' | 'journal' | 'horaires' | 'invocations' | 'qibla' | 'regularite' | 'cours' | 'ramadan' | 'dhulhijja';
 /** Compteur de dhikr : on touche le cercle, objectif 33, enregistrement du total du jour. */
 function DhikrCounter({ day, entries, onCreate }: { day: string; entries: Entry[]; onCreate: (i: EntryInput) => Promise<void> }) {
   const [count, setCount] = useState(0);
@@ -171,6 +174,7 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }:
         <RowLink icon={Heart} title="Mes invocations" sub="routine de dhikr, protection, pardon, réussite…" onClick={() => onTab('invocations')} />
         <RowLink icon={BookOpen} title="Mes cours" sub="tafsir, Ayat al-Kursî, la prière, la roqya" onClick={() => onTab('cours')} />
         <RowLink icon={Moon} title="Ramadan" sub={ramadanSub(day)} onClick={() => onTab('ramadan')} />
+        <RowLink icon={Mountain} title="Les 10 jours de Dhu al-Hijja" sub={dhulSub(day)} onClick={() => onTab('dhulhijja')} />
         <RowLink icon={Sun} title="Calendrier spirituel" sub="jeûnes recommandés, dates importantes" onClick={() => onTab('hijri')} />
         <RowLink icon={BookHeart} title="Mon journal spirituel" onClick={() => onTab('journal')} />
       </div>
@@ -181,5 +185,6 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }:
     {tab === 'hijri' && <SpiritCalendar />}
     {tab === 'cours' && <SpiritLessons onBack={() => onTab('home')} />}
     {tab === 'ramadan' && <Ramadan entries={entries} onCreate={onCreate} onUpdate={onUpdate} />}
+    {tab === 'dhulhijja' && <DhulHijja entries={entries} onCreate={onCreate} onUpdate={onUpdate} />}
   </div>;
 }

@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, BookText, Check, Languages, Settings2, Sparkles, Trophy } from 'lucide-react';
+import { BookOpen, BookText, Check, Languages, Mountain, Settings2, Sparkles, Trophy } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { pathById } from '../lib/learning';
 import { COURSE_LOADERS } from '../lib/langCourses';
 import type { LangCourse } from '../lib/langCourses/types';
 import { QURAN_PAGES } from '../lib/ramadan';
+import { actsDone, DH_ACTS, DH_DAYS, DHUL_HIJJA_KIND, dhulHijjaStatus, type DhData } from '../lib/dhulHijja';
 import { allahNameOfDay, challengesToday, QURAN_KIND, quranPlan, quranRead, tafsirOfDay, wordOfDay } from '../lib/todayLearning';
 
-export type LearningTarget = 'passions' | 'challenges' | 'cours';
+export type LearningTarget = 'passions' | 'challenges' | 'cours' | 'dhulhijja';
 
 /** Accueil : ce que j'ai commencé et que je ne veux pas oublier aujourd'hui (défis, mot du jour, tafsir, lecture du Coran). */
 export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
@@ -18,6 +19,9 @@ export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
   const paths = entries.filter((e) => e.kind === 'path' && pathById(e.data.pathId));
   const tafsir = tafsirOfDay(today);
   const name = allahNameOfDay(today);
+  const dh = dhulHijjaStatus(today);
+  const dhDay = dh && 'day' in dh && dh.day <= 10 ? dh.day : 0;
+  const dhData = (dh ? entries.find((e) => e.kind === DHUL_HIJJA_KIND && Number(e.data.year) === dh.hijriYear)?.data ?? {} : {}) as DhData;
   const quran = entries.find((e) => e.kind === QURAN_KIND);
   const plan = quran ? quranPlan(quran.data, today) : null;
 
@@ -37,6 +41,14 @@ export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
   return <section className="today-learning" aria-label="Aujourd’hui, je n’oublie pas">
     <p className="eyebrow-s">Aujourd’hui, je n’oublie pas</p>
     <div className="soft-card dl-list">
+      {dhDay > 0 && <button className="dl-row" onClick={() => onOpen('dhulhijja')}>
+        <span className="dl-icon"><Mountain size={18} /></span>
+        <span className="dl-text"><small>Dhu al-Hijja · jour {dhDay} sur 10 · {actsDone(dhData, dhDay)}/{DH_ACTS.length} actes</small>
+          <strong>{DH_DAYS[dhDay - 1]!.theme}</strong>
+          <span className="dl-point">{DH_DAYS[dhDay - 1]!.question}</span>
+        </span>
+      </button>}
+
       {challenges.map((c) => <div key={c.entry.id} className="dl-row">
         <span className="dl-icon"><Trophy size={18} /></span>
         <button className="dl-text" onClick={() => onOpen('challenges')}>
