@@ -1913,3 +1913,20 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .phone{padding-bottom:124px}
 .fab{bottom:calc(94px + env(safe-area-inset-bottom))}
 
+/* Aujourd'hui, je n'oublie pas */
+.today-learning{margin:0 0 18px}
+.dl-list{padding:4px 14px;display:flex;flex-direction:column}
+.dl-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(58,56,51,.08);width:100%;background:none;border-left:0;border-right:0;border-top:0;text-align:left;color:inherit;font:inherit}
+.dl-row:last-child{border-bottom:0}
+.dl-row.tafsir{align-items:flex-start}
+.dl-icon{width:38px;height:38px;flex:none;border-radius:19px;display:grid;place-items:center;background:#E3E9DE;color:#5F7A59}
+.dl-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;border:0;background:none;padding:0;text-align:left;color:#3A3833;font:inherit}
+.dl-text small{font-size:.78rem;color:#6F6B63}
+.dl-text strong{font-size:.95rem;font-weight:700;line-height:1.3}
+.dl-text em{font-size:.85rem;color:#6E6448}
+.dl-word span[lang=ar],.dl-ar{font-family:Amiri,serif;font-size:1.25rem;font-weight:400}
+.dl-ar{display:block;text-align:right;line-height:1.7}
+.dl-point{font-size:.85rem;color:#55514a;line-height:1.4}
+.dl-btn{flex:none;min-width:52px;height:36px;padding:0 14px;border-radius:18px;border:0;background:#7E7254;color:#fff;font:inherit;font-size:.85rem;font-weight:700;display:grid;place-items:center}
+.dl-done{flex:none;width:36px;height:36px;border-radius:18px;display:grid;place-items:center;background:#8FA08A;color:#fff}
+

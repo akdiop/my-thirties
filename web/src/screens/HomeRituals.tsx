@@ -3,6 +3,7 @@ import { BookHeart, BookOpen, Cake, Gift, CalendarCheck, ChevronDown, ChevronUp,
 import type { Entry, EntryInput } from '../lib/cloud';
 import { PandaWidget } from '../features/panda/PandaWidget';
 import { MomentBar } from '../features/MomentBar';
+import { TodayLearning, type LearningTarget } from '../features/TodayLearning';
 import { affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, isoOf, NOTE_KIND } from '../lib/rituals';
 
 type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'finances' | 'transformation';
@@ -25,8 +26,8 @@ const SHORTCUTS: Shortcut[] = [
 export const HOME_CFG_KIND = 'reglages_accueil';
 
 /** Accueil : carte « Mon jour », micro-rituels (respiration, affirmation) et raccourcis. */
-export function HomeRituals({ entries, onGo, onOpenDay, onCreate, onUpdate }: {
-  entries: Entry[]; onGo: (t: Target) => void; onOpenDay: (part: 'matin' | 'soir') => void; onCreate: (i: EntryInput) => Promise<void>;
+export function HomeRituals({ entries, onGo, onLearn, onOpenDay, onCreate, onUpdate }: {
+  entries: Entry[]; onGo: (t: Target) => void; onLearn: (t: LearningTarget) => void; onOpenDay: (part: 'matin' | 'soir') => void; onCreate: (i: EntryInput) => Promise<void>;
   onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void>;
 }) {
   // Raccourcis de l'accueil : choisis et ordonnés par moi (enregistrés avec mes données).
@@ -64,6 +65,8 @@ export function HomeRituals({ entries, onGo, onOpenDay, onCreate, onUpdate }: {
     </section>}
 
     <MomentBar entries={entries} onGo={onGo} onCreate={onCreate} onUpdate={onUpdate} />
+
+    <TodayLearning entries={entries} today={today} onOpen={onLearn} onCreate={onCreate} onUpdate={onUpdate} />
 
     <p className="eyebrow-s">Micro-rituels</p>
     <div className="ritual-grid">
