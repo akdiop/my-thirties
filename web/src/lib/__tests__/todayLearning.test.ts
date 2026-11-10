@@ -46,3 +46,22 @@ describe('aujourd’hui, je n’oublie pas', () => {
     expect(challengesToday([e], '2026-12-20')).toEqual([]);
   });
 });
+
+import { ALLAH_NAMES, PLAN_WEEKS } from '../asmaUlHusna';
+import { LESSONS } from '../lessons';
+import { allahNameOfDay } from '../todayLearning';
+
+describe('les 99 noms d’Allah', () => {
+  it('contient 99 noms numérotés (81 du Coran, 18 de la Sunna) répartis sur 6 semaines', () => {
+    expect(ALLAH_NAMES).toHaveLength(99);
+    expect(ALLAH_NAMES.map((x) => x.n)).toEqual(Array.from({ length: 99 }, (_, i) => i + 1));
+    expect(ALLAH_NAMES.filter((x) => x.source === 'Sunna')).toHaveLength(18);
+    expect(new Set(ALLAH_NAMES.map((x) => x.ar)).size).toBe(99);
+    expect(PLAN_WEEKS.map((w) => w.length)).toEqual([18, 18, 18, 18, 18, 9]);
+  });
+  it('a sa fiche dans « Mes cours » et un nom du jour', () => {
+    expect(LESSONS.find((l) => l.id === 'noms-allah')?.parts).toHaveLength(7);
+    expect(allahNameOfDay('2026-11-10')).toBe(allahNameOfDay('2026-11-10'));
+    expect(allahNameOfDay('2026-11-11')!.n).not.toBe(allahNameOfDay('2026-11-10')!.n);
+  });
+});

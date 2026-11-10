@@ -2,6 +2,8 @@
  * « Mes cours » (Spiritualité) : fiches tirées des cours Almadrassa d'Aïda, reformulées et structurées
  * sans changer le fond. Le texte arabe du Coran et des invocations est donné tel quel.
  */
+import { ALLAH_NAMES, PLAN_WEEKS } from './asmaUlHusna';
+
 export type LessonPart = {
   title: string;
   arabic?: string;
@@ -186,6 +188,23 @@ export const LESSONS: Lesson[] = [
       'Il faut se protéger auprès d’Allah contre tous les diables, djinns et humains.',
     ] },
 
+  { id: 'noms-allah', title: 'Les 99 noms d’Allah', sub: 'liste du cheikh al-‘Outhaymîne · 81 du Coran, 18 de la Sunna',
+    intro: 'Connaître les noms d’Allah, comprendre leur sens et L’adorer par eux. Liste établie par le cheikh Mouhammad ibn Sâlih al-‘Outhaymîne ; sens en français traduits par Ibnkhayr (IslamHouse) ; planning d’apprentissage d’Avenue des Sœurs : 3 noms par jour du lundi au samedi, révision le dimanche.',
+    parts: [
+      { title: 'Pourquoi les apprendre', points: [
+        'D’après Abou Houreira, le Prophète ﷺ a dit : « Certes Allah a quatre-vingt-dix-neuf noms, cent moins un, celui qui les dénombre entre au Paradis. » (al-Boukhârî 2736, Mouslim 2677)',
+        '« C’est à Allah qu’appartiennent les noms les plus beaux. Invoquez-Le par ces noms et laissez ceux qui profanent Ses noms : ils seront rétribués pour ce qu’ils ont fait. » (sourate al-A‘râf, 7:180)',
+        'Ibn al-Qayyim : il n’est pas de plus grand besoin pour les âmes que de connaître leur Créateur, de L’aimer, de L’évoquer et de se rapprocher de Lui, et cela passe par la connaissance de Ses noms et attributs. (cité dans « Explications des noms d’Allah » du cheikh as-Sa‘dî, p. 9-10)',
+        'Le cheikh al-‘Outhaymîne : les dénombrer, c’est d’abord les connaître, puis comprendre leur sens, puis adorer Allah par eux : L’invoquer par ces noms et vivre dans ses adorations ce qu’ils impliquent.',
+      ] },
+      ...PLAN_WEEKS.map((week, w) => ({ title: 'Semaine ' + (w + 1) + ' · noms ' + week[0]!.n + ' à ' + week[week.length - 1]!.n,
+        points: week.map((x) => x.n + '. ' + x.ar + ' · ' + x.tr + ' : ' + x.fr + (x.source === 'Sunna' ? ' (Sunna)' : '')) })),
+    ],
+    retain: [
+      '3 noms par jour du lundi au samedi, le dimanche pour réviser : les 99 en 6 semaines.',
+      'Pour chaque nom : le retenir, comprendre son sens, puis L’invoquer par ce nom dans tes dou‘âs.',
+      ALLAH_NAMES.length + ' noms : 81 tirés du Coran, 18 de la Sunna authentique.',
+    ] },
   { id: 'kursi', title: 'Ayat al-Kursî', sub: 'le plus immense verset du Coran · 2:255',
     intro: 'Verset 255 d’Al-Baqara, sourate médinoise. Le plus immense et le plus noble verset du Coran : il réunit cinq noms d’Allah et plus de vingt de Ses attributs, et aucun autre verset ne concentre autant de tawhîd.',
     parts: [
