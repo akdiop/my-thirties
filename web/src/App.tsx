@@ -695,7 +695,7 @@ export default function App() {
       {screen === 'myday' && <LockGate><MyDay key={dayTarget.n} entries={ritualEntries} initialDate={dayTarget.date} initialPart={dayTarget.part} onCreate={createFromTool} onUpdate={updateData} /></LockGate>}
       {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEdit={editFull} />}
       {screen === 'notes' && <LockGate><Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={drop} onOpenDay={openDay} /></LockGate>}
-      {screen === 'bilan' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><Review entries={ritualEntries} /></LockGate>}
+      {screen === 'bilan' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><Review entries={ritualEntries} birthDate={readProfile(profileEntry).birthDate} /></LockGate>}
       {screen === 'boussole' && <><ScreenHeader title="" onBack={() => go('home')} /><Compass entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEditProfile={() => go('settings')} /></>}
       {screen === 'focus' && <><ScreenHeader title="" onBack={() => go('home')} /><Focus entries={ritualEntries} onCreate={createFromTool} /></>}
       {screen === 'sommeil' && <><ScreenHeader title="" onBack={() => go('home')} /><Sleep entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={remove} /></>}
