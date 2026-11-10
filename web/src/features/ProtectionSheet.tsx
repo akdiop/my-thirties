@@ -2,8 +2,8 @@ import { X } from 'lucide-react';
 import { DUAS } from '../lib/duas';
 import { RepeatCounter } from './Duas';
 
-const FIRST = 'laqad';
-const PROTECTION = [...DUAS.filter((d) => d.id === FIRST), ...DUAS.filter((d) => d.category === 'Protection' && d.id !== FIRST)];
+const FIRST = ['laqad', 'kursi', 'baqara-fin'];
+const PROTECTION = [...FIRST.flatMap((id) => DUAS.filter((d) => d.id === id)), ...DUAS.filter((d) => d.category === 'Protection' && !FIRST.includes(d.id))];
 
 /** Accès rapide depuis l'accueil aux invocations de protection (avant de prendre la route, en sortant…). */
 export function ProtectionSheet({ onClose }: { onClose: () => void }) {
