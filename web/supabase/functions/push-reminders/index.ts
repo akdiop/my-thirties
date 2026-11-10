@@ -11,7 +11,7 @@ import { CalculationMethod, Coordinates, Madhab, PrayerTimes } from 'npm:adhan@4
 type Prefs = { morning?: { on?: boolean; time?: string }; evening?: { on?: boolean; time?: string }; habits?: { on?: boolean; time?: string };
   agenda?: { on?: boolean; minutes?: number }; weekly?: { on?: boolean; day?: number; time?: string }; supplements?: { on?: boolean };
   plan?: { on?: boolean; time?: string }; birthdays?: { on?: boolean; time?: string };
-  prayers?: { on?: boolean; minutes?: number }; fasting?: { on?: boolean; time?: string } };
+  prayers?: { on?: boolean; minutes?: number }; fasting?: { on?: boolean; time?: string }; water?: { on?: boolean; time?: string } };
 type Row = { id: string; module: string; kind: string; title: string; entry_date: string | null; data: Record<string, unknown> };
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 const json = (d: unknown, status = 200) => new Response(JSON.stringify(d), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -144,11 +144,18 @@ Deno.serve(async (request) => {
     // Anniversaires : 3 jours avant et le jour J.
     if (p.birthdays?.on !== false && due(now.minutes, mins(p.birthdays?.time ?? '09:00'))) {
       const md = now.date.slice(5), in3 = new Date(Date.parse(now.date + 'T12:00:00Z') + 3 * 86_400_000).toISOString().slice(5, 10);
+      const in7 = new Date(Date.parse(now.date + 'T12:00:00Z') + 7 * 86_400_000).toISOString().slice(5, 10);
       for (const e of list.filter((x) => x.kind === 'proche' && x.data.remind !== false)) {
         const day = String(e.data.day ?? '');
         if (day === md) queue.push({ key: 'bday:' + e.id + ':' + now.date, title: 'Anniversaire aujourd’hui', body: 'C’est l’anniversaire de ' + e.title.slice(0, 60) + ' !', url: '/?ecran=proches' });
         else if (day === in3) queue.push({ key: 'bday3:' + e.id + ':' + now.date, title: 'Anniversaire dans 3 jours', body: e.title.slice(0, 60) + (e.data.gifts ? ' · tes idées de cadeaux t’attendent' : ' · pense au cadeau'), url: '/?ecran=proches' });
+        else if (day === in7) queue.push({ key: 'bday7:' + e.id + ':' + now.date, title: 'Anniversaire dans une semaine', body: e.title.slice(0, 60) + (e.data.gifts ? ' · tes idées de cadeaux t’attendent' : ' · le temps de trouver une attention'), url: '/?ecran=proches' });
       }
+    }
+    // Eau : l'après-midi, si l'objectif de 8 verres n'est pas atteint.
+    if (p.water?.on !== false && due(now.minutes, mins(p.water?.time ?? '16:00'))) {
+      const n = Math.max(0, Number(today?.data.water) || 0);
+      if (n < 8) queue.push({ key: 'water:' + now.date, title: 'Un verre d’eau ?', body: n ? n + ' verre' + (n > 1 ? 's' : '') + ' sur 8 aujourd’hui.' : 'Pas encore de verre noté aujourd’hui.', url: '/' });
     }
     // Prières : quelques minutes avant chaque heure (position enregistrée dans Ma spiritualité).
     const ps = list.filter((e) => e.kind === 'prayer_settings').sort((a, b) => String(b.data.updated ?? '').localeCompare(String(a.data.updated ?? '')))[0];

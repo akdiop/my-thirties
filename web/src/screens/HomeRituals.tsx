@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { BookHeart, BookOpen, Cake, Gift, CalendarCheck, ChevronDown, ChevronUp, Compass, Flower2, Heart, Leaf, Moon, Pill, Settings2, Sparkles, Timer } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { PandaWidget } from '../features/panda/PandaWidget';
+import { MomentBar } from '../features/MomentBar';
 import { affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, isoOf, NOTE_KIND } from '../lib/rituals';
 
 type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda';
@@ -60,6 +61,8 @@ export function HomeRituals({ entries, onGo, onOpenDay, onCreate, onUpdate }: {
       <p>{part === 'soir' ? 'Ta victoire, ce que tu déposes, ton intention pour demain.' : '3 minutes pour t’aligner avec ta journée'}</p>
       <button className="button reset-btn" onClick={() => onOpenDay(part)}>Commencer →</button>
     </section>}
+
+    <MomentBar entries={entries} onGo={onGo} onCreate={onCreate} onUpdate={onUpdate} />
 
     <p className="eyebrow-s">Micro-rituels</p>
     <div className="ritual-grid">
