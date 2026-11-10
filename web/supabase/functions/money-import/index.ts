@@ -7,7 +7,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { parseMoneySms } from './parse.ts';
 
 const text = (body: string, status = 200) => new Response(body, { status, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
-const fmt = (n: number) => new Intl.NumberFormat('fr-FR').format(n).replace(/ | /g, ' ') + ' XOF';
+const fmt = (n: number) => new Intl.NumberFormat('fr-FR').format(n).replace(/\u202f|\u00a0/g, ' ') + ' XOF';
 
 Deno.serve(async (request) => {
   if (request.method !== 'POST') return text('Méthode interdite.', 405);
