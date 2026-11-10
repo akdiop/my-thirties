@@ -5,10 +5,11 @@ import { PandaWidget } from '../features/panda/PandaWidget';
 import { MomentBar } from '../features/MomentBar';
 import { affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, isoOf, NOTE_KIND } from '../lib/rituals';
 
-type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'finances';
-type Shortcut = { id: Exclude<Target, 'myday' | 'panda'>; label: string; sub: string; icon: typeof Heart };
+type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'finances' | 'transformation';
+type Shortcut = { id: Exclude<Target, 'myday' | 'panda' | 'finances'>; label: string; sub: string; icon: typeof Heart };
 const SHORTCUTS: Shortcut[] = [
   { id: 'habits', label: 'Habitudes', sub: 'Suivi quotidien', icon: Heart },
+  { id: 'transformation', label: 'Ma meilleure version', sub: 'Programme 3 mois', icon: Sparkles },
   { id: 'notes', label: 'Mon journal', sub: 'Notes et historique', icon: BookHeart },
   { id: 'bienetre', label: 'Bien-être', sub: 'Humeur, cycle, prière', icon: Leaf },
   { id: 'bilan', label: 'Bilan de la semaine', sub: 'Humeurs, habitudes, victoires', icon: CalendarCheck },
