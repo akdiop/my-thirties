@@ -650,7 +650,7 @@ export default function App() {
   const currentModule = modules.find((m) => m.id === screen);
   const allModuleEntries = currentModule ? entries.filter((e) => e.module === currentModule.id) : [];
   // En spiritualité, la liste ne garde que le journal (prières cochées, horaires et dhikr ont leurs propres écrans).
-  const listedEntries = allModuleEntries.filter((e) => !(e.module === 'spiritualite' && (e.kind === 'dhikr' || e.kind.startsWith('prayer'))));
+  const listedEntries = allModuleEntries.filter((e) => !(e.module === 'spiritualite' && (e.kind === 'dhikr' || e.kind === 'ramadan' || e.kind.startsWith('prayer'))));
   const moduleEntries = listedEntries.filter((e) => !search || e.title.toLowerCase().includes(search.toLowerCase()));
   const go = (next: Screen) => { setScreen(next); setSearch(''); window.scrollTo({ top: 0 }); };
   const openEntry = (e: Entry) => setEditor({ module: moduleById(e.module), initial: e });
