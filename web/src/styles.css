@@ -1942,3 +1942,8 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .dhul-know summary{display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;list-style:none}
 .dhul-know .fiche-pt small{color:#6F6B63}
 
+/* Hier ou aujourd'hui */
+.day-switch{display:flex;flex-direction:column;gap:6px;margin:0 0 12px}
+.day-switch .segmented{max-width:260px}
+.day-switch small{color:#6E6448;font-size:.82rem;font-weight:600}
+

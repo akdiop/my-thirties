@@ -2,7 +2,8 @@ import { QUESTS } from '../lib/boosterDays';
 import { useState, type ReactNode } from 'react';
 import { BookHeart, BookOpen, CalendarDays, Compass, CloudSun, HandCoins, Heart, Lightbulb, MapPin, Mountain, Star, Sun, Waves, Zap, Shield, Smile, Scale, Feather, Moon } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
-import { str, todayIso } from '../lib/day';
+import { bilanDay, str, todayIso } from '../lib/day';
+import { DaySwitch } from '../features/DaySwitch';
 import { amountOf, currencyOf, fmt } from '../lib/money';
 import { currentPrayer, PRAYERS, prayerDay, togglePrayer } from '../lib/wellbeing';
 import { usePrayerAutoLocation } from '../features/AutomaticPrayerTimes';
@@ -149,7 +150,10 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }:
   usePrayerAutoLocation(entries, onCreate, onUpdate);
   const day = todayIso();
   const p = prayerDay(entries);
-  const toggle = (name: string, on: boolean) => togglePrayer(entries, name, on, onCreate, onRemove);
+  const [checkDay, setCheckDay] = useState(bilanDay);
+  const late = checkDay !== day;
+  const prayedOn = new Set(entries.filter((e) => e.kind === 'prayer' && e.entry_date === checkDay).map((e) => str(e, 'prayer')));
+  const toggle = (name: string, on: boolean, forDay = checkDay) => togglePrayer(entries, name, on, onCreate, onRemove, forDay);
   const cur = p ? currentPrayer(p) : null;
   return <div className="module-top">
     {tab === 'home' && <>
@@ -158,11 +162,12 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }:
         <strong className="serif">{p?.next ? `${p.next.name} · ${p.next.time}` : p ? 'Fajr · demain' : 'Horaires du jour'}</strong>
         <span>{p?.next ? `${p.inText}${p.city ? ' · ' + p.city : ''}` : p ? `vers ${p.times[0]?.time ?? ''} (horaire d’aujourd’hui)${p.city ? ' · ' + p.city : ''}` : 'Indique ta position une fois dans « Horaires des prières »'}</span>
         <small>{hijri()} · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</small>
-        {cur && <button className="prayer-done-btn" onClick={() => void toggle(cur.name, true)}>J’ai prié {cur.name}</button>}
+        {cur && <button className="prayer-done-btn" onClick={() => void toggle(cur.name, true, day)}>J’ai prié {cur.name}</button>}
       </div>
-      <div className="soft-card list-card">{p && <div className="prayed-count">{p.prayed.size} / 5 aujourd’hui</div>}{PRAYERS.map((name) => {
+      <DaySwitch day={checkDay} onChange={setCheckDay} />
+      <div className="soft-card list-card"><div className="prayed-count">{prayedOn.size} / 5 {late ? 'hier' : 'aujourd’hui'}</div>{PRAYERS.map((name) => {
         const t = p?.times.find((x) => x.name === name)?.time ?? '—';
-        const done = p?.prayed.has(name) ?? entries.some((e) => e.kind === 'prayer' && e.entry_date === day && str(e, 'prayer') === name);
+        const done = prayedOn.has(name);
         return <div className={'prio-row' + (p?.next?.name === name ? ' strong' : '')} key={name}><span>{name}</span><small className="num">{t}</small>
           <Check22 checked={done} label={name + ' accomplie'} onChange={(v) => void toggle(name, v)} /></div>;
       })}</div>
