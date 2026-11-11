@@ -3,7 +3,7 @@ import { useState, type ReactNode } from 'react';
 import { BookHeart, BookOpen, CalendarDays, Compass, CloudSun, HandCoins, Heart, Lightbulb, MapPin, Mountain, Star, Sun, Waves, Zap, Shield, Smile, Scale, Feather, Moon } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { bilanDay, str, todayIso } from '../lib/day';
-import { DaySwitch } from '../features/DaySwitch';
+import { DaySwitch, dayName } from '../features/DaySwitch';
 import { amountOf, currencyOf, fmt } from '../lib/money';
 import { currentPrayer, PRAYERS, prayerDay, togglePrayer } from '../lib/wellbeing';
 import { usePrayerAutoLocation } from '../features/AutomaticPrayerTimes';
@@ -151,7 +151,6 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }:
   const day = todayIso();
   const p = prayerDay(entries);
   const [checkDay, setCheckDay] = useState(bilanDay);
-  const late = checkDay !== day;
   const prayedOn = new Set(entries.filter((e) => e.kind === 'prayer' && e.entry_date === checkDay).map((e) => str(e, 'prayer')));
   const toggle = (name: string, on: boolean, forDay = checkDay) => togglePrayer(entries, name, on, onCreate, onRemove, forDay);
   const cur = p ? currentPrayer(p) : null;
@@ -165,7 +164,7 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }:
         {cur && <button className="prayer-done-btn" onClick={() => void toggle(cur.name, true, day)}>J’ai prié {cur.name}</button>}
       </div>
       <DaySwitch day={checkDay} onChange={setCheckDay} />
-      <div className="soft-card list-card"><div className="prayed-count">{prayedOn.size} / 5 {late ? 'hier' : 'aujourd’hui'}</div>{PRAYERS.map((name) => {
+      <div className="soft-card list-card"><div className="prayed-count">{prayedOn.size} / 5 {dayName(checkDay)}</div>{PRAYERS.map((name) => {
         const t = p?.times.find((x) => x.name === name)?.time ?? '—';
         const done = prayedOn.has(name);
         return <div className={'prio-row' + (p?.next?.name === name ? ' strong' : '')} key={name}><span>{name}</span><small className="num">{t}</small>

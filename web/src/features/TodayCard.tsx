@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ChevronDown, Moon, Sparkles, Sun } from 'lucide-react';
 import type { Entry } from '../lib/cloud';
 import { bilanDay, isDoneOn, timeline, todayIso, toggledData } from '../lib/day';
-import { DaySwitch } from './DaySwitch';
+import { DaySwitch, dayName } from './DaySwitch';
 import { habitDone, habitFreq } from '../lib/rituals';
 import { Check22 } from '../ui/kit';
 
@@ -55,14 +55,14 @@ export function TodayCard({ entries, habits, onUpdate, onTogglePrayer, onOpenHab
 
   return <section className="today-card">
     <DaySwitch day={day} onChange={(d) => { setDay(d); setOpen(false); }} />
-    <div className="today-head"><strong>{past ? 'Hier' : 'Aujourd’hui'}</strong>
+    <div className="today-head"><strong>Ma journée</strong>
       <span className="today-chips">
         {prayers.length > 0 && <span className="tchip sauge">{prayers.filter((p) => p.done).length}/{prayers.length} prières</span>}
         {daily.length > 0 && <span className="tchip rose">{daily.length - left.length}/{daily.length} habitudes</span>}
         {events.length > 0 && <span className="tchip lilas">{events.length} rdv</span>}
       </span></div>
     {!items.length ? <p className="day-empty">Rien de prévu pour l’instant. Une journée à ton rythme.</p>
-      : !shown.length ? <p className="day-empty">{past ? 'Tout est fait pour hier, macha’Allah.' : 'Tout est fait pour aujourd’hui, macha’Allah.'}</p>
+      : !shown.length ? <p className="day-empty">{'Tout est fait pour ' + dayName(day) + ', macha’Allah.'}</p>
       : <div className="today-list">{shown.map((i, k) => <div key={i.key}>{open && !past && k === nowIndex && <div className="today-now">{String(now.getHours()).padStart(2, '0')}:{String(now.getMinutes()).padStart(2, '0')} · maintenant</div>}{row(i)}</div>)}</div>}
     <div className="today-foot">
       {!past && (items.length > shown.length || open) ? <button className="link-btn small" aria-expanded={open} onClick={() => setOpen(!open)}>{open ? 'Réduire' : 'Toute ma journée'} <ChevronDown size={14} className={open ? 'flip' : ''} /></button> : <span />}
