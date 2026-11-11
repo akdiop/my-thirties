@@ -3,6 +3,10 @@ import { computeTimes, readSettings } from './prayertimes';
 
 export const iso = (d: Date) => [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
 export const todayIso = () => iso(new Date());
+/** Avant 4 h du matin, le bilan porte encore sur la veille (on coche sa journée après minuit). */
+export const LATE_HOUR = 4;
+export const dayBefore = (day: string) => { const d = new Date(day + 'T12:00:00'); d.setDate(d.getDate() - 1); return iso(d); };
+export const bilanDay = (now = new Date()) => now.getHours() < LATE_HOUR ? dayBefore(iso(now)) : iso(now);
 export const parseDay = (s: string) => new Date(s + 'T12:00:00');
 export const plusDays = (date: Date, n: number) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + n);
 export const weekday = (d: Date) => (d.getDay() + 6) % 7;

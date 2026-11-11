@@ -5,6 +5,8 @@ import { SwipeRow } from '../ui/SwipeRow';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { addDays, FREQ_LABEL, freqTarget, HABIT_GROUPS, HABIT_KIND, HABIT_LIBRARY, habitDone, habitFreq, habitStreak, isoOf, weekStartOf, type HabitFreq, type HabitLevel, type HabitTemplate } from '../lib/rituals';
 import { Bar, Segmented } from '../ui/kit';
+import { bilanDay } from '../lib/day';
+import { DaySwitch, dayName } from '../features/DaySwitch';
 import { badgesOf, nextBadge } from '../lib/growth';
 import { JOURNEYS, JOURNEY_KIND, journeyWeek } from '../lib/journeys';
 
@@ -19,9 +21,10 @@ export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit }: { entr
   const [tab, setTab] = useState<'today' | 'parcours' | 'stats'>('today');
   const [chainFor, setChainFor] = useState<string | null>(null);
   const today = isoOf(new Date());
+  const [day, setDay] = useState(bilanDay);
   const week = weekStartOf(today);
   const days = Array.from({ length: 7 }, (_, i) => addDays(week, i));
-  const doneToday = mine.filter((e) => habitDone(e)[today]).length;
+  const doneToday = mine.filter((e) => habitDone(e)[day]).length;
   const dueToday = mine.filter((e) => habitFreq(e) === 'daily').length;
   // Rangées par catégorie de la bibliothèque ; celles que j'ai créées vont dans « Mes habitudes ».
   const groupOf = (e: Entry) => HABIT_LIBRARY.find((t) => t.id === String(e.data.templateId))?.group ?? 'Mes habitudes';
@@ -42,15 +45,15 @@ export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit }: { entr
       <button className="button ghost wide" onClick={() => setView('create')}><Pencil size={16} /> Créer la mienne</button>
       <button className="button ghost wide" onClick={() => setTab('parcours')}>Suivre un parcours progressif</button>
     </div> : <>
-      <header className="tab-head"><h1>Habitudes</h1><p>{dueToday ? doneToday + ' sur ' + mine.length + ' aujourd’hui' : 'Ton suivi de la semaine'}</p></header>
+      <header className="tab-head"><h1>Habitudes</h1><p>{dueToday ? doneToday + ' sur ' + mine.length + ' ' + dayName(day) : 'Ton suivi de la semaine'}</p></header>
       <Segmented label="Habitudes" value={tab} onChange={setTab} options={[{ value: 'today', label: 'Aujourd’hui' }, { value: 'parcours', label: 'Parcours' }, { value: 'stats', label: 'Statistiques' }]} />
       {tab === 'parcours' && <Journeys entries={entries} onCreate={onCreate} onUpdate={onUpdate} onRemove={onRemove} />}
       {tab === 'stats' && <HabitStats habits={mine} />}
-      {tab === 'today' && <><Bar value={mine.length ? doneToday / mine.length : 0} />
+      {tab === 'today' && <><DaySwitch day={day} onChange={setDay} /><Bar value={mine.length ? doneToday / mine.length : 0} />
       {groups.map(({ name, items }) => <section key={name} className="habit-section">
         <h2 className="habit-group">{name}</h2>
         <div className="habit-list">{items.map((e) => {
-        const done = habitDone(e), f = habitFreq(e), on = Boolean(done[today]);
+        const done = habitDone(e), f = habitFreq(e), on = Boolean(done[day]);
         const weekCount = days.filter((d) => done[d]).length, streak = habitStreak(e, today);
         const total = Object.values(done).filter(Boolean).length, badges = badgesOf(total), next = nextBadge(total);
         const anchor = mine.find((x) => x.id === e.data.after);
@@ -58,8 +61,8 @@ export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit }: { entr
           { label: 'Renommer', icon: <Pencil size={18} />, onClick: () => { const v = window.prompt('Nouveau nom', e.title)?.trim(); if (v && onEdit) void onEdit(e.id, { title: v.slice(0, 80), data: e.data }); } },
           { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => void onRemove(e) },
         ]}><article className={'habit-card' + (on ? ' on' : '')}>
-          <button className="habit-check" aria-pressed={on} aria-label={(on ? 'Décocher ' : 'Fait aujourd’hui : ') + e.title}
-            onClick={() => void onUpdate(e, { ...e.data, done: { ...done, [today]: !on } })}>{on ? <Check size={22} strokeWidth={3} /> : <Glyph name={String(e.data.icon || 'sprout')} tint={(e.data.tint as Tint) || 'sauge'} size={24} />}</button>
+          <button className="habit-check" aria-pressed={on} aria-label={(on ? 'Décocher ' : 'Fait ' + dayName(day) + ' : ') + e.title}
+            onClick={() => void onUpdate(e, { ...e.data, done: { ...done, [day]: !on } })}>{on ? <Check size={22} strokeWidth={3} /> : <Glyph name={String(e.data.icon || 'sprout')} tint={(e.data.tint as Tint) || 'sauge'} size={24} />}</button>
           <div className="habit-body">
             {anchor && <span className="habit-after"><Link2 size={12} /> Après « {anchor.title} »</span>}
             <strong>{e.title}</strong>

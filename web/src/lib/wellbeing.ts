@@ -22,8 +22,7 @@ export function prayerDay(entries: Entry[], now = new Date()) {
 }
 
 /** Coche ou décoche une prière du jour (une entrée « prayer » par prière accomplie). */
-export async function togglePrayer(entries: Entry[], name: string, on: boolean, onCreate: (i: EntryInput) => Promise<void>, onRemove: (e: Entry) => Promise<void>) {
-  const day = todayIso();
+export async function togglePrayer(entries: Entry[], name: string, on: boolean, onCreate: (i: EntryInput) => Promise<void>, onRemove: (e: Entry) => Promise<void>, day = todayIso()) {
   const existing = entries.find((e) => e.kind === 'prayer' && e.entry_date === day && String(e.data.prayer) === name);
   if (on && !existing) await onCreate({ module: 'spiritualite', kind: 'prayer', title: name, entry_date: day, data: { date: day, prayer: name } });
   if (!on && existing) await onRemove(existing);

@@ -88,3 +88,14 @@ describe('nouvelles fiches de Mes cours', () => {
     expect(LESSONS.find((l) => l.id === 'retour-allah')?.parts).toHaveLength(9);
   });
 });
+
+import { bilanDay, dayBefore } from '../day';
+
+describe('bilan après minuit', () => {
+  it('avant 4 h, le bilan porte sur la veille', () => {
+    expect(bilanDay(new Date(2026, 10, 11, 0, 30))).toBe('2026-11-10');
+    expect(bilanDay(new Date(2026, 10, 11, 3, 59))).toBe('2026-11-10');
+    expect(bilanDay(new Date(2026, 10, 11, 4, 0))).toBe('2026-11-11');
+    expect(dayBefore('2026-03-01')).toBe('2026-02-28');
+  });
+});
