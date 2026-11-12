@@ -152,13 +152,13 @@ describe('carnet de vœux', () => {
   });
 });
 
-import { existsSync } from 'node:fs';
+const PAGES = new Set(Object.keys(import.meta.glob('../../../public/cours/*/*.jpg')).map((k) => k.replace('../../../', '')));
 
 describe('livrets intégrés', () => {
   it('chaque page du sommaire existe', () => {
     for (const l of LESSONS.filter((x) => x.book)) {
       const b = l.book!;
-      for (let n = 1; n <= b.pages; n++) expect(existsSync('public/cours/' + b.dir + '/p-' + String(n).padStart(2, '0') + '.jpg')).toBe(true);
+      for (let n = 1; n <= b.pages; n++) expect(PAGES.has('public/cours/' + b.dir + '/p-' + String(n).padStart(2, '0') + '.jpg')).toBe(true);
       for (const [, n] of b.toc ?? []) expect(n).toBeLessThanOrEqual(b.pages);
     }
   });
