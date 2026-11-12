@@ -2074,3 +2074,42 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .hsp-step{display:flex;gap:12px;align-items:flex-start}.hsp-step p{margin:2px 0 0}
 .hsp-phrase{position:relative;padding-right:44px}.hsp-phrase p{margin:4px 0;font-size:1.05rem}
 .hsp-phrase .icon-btn{position:absolute;right:10px;top:12px}
+.habit-card.rest{opacity:.6}
+.habit-settings{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding:10px 12px;border-radius:14px;background:rgba(95,122,89,.08)}
+.day-chips{display:flex;gap:6px}
+.day-chip{width:34px;height:34px;border-radius:50%;border:1px solid #DDE5D7;background:#fbfaf7;color:#5F5A4F;font:inherit;font-weight:700;font-size:.85rem}
+.day-chip.on{background:#5F7A59;border-color:#5F7A59;color:#fff}
+.habit-remind{display:flex;flex-direction:row;align-items:center;gap:8px;font-weight:400}
+.habit-remind input[type=checkbox]{width:20px;height:20px;min-height:0;padding:0;flex:none;accent-color:#5F7A59}
+.habit-remind input[type=time]{width:auto;margin-left:auto}
+.journal-card{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;text-align:left;border:1px solid rgba(255,255,255,.75);background:rgba(255,255,255,.62);border-radius:18px;padding:14px 16px;color:#3A3833;font:inherit;cursor:pointer}
+.jc-date{display:flex;align-items:center;gap:6px;font-size:.72rem;letter-spacing:.05em;color:#7E7254;font-weight:700}
+.jc-title{font-size:1.12rem;line-height:1.25}
+.jc-excerpt{color:#5F5A4F;font-size:.92rem;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.jc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.jc-tags span{font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:#EFEADF;color:#6E6448}
+.fin-totals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}
+.fin-totals div{display:flex;flex-direction:column;gap:4px;padding:12px 10px;border-radius:16px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.75);min-width:0}
+.fin-totals span{font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:#7E7254;font-weight:700}
+.fin-totals strong{font-size:1rem;overflow-wrap:anywhere}.fin-totals strong.out{color:#8A5A3C}
+.fin-cats{display:flex;flex-direction:column;gap:10px}
+.fin-cat{display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:center}
+.fin-cat .bar{grid-column:1 / -1}
+.fin-quick summary{cursor:pointer}
+.task-quick{display:flex;flex-direction:column;gap:10px}
+.tq-head{display:flex;justify-content:space-between;align-items:center}.tq-head strong{font-size:1.1rem}
+.tq-head small{padding:3px 10px;border-radius:999px;background:#EFEADF;color:#6E6448;font-size:.75rem}
+.tq-add{display:flex;gap:8px}.tq-add input{flex:1;min-width:0;border-radius:999px}
+.tq-plus{width:44px;height:44px;flex:none;border:0;border-radius:14px;background:#7E7254;color:#fff;display:grid;place-items:center}
+.tq-plus:disabled{opacity:.5}
+.tq-tags{display:flex;gap:6px;flex-wrap:wrap}
+.tq-tag{padding:4px 10px;border-radius:999px;border:1px solid #E5DFD2;background:transparent;color:#6E6448;font:inherit;font-size:.78rem}
+.tq-tag.on{background:#EFEADF;border-color:#C9BFA8;color:#3A3833;font-weight:600}
+.tq-filters{display:flex;gap:6px;flex-wrap:wrap}
+.tq-list{display:flex;flex-direction:column;gap:6px}
+.tq-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.7);border:1px solid rgba(58,56,51,.06)}
+.tq-row .tq-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tq-row.done .tq-title{text-decoration:line-through;color:#9A958B}
+.tq-row small{font-size:.75rem;color:#6E6448;white-space:nowrap}.tq-row small.late{color:#8A5A3C}
+.tq-pill{font-size:.7rem;padding:2px 8px;border-radius:999px;background:#EFEADF;color:#6E6448;white-space:nowrap}
+.tq-foot{display:flex;justify-content:space-between;align-items:center}.tq-foot small{font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:#7E7254}

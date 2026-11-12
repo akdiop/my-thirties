@@ -11,7 +11,8 @@ import { ProtectionSheet } from '../features/ProtectionSheet';
 
 type Go = (screen: ModuleId | 'calme' | 'assistant' | 'settings' | 'agenda' | 'spaces') => void;
 
-export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd, rituals, todayCard, word = '' }: {
+export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd, rituals, todayCard, tasksCard, word = '' }: {
+  tasksCard?: ReactNode;
   word?: string; rituals?: ReactNode; todayCard?: ReactNode; entries: Entry[]; profileEntry: Entry | undefined; onGo: Go;
   onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>; onAdd: () => void; onQuickAdd: (title: string) => Promise<void>;
 }) {
@@ -65,6 +66,8 @@ export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd,
         </select>}
       </div>
     </section>
+
+    {tasksCard}
 
     <div className="two-cards">
       <button className="soft-card stat-card" onClick={() => onGo('challenges')}>

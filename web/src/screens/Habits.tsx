@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Check, Flame, Link2, Pencil, Plus, Sparkles, Trash2, Trophy, X } from 'lucide-react';
 import { SwipeRow } from '../ui/SwipeRow';
 import type { Entry, EntryInput } from '../lib/cloud';
-import { addDays, FREQ_LABEL, freqTarget, HABIT_GROUPS, HABIT_KIND, HABIT_LIBRARY, habitDone, habitFreq, habitStreak, isoOf, weekStartOf, type HabitFreq, type HabitLevel, type HabitTemplate } from '../lib/rituals';
+import { addDays, DAY_LETTERS, FREQ_LABEL, freqTarget, HABIT_GROUPS, HABIT_KIND, HABIT_LIBRARY, habitDays, habitDaysLabel, habitDone, habitFreq, habitScheduled, habitStreak, isoOf, weekStartOf, type HabitFreq, type HabitLevel, type HabitTemplate } from '../lib/rituals';
 import { Bar, Segmented } from '../ui/kit';
 import { bilanDay } from '../lib/day';
 import { DaySwitch, dayName } from '../features/DaySwitch';
@@ -20,12 +20,13 @@ export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit }: { entr
   const [view, setView] = useState<'list' | 'library' | 'create'>('list');
   const [tab, setTab] = useState<'today' | 'parcours' | 'stats'>('today');
   const [chainFor, setChainFor] = useState<string | null>(null);
+  const [settingsFor, setSettingsFor] = useState<string | null>(null);
   const today = isoOf(new Date());
   const [day, setDay] = useState(bilanDay);
   const week = weekStartOf(today);
   const days = Array.from({ length: 7 }, (_, i) => addDays(week, i));
   const doneToday = mine.filter((e) => habitDone(e)[day]).length;
-  const dueToday = mine.filter((e) => habitFreq(e) === 'daily').length;
+  const dueToday = mine.filter((e) => habitFreq(e) === 'daily' && habitScheduled(e, day)).length;
   // Rangées par catégorie de la bibliothèque ; celles que j'ai créées vont dans « Mes habitudes ».
   const groupOf = (e: Entry) => HABIT_LIBRARY.find((t) => t.id === String(e.data.templateId))?.group ?? 'Mes habitudes';
   const groups = [...HABIT_GROUPS, 'Mes habitudes'].map((name) => ({ name, items: mine.filter((e) => groupOf(e) === name) })).filter((g) => g.items.length);
@@ -60,19 +61,21 @@ export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit }: { entr
         return <SwipeRow key={e.id} className="card-swipe" actions={[
           { label: 'Renommer', icon: <Pencil size={18} />, onClick: () => { const v = window.prompt('Nouveau nom', e.title)?.trim(); if (v && onEdit) void onEdit(e.id, { title: v.slice(0, 80), data: e.data }); } },
           { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => void onRemove(e) },
-        ]}><article className={'habit-card' + (on ? ' on' : '')}>
+        ]}><article className={'habit-card' + (on ? ' on' : '') + (f === 'daily' && !habitScheduled(e, day) && !on ? ' rest' : '')}>
           <button className="habit-check" aria-pressed={on} aria-label={(on ? 'Décocher ' : 'Fait ' + dayName(day) + ' : ') + e.title}
             onClick={() => void onUpdate(e, { ...e.data, done: { ...done, [day]: !on } })}>{on ? <Check size={22} strokeWidth={3} /> : <Glyph name={String(e.data.icon || 'sprout')} tint={(e.data.tint as Tint) || 'sauge'} size={24} />}</button>
           <div className="habit-body">
             {anchor && <span className="habit-after"><Link2 size={12} /> Après « {anchor.title} »</span>}
             <strong>{e.title}</strong>
-            <small>{FREQ_LABEL[f]}{f !== 'daily' ? ' · ' + weekCount + '/' + freqTarget(f) + ' cette semaine' : ''}{streak > 1 ? <> · <Flame size={12} /> {streak} {f === 'daily' ? 'jours' : 'semaines'}</> : null}</small>
+            <small>{FREQ_LABEL[f]}{habitDaysLabel(e) ? ' · ' + habitDaysLabel(e) : ''}{f === 'daily' && !habitScheduled(e, day) && !on ? ' · pas prévue ' + dayName(day) : ''}{(e.data.remind as { on?: boolean; time?: string } | undefined)?.on ? ' · rappel ' + String((e.data.remind as { time?: string }).time ?? '') : ''}{f !== 'daily' ? ' · ' + weekCount + '/' + freqTarget(f) + ' cette semaine' : ''}{streak > 1 ? <> · <Flame size={12} /> {streak} {f === 'daily' ? 'jours' : 'semaines'}</> : null}</small>
             <div className="week-dots">{days.map((d, i) => <span key={d} title={d} className={(done[d] ? 'on' : '') + (d === today ? ' today' : '') + (d > today ? ' future' : '')}>{LETTERS[i]}</span>)}</div>
             <div className="habit-meta">
               {badges.map((b) => <span key={b} className="badge"><Trophy size={12} /> {b} jours</span>)}
               {next && <small className="muted">{next - total} {next - total > 1 ? 'fois' : 'fois'} avant le badge {next}</small>}
+              <button className="link-btn small" onClick={() => setSettingsFor(settingsFor === e.id ? null : e.id)}>Jours et rappel</button>
               <button className="link-btn small" onClick={() => setChainFor(chainFor === e.id ? null : e.id)}>{anchor ? 'Changer l’enchaînement' : 'Enchaîner après…'}</button>
             </div>
+            {settingsFor === e.id && <HabitSettings habit={e} onSave={(d) => void onUpdate(e, { ...e.data, ...d })} />}
             {chainFor === e.id && <select className="chain-select" value={String(e.data.after ?? '')} onChange={(ev) => { void onUpdate(e, { ...e.data, after: ev.target.value || null }); setChainFor(null); }}>
               <option value="">Aucune (habitude indépendante)</option>
               {mine.filter((x) => x.id !== e.id && x.data.after !== e.id).map((x) => <option key={x.id} value={x.id}>Après « {x.title} »</option>)}
@@ -193,5 +196,19 @@ function Journeys({ entries, onCreate, onUpdate, onRemove }: { entries: Entry[];
       <div className="habit-body"><strong>{j.title}</strong><small>{j.why}</small><small className="muted">{j.steps.length} semaines · 1re étape : {j.steps[0]!.text}</small></div>
       <button className="button ghost small" disabled={Boolean(busy)} onClick={async () => { setBusy(j.id); try { await onCreate({ module: 'quotidien', kind: JOURNEY_KIND, title: 'Parcours · ' + j.title, entry_date: today, data: { journeyId: j.id, start: today, done: {} } }); } finally { setBusy(''); } }}>
         {busy === j.id ? '…' : 'Commencer'}</button></article>)}
+  </div>;
+}
+
+/** Jours de répétition (pour une habitude quotidienne) et rappel à l'heure choisie. */
+function HabitSettings({ habit, onSave }: { habit: Entry; onSave: (d: Record<string, unknown>) => void }) {
+  const days = habitDays(habit), all = !days.length || days.length === 7;
+  const remind = (habit.data.remind ?? {}) as { on?: boolean; time?: string };
+  const toggle = (i: number) => { const cur = all ? [0, 1, 2, 3, 4, 5, 6] : days; const next = cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i].sort(); if (next.length) onSave({ days: next.length === 7 ? [] : next }); };
+  return <div className="habit-settings">
+    {habitFreq(habit) === 'daily' && <><p className="ritual-label">Répéter le</p>
+      <div className="day-chips">{DAY_LETTERS.map((l, i) => { const on = all || days.includes(i);
+        return <button key={i} type="button" className={'day-chip' + (on ? ' on' : '')} aria-pressed={on} aria-label={['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'][i]} onClick={() => toggle(i)}>{l}</button>; })}</div></>}
+    <label className="habit-remind"><input type="checkbox" checked={Boolean(remind.on)} onChange={(ev) => onSave({ remind: { time: remind.time ?? '08:00', on: ev.target.checked } })} /> Me le rappeler
+      {remind.on && <input type="time" value={remind.time ?? '08:00'} onChange={(ev) => onSave({ remind: { on: true, time: ev.target.value } })} />}</label>
   </div>;
 }

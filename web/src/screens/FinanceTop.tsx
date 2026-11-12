@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Receipt, Repeat } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
-import { EXPENSE_CATEGORIES } from '../modules';
+import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '../modules';
 import { str, todayIso } from '../lib/day';
 import { amountOf, BUDGETS_KIND, categoryBudgets, currencyOf, fmt, limitsOf, mainCurrency, monthReport, num, XOF_PER_EUR } from '../lib/money';
 import { Bar, Segmented, SectionTitle } from '../ui/kit';
@@ -43,6 +43,14 @@ export function FinanceTop({ entries, onAdd, onOpen, onUpdate, onCreate }: { ent
       <div className="month-nav"><button onClick={() => shift(-1)} aria-label="Mois précédent">‹</button>{label.charAt(0).toUpperCase() + label.slice(1)}<button onClick={() => shift(1)} aria-label="Mois suivant">›</button></div>
       <div className="currency-switch">{CURRENCIES.map((c) => <button key={c} className={c === currency ? 'on' : ''} onClick={() => setCurrency(c)}>{c}</button>)}</div>
     </div>
+    <div className="fin-totals">
+      <div><span>Solde</span><strong>{fmt(r.income - r.spent, currency)}</strong></div>
+      <div><span>Entrées</span><strong>{fmt(r.income, currency)}</strong></div>
+      <div><span>Dépenses</span><strong className="out">{fmt(r.spent, currency)}</strong></div>
+    </div>
+    <QuickTransaction currency={currency} onCreate={onCreate} />
+    {r.categories.length > 0 && <section className="soft-card fin-cats"><p className="ritual-label">Dépenses par catégorie</p>
+      {r.categories.map((c) => <div key={c.name} className="fin-cat"><span>{c.name}</span><strong>{fmt(c.total, currency)}</strong><Bar value={c.share} tone="caramel" /></div>)}</section>}
     <div className="donut-row">
       <Donut parts={r.categories} total={r.spent} currency={currency} />
       <div className="donut-legend">{r.categories.length ? r.categories.slice(0, 6).map((c) => <div key={c.name}><i style={{ background: c.color }} /><span>{c.name}</span><small>{Math.round(c.share * 100)} %</small></div>)
@@ -108,4 +116,33 @@ function CategoryBudgets({ entries, month, currency, onCreate, onUpdate }: { ent
         : b.share >= 0.8 ? <small className="budget-note">Plus que {fmt(b.limit - b.spent, currency)} ce mois-ci</small> : null}
     </div>)}</div> : <p className="muted">Fixe un plafond pour les catégories que tu veux surveiller (shopping, sorties…).</p>}
   </>;
+}
+
+/** Saisie rapide : dépense ou revenu, montant, pour quoi, catégorie et date, en un seul écran. */
+function QuickTransaction({ currency, onCreate }: { currency: string; onCreate: (i: EntryInput) => Promise<void> }) {
+  const [kind, setKind] = useState<'expense' | 'income'>('expense');
+  const [amount, setAmount] = useState(''), [what, setWhat] = useState(''), [cat, setCat] = useState(''), [date, setDate] = useState(todayIso());
+  const [busy, setBusy] = useState(false), [done, setDone] = useState('');
+  const cats = kind === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
+  const value = Number(amount.replace(/\s/g, '').replace(',', '.'));
+  const save = async () => {
+    if (!(value > 0)) return;
+    setBusy(true);
+    try {
+      const category = cat || 'Autres';
+      await onCreate({ module: 'finances', kind, title: (what.trim() || category).slice(0, 80), entry_date: date, data: { date, amount: String(value), currency, category, note: what.trim() } });
+      setDone((kind === 'expense' ? 'Dépense' : 'Revenu') + ' enregistré' + (kind === 'expense' ? 'e' : '') + ' : ' + fmt(value, currency));
+      setAmount(''); setWhat(''); setCat('');
+    } finally { setBusy(false); }
+  };
+  return <details className="soft-card fin-quick"><summary className="ritual-label">Nouvelle opération</summary>
+    <div className="form-stack">
+      <Segmented label="Type d’opération" value={kind} onChange={(v) => { setKind(v); setCat(''); }} options={[{ value: 'expense', label: 'Dépense' }, { value: 'income', label: 'Revenu' }]} />
+      <label>Montant ({currency})<input inputMode="decimal" value={amount} placeholder="0" onChange={(e) => setAmount(e.target.value)} /></label>
+      <label>Pour quoi ?<input value={what} maxLength={80} placeholder={kind === 'expense' ? 'Déjeuner dehors' : 'Salaire de novembre'} onChange={(e) => setWhat(e.target.value)} /></label>
+      <div><p className="ritual-label">Catégorie</p><div className="chip-row">{cats.map((c) => <button key={c} type="button" className={'chip' + (cat === c ? ' on' : '')} aria-pressed={cat === c} onClick={() => setCat(cat === c ? '' : c)}>{c}</button>)}</div></div>
+      <label>Date<input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></label>
+      <button className="button primary wide" disabled={busy || !(value > 0)} onClick={() => void save()}>Enregistrer</button>
+      {done && <p role="status" className="muted small">{done}</p>}
+    </div></details>;
 }
