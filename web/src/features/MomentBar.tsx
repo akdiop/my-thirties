@@ -7,6 +7,7 @@ import { ProtectionSheet } from './ProtectionSheet';
 import { ramadanTimes } from './Ramadan';
 import { ramadanStatus } from '../lib/ramadan';
 import { categoryBudgets, mainCurrency } from '../lib/money';
+import { suppStatus } from '../../supabase/functions/push-reminders/supplements';
 
 type Go = (t: 'sommeil' | 'complements' | 'focus' | 'finances') => void;
 const dayOf = (start: string, today: string) => Math.floor((new Date(today + 'T12:00:00').getTime() - new Date(start + 'T12:00:00').getTime()) / 86400000) + 1;
@@ -22,7 +23,8 @@ export function MomentBar({ entries, onGo, onCreate, onUpdate, now = new Date() 
   const yesterday = entries.find((e) => e.kind === DAILY_KIND && e.entry_date === addDays(today, -1));
   const steps = Number(yesterday?.data.steps) || 0;
   const supps = entries.filter((e) => e.kind === 'complement' && (() => { const d = Number(e.data.days) || 0; return !d || dayOf(String(e.data.start ?? today), today) <= d; })());
-  const suppsDone = supps.filter((e) => (e.data.done as Record<string, boolean> | undefined)?.[today]).length;
+  const suppsToday = supps.filter((e) => { const s = suppStatus(e.data, today); return s.due || s.takenToday; });
+  const suppsDone = suppsToday.filter((e) => suppStatus(e.data, today).takenToday).length;
 
   const ramadan = ramadanStatus(today)?.active ? ramadanTimes(entries, now) : null;
   const budget = categoryBudgets(entries, today.slice(0, 7), mainCurrency(entries)).find((b) => b.share >= 0.8);
@@ -34,7 +36,7 @@ export function MomentBar({ entries, onGo, onCreate, onUpdate, now = new Date() 
     {ramadan && (hm < ramadan.suhur ? <span className="moment-chip info"><Sunrise size={16} /> Suhûr jusqu’à {ramadan.suhur}</span>
       : hm < ramadan.iftar ? <span className="moment-chip info"><Sunset size={16} /> Iftar à {ramadan.iftar}</span> : null)}
     {(moment === 'matin' || moment === 'soir' || moment === 'nuit') && <button className="moment-chip" onClick={() => setProtection(true)}><Shield size={16} /> Protection</button>}
-    {supps.length > 0 && suppsDone < supps.length && moment !== 'nuit' && <button className="moment-chip" onClick={() => onGo('complements')}><Pill size={16} /> Compléments {suppsDone}/{supps.length}</button>}
+    {suppsToday.length > 0 && suppsDone < suppsToday.length && moment !== 'nuit' && <button className="moment-chip" onClick={() => onGo('complements')}><Pill size={16} /> Compléments {suppsDone}/{suppsToday.length}</button>}
     {moment !== 'nuit' && <span className={'moment-chip water' + (water >= WATER_GOAL ? ' done' : '')}>
       <button className="moment-water" aria-label={'Ajouter un verre d’eau, ' + water + ' sur ' + WATER_GOAL} onClick={() => void setWater(water + 1)}><Droplet size={16} /> Eau {water}/{WATER_GOAL}</button>
       {water > 0 && <button className="moment-minus" aria-label="Retirer un verre" onClick={() => void setWater(water - 1)}><Minus size={14} /></button>}

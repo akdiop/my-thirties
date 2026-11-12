@@ -99,3 +99,23 @@ describe('bilan après minuit', () => {
     expect(dayBefore('2026-03-01')).toBe('2026-02-28');
   });
 });
+
+import { everyOf, suppStatus } from '../../../supabase/functions/push-reminders/supplements';
+
+describe('compléments tous les X jours', () => {
+  it('tous les jours par défaut', () => {
+    expect(everyOf({})).toBe(1);
+    expect(suppStatus({ start: '2026-11-01', done: { '2026-11-11': true } }, '2026-11-12')).toMatchObject({ due: true, late: 0 });
+  });
+  it('tous les 15 jours : prochaine prise 15 jours après la dernière, retard compté', () => {
+    const d = { every: 15, start: '2026-10-01', done: { '2026-10-28': true } };
+    expect(suppStatus(d, '2026-11-05')).toMatchObject({ due: false, next: '2026-11-12' });
+    expect(suppStatus(d, '2026-11-12')).toMatchObject({ due: true, late: 0 });
+    expect(suppStatus(d, '2026-11-14')).toMatchObject({ due: true, late: 2 });
+    expect(suppStatus({ ...d, done: { ...d.done, '2026-11-14': true } }, '2026-11-14')).toMatchObject({ due: false, takenToday: true, next: '2026-11-29' });
+  });
+  it('avant la première prise : à prendre dès le début', () => {
+    expect(suppStatus({ every: 30, start: '2026-11-20', done: {} }, '2026-11-12')).toMatchObject({ due: false, next: '2026-11-20' });
+    expect(suppStatus({ every: 30, start: '2026-11-10', done: {} }, '2026-11-12')).toMatchObject({ due: true, late: 2 });
+  });
+});

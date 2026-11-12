@@ -1379,6 +1379,8 @@ h2{font-size:1.55rem;line-height:1.2}
 .tool-chip{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid #e5e4e0;background:#fff;border-radius:999px;padding:9px 14px;font-weight:600;color:#7e7254;font-size:.9rem}
 .supp-card{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #e5e4e0;border-radius:18px;padding:14px}
 .supp-card.on{background:#F3F6F1}
+.supp-card .habit-check{color:#7E7254}
+.supp-card.on .habit-check{background:#5F7A59;border-color:#5F7A59;color:#fff}
 .supp-card .week-dots span{font-size:.7rem}
 .time-inline{border:1px solid #dad8d4;border-radius:999px;padding:6px 10px;font-size:16px;background:#fbfaf7}
 .search-hit{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}.search-hit .snippet{font-size:.85rem;color:#787670;line-height:1.4}
@@ -1947,3 +1949,9 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .day-switch strong{min-width:150px;text-align:center;font-size:.98rem}
 .day-switch .icon-btn:disabled{opacity:.3}
 .day-switch .link-btn{margin-left:auto}
+
+/* Compléments espacés (tous les X jours) */
+.supp-every{align-self:flex-start;padding:2px 0}
+.supp-next{font-weight:600;color:#6E6448}.supp-next.due{color:#5F7A59}
+.supp-card.later{opacity:.75}
+

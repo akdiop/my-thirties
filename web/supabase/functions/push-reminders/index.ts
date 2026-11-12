@@ -7,6 +7,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import webpush from 'npm:web-push@3.6.7';
 import { CalculationMethod, Coordinates, Madhab, PrayerTimes } from 'npm:adhan@4.4.3';
+import { suppStatus } from './supplements.ts';
 
 type Prefs = { morning?: { on?: boolean; time?: string }; evening?: { on?: boolean; time?: string }; habits?: { on?: boolean; time?: string };
   agenda?: { on?: boolean; minutes?: number }; weekly?: { on?: boolean; day?: number; time?: string }; supplements?: { on?: boolean };
@@ -132,7 +133,7 @@ Deno.serve(async (request) => {
         const t = typeof e.data.time === 'string' ? mins(e.data.time) : -1;
         const start = String(e.data.start ?? e.entry_date ?? now.date), days = Number(e.data.days) || 0;
         const n = Math.floor((Date.parse(now.date + 'T12:00:00Z') - Date.parse(start + 'T12:00:00Z')) / 86_400_000) + 1;
-        if (t < 0 || n < 1 || (days && n > days) || (e.data.done as Record<string, boolean> | undefined)?.[now.date]) continue;
+        if (t < 0 || n < 1 || (days && n > days) || !suppStatus(e.data, now.date).due) continue;
         if (due(now.minutes, t)) queue.push({ key: 'supp:' + e.id + ':' + now.date, title: 'Mes compléments', body: e.title + (e.data.dose ? ' · ' + String(e.data.dose) : '') + (days ? ' · jour ' + n + '/' + days : ''), url: '/?ecran=complements' });
       }
     }
