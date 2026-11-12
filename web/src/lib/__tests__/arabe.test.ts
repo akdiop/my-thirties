@@ -64,3 +64,18 @@ describe('dou’â de Moussa', () => {
     expect(l.sub).toContain('28:24');
   });
 });
+
+describe('livrets de grammaire recopiés', () => {
+  it('contient les 30 fiches de chaque livret, avec phonétique ou traduction partout', async () => {
+    const { FAWAID, GRAMMAIRE_SIMPLIFIEE } = await import('../arabe/grammaire');
+    expect(GRAMMAIRE_SIMPLIFIEE).toHaveLength(30);
+    expect(FAWAID).toHaveLength(30);
+    const all = [...GRAMMAIRE_SIMPLIFIEE, ...FAWAID];
+    expect(new Set(all.map((c) => c.id)).size).toBe(60);
+    for (const c of all) for (const b of c.blocs) for (const [ar, ph, fr] of b.lignes) {
+      if (/[؀-ۿ]/.test(ar)) expect(ph || fr).toBeTruthy();
+      expect(ar || fr).toBeTruthy();
+    }
+    expect(PAQUETS.find((p) => p.id === 'grammaire')!.cards.length).toBeGreaterThan(40);
+  });
+});

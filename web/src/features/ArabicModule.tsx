@@ -6,13 +6,14 @@ import { ALPHABET, HARAKAT, SOURCE_ARABE, vocalise } from '../lib/arabe/alphabet
 import { PREMIERS_MOTS } from '../lib/arabe/premiersMots';
 import { RELIGIEUX, type Famille } from '../lib/arabe/religieux';
 import { FORMES, VERBES } from '../lib/arabe/verbes';
+import { FAWAID, GRAMMAIRE_SIMPLIFIEE, type Chapitre } from '../lib/arabe/grammaire';
 import { addXp, ARABE_KIND, boxOf, grade, mastered, MAX_BOX, PAQUETS, paquet, question, session, shuffle, streak, type ArabeData, type Carte } from '../lib/arabe/jeux';
 import type { Book } from '../lib/lessons';
 import { BookPages } from './SpiritLessons';
 import { speak } from './LearningPaths';
 import { Bar, RowLink, Segmented } from '../ui/kit';
 
-type Tab = 'jeux' | 'fiches' | 'alphabet' | 'livrets';
+type Tab = 'jeux' | 'fiches' | 'grammaire' | 'lecture';
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 type Finish = (xp: number, update?: (d: ArabeData) => ArabeData, best?: number) => void;
 const canSpeak = () => typeof window !== 'undefined' && 'speechSynthesis' in window;
@@ -33,8 +34,6 @@ type GameId = (typeof GAMES)[number]['id'];
 const LIVRETS: { title: string; sub: string; book: Book }[] = [
   { title: 'Apprendre à lire l’arabe', sub: 'lettres, voyelles, exercices de lecture', book: { dir: 'apprendre-lire', pages: 35, size: [1169, 658] } },
   { title: 'Lire l’arabe sans les voyelles', sub: 'méthode et exemples', book: { dir: 'lire-sans-voyelles', pages: 18, size: [827, 1170] } },
-  { title: 'La grammaire simplifiée', sub: '60 pages', book: { dir: 'grammaire-simplifiee', pages: 60, size: [1169, 658] } },
-  { title: '30 fawâ’id de grammaire', sub: '76 pages', book: { dir: 'fawaid-grammaire', pages: 76, size: [1168, 584] } },
 ];
 
 /** Mon arabe : jeux de mémorisation, fiches avec phonétique, alphabet et voyelles, livrets d'origine. */
@@ -53,11 +52,11 @@ export function ArabicModule({ entries, onCreate, onUpdate }: { entries: Entry[]
       <div><strong>{streak(data, today)}</strong><small>jours de suite</small></div>
       <div><strong>{mastered(data)}</strong><small>mots retenus sur {total}</small></div>
     </div>
-    <Segmented label="Mon arabe" value={tab} onChange={setTab} options={[{ value: 'jeux', label: 'Jeux' }, { value: 'fiches', label: 'Fiches' }, { value: 'alphabet', label: 'Alphabet' }, { value: 'livrets', label: 'Livrets' }]} />
+    <Segmented label="Mon arabe" value={tab} onChange={setTab} options={[{ value: 'jeux', label: 'Jeux' }, { value: 'fiches', label: 'Fiches' }, { value: 'grammaire', label: 'Grammaire' }, { value: 'lecture', label: 'Lecture' }]} />
     {tab === 'jeux' && <Games data={data} onFinish={finish} />}
     {tab === 'fiches' && <Fiches data={data} />}
-    {tab === 'alphabet' && <Alphabet />}
-    {tab === 'livrets' && <Livrets />}
+    {tab === 'grammaire' && <Grammaire />}
+    {tab === 'lecture' && <><Alphabet /><Livrets /></>}
     <p className="fineprint">Contenus : {SOURCE_ARABE}. Phonétique ajoutée : â, î, û longs ; ‘ pour le ‘ayn ; ’ pour la hamza.</p>
   </section>;
 }
@@ -71,7 +70,7 @@ function Games({ data, onFinish }: { data: ArabeData; onFinish: Finish }) {
     <label>Paquet de mots<select value={deckId} onChange={(e) => setDeckId(e.target.value)}>
       <optgroup label="Pour commencer">{PAQUETS.filter((p) => p.id === 'alphabet' || p.id.startsWith('pm-')).map((p) => <option key={p.id} value={p.id}>{p.title} ({p.cards.length})</option>)}</optgroup>
       <optgroup label="Vocabulaire religieux">{PAQUETS.filter((p) => p.id.startsWith('rel-')).map((p) => <option key={p.id} value={p.id}>{p.title} ({p.cards.length})</option>)}</optgroup>
-      <optgroup label="Verbes"><option value="verbes">50 verbes (50)</option></optgroup>
+      <optgroup label="Verbes et grammaire"><option value="verbes">50 verbes (50)</option><option value="grammaire">{paquet('grammaire').title} ({paquet('grammaire').cards.length})</option></optgroup>
     </select></label>
     <Bar value={deck.filter((c) => boxOf(data, c.id) >= 3).length / deck.length} />
     <div className="game-grid">{GAMES.filter((g) => g.id !== 'ecoute' || canSpeak()).map((g) => <button key={g.id} className="game-card" onClick={() => setGame(g.id)}>
@@ -255,6 +254,23 @@ function Livrets() {
   const [open, setOpen] = useState<string | null>(null);
   const l = LIVRETS.find((x) => x.book.dir === open);
   if (l) return <><button className="link-btn back-link" onClick={() => setOpen(null)}>‹ Livrets</button><BookPages book={l.book} title={l.title} /></>;
-  return <><p className="muted small">Premiers mots, vocabulaire religieux et 50 verbes sont dans les fiches et les jeux. Les livrets ci-dessous gardent leurs pages d’origine.</p>
+  return <><p className="ritual-label">Livrets de lecture, pages d’origine</p>
     <div className="rows">{LIVRETS.map((x) => <RowLink key={x.book.dir} icon={BookOpen} title={x.title} sub={x.sub} onClick={() => setOpen(x.book.dir)} />)}</div></>;
+}
+
+/** Grammaire : les deux livrets recopiés, chaque fiche avec l'arabe, la phonétique et la traduction. */
+function Grammaire() {
+  const [book, setBook] = useState<'gs' | 'fw'>('gs');
+  const list: Chapitre[] = book === 'gs' ? GRAMMAIRE_SIMPLIFIEE : FAWAID;
+  return <>
+    <Segmented label="Livret de grammaire" value={book} onChange={setBook} options={[{ value: 'gs', label: 'Grammaire simplifiée' }, { value: 'fw', label: '30 fawâ’id' }]} />
+    {list.map((c, i) => <details key={c.id} className="soft-card ar-verb"><summary><span>{i + 1}. {c.titre[2]}</span>{/[\u0600-\u06FF]/.test(c.titre[0]) && <Ar text={c.titre[0]} />}</summary>
+      {c.titre[1] && <p className="muted small">{c.titre[1]}</p>}
+      {c.blocs.map((bl, k) => <div key={k} className="ar-table">
+        {bl.titre && <div className="ar-bloc-title">{/[\u0600-\u06FF]/.test(bl.titre[0]) ? <Ar text={bl.titre[0]} /> : <strong>{bl.titre[0]}</strong>}{bl.titre[1] && <em>{bl.titre[1]}</em>}{bl.titre[2] && <strong>{bl.titre[2]}</strong>}</div>}
+        {bl.lignes.map((l, j) => <div key={j} className="ar-line">{l[0] && <Ar text={l[0]} />}{l[1] && <em>{l[1]}</em>}{l[2] && <span>{l[2]}</span>}{l[0] && /[\u0600-\u06FF]/.test(l[0]) && <Listen text={l[0]} />}</div>)}
+      </div>)}
+    </details>)}
+    <p className="fineprint">{book === 'gs' ? '« La grammaire simplifiée »' : '« 30 fawâ’id indispensables dans la grammaire et la conjugaison »'}, Apprendre l’arabe facilement. Phonétique et traductions ajoutées.</p>
+  </>;
 }

@@ -3,6 +3,7 @@ import { ALPHABET } from './alphabet';
 import { PREMIERS_MOTS } from './premiersMots';
 import { RELIGIEUX, type Mot } from './religieux';
 import { VERBES } from './verbes';
+import { FAWAID, GRAMMAIRE_SIMPLIFIEE } from './grammaire';
 import { isoOf } from '../rituals';
 
 export const ARABE_KIND = 'arabe_jeux';
@@ -15,6 +16,8 @@ export const PAQUETS: Paquet[] = [
   { id: 'alphabet', title: 'L’alphabet', cards: ALPHABET.map((x, i) => ({ ar: x.ar, ph: x.name, fr: 'la lettre ' + x.name + ' (' + x.ph + ')', id: 'alphabet:' + i, deck: 'alphabet' })) },
   ...PREMIERS_MOTS.map((f) => ({ id: 'pm-' + f.id, title: f.title, cards: cards('pm-' + f.id, f.words) })),
   ...RELIGIEUX.map((f) => ({ id: 'rel-' + f.id, title: f.title, cards: cards('rel-' + f.id, f.words.map((w) => ({ ...w, ph: w.ph.split(' → ')[0]! }))) })),
+  { id: 'grammaire', title: 'Les notions de grammaire', cards: [...GRAMMAIRE_SIMPLIFIEE, ...FAWAID].filter((c) => c.titre[1] && /[\u0600-\u06FF]/.test(c.titre[0])).filter((c, i, a) => a.findIndex((x) => x.titre[2] === c.titre[2]) === i)
+    .map((c) => ({ ar: c.titre[0], ph: c.titre[1], fr: c.titre[2], id: 'grammaire:' + c.id, deck: 'grammaire' })) },
   { id: 'verbes', title: '50 verbes', cards: VERBES.map((v) => ({ ar: v.ar[0], ph: v.ph[0], fr: v.fr, id: 'verbes:' + v.n, deck: 'verbes' })) },
 ];
 export const paquet = (id: string) => PAQUETS.find((p) => p.id === id) ?? PAQUETS[0]!;
