@@ -46,3 +46,19 @@ describe('fréquences', () => {
     expect(mesFrequences(list)[0]).toMatchObject({ hz: 528, fois: 2, minutes: 15, ressenti: 'Apaisée', bien: 2 });
   });
 });
+
+describe('gratitude : relire, mots, météo', () => {
+  it('trouve les mots qui reviennent et une gratitude d’un autre jour', async () => {
+    const { topWords, gratitudeToReread, weatherOf, MERCI, ideasFor } = await import('../gratitude');
+    const list = [
+      { date: '2026-11-12', text: 'Le thé avec ma sœur', source: 'Soir' }, { date: '2026-11-11', text: 'Un thé au soleil', source: 'Soir' },
+      { date: '2026-11-10', text: 'Ma sœur a appelé', source: 'Matin' }, { date: '2026-10-01', text: 'thé', source: 'Matin' },
+    ];
+    expect(topWords(list, '2026-11-01', '2026-11-30').map((w) => w.word)).toEqual(['sœur', 'thé']);
+    expect(gratitudeToReread(list, '2026-11-12', true)!.date < '2026-11-12').toBe(true);
+    expect(gratitudeToReread([list[0]!], '2026-11-12')).toBeNull();
+    expect(weatherOf([e('gratitude_jour', '2026-11-12', { meteo: 'Douce', gestes: ['Lire'] })], '2026-11-12')).toEqual({ meteo: 'Douce', gestes: ['Lire'] });
+    expect(MERCI('Awa', 'ton appel')).toBe('Je pensais à toi, Awa. Merci pour ton appel. Ça m’a fait du bien.');
+    expect(ideasFor('soir')).toHaveLength(43);
+  });
+});

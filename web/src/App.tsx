@@ -36,6 +36,7 @@ import { applyOutbox, flushOutbox, pendingCount } from './lib/outbox';
 import { clearOffline, isNetworkError, knownOwner, loadOffline, rememberOwner, saveOffline } from './lib/offline';
 import { Sparkles } from 'lucide-react';
 import { useIntegrationCloudSync } from './lib/integrations';
+import { allGratitudes, gratitudeToReread } from './lib/gratitude';
 
 // Écrans chargés à la demande : l'app s'ouvre plus vite.
 const Agenda = lazy(() => import('./screens/Agenda').then((m) => ({ default: m.Agenda })));
@@ -709,7 +710,7 @@ export default function App() {
       {screen === 'proches' && <><ScreenHeader title="" onBack={() => go('home')} /><Relatives entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onEdit={editFull} onRemove={drop} /></>}
       {screen === 'lectures' && <><ScreenHeader title="" onBack={() => go('home')} /><Reading entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} /></>}
       {screen === 'panda' && <><ScreenHeader title="" onBack={() => go('home')} /><PandaScreen entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onGo={(x) => go(x as Screen)} /></>}
-      {screen === 'gratitude' && <><ScreenHeader title="" onBack={() => go('home')} /><Gratitude entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} /></>}
+      {screen === 'gratitude' && <><ScreenHeader title="" onBack={() => go('home')} /><Gratitude entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onOpenProches={() => go('proches')} /></>}
       {screen === 'carnet' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><Carnet key={carnetSign} entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} signFirst={carnetSign > 0} /></LockGate>}
       {screen === 'transformation' && <><ScreenHeader title="" onBack={() => go('home')} /><Transformation entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onGo={(t) => go(t as Screen)} /></>}
       {screen === 'envies' && <><ScreenHeader title="" onBack={() => go('home')} /><Wishes entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEdit={editFull} /></>}
@@ -717,7 +718,7 @@ export default function App() {
       {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onCreate={createFromTool} onRemove={remove} onImported={() => void refresh()} />}
       {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
       {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}
-      {screen === 'calme' && <Calm onQuit={() => go('home')} onWrite={() => addIn('equilibre', 'emotion', { date: today() })} />}
+      {screen === 'calme' && <Calm gratitude={gratitudeToReread(allGratitudes(ritualEntries), today(), true)?.text} onQuit={() => go('home')} onWrite={() => addIn('equilibre', 'emotion', { date: today() })} />}
       {screen === 'assistant' && <div className="screen"><ScreenHeader title="Assistant" onBack={() => go('home')} /><PersonalBrief entries={entries} onGo={go} /><PersonalAssistant key={assistantIdea} entries={ritualEntries} onCreate={createFromTool} initialIdea={assistantIdea} /></div>}
       {screen === 'settings' && <div className="screen"><Profile view="profile" onSettings={() => go('parametres')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); clearOffline(); await signOut(); setEntries([]); }} /></div>}
       {screen === 'parametres' && <div className="screen"><Profile view="settings" onSettings={() => go('settings')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); clearOffline(); await signOut(); setEntries([]); }} /></div>}

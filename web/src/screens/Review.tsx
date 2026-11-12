@@ -1,4 +1,5 @@
 import { SpiritStats } from '../features/SpiritStats';
+import { allGratitudes, GRAT_SETTINGS, topWords, weatherOf } from '../lib/gratitude';
 import { realisedBetween } from '../lib/carnet';
 import { Glyph, MoodIcon, type Tint } from '../ui/Glyph';
 import { useMemo, useState } from 'react';
@@ -166,7 +167,27 @@ function MoodCalendar({ entries }: { entries: Entry[] }) {
       {days.map((d, i) => <span key={d} className={'cal-day' + (d === isoOf(now) ? ' today' : '')} style={{ background: MOOD_COLOR[moods[i]!] ?? '#F4F2EF' }} title={moods[i] || ''}>
         <small>{i + 1}</small><MoodIcon mood={moods[i]} size={16} /></span>)}</div>
     <div className="cal-legend">{totals.map((t) => <span key={t.value}><i style={{ background: MOOD_COLOR[t.value] }} />{t.value} · {t.n}</span>)}</div>
+    <MonthGratitude entries={entries} days={days} />
   </div>;
+}
+
+/** Sous le calendrier d'humeur : mes météos intérieures, les gestes, les mots de gratitude qui reviennent et une préférée. */
+function MonthGratitude({ entries, days }: { entries: Entry[]; days: string[] }) {
+  const weathers = days.map((d) => ({ d, ...weatherOf(entries, d) })).filter((w) => w.meteo || w.gestes.length);
+  const all = allGratitudes(entries), inMonth = all.filter((g) => g.date >= days[0]! && g.date <= days.at(-1)!);
+  const words = topWords(all, days[0]!, days.at(-1)!, 6);
+  const favs = (entries.find((e) => e.kind === GRAT_SETTINGS)?.data.favs ?? []) as string[];
+  const fav = inMonth.find((g) => favs.includes(g.text)) ?? all.find((g) => favs.includes(g.text));
+  const gestes = new Map<string, number>(); for (const w of weathers) for (const g of w.gestes) gestes.set(g, (gestes.get(g) ?? 0) + 1);
+  if (!weathers.length && !inMonth.length) return null;
+  return <section className="ritual-card month-grat">
+    {weathers.some((w) => w.meteo) && <><p className="ritual-label">Mes météos intérieures</p>
+      <p className="muted">{weathers.filter((w) => w.meteo).map((w) => new Date(w.d + 'T12:00:00').getDate() + ' ' + w.meteo).join(' · ')}</p></>}
+    {gestes.size > 0 && <p className="muted small">Petits gestes : {[...gestes.entries()].map(([g, n]) => g.toLowerCase() + ' ' + n + ' fois').join(', ')}</p>}
+    {inMonth.length > 0 && <><p className="ritual-label">{inMonth.length} gratitude{inMonth.length > 1 ? 's' : ''} ce mois-ci</p>
+      {words.length > 0 && <p className="muted">Ce qui revient : {words.map((w) => w.word).join(', ')}</p>}</>}
+    {fav && <p className="grat-quote">« {fav.text} »</p>}
+  </section>;
 }
 
 /** « Il y a un an… » : la journée et les notes à la même date l'an dernier. */

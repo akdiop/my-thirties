@@ -5,7 +5,7 @@ import { unlockSound } from '../lib/sound';
 import { BreathPlayer, GuidedPlayer } from '../features/MeditationPlayers';
 
 /** « J’ai besoin de me calmer » : un SOS à trois choix, puis une respiration et un exercice adaptés. */
-export function Calm({ onQuit, onWrite }: { onQuit: () => void; onWrite: () => void }) {
+export function Calm({ onQuit, onWrite, gratitude }: { onQuit: () => void; onWrite: () => void; gratitude?: string }) {
   const [sos, setSos] = useState<SosKey | 'respirer' | null>(null);
   const [stage, setStage] = useState<'breath' | 'guided'>('breath');
   const plan = sos && sos !== 'respirer' ? SOS[sos] : null;
@@ -31,6 +31,7 @@ export function Calm({ onQuit, onWrite }: { onQuit: () => void; onWrite: () => v
         <button onClick={() => { setSos(null); setStage('breath'); }}>Changer</button>
       </div>
     </>}
+    {gratitude && <div className="calm-grat"><small>Une gratitude d’un autre jour</small><p>{gratitude}</p></div>}
     <button className="calm-note" onClick={onWrite}>Écrire ce que je ressens (facultatif)</button>
   </div>;
 }

@@ -42,7 +42,8 @@ export const PROGRAMME: JourProgramme[] = [
   { theme: 'Ma semaine, vue d’ici', q: ['La gratitude que j’aime le plus relire', 'Ce qui m’a surprise cette semaine', 'Ce que j’aimerais emporter dans la suivante'], extra: 'Ce que ces sept jours m’ont appris', extraHint: 'quelques mots', mot: 'Tu peux reprendre demain ou plus tard.' },
 ];
 
-export type GratData = { date?: string; matin?: string[]; soir?: string[]; qMatin?: string[]; qSoir?: string[]; p7?: string[]; p7extra?: string; meteo?: string; gestes?: string[]; note?: string };
+export type GratData = { date?: string; matin?: string[]; soir?: string[]; qMatin?: string[]; qSoir?: string[]; p7?: string[]; p7extra?: string; meteo?: string; gestes?: string[]; note?: string;
+  photo?: string; media?: { path: string; type: 'photo' | 'audio'; secs?: number }[]; nom?: { n: number; text: string } };
 
 const dayNumber = (iso: string) => Math.floor(Date.parse(iso + 'T12:00:00Z') / 86_400_000);
 /** Les trois questions du jour : elles changent chaque jour, dans l'ordre des listes. */
@@ -86,3 +87,34 @@ export function gratitudeStreak(list: Gratitude[], today: string) {
   while (days.has(iso(n))) { count++; n--; }
   return count;
 }
+
+/** Une idée quand rien ne vient : les 30 amorces et les idées du moment (matin ou soir). */
+export const ideasFor = (moment: Moment | 'sept') => [...AMORCES, ...(moment === 'matin' ? MATIN : SOIR)];
+
+const STOP = new Set(('le la les un une des de du d l à au aux et en dans pour par sur avec sans que qui quoi ce cet cette ces mon ma mes ton ta tes son sa ses notre nos votre vos leur leurs je j me m moi tu te t il elle on nous vous ils elles y a ai as est été être avoir fait faire plus très bien tout tous toute toutes ne pas n se s qu c ça cela comme mais ou où donc si aussi encore déjà quand chez entre peu un peu aujourd hui aujourd’hui jour journée').split(' '));
+/** Les mots qui reviennent le plus dans mes gratitudes d'une période. */
+export function topWords(list: Gratitude[], from: string, to: string, n = 8) {
+  const count = new Map<string, number>();
+  for (const g of list) if (g.date >= from && g.date <= to)
+    for (const w of g.text.toLowerCase().normalize('NFC').split(/[^\p{L}]+/u)) if (w.length > 2 && !STOP.has(w)) count.set(w, (count.get(w) ?? 0) + 1);
+  return [...count.entries()].filter(([, c]) => c > 1).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, n).map(([word, c]) => ({ word, c }));
+}
+
+/** Une gratitude d'un autre jour, à relire (au hasard, ou stable pour la journée si un jour est donné). */
+export function gratitudeToReread(list: Gratitude[], today: string, stable = false) {
+  const old = list.filter((g) => g.date < today);
+  if (!old.length) return null;
+  return old[stable ? dayNumber(today) % old.length : Math.floor(Math.random() * old.length)]!;
+}
+
+/** Une fois par semaine (le vendredi), relier un bienfait à un Nom d'Allah : un nom différent chaque semaine. */
+export const isNameDay = (day: string) => new Date(day + 'T12:00:00').getDay() === 5;
+export const nameIndexOf = (day: string) => Math.floor(dayNumber(day) / 7);
+
+/** Météo intérieure et gestes du jour notés dans Ma gratitude, pour le calendrier d'humeur du bilan. */
+export function weatherOf(entries: Entry[], day: string) {
+  const d = entries.find((e) => e.kind === GRAT_KIND && e.entry_date === day)?.data as GratData | undefined;
+  return { meteo: d?.meteo ?? '', gestes: d?.gestes ?? [] };
+}
+
+export const MERCI = (name: string, why: string) => 'Je pensais à toi' + (name ? ', ' + name : '') + '. ' + (why ? 'Merci pour ' + why.replace(/^(pour|merci)\s+/i, '') + '.' : 'Merci d’être là, tout simplement.') + ' Ça m’a fait du bien.';

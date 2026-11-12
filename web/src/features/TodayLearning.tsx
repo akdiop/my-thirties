@@ -4,7 +4,7 @@ import { useWirdCount, WIRD_KIND } from './Wird';
 import { afterEntry, currentAfterPrayer } from './AfterPrayer';
 import { afterProgress, type AfterData } from '../lib/afterPrayer';
 import { goalOf } from '../../supabase/functions/push-reminders/wird';
-import { GRAT_KIND, type GratData } from '../lib/gratitude';
+import { allGratitudes, GRAT_KIND, gratitudeToReread, type GratData } from '../lib/gratitude';
 import { ARABE_KIND, arabicWordOfDay, streak, type ArabeData } from '../lib/arabe/jeux';
 import { carnetWindow, pageOf, wishes } from '../lib/carnet';
 import { inWindow } from '../../supabase/functions/push-reminders/carnet';
@@ -32,6 +32,7 @@ export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
   const afterP = afterProgress((afterEntry(entries, today)?.data ?? {}) as AfterData, after);
   const gMoment = new Date().getHours() < 14 ? 'matin' as const : 'soir' as const;
   const gDone = ((entries.find((e) => e.kind === GRAT_KIND && e.entry_date === today)?.data ?? {}) as GratData)[gMoment]?.filter((x) => x.trim()).length ?? 0;
+  const reread = gratitudeToReread(allGratitudes(entries), today, true);
   const arabe = entries.find((e) => e.kind === ARABE_KIND);
   const arWord = arabe ? arabicWordOfDay(today) : null;
   const arStreak = arabe ? streak(arabe.data as ArabeData, today) : 0;
@@ -79,7 +80,8 @@ export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
       <button className="dl-row" onClick={() => onOpen('gratitude')}>
         <span className="dl-icon"><HandHeart size={18} /></span>
         <span className="dl-text"><small>Ma gratitude · {gMoment === 'matin' ? 'ce matin' : 'ce soir'} · {gDone}/3</small>
-          <strong>{gDone >= 3 ? 'Trois gratitudes notées, alhamdulillah' : gMoment === 'matin' ? 'Pour quoi es-tu reconnaissante ce matin ?' : 'Qu’est-ce que tu gardes de ta journée ?'}</strong></span>
+          <strong>{gDone >= 3 ? 'Trois gratitudes notées, alhamdulillah' : gMoment === 'matin' ? 'Pour quoi es-tu reconnaissante ce matin ?' : 'Qu’est-ce que tu gardes de ta journée ?'}</strong>
+          {reread && <span className="dl-point">À relire : « {reread.text.slice(0, 90)} »</span>}</span>
       </button>
 
       {arabe && arWord && <div className="dl-row">
