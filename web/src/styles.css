@@ -2071,3 +2071,6 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .mc-line{fill:none;stroke:#5F7A59;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
 .mc-dot{fill:#fff;stroke:#5F7A59;stroke-width:2}
 .mood-curve .stat-row{grid-template-columns:repeat(2,1fr)}
+.hsp-step{display:flex;gap:12px;align-items:flex-start}.hsp-step p{margin:2px 0 0}
+.hsp-phrase{position:relative;padding-right:44px}.hsp-phrase p{margin:4px 0;font-size:1.05rem}
+.hsp-phrase .icon-btn{position:absolute;right:10px;top:12px}
