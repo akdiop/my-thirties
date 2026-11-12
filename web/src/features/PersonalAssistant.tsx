@@ -4,7 +4,7 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { askAssistant, type Turn } from '../lib/assistant';
 import { Dictate, appendText } from '../ui/Dictate';
 import { useIntegrationPrefs } from '../lib/integrations';
-import { addDays, habitStreak, isoOf, NOTE_KIND } from '../lib/rituals';
+import { activeHabits, addDays, habitStreak, isoOf, NOTE_KIND } from '../lib/rituals';
 import { GOAL_KIND, goalProgress, goalSteps, VISION_KIND } from '../lib/growth';
 import { fmt, mainCurrency, monthReport } from '../lib/money';
 import { moodOn } from '../screens/Review';
@@ -47,7 +47,7 @@ export function buildContext(entries: Entry[], on: Set<Source>, today = isoOf(ne
     parts.push('Agenda des 7 prochains jours :\n' + (items.join('\n') || '- rien de prévu'));
   }
   if (on.has('habits')) {
-    const items = entries.filter((e) => e.kind === 'habit').slice(0, 20).map((e) => {
+    const items = activeHabits(entries).slice(0, 20).map((e) => {
       const done = (e.data.done ?? {}) as Record<string, boolean>;
       const week = Array.from({ length: 7 }, (_, i) => addDays(today, -i)).filter((d) => done[d]).length;
       return `- ${short(e.title)} : série ${habitStreak(e, today)} j, ${week}/7 cette semaine${done[today] ? ', fait aujourd’hui' : ''}`;

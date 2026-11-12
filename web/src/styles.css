@@ -1046,7 +1046,9 @@ textarea.soft-input,.ritual-card textarea{resize:vertical;min-height:64px}
 .habits-empty p{color:#6F6B63;margin:0 0 6px}
 .leaf-badge{width:84px;height:84px;border-radius:50%;background:#EBE8E2;display:grid;place-items:center;font-size:2.2rem}
 .habit-list{display:flex;flex-direction:column;gap:10px}
-.habit-card{background:#fff;border:1px solid #E8E2D6;border-radius:18px;padding:12px;display:flex;align-items:center;gap:12px}
+.habit-card{background:#fff;border:1px solid #E8E2D6;border-radius:18px;padding:12px;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.habit-panel{flex-basis:100%;min-width:0}
+.habit-panel > .habit-settings,.habit-panel > .habit-month,.habit-panel > .habit-note-edit,.habit-panel > .chain-select{margin-top:0}
 .habit-card.on{background:#F2F5F0;border-color:#D7E0D2}
 .habit-check{width:52px;height:52px;border-radius:50%;border:2px solid #DDD8CD;background:#fff;display:grid;place-items:center;font-size:1.4rem;flex:none;cursor:pointer;color:#fff}
 .habit-card.on .habit-check{background:#5F7A59;border-color:#5F7A59}
@@ -1054,10 +1056,12 @@ textarea.soft-input,.ritual-card textarea{resize:vertical;min-height:64px}
 .habit-body strong{font-size:.95rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .habit-body small{font-size:.76rem;color:#6F6B63;display:flex;align-items:center;gap:3px;flex-wrap:wrap}
 .week-dots{display:flex;gap:4px;margin-top:4px}
-.week-dots span{width:22px;height:22px;border-radius:50%;background:#EFEDE9;color:#97938B;font-size:.62rem;display:grid;place-items:center;font-weight:600}
-.week-dots span.on{background:#5F7A59;color:#fff}
-.week-dots span.today{box-shadow:0 0 0 2px #CAC4B7}
-.week-dots span.future{opacity:.45}
+.week-dots span,.week-dots button{width:22px;height:22px;border-radius:50%;background:#EFEDE9;color:#97938B;font-size:.62rem;display:grid;place-items:center;font-weight:600}
+.week-dots button{width:26px;height:26px;border:0;padding:0;font:inherit;font-size:.66rem;font-weight:600}
+.week-dots span.on,.week-dots button.on{background:#5F7A59;color:#fff}
+.week-dots span.today,.week-dots button.today{box-shadow:0 0 0 2px #CAC4B7}
+.week-dots span.future,.week-dots button.future{opacity:.45}
+.week-dots button.paused:not(.on){background:repeating-linear-gradient(135deg,#EFEDE9 0 3px,#E2DED5 3px 6px)}
 .habit-group{font-size:1.05rem;margin:18px 0 8px}
 .habit-lib{background:#fff;border:1px solid #E8E2D6;border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:10px}
 .habit-emoji{font-size:1.7rem;width:40px;text-align:center;flex:none}
@@ -2085,6 +2089,37 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .habit-remind input[type=time]{width:auto;margin-left:auto}
 .habit-actions{display:flex;flex-direction:column;gap:2px;flex:none}
 .freq-stepper{margin-top:10px}
+.habit-count{display:grid;grid-template-columns:auto auto auto 1fr;align-items:center;gap:8px;margin-top:6px}
+.habit-count button{width:32px;height:32px;border-radius:16px;border:0;background:#E4E0D8;color:#7E7254;display:grid;place-items:center;padding:0}
+.habit-count button:disabled{opacity:.4}
+.habit-count span{font-size:.85rem;color:#3A3833;font-variant-numeric:tabular-nums;white-space:nowrap}
+.habit-steps{margin-top:6px}
+.habit-steps button{padding:7px 10px;font-size:.85rem}
+.habit-note{margin:4px 0 0;font-size:.8rem;font-style:italic;color:#6F6B63}
+.habit-note-edit{display:flex;gap:8px;margin-top:8px;align-items:center}
+.habit-note-edit input{flex:1;min-width:0}
+.habit-pause{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:.85rem}
+.habit-pause input[type=date]{width:auto}
+.habit-archive-btn{align-self:flex-start;display:inline-flex;align-items:center;gap:6px}
+.habit-remind select{width:auto;margin-left:auto}
+.habit-goal-fields{display:grid;grid-template-columns:80px 1fr;gap:8px}
+.habit-archive{margin-top:14px;padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.55);border:1px solid #E8E2D6}
+.habit-archive summary{cursor:pointer;font-weight:600;color:#7E7254}
+.habit-archive-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid #EFEBE3}
+.habit-archive-row > span{flex:1;min-width:0;display:flex;flex-direction:column}
+.habit-month{margin-top:8px;padding:10px 12px;border-radius:14px;background:rgba(95,122,89,.06)}
+.habit-month-head{display:flex;align-items:center;justify-content:space-between;text-transform:capitalize}
+.habit-month-head .icon-btn:disabled{opacity:.3}
+.habit-month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;margin:6px 0}
+.habit-month-grid small{font-size:.66rem;color:#97938B;font-weight:600}
+.habit-month-grid button{aspect-ratio:1;border:0;border-radius:50%;background:#EFEDE9;color:#6F6B63;font:inherit;font-size:.74rem;padding:0;position:relative}
+.habit-month-grid button.on{background:#5F7A59;color:#fff;font-weight:600}
+.habit-month-grid button.paused:not(.on){background:repeating-linear-gradient(135deg,#EFEDE9 0 3px,#E2DED5 3px 6px)}
+.habit-month-grid button.today{box-shadow:0 0 0 2px #CAC4B7}
+.habit-month-grid button:disabled{opacity:.4}
+.habit-month-grid button.noted::after{content:'';position:absolute;bottom:3px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:#B08A6E}
+.habit-month-notes{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:#3A3833}
+.habit-month-notes b{color:#7E7254;font-weight:600;margin-right:4px}
 .freq-stepper .freq-value{flex:1;text-align:center;font-weight:600;color:#3A3833}
 .freq-stepper button:disabled{opacity:.4}
 .journal-card{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;text-align:left;border:1px solid rgba(255,255,255,.75);background:rgba(255,255,255,.62);border-radius:18px;padding:14px 16px;color:#3A3833;font:inherit;cursor:pointer}
