@@ -7,11 +7,14 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import webpush from 'npm:web-push@3.6.7';
 import { CalculationMethod, Coordinates, Madhab, PrayerTimes } from 'npm:adhan@4.4.3';
+import { suppStatus } from './supplements.ts';
+import { isEve, writingWindow, type CarnetSettings } from './carnet.ts';
+import { wirdPace, wirdSlots } from './wird.ts';
 
 type Prefs = { morning?: { on?: boolean; time?: string }; evening?: { on?: boolean; time?: string }; habits?: { on?: boolean; time?: string };
   agenda?: { on?: boolean; minutes?: number }; weekly?: { on?: boolean; day?: number; time?: string }; supplements?: { on?: boolean };
   plan?: { on?: boolean; time?: string }; birthdays?: { on?: boolean; time?: string };
-  prayers?: { on?: boolean; minutes?: number }; fasting?: { on?: boolean; time?: string }; water?: { on?: boolean; time?: string } };
+  prayers?: { on?: boolean; minutes?: number }; fasting?: { on?: boolean; time?: string }; water?: { on?: boolean; time?: string }; carnet?: { on?: boolean; time?: string }; wird?: { on?: boolean } };
 type Row = { id: string; module: string; kind: string; title: string; entry_date: string | null; data: Record<string, unknown> };
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 const json = (d: unknown, status = 200) => new Response(JSON.stringify(d), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -114,7 +117,7 @@ Deno.serve(async (request) => {
     const p = (u.prefs ?? {}) as Prefs, now = localNow(u.tz);
     const queue: { key: string; title: string; body: string; url: string }[] = [];
     const { data: rows } = await db.from('entries').select('id,module,kind,title,entry_date,data').eq('user_id', u.user_id)
-      .in('kind', ['daily', 'habit', 'task', 'event', 'appointment', 'routine', 'complement', 'proche', 'prayer_settings']);
+      .in('kind', ['daily', 'habit', 'task', 'event', 'appointment', 'routine', 'complement', 'proche', 'prayer_settings', 'cycle', 'carnet_reglages', 'wird']);
     const list = (rows ?? []) as Row[];
     const today = list.find((e) => e.kind === 'daily' && e.entry_date === now.date);
 
@@ -132,7 +135,7 @@ Deno.serve(async (request) => {
         const t = typeof e.data.time === 'string' ? mins(e.data.time) : -1;
         const start = String(e.data.start ?? e.entry_date ?? now.date), days = Number(e.data.days) || 0;
         const n = Math.floor((Date.parse(now.date + 'T12:00:00Z') - Date.parse(start + 'T12:00:00Z')) / 86_400_000) + 1;
-        if (t < 0 || n < 1 || (days && n > days) || (e.data.done as Record<string, boolean> | undefined)?.[now.date]) continue;
+        if (t < 0 || n < 1 || (days && n > days) || !suppStatus(e.data, now.date).due) continue;
         if (due(now.minutes, t)) queue.push({ key: 'supp:' + e.id + ':' + now.date, title: 'Mes compléments', body: e.title + (e.data.dose ? ' · ' + String(e.data.dose) : '') + (days ? ' · jour ' + n + '/' + days : ''), url: '/?ecran=complements' });
       }
     }
@@ -153,6 +156,23 @@ Deno.serve(async (request) => {
       }
     }
     // Eau : l'après-midi, si l'objectif de 8 verres n'est pas atteint.
+    // Objectifs de dhikr : à 4 moments répartis dans la plage choisie, seulement si j'ai du retard.
+    if (p.wird?.on !== false) {
+      for (const e of list.filter((x) => x.kind === 'wird')) {
+        const slot = wirdSlots(e.data).find((m) => due(now.minutes, m));
+        if (slot === undefined) continue;
+        const pace = wirdPace(e.data, now.date, now.minutes);
+        if (!pace.finished && pace.behind > 0)
+          queue.push({ key: 'wird:' + e.id + ':' + now.date + ':' + slot, title: 'Mon dhikr du jour', body: e.title.slice(0, 60) + ' · ' + pace.done + ' sur ' + pace.goal + ', vise ' + pace.expected + ' à cette heure.', url: '/?ecran=spiritualite' });
+      }
+    }
+    // Carnet de vœux : la veille de la fenêtre d'écriture, un rappel neutre (sans mention du cycle).
+    if (p.carnet?.on !== false && due(now.minutes, mins(p.carnet?.time ?? '20:00'))) {
+      const settings = (list.find((e) => e.kind === 'carnet_reglages')?.data ?? {}) as CarnetSettings;
+      const starts = list.filter((e) => e.kind === 'cycle' && e.entry_date).map((e) => e.entry_date!);
+      if (isEve(writingWindow(starts, settings, now.date), now.date))
+        queue.push({ key: 'carnet:' + now.date, title: 'Mon carnet', body: 'Demain, ta page du mois t’attend.', url: '/?ecran=carnet' });
+    }
     if (p.water?.on !== false && due(now.minutes, mins(p.water?.time ?? '16:00'))) {
       const n = Math.max(0, Number(today?.data.water) || 0);
       if (n < 8) queue.push({ key: 'water:' + now.date, title: 'Un verre d’eau ?', body: n ? n + ' verre' + (n > 1 ? 's' : '') + ' sur 8 aujourd’hui.' : 'Pas encore de verre noté aujourd’hui.', url: '/' });

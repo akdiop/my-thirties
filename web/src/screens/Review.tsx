@@ -1,4 +1,5 @@
 import { SpiritStats } from '../features/SpiritStats';
+import { realisedBetween } from '../lib/carnet';
 import { Glyph, MoodIcon, type Tint } from '../ui/Glyph';
 import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
@@ -53,6 +54,7 @@ function YearInNumbers({ entries, birthDate }: { entries: Entry[]; birthDate: st
     s.notes && { k: pl(s.notes, 'page de journal', 'pages de journal'), v: n(s.notes) },
     s.water && { k: pl(s.water, 'verre d’eau', 'verres d’eau'), v: n(s.water) },
     s.steps && { k: 'pas', v: n(s.steps) },
+    s.wishes && { k: pl(s.wishes, 'souhait réalisé', 'souhaits réalisés'), v: n(s.wishes) },
   ].filter(Boolean) as { k: string; v: string; sub?: string }[];
   const share = async () => {
     const txt = 'Ma trentaine en chiffres · ' + w.label.toLowerCase() + '\n' + tiles.map((t) => '• ' + t.v + ' ' + t.k).join('\n');
@@ -74,7 +76,8 @@ function Week({ entries }: { entries: Entry[] }) {
   const inWeek = (d?: string | null) => Boolean(d && d >= days[0]! && d <= days[6]!);
   const s = useMemo(() => {
     const dailies = entries.filter((e) => e.kind === DAILY_KIND && inWeek(e.entry_date)).sort((a, b) => String(a.entry_date).localeCompare(String(b.entry_date)));
-    const wins = dailies.flatMap((e) => typeof e.data.win === 'string' && e.data.win.trim() ? [{ day: String(e.entry_date), text: e.data.win.trim() }] : []);
+    const wins = [...dailies.flatMap((e) => typeof e.data.win === 'string' && e.data.win.trim() ? [{ day: String(e.entry_date), text: e.data.win.trim() }] : []),
+      ...realisedBetween(entries, days[0]!, days[6]!).map((w) => ({ day: w.realisedOn, text: 'Souhait réalisé, alhamdulillah : ' + w.text }))].sort((a, b) => a.day.localeCompare(b.day));
     const grats = dailies.flatMap((e) => Array.isArray(e.data.gratitudes) ? e.data.gratitudes.map(String).filter((g) => g.trim()) : []);
     const habits = entries.filter((e) => e.kind === HABIT_KIND).map((e) => {
       const f = habitFreq(e), done = habitDone(e);
@@ -129,7 +132,7 @@ function Week({ entries }: { entries: Entry[] }) {
       {s.habits.map(({ e, count, target }) => <div key={e.id} className="habit-stat"><span className="inline-glyph"><Glyph name={String(e.data.icon || 'sprout')} tint={(e.data.tint as Tint) || 'sauge'} size={16} /> {e.title}</span><small>{count}/{target}</small><Bar value={Math.min(1, count / target)} /></div>)}</section>}
     <SpiritStats entries={entries} days={7} end={days[6]! > today ? today : days[6]!} compact />
     <section className="ritual-card"><p className="ritual-label"><Glyph name="trophy" tint="or" /> Mes victoires</p>
-      {s.wins.length ? <ul className="win-list">{s.wins.map((w) => <li key={w.day}><small>{short(w.day)}</small> {w.text}</li>)}</ul> : <p className="muted">Note ta victoire du jour dans le débriefing du soir.</p>}</section>
+      {s.wins.length ? <ul className="win-list">{s.wins.map((w, i) => <li key={w.day + i}><small>{short(w.day)}</small> {w.text}</li>)}</ul> : <p className="muted">Note ta victoire du jour dans le débriefing du soir.</p>}</section>
     {s.grats.length > 0 && <section className="ritual-card"><p className="ritual-label"><Glyph name="handHeart" tint="rose" /> {s.grats.length} gratitude(s)</p><p className="muted">{s.grats.slice(0, 8).join(' · ')}</p></section>}
     {s.spend.size > 0 && <section className="ritual-card"><p className="ritual-label"><Glyph name="coins" tint="caramel" /> Dépenses de la semaine</p>{[...s.spend].map(([c, n]) => <strong key={c}>{fmt(n, c)}</strong>)}</section>}
     <section className="ritual-card ai-card">
@@ -171,11 +174,13 @@ export function OneYearAgo({ entries, onOpenDay, onOpenNote }: { entries: Entry[
   const t = new Date(); const d = isoOf(new Date(t.getFullYear() - 1, t.getMonth(), t.getDate()));
   const day = entries.find((e) => e.kind === DAILY_KIND && e.entry_date === d);
   const notes = entries.filter((e) => e.kind === NOTE_KIND && e.entry_date === d);
-  if (!day && !notes.length) return null;
+  const realised = realisedBetween(entries, d, d);
+  if (!day && !notes.length && !realised.length) return null;
   return <section className="year-ago">
     <p className="ritual-label"><Glyph name="history" tint="lilas" /> Il y a un an, jour pour jour</p>
     {day && <button className="note-row" onClick={() => onOpenDay(d)}><span className="note-emoji">{day.data.mood ? <MoodIcon mood={day.data.mood} badge={36} /> : <Glyph name="calendar" tint="caramel" badge={36} />}</span>
       <span><strong>Mon jour</strong><small>{String(day.data.intention || day.data.win || '')}</small></span></button>}
+    {realised.map((w) => <div key={w.entry.id} className="note-row"><span className="note-emoji"><Glyph name="trophy" tint="or" badge={36} /></span><span><strong>Souhait réalisé, alhamdulillah</strong><small>{w.text}</small></span></div>)}
     {notes.map((n) => <button key={n.id} className="note-row" onClick={() => onOpenNote?.(n)}><span className="note-emoji"><Glyph name="notebook" badge={36} /></span><span><strong>{n.title}</strong><small>{String(n.data.body ?? '').slice(0, 100)}</small></span></button>)}
   </section>;
 }

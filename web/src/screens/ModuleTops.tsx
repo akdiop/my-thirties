@@ -1,6 +1,6 @@
 import { QUESTS } from '../lib/boosterDays';
 import { useState, type ReactNode } from 'react';
-import { BookHeart, BookOpen, CalendarDays, Compass, CloudSun, HandCoins, Heart, Lightbulb, MapPin, Mountain, Star, Sun, Waves, Zap, Shield, Smile, Scale, Feather, Moon } from 'lucide-react';
+import { BookHeart, BookOpen, CalendarDays, Compass, CloudSun, HandCoins, Heart, Lightbulb, MapPin, Mountain, Star, Sun, Waves, Zap, Shield, Smile, Scale, Feather, Moon, Languages } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { bilanDay, str, todayIso } from '../lib/day';
 import { DaySwitch, dayName } from '../features/DaySwitch';
@@ -11,6 +11,9 @@ import { SpiritStats } from '../features/SpiritStats';
 import { SpiritLessons } from '../features/SpiritLessons';
 import { Ramadan } from '../features/Ramadan';
 import { DhulHijja } from '../features/DhulHijja';
+import { Wird } from '../features/Wird';
+import { AfterPrayer } from '../features/AfterPrayer';
+import { ArabicModule } from '../features/ArabicModule';
 import { dhulHijjaStatus } from '../lib/dhulHijja';
 import { ramadanStatus } from '../lib/ramadan';
 
@@ -109,7 +112,7 @@ export function EquilibreTop({ tab, onTab, entries, onAxis, onQuest, booster }: 
 /* ---------- Ma spiritualité ---------- */
 const hijri = (d = new Date()) => { try { return new Intl.DateTimeFormat('fr-FR-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric' }).format(d); } catch { return ''; } };
 const DHIKR = ['SubhanAllah', 'Alhamdulillah', 'Allahu akbar', 'Astaghfirullah', 'La ilaha illa Allah'];
-export type SpiritTab = 'home' | 'dhikr' | 'hijri' | 'journal' | 'horaires' | 'invocations' | 'qibla' | 'regularite' | 'cours' | 'ramadan' | 'dhulhijja';
+export type SpiritTab = 'home' | 'dhikr' | 'hijri' | 'journal' | 'horaires' | 'invocations' | 'qibla' | 'regularite' | 'cours' | 'ramadan' | 'dhulhijja' | 'wird' | 'apres' | 'arabe';
 /** Compteur de dhikr : on touche le cercle, objectif 33, enregistrement du total du jour. */
 function DhikrCounter({ day, entries, onCreate }: { day: string; entries: Entry[]; onCreate: (i: EntryInput) => Promise<void> }) {
   const [count, setCount] = useState(0);
@@ -175,7 +178,10 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }:
         <RowLink icon={CalendarDays} title="Horaires des prières" sub={p?.city ? p.city + " · position, méthode" : "ma position, méthode de calcul"} onClick={() => onTab('horaires')} />
         <RowLink icon={Star} title="Ma régularité" sub="prières, dhikr et Coran sur 30 jours" onClick={() => onTab('regularite')} />
         <RowLink icon={Compass} title="Direction de la Qibla" sub="boussole" onClick={() => onTab('qibla')} />
+        <RowLink icon={Star} title="Mes objectifs de dhikr" sub="100 ou 1000 fois dans la journée, à ton rythme" onClick={() => onTab('wird')} />
+        <RowLink icon={Sun} title="Après la prière" sub="istighfâr, tasbîh 33, Âyat al-Kursî, al-Mu‘awwidhât" onClick={() => onTab('apres')} />
         <RowLink icon={Heart} title="Mes invocations" sub="routine de dhikr, protection, pardon, réussite…" onClick={() => onTab('invocations')} />
+        <RowLink icon={Languages} title="Mon arabe" sub="jeux, fiches avec phonétique, alphabet, livrets" onClick={() => onTab('arabe')} />
         <RowLink icon={BookOpen} title="Mes cours" sub="tafsir, Ayat al-Kursî, la prière, la roqya" onClick={() => onTab('cours')} />
         <RowLink icon={Moon} title="Ramadan" sub={ramadanSub(day)} onClick={() => onTab('ramadan')} />
         <RowLink icon={Mountain} title="Les 10 jours de Dhu al-Hijja" sub={dhulSub(day)} onClick={() => onTab('dhulhijja')} />
@@ -189,6 +195,9 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }:
     {tab === 'hijri' && <SpiritCalendar />}
     {tab === 'cours' && <SpiritLessons onBack={() => onTab('home')} />}
     {tab === 'ramadan' && <Ramadan entries={entries} onCreate={onCreate} onUpdate={onUpdate} />}
+    {tab === 'wird' && <Wird entries={entries} onCreate={onCreate} onUpdate={onUpdate} onRemove={onRemove} />}
+    {tab === 'apres' && <AfterPrayer entries={entries} onCreate={onCreate} onUpdate={onUpdate} />}
+    {tab === 'arabe' && <ArabicModule entries={entries} onCreate={onCreate} onUpdate={onUpdate} />}
     {tab === 'dhulhijja' && <DhulHijja entries={entries} onCreate={onCreate} onUpdate={onUpdate} />}
   </div>;
 }

@@ -99,3 +99,97 @@ describe('bilan après minuit', () => {
     expect(dayBefore('2026-03-01')).toBe('2026-02-28');
   });
 });
+
+import { everyOf, suppStatus } from '../../../supabase/functions/push-reminders/supplements';
+
+describe('compléments tous les X jours', () => {
+  it('tous les jours par défaut', () => {
+    expect(everyOf({})).toBe(1);
+    expect(suppStatus({ start: '2026-11-01', done: { '2026-11-11': true } }, '2026-11-12')).toMatchObject({ due: true, late: 0 });
+  });
+  it('tous les 15 jours : prochaine prise 15 jours après la dernière, retard compté', () => {
+    const d = { every: 15, start: '2026-10-01', done: { '2026-10-28': true } };
+    expect(suppStatus(d, '2026-11-05')).toMatchObject({ due: false, next: '2026-11-12' });
+    expect(suppStatus(d, '2026-11-12')).toMatchObject({ due: true, late: 0 });
+    expect(suppStatus(d, '2026-11-14')).toMatchObject({ due: true, late: 2 });
+    expect(suppStatus({ ...d, done: { ...d.done, '2026-11-14': true } }, '2026-11-14')).toMatchObject({ due: false, takenToday: true, next: '2026-11-29' });
+  });
+  it('avant la première prise : à prendre dès le début', () => {
+    expect(suppStatus({ every: 30, start: '2026-11-20', done: {} }, '2026-11-12')).toMatchObject({ due: false, next: '2026-11-20' });
+    expect(suppStatus({ every: 30, start: '2026-11-10', done: {} }, '2026-11-12')).toMatchObject({ due: true, late: 2 });
+  });
+});
+
+import { cycleLength, inWindow, isEve, writingWindow } from '../../../supabase/functions/push-reminders/carnet';
+import { pathByMonth, realisedBetween, tagCounts, wishes } from '../carnet';
+
+describe('carnet de vœux', () => {
+  it('estime la fenêtre d’écriture autour de l’ovulation', () => {
+    const starts = ['2026-09-05', '2026-10-03', '2026-10-31'];
+    expect(cycleLength(starts)).toBe(28);
+    const w = writingWindow(starts, {}, '2026-11-05');
+    expect(w).toEqual({ start: '2026-11-12', end: '2026-11-15', source: 'cycle' });
+    expect(inWindow(w, '2026-11-13')).toBe(true);
+    expect(isEve(w, '2026-11-11')).toBe(true);
+    expect(writingWindow(starts, {}, '2026-11-16').start).toBe('2026-12-10');
+  });
+  it('sans cycle ou en mode manuel : le jour choisi', () => {
+    expect(writingWindow([], { day: 20 }, '2026-11-05')).toEqual({ start: '2026-11-20', end: '2026-11-22', source: 'manuel' });
+    expect(writingWindow([], { day: 3 }, '2026-11-12').start).toBe('2026-12-03');
+    expect(writingWindow(['2026-10-31'], { mode: 'manuel', day: 1 }, '2026-11-12').start).toBe('2026-12-01');
+  });
+  it('suit les souhaits, les signes et les réalisations mois par mois', () => {
+    const e = (id: string, title: string, data: Record<string, unknown>) => ({ id, kind: 'voeu', title, entry_date: '2026-10-12', data } as unknown as Entry);
+    const list = [e('1', 'Un nouveau travail', { month: '2026-10', tag: 'Travail', status: 'realise', realisedOn: '2026-11-08', signs: [{ d: '2026-10-20', t: 'Un appel' }], people: [{ d: '2026-10-25', n: 'Awa' }] }),
+      e('2', 'Voyager', { month: '2026-11', tag: 'Moi', status: 'chemin', signs: [] })];
+    expect(wishes(list)).toHaveLength(2);
+    expect(realisedBetween(list, '2026-11-02', '2026-11-08').map((w) => w.text)).toEqual(['Un nouveau travail']);
+    const path = pathByMonth(list);
+    expect(path.map((m) => m.month)).toEqual(['2026-11', '2026-10']);
+    expect(path[0]!.realised).toHaveLength(1);
+    expect(path[1]!.signs).toHaveLength(1);
+    expect(tagCounts(wishes(list))).toEqual([{ tag: 'Moi', total: 1, done: 0 }, { tag: 'Travail', total: 1, done: 1 }]);
+  });
+});
+
+const PAGES = new Set(Object.keys(import.meta.glob('../../../public/cours/*/*.jpg')).map((k) => k.replace('../../../', '')));
+
+describe('livrets intégrés', () => {
+  it('chaque page du sommaire existe', () => {
+    for (const l of LESSONS.filter((x) => x.book)) {
+      const b = l.book!;
+      for (let n = 1; n <= b.pages; n++) expect(PAGES.has('public/cours/' + b.dir + '/p-' + String(n).padStart(2, '0') + '.jpg')).toBe(true);
+      for (const [, n] of b.toc ?? []) expect(n).toBeLessThanOrEqual(b.pages);
+    }
+  });
+});
+
+import { countOn, wirdPace, wirdSlots } from '../../../supabase/functions/push-reminders/wird';
+import { AFTER_PRAYER, afterProgress, lastPrayer } from '../afterPrayer';
+
+describe('objectifs de dhikr', () => {
+  it('répartit l’objectif dans la journée et calcule le retard', () => {
+    const d = { goal: 100, start: '07:00', end: '22:00', counts: { '2026-11-12': 20 } };
+    expect(countOn(d, '2026-11-12')).toBe(20);
+    expect(wirdPace(d, '2026-11-12', 14 * 60 + 30)).toMatchObject({ expected: 50, behind: 30, left: 80, finished: false });
+    expect(wirdPace(d, '2026-11-12', 6 * 60)).toMatchObject({ expected: 0, behind: 0 });
+    expect(wirdSlots(d)).toEqual([600, 780, 960, 1140]);
+  });
+});
+
+describe('après la prière', () => {
+  it('adapte les répétitions à Fajr et Maghrib', () => {
+    const fajr = afterProgress({}, 'Fajr'), dhuhr = afterProgress({}, 'Dhuhr');
+    expect(fajr.total).toBe(AFTER_PRAYER.length);
+    expect(dhuhr.total).toBe(AFTER_PRAYER.length - 1);
+    expect(AFTER_PRAYER.find((d) => d.id === 'ikhlas')!.times('Maghrib')).toBe(3);
+    expect(AFTER_PRAYER.find((d) => d.id === 'ikhlas')!.times('Isha')).toBe(1);
+    expect(afterProgress({ done: { Isha: { istighfar: 3, subhanallah: 10 } } }, 'Isha').complete).toBe(1);
+  });
+  it('trouve la dernière prière passée', () => {
+    const t = [{ name: 'Fajr', time: '05:40' }, { name: 'Dhuhr', time: '13:30' }, { name: 'Asr', time: '16:45' }, { name: 'Maghrib', time: '19:10' }, { name: 'Isha', time: '20:30' }];
+    expect(lastPrayer(t, 14 * 60)).toBe('Dhuhr');
+    expect(lastPrayer(t, 3 * 60)).toBe('Isha');
+    expect(lastPrayer([], 6 * 60)).toBe('Fajr');
+  });
+});

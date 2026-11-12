@@ -85,7 +85,7 @@ export function buildContext(entries: Entry[], on: Set<Source>, today = isoOf(ne
     parts.push('Mes recettes : ' + (recipes.join(', ') || 'aucune') + '\nRepas prévus :\n' + (meals.join('\n') || '- aucun'));
   }
   if (on.has('supplements')) {
-    const items = entries.filter((e) => e.kind === 'complement').slice(0, 12).map((e) => `- ${short(e.title, 50)}${e.data.dose ? ' · ' + short(e.data.dose, 30) : ''}${e.data.time ? ' à ' + short(e.data.time, 5) : ''}${Number(e.data.days) ? ' · cure de ' + Number(e.data.days) + ' j' : ''}`);
+    const items = entries.filter((e) => e.kind === 'complement').slice(0, 12).map((e) => `- ${short(e.title, 50)}${e.data.dose ? ' · ' + short(e.data.dose, 30) : ''}${Number(e.data.every) > 1 ? ' tous les ' + Number(e.data.every) + ' jours' : ''}${e.data.time ? ' à ' + short(e.data.time, 5) : ''}${Number(e.data.days) ? ' · cure de ' + Number(e.data.days) + ' j' : ''}`);
     parts.push('Compléments :\n' + (items.join('\n') || '- aucun'));
   }
   return parts.join('\n\n').slice(0, 6000);

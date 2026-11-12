@@ -13,7 +13,9 @@ export type LessonPart = {
   avoid?: string[];
   duas?: { arabic: string; phonetic: string; french: string; note?: string }[];
 };
-export type Lesson = { id: string; title: string; sub: string; intro: string; parts: LessonPart[]; retain?: string[]; quiz?: { q: string; a: boolean }[] };
+/** Livret intégré tel quel : ses pages (images dans public/cours/<dir>/p-01.jpg…) et son sommaire (titre, page). */
+export type Book = { dir: string; pages: number; toc?: [string, number][]; size?: [number, number] };
+export type Lesson = { id: string; title: string; sub: string; intro: string; parts: LessonPart[]; retain?: string[]; quiz?: { q: string; a: boolean }[]; book?: Book };
 
 export const LESSONS: Lesson[] = [
   { id: 'tafsir-fatiha', title: 'Tafsir d’Al-Fâtiha', sub: 'l’Ouverture · amour, espoir, crainte, guidée',
@@ -295,6 +297,44 @@ export const LESSONS: Lesson[] = [
       ] },
     ],
     retain: ['Commencer par la prochaine prière, sans se juger.', 'Chaque jour : une obligation + un acte volontaire.', 'Après une chute : wudû’, prière, istighfâr, une petite action.'] },
+  { id: 'invocations-mot-a-mot', title: 'Les invocations du quotidien mot à mot', sub: 'comprendre chaque mot de ce que tu récites, du matin au soir',
+    intro: 'Livret « Les invocations du quotidien mot à mot » d’Apprendre l’arabe facilement (apprendre-larabe-facilement.com), intégré tel quel. Textes arabes de Hisn al-Muslim (Sa‘îd ibn ‘Alî ibn Wahf al-Qahtânî), revus sur les recueils de hadith cités en source à la fin de chaque invocation.',
+    parts: [], book: { dir: 'invocations', pages: 63, toc: [['Introduction', 3], ['Comment étudier ce livret', 5], ['Les dix mots clés', 6], ['Le matin · Âyat al-Kursî', 7],
+      ['Le matin · Les trois dernières sourates', 10], ['Le matin · Sayyid al-istighfâr', 13], ['Le matin · Asbahnâ wa asbaha l-mulku li-llâh', 16], ['Le matin · Allâhumma bika asbahnâ', 19],
+      ['Le matin · Bismi llâhi lladhî lâ yadurru', 21], ['Le soir · Les mots qui changent', 23], ['Avant de dormir et au réveil', 26], ['Le repas', 28], ['Sortir de chez soi et rentrer', 30],
+      ['Les toilettes', 32], ['L’éternuement', 34], ['Après les ablutions', 36], ['Entrer à la mosquée et en sortir', 38], ['Après la prière', 40], ['L’Istikhara', 42], ['Le voyage', 46],
+      ['La visite du cimetière', 49], ['La tristesse et l’angoisse', 51], ['L’épreuve difficile', 53], ['Quand une chose paraît difficile', 55], ['La douleur', 57], ['La protection', 59],
+      ['Les mots qui reviennent partout', 61], ['Pour aller plus loin', 63]] } },
+  { id: 'calligraphie-coran', title: 'Tout comprendre sur la calligraphie du Coran', sub: 'apprendre à lire le Coran · les signes propres au Mushaf',
+    intro: 'Livret de Bastien / Yaseen Ibn Adam, intégré tel quel : des passages du « Moushaf Tajwid » commentés pour aider les débutants à lire la calligraphie propre au Coran.',
+    parts: [], book: { dir: 'calligraphie', pages: 24 } },
+  { id: 'rabbi-inni', title: 'Rabbi innî limâ anzalta ilayya min khayrin faqîr', sub: 'la dou’â de Moussa · Coran 28:24',
+    intro: 'D’après la fiche d’Effat Saleh, islamtics.com (« Rabbi Inni Lima Anzalta Ilayya Min Khairin Faqir : Meaning & Benefits »), traduite et résumée. Traduction du verset : Muhammad Hamidullah.',
+    parts: [
+      { title: 'La dou’â', arabic: 'رَبِّ إِنِّي لِمَا أَنزَلْتَ إِلَيَّ مِنْ خَيْرٍ فَقِيرٌ', phonetic: 'Rabbi innî limâ anzalta ilayya min khayrin faqîr',
+        french: 'Seigneur, j’ai grand besoin du bien que Tu feras descendre vers moi.',
+        points: ['Sourate al-Qasas (28), verset 24.', 'Khairin et khayrin, faqir et faqîr sont deux façons d’écrire les mêmes mots arabes.'] },
+      { title: 'Mot à mot', points: ['رَبِّ, rabbi : mon Seigneur. La dou’â s’adresse directement à Allah.', 'إِنِّي, innî : certes, je suis. Le mot insiste sur ce qui suit.',
+        'لِمَا, limâ : pour ce que, quel qu’il soit. La demande reste ouverte au bien qu’Allah choisit.', 'أَنزَلْتَ, anzalta : Tu as fait descendre.', 'إِلَيَّ, ilayya : vers moi.',
+        'مِنْ خَيْرٍ, min khayrin : de bien, de tout bien.', 'فَقِيرٌ, faqîr : dans le besoin, pauvre. Moussa reconnaît son besoin devant Allah.'] },
+      { title: 'L’histoire (28:22 à 28)', points: ['Moussa part vers Madyan et demande à son Seigneur de le guider (28:22).',
+        'Au point d’eau, des bergers abreuvent leurs bêtes ; deux femmes retiennent leur troupeau. Elles attendent que les bergers aient fini, car leur père est très âgé (28:23).',
+        'Moussa abreuve leur troupeau, puis se retire à l’ombre et prononce cette dou’â (28:24).',
+        'L’une des deux revient l’inviter de la part de son père pour le récompenser ; après avoir entendu son histoire, le père le rassure : il est à l’abri des injustes (28:25).',
+        'L’une des filles conseille de l’engager : le meilleur à engager est celui qui est fort et digne de confiance (28:26).',
+        'Le père lui propose d’épouser l’une de ses filles contre huit années de service, dix s’il le veut de lui-même ; Moussa accepte (28:27 et 28).',
+        'Le texte ne précise ni le temps écoulé après la dou’â, ni le nom du père.'] },
+      { title: 'Ce qu’elle exprime', points: ['Demander la subsistance : « min khayrin » laisse la demande ouverte à tout bien venant d’Allah, sans se limiter à un besoin matériel.',
+        'Demander un mariage : une demande en mariage arrive plus loin dans l’histoire de Moussa ; on peut demander ce bien avec ces mots.',
+        'Reconnaître sa dépendance à Allah : « faqîr » est une manière simple et sincère de dire son besoin.',
+        'Agir et invoquer : Moussa aide les deux femmes, puis invoque. L’effort et la dou’â vont ensemble.'] },
+      { title: 'Quand la réciter', points: ['Chaque fois que tu demandes un bien à Allah : subsistance, famille, travail ou tout autre besoin. Tu peux ensuite détailler tes besoins avec tes propres mots.',
+        'Le dernier tiers de la nuit est un moment encouragé pour l’invocation en général (Sahîh al-Bukhârî 1145).',
+        'Garder l’effort à côté de la dou’â : chercher un travail adapté, demander l’aide de personnes de confiance, faire les démarches vers le mariage.'] },
+      { title: 'Les leçons', points: ['On peut aider les autres même quand on est soi-même dans le besoin (28:23 et 24).', 'Le besoin se dit simplement : la dou’â est courte et ne détaille pas tout (28:24).',
+        'La confiance compte : la fille de l’homme âgé recommande Moussa pour sa force et sa loyauté (28:26).'] },
+    ],
+    retain: ['Rabbi innî limâ anzalta ilayya min khayrin faqîr : Seigneur, j’ai grand besoin du bien que Tu feras descendre vers moi.', 'Moussa a aidé, puis s’est retiré à l’ombre pour invoquer.', 'Une demande ouverte à tout bien : subsistance, mariage, guidance.'] },
   { id: 'kursi', title: 'Ayat al-Kursî', sub: 'le plus immense verset du Coran · 2:255',
     intro: 'Verset 255 d’Al-Baqara, sourate médinoise. Le plus immense et le plus noble verset du Coran : il réunit cinq noms d’Allah et plus de vingt de Ses attributs, et aucun autre verset ne concentre autant de tawhîd.',
     parts: [

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BookOpen, Check, ChevronDown, X } from 'lucide-react';
-import { LESSONS, type LessonPart } from '../lib/lessons';
+import { LESSONS, type Book, type LessonPart } from '../lib/lessons';
 import { RowLink } from '../ui/kit';
 
 function Part({ part, open, onToggle }: { part: LessonPart; open: boolean; onToggle: () => void }) {
@@ -52,8 +52,23 @@ export function SpiritLessons({ onBack }: { onBack: () => void }) {
   return <div className="stack-8 lesson">
     <button className="link-btn back-link" onClick={() => setId(null)}>‹ Mes cours</button>
     <div className="soft-card"><strong className="serif lesson-title">{lesson.title}</strong><p className="muted">{lesson.intro}</p></div>
+    {lesson.book && <BookPages book={lesson.book} title={lesson.title} />}
     {lesson.parts.map((p, i) => <Part key={p.title} part={p} open={open === i} onToggle={() => setOpen(open === i ? null : i)} />)}
     {lesson.retain && <div className="soft-card"><strong>Ce que je retiens</strong>{lesson.retain.map((r) => <p key={r} className="fiche-pt">{r}</p>)}</div>}
     {lesson.quiz && <Quiz items={lesson.quiz} />}
   </div>;
 }
+
+/** Livret intégré page par page (images), avec son sommaire. Les pages se chargent au fil de la lecture. */
+export function BookPages({ book, title }: { book: Book; title: string }) {
+  const src = (n: number) => '/cours/' + book.dir + '/p-' + String(n).padStart(2, '0') + '.jpg';
+  const go = (n: number) => document.getElementById(book.dir + '-' + n)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  return <>
+    {book.toc && <details className="soft-card book-toc"><summary>Sommaire</summary>
+      <ol>{book.toc.map(([t, n]) => <li key={t}><button className="link-btn" onClick={() => go(n)}>{t}</button><small>p. {n}</small></li>)}</ol></details>}
+    <p className="muted small">Touche une page pour l’ouvrir en grand et zoomer.</p>
+    <div className="book-pages">{Array.from({ length: book.pages }, (_, i) => <a key={i} id={book.dir + '-' + (i + 1)} href={src(i + 1)} target="_blank" rel="noreferrer">
+      <img src={src(i + 1)} loading="lazy" decoding="async" alt={title + ', page ' + (i + 1)} width={book.size?.[0] ?? 993} height={book.size?.[1] ?? 1404} /></a>)}</div>
+  </>;
+}
+

@@ -8,12 +8,14 @@ export type NotifPrefs = {
   agenda: { on: boolean; minutes: number }; weekly: { on: boolean; day: number; time: string }; supplements: { on: boolean };
   plan: { on: boolean; time: string }; birthdays: { on: boolean; time: string };
   prayers: { on: boolean; minutes: number }; fasting: { on: boolean; time: string }; water: { on: boolean; time: string };
+  carnet: { on: boolean; time: string }; wird: { on: boolean };
 };
 export const DEFAULT_PREFS: NotifPrefs = {
   morning: { on: true, time: '08:00' }, evening: { on: true, time: '21:00' }, habits: { on: true, time: '19:00' },
   agenda: { on: true, minutes: 15 }, weekly: { on: true, day: 0, time: '18:00' }, supplements: { on: true },
   plan: { on: true, time: '19:30' }, birthdays: { on: true, time: '09:00' },
   prayers: { on: true, minutes: 5 }, fasting: { on: true, time: '20:30' }, water: { on: true, time: '16:00' },
+  carnet: { on: true, time: '20:00' }, wird: { on: true },
 };
 const DAYS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 const pushSupported = () => typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window && typeof Notification !== 'undefined';
@@ -25,7 +27,7 @@ const merge = (v: unknown): NotifPrefs => {
   return { morning: { ...DEFAULT_PREFS.morning, ...p.morning }, evening: { ...DEFAULT_PREFS.evening, ...p.evening }, habits: { ...DEFAULT_PREFS.habits, ...p.habits },
     agenda: { ...DEFAULT_PREFS.agenda, ...p.agenda }, weekly: { ...DEFAULT_PREFS.weekly, ...p.weekly }, supplements: { ...DEFAULT_PREFS.supplements, ...p.supplements },
     plan: { ...DEFAULT_PREFS.plan, ...p.plan }, birthdays: { ...DEFAULT_PREFS.birthdays, ...p.birthdays },
-    prayers: { ...DEFAULT_PREFS.prayers, ...p.prayers }, fasting: { ...DEFAULT_PREFS.fasting, ...p.fasting }, water: { ...DEFAULT_PREFS.water, ...p.water } };
+    prayers: { ...DEFAULT_PREFS.prayers, ...p.prayers }, fasting: { ...DEFAULT_PREFS.fasting, ...p.fasting }, water: { ...DEFAULT_PREFS.water, ...p.water }, carnet: { ...DEFAULT_PREFS.carnet, ...p.carnet }, wird: { ...DEFAULT_PREFS.wird, ...p.wird } };
 };
 
 export function NotificationSettings() {
@@ -123,6 +125,9 @@ export function NotificationSettings() {
       time(prefs.birthdays.time, (v) => void save({ ...prefs, birthdays: { ...prefs.birthdays, time: v } })))}
     {row('Boire de l’eau', 'L’après-midi, si tu n’as pas encore noté tes 8 verres.', prefs.water.on, (on) => void save({ ...prefs, water: { ...prefs.water, on } }),
       time(prefs.water.time, (v) => void save({ ...prefs, water: { ...prefs.water, time: v } })))}
+    {row('Mon dhikr du jour', '4 fois dans la journée, seulement si tu as du retard sur ton objectif.', prefs.wird.on, (on) => void save({ ...prefs, wird: { on } }))}
+    {row('Mon carnet', 'La veille de ta page du mois, un rappel discret.', prefs.carnet.on, (on) => void save({ ...prefs, carnet: { ...prefs.carnet, on } }),
+      time(prefs.carnet.time, (v) => void save({ ...prefs, carnet: { ...prefs.carnet, time: v } })))}
     {msg && <p role="status" className="fineprint">{msg}</p>}
   </section>;
 }

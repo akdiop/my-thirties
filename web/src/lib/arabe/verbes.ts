@@ -1,0 +1,61 @@
+/**
+ * « 50 verbes indispensables au quotidien » (fiches Apprendre l'arabe facilement, apprendre-larabe-facilement.com) :
+ * passé, présent, impératif et nom d'action (masdar) tels que donnés dans les fiches, avec la phonétique ajoutée.
+ */
+export type Verbe = { n: number; fr: string; ar: [madi: string, mudari: string, amr: string, masdar: string]; ph: [string, string, string, string] };
+
+const V: [string, string, string, string, string, string][] = [
+  ['Écrire', 'كَتَبَ', 'يَكْتُبُ', 'اُكْتُبْ', 'كِتَابَة', 'kataba · yaktubu · uktub · kitâba'],
+  ['Partir', 'ذَهَبَ', 'يَذْهَبُ', 'اِذْهَبْ', 'ذَهَاب', 'dhahaba · yadh-habu · idh-hab · dhahâb'],
+  ['Étudier', 'دَرَسَ', 'يَدْرُسُ', 'اُدْرُسْ', 'دِرَاسَة', 'darasa · yadrusu · udrus · dirâsa'],
+  ['Comprendre', 'فَهِمَ', 'يَفْهَمُ', 'اِفْهَمْ', 'فَهْم', 'fahima · yafhamu · ifham · fahm'],
+  ['Revenir', 'رَجَعَ', 'يَرْجِعُ', 'اِرْجِعْ', 'رُجُوع', 'raja‘a · yarji‘u · irji‘ · rujû‘'],
+  ['Voyager', 'سَافَرَ', 'يُسَافِرُ', 'سَافِرْ', 'مُسَافَرَة', 'sâfara · yusâfiru · sâfir · musâfara'],
+  ['Parler', 'تَكَلَّمَ', 'يَتَكَلَّمُ', 'تَكَلَّمْ', 'تَكَلُّم', 'takallama · yatakallamu · takallam · takallum'],
+  ['Apprendre', 'تَعَلَّمَ', 'يَتَعَلَّمُ', 'تَعَلَّمْ', 'تَعَلُّم', 'ta‘allama · yata‘allamu · ta‘allam · ta‘allum'],
+  ['Manger', 'أَكَلَ', 'يَأْكُلُ', 'كُلْ', 'أَكْل', 'akala · ya’kulu · kul · akl'],
+  ['Boire', 'شَرِبَ', 'يَشْرَبُ', 'اِشْرَبْ', 'شُرْب', 'shariba · yashrabu · ishrab · shurb'],
+  ['Dire', 'قَالَ', 'يَقُولُ', 'قُلْ', 'قَوْل', 'qâla · yaqûlu · qul · qawl'],
+  ['Être', 'كَانَ', 'يَكُونُ', 'كُنْ', 'كَوْن', 'kâna · yakûnu · kun · kawn'],
+  ['Lire', 'قَرَأَ', 'يَقْرَأُ', 'اِقْرَأْ', 'قِرَاءَة', 'qara’a · yaqra’u · iqra’ · qirâ’a'],
+  ['Arriver', 'وَصَلَ', 'يَصِلُ', 'صِلْ', 'وُصُول', 'wasala · yasilu · sil · wusûl'],
+  ['Essayer', 'حَاوَلَ', 'يُحَاوِلُ', 'حَاوِلْ', 'مُحَاوَلَة', 'hâwala · yuhâwilu · hâwil · muhâwala'],
+  ['Être capable de', 'اِسْتَطَاعَ', 'يَسْتَطِيعُ', 'اِسْتَطِعْ', 'اِسْتِطَاعَة', 'istatâ‘a · yastatî‘u · istati‘ · istitâ‘a'],
+  ['Acheter', 'اِشْتَرَى', 'يَشْتَرِي', 'اِشْتَرِ', 'اِشْتِرَاء', 'ishtarâ · yashtarî · ishtari · ishtirâ’'],
+  ['Vendre', 'بَاعَ', 'يَبِيعُ', 'بِعْ', 'بَيْع', 'bâ‘a · yabî‘u · bi‘ · bay‘'],
+  ['Voir', 'رَأَى', 'يَرَى', 'رَ', 'رُؤْيَة', 'ra’â · yarâ · ra · ru’ya'],
+  ['Donner', 'أَعْطَى', 'يُعْطِي', 'أَعْطِ', 'إِعْطَاء', 'a‘tâ · yu‘tî · a‘ti · i‘tâ’'],
+  ['Rester', 'بَقِيَ', 'يَبْقَى', 'اِبْقَ', 'بَقَاء', 'baqiya · yabqâ · ibqa · baqâ’'],
+  ['Visiter', 'زَارَ', 'يَزُورُ', 'زُرْ', 'زِيَارَة', 'zâra · yazûru · zur · ziyâra'],
+  ['Utiliser', 'اِسْتَعْمَلَ', 'يَسْتَعْمِلُ', 'اِسْتَعْمِلْ', 'اِسْتِعْمَال', 'ista‘mala · yasta‘milu · ista‘mil · isti‘mâl'],
+  ['Demander', 'طَلَبَ', 'يَطْلُبُ', 'اُطْلُبْ', 'طَلَب', 'talaba · yatlubu · utlub · talab'],
+  ['Connaître', 'عَرَفَ', 'يَعْرِفُ', 'اِعْرِفْ', 'عِرْفَان', '‘arafa · ya‘rifu · i‘rif · ‘irfân'],
+  ['Savoir', 'عَلِمَ', 'يَعْلَمُ', 'اِعْلَمْ', 'عِلْم', '‘alima · ya‘lamu · i‘lam · ‘ilm'],
+  ['S’asseoir', 'جَلَسَ', 'يَجْلِسُ', 'اِجْلِسْ', 'جُلُوس', 'jalasa · yajlisu · ijlis · julûs'],
+  ['Préférer', 'فَضَّلَ', 'يُفَضِّلُ', 'فَضِّلْ', 'تَفْضِيل', 'faddala · yufaddilu · faddil · tafdîl'],
+  ['Entrer', 'دَخَلَ', 'يَدْخُلُ', 'اُدْخُلْ', 'دُخُول', 'dakhala · yadkhulu · udkhul · dukhûl'],
+  ['Sortir', 'خَرَجَ', 'يَخْرُجُ', 'اُخْرُجْ', 'خُرُوج', 'kharaja · yakhruju · ukhruj · khurûj'],
+  ['Descendre', 'نَزَلَ', 'يَنْزِلُ', 'اِنْزِلْ', 'نُزُول', 'nazala · yanzilu · inzil · nuzûl'],
+  ['Monter, grimper', 'صَعِدَ', 'يَصْعَدُ', 'اِصْعَدْ', 'صُعُود', 'sa‘ida · yas‘adu · is‘ad · su‘ûd'],
+  ['Aider', 'سَاعَدَ', 'يُسَاعِدُ', 'سَاعِدْ', 'مُسَاعَدَة', 'sâ‘ada · yusâ‘idu · sâ‘id · musâ‘ada'],
+  ['Questionner', 'سَأَلَ', 'يَسْأَلُ', 'اِسْأَلْ', 'سُؤَال', 'sa’ala · yas’alu · is’al · su’âl'],
+  ['Répondre', 'أَجَابَ', 'يُجِيبُ', 'أَجِبْ', 'إِجَابَة', 'ajâba · yujîbu · ajib · ijâba'],
+  ['Attester', 'شَهِدَ', 'يَشْهَدُ', 'اِشْهَدْ', 'شَهَادَة', 'shahida · yash-hadu · ish-had · shahâda'],
+  ['Prier', 'صَلَّى', 'يُصَلِّي', 'صَلِّ', 'تَصْلِيَة', 'sallâ · yusallî · salli · tasliya'],
+  ['Purifier', 'زَكَّى', 'يُزَكِّي', 'زَكِّ', 'تَزْكِيَة', 'zakkâ · yuzakkî · zakki · tazkiya'],
+  ['Jeûner', 'صَامَ', 'يَصُومُ', 'صُمْ', 'صَوْم', 'sâma · yasûmu · sum · sawm'],
+  ['Faire le pèlerinage', 'حَجَّ', 'يَحُجُّ', 'حُجَّ', 'حَجّ', 'hajja · yahujju · hujja · hajj'],
+  ['Faire', 'فَعَلَ', 'يَفْعَلُ', 'اِفْعَلْ', 'فَعْل', 'fa‘ala · yaf‘alu · if‘al · fa‘l'],
+  ['Porter', 'حَمَلَ', 'يَحْمِلُ', 'اِحْمِلْ', 'حَمْل', 'hamala · yahmilu · ihmil · haml'],
+  ['Fouiller', 'فَتَّشَ', 'يُفَتِّشُ', 'فَتِّشْ', 'تَفْتِيش', 'fattasha · yufattishu · fattish · taftîsh'],
+  ['Nettoyer', 'نَظَّفَ', 'يُنَظِّفُ', 'نَظِّفْ', 'تَنْظِيف', 'nazzafa · yunazzifu · nazzif · tanzîf'],
+  ['Organiser', 'نَظَّمَ', 'يُنَظِّمُ', 'نَظِّمْ', 'تَنْظِيم', 'nazzama · yunazzimu · nazzim · tanzîm'],
+  ['Marcher', 'مَشَى', 'يَمْشِي', 'اِمْشِ', 'مَشْي', 'mashâ · yamshî · imshi · mashy'],
+  ['Entendre', 'سَمِعَ', 'يَسْمَعُ', 'اِسْمَعْ', 'سَمْع', 'sami‘a · yasma‘u · isma‘ · sam‘'],
+  ['Écouter', 'اِسْتَمَعَ', 'يَسْتَمِعُ', 'اِسْتَمِعْ', 'اِسْتِمَاع', 'istama‘a · yastami‘u · istami‘ · istimâ‘'],
+  ['Bénir', 'بَارَكَ', 'يُبَارِكُ', 'بَارِكْ', 'مُبَارَكَة', 'bâraka · yubâriku · bârik · mubâraka'],
+  ['Remercier', 'شَكَرَ', 'يَشْكُرُ', 'اُشْكُرْ', 'شُكْر', 'shakara · yashkuru · ushkur · shukr'],
+];
+
+export const VERBES: Verbe[] = V.map(([fr, a, b, c, d, ph], i) => ({ n: i + 1, fr, ar: [a, b, c, d], ph: ph.split(' · ') as [string, string, string, string] }));
+export const FORMES = ['Passé (il a…)', 'Présent (il…)', 'Impératif', 'Nom d’action'] as const;

@@ -19,6 +19,7 @@ import { birthdayLine, PROFILE_KIND, readProfile } from './lib/profile';
 import { PHOTO_KIND } from './lib/photos';
 import { PhotoProvider } from './features/HeroPhoto';
 import { Home as HomeScreen } from './screens/Home';
+import { wordOfMonth } from './lib/carnet';
 import type { CuisineTab, EquilibreTab, SpiritTab } from './screens/ModuleTops';
 import { ScreenHeader, SectionTitle, Segmented } from './ui/kit';
 import { GuidedField } from './ui/fields';
@@ -56,6 +57,7 @@ const TravelTools = lazy(() => import('./features/TravelTools').then((m) => ({ d
 const EquilibriumInsights = lazy(() => import('./features/EquilibriumInsights').then((m) => ({ default: m.EquilibriumInsights })));
 const KitchenPlanner = lazy(() => import('./features/KitchenPlanner').then((m) => ({ default: m.KitchenPlanner })));
 const PassionPath = lazy(() => import('./features/PassionPath').then((m) => ({ default: m.PassionPath })));
+const Carnet = lazy(() => import('./screens/Carnet').then((m) => ({ default: m.Carnet })));
 const Transformation = lazy(() => import('./screens/Transformation').then((m) => ({ default: m.Transformation })));
 const PassionIdeas = lazy(() => import('./features/PassionIdeas').then((m) => ({ default: m.PassionIdeas })));
 const TravelPlanner = lazy(() => import('./features/TravelPlanner').then((m) => ({ default: m.TravelPlanner })));
@@ -90,7 +92,7 @@ const NotificationSettings = lazy(() => import('./features/Notifications').then(
 const JournalSettings = lazy(() => import('./features/JournalSettings').then((m) => ({ default: m.JournalSettings })));
 const IphoneCalendar = lazy(() => import('./features/IphoneCalendar').then((m) => ({ default: m.IphoneCalendar })));
 
-type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'transformation' | ModuleId;
+type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'transformation' | 'carnet' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
 const today = () => new Date().toLocaleDateString('en-CA');
 const value = (obj: Record<string, unknown>, key: string) => typeof obj[key] === 'string' ? obj[key] as string : '';
@@ -450,12 +452,13 @@ export default function App() {
   const ritualEntries = useMemo(() => allEntries.filter((e) => e.kind !== PROFILE_KIND && e.kind !== PHOTO_KIND && e.kind !== HIDDEN_KIND), [allEntries]);
   const [assistantIdea, setAssistantIdea] = useState('');
   const [pendingExpense, setPendingExpense] = useState(false);
+  const [carnetSign, setCarnetSign] = useState(0);
   const [dayTarget, setDayTarget] = useState<{ date?: string; part?: 'matin' | 'soir'; n: number }>({ n: 0 });
   // Lien ouvert depuis une notification : ?ecran=myday&moment=soir, ?ecran=habits…
   useEffect(() => {
     const q = new URLSearchParams(window.location.search), target = q.get('ecran');
     if (!target) return;
-    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'assistant', 'proches', 'lectures', 'envies', 'panda', 'transformation'].includes(target)) {
+    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'assistant', 'proches', 'lectures', 'envies', 'panda', 'transformation', 'carnet'].includes(target)) {
       if (target === 'myday') setDayTarget((t) => ({ part: q.get('moment') === 'soir' ? 'soir' : 'matin', n: t.n + 1 }));
       if (target === 'assistant') setAssistantIdea(q.get('idee') ?? '');
       setScreen(target as Screen);
@@ -653,7 +656,7 @@ export default function App() {
   const currentModule = modules.find((m) => m.id === screen);
   const allModuleEntries = currentModule ? entries.filter((e) => e.module === currentModule.id) : [];
   // En spiritualité, la liste ne garde que le journal (prières cochées, horaires et dhikr ont leurs propres écrans).
-  const listedEntries = allModuleEntries.filter((e) => !(e.module === 'spiritualite' && (e.kind === 'dhikr' || e.kind === 'ramadan' || e.kind === 'dhul_hijja' || e.kind.startsWith('prayer'))) && e.kind !== BUDGETS_KIND);
+  const listedEntries = allModuleEntries.filter((e) => !(e.module === 'spiritualite' && (e.kind === 'dhikr' || e.kind === 'ramadan' || e.kind === 'dhul_hijja' || e.kind === 'wird' || e.kind === 'apres_priere' || e.kind === 'arabe_jeux' || e.kind.startsWith('prayer'))) && e.kind !== BUDGETS_KIND);
   const moduleEntries = listedEntries.filter((e) => !search || e.title.toLowerCase().includes(search.toLowerCase()));
   const go = (next: Screen) => { setScreen(next); setSearch(''); window.scrollTo({ top: 0 }); };
   const openEntry = (e: Entry) => setEditor({ module: moduleById(e.module), initial: e });
@@ -693,18 +696,19 @@ export default function App() {
       {undoEntry && <div className="undo-toast" role="status"><span>« {undoEntry.title.slice(0, 40)} » supprimé</span><button onClick={undoRemove}>Annuler</button></div>}
       {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
       {loading && <div className="sync-status" role="status">Synchronisation…</div>}
-      {screen === 'home' && <HomeScreen todayCard={<TodayCard entries={entries} habits={ritualEntries.filter((e) => e.kind === HABIT_KIND)} onUpdate={updateData} onTogglePrayer={(name, on, day) => void togglePrayer(entries, name, on, createFromTool, removeQuiet, day)} onOpenHabits={() => go('habits')} onOpenAgenda={() => go('agenda')} />} rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onLearn={(t) => { if (t === 'passions') setPassionTab('parcours'); if (t === 'cours' || t === 'dhulhijja') setSpiritTab(t); go(t === 'cours' || t === 'dhulhijja' ? 'spiritualite' : t); }} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} onUpdate={updateData} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} onQuickAdd={(title) => createFromTool({ module: 'quotidien', kind: 'task', title, entry_date: today(), data: { date: today(), priority: 'Haute' } })} />}
+      {screen === 'home' && <HomeScreen word={wordOfMonth(ritualEntries, today())} todayCard={<TodayCard entries={entries} habits={ritualEntries.filter((e) => e.kind === HABIT_KIND)} onUpdate={updateData} onTogglePrayer={(name, on, day) => void togglePrayer(entries, name, on, createFromTool, removeQuiet, day)} onOpenHabits={() => go('habits')} onOpenAgenda={() => go('agenda')} />} rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onLearn={(t) => { if (t === 'wird' || t === 'apres' || t === 'arabe') { setSpiritTab(t); go('spiritualite'); return; } if (t === 'carnet' || t === 'carnet-signe') { setCarnetSign(t === 'carnet-signe' ? (n) => n + 1 : 0); go('carnet'); return; } if (t === 'passions') setPassionTab('parcours'); if (t === 'cours' || t === 'dhulhijja') setSpiritTab(t); go(t === 'cours' || t === 'dhulhijja' ? 'spiritualite' : t as Screen); }} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} onUpdate={updateData} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} onQuickAdd={(title) => createFromTool({ module: 'quotidien', kind: 'task', title, entry_date: today(), data: { date: today(), priority: 'Haute' } })} />}
       {screen === 'myday' && <LockGate><MyDay key={dayTarget.n} entries={ritualEntries} initialDate={dayTarget.date} initialPart={dayTarget.part} onCreate={createFromTool} onUpdate={updateData} /></LockGate>}
       {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEdit={editFull} />}
       {screen === 'notes' && <LockGate><Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={drop} onOpenDay={openDay} /></LockGate>}
       {screen === 'bilan' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><Review entries={ritualEntries} birthDate={readProfile(profileEntry).birthDate} /></LockGate>}
-      {screen === 'boussole' && <><ScreenHeader title="" onBack={() => go('home')} /><Compass entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEditProfile={() => go('settings')} /></>}
+      {screen === 'boussole' && <><ScreenHeader title="" onBack={() => go('home')} /><Compass entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEditProfile={() => go('settings')} onOpenCarnet={() => go('carnet')} /></>}
       {screen === 'focus' && <><ScreenHeader title="" onBack={() => go('home')} /><Focus entries={ritualEntries} onCreate={createFromTool} /></>}
       {screen === 'sommeil' && <><ScreenHeader title="" onBack={() => go('home')} /><Sleep entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={remove} /></>}
       {screen === 'complements' && <><ScreenHeader title="" onBack={() => go('home')} /><Supplements entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEdit={editFull} /></>}
       {screen === 'proches' && <><ScreenHeader title="" onBack={() => go('home')} /><Relatives entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onEdit={editFull} onRemove={drop} /></>}
       {screen === 'lectures' && <><ScreenHeader title="" onBack={() => go('home')} /><Reading entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} /></>}
       {screen === 'panda' && <><ScreenHeader title="" onBack={() => go('home')} /><PandaScreen entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onGo={(x) => go(x as Screen)} /></>}
+      {screen === 'carnet' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><Carnet key={carnetSign} entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} signFirst={carnetSign > 0} /></LockGate>}
       {screen === 'transformation' && <><ScreenHeader title="" onBack={() => go('home')} /><Transformation entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onGo={(t) => go(t as Screen)} /></>}
       {screen === 'envies' && <><ScreenHeader title="" onBack={() => go('home')} /><Wishes entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEdit={editFull} /></>}
       {screen === 'mediter' && <><ScreenHeader title="" onBack={() => go('home')} /><Meditate entries={ritualEntries} onCreate={createFromTool} /></>}

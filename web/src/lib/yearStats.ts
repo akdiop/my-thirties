@@ -18,7 +18,7 @@ export function yearWindow(birthDate: string, today: Date) {
 
 export type YearStats = {
   nights: number; avgSleep: number; habits: number; prayers: number; books: number; trips: number;
-  challengeDays: number; notes: number; sessions: number; water: number; steps: number; fasts: number;
+  challengeDays: number; notes: number; sessions: number; water: number; steps: number; fasts: number; wishes: number;
 };
 
 export function yearStats(entries: Entry[], from: string, to: string, sleepHoursOf: (e: Entry) => number): YearStats {
@@ -43,5 +43,6 @@ export function yearStats(entries: Entry[], from: string, to: string, sleepHours
     water: days.reduce((n, e) => n + (Number(e.data.water) || 0), 0),
     steps: days.reduce((n, e) => n + (Number(e.data.steps) || 0), 0),
     fasts,
+    wishes: entries.filter((e) => e.kind === 'voeu' && e.data.status === 'realise' && inRange(e.data.realisedOn)).length,
   };
 }

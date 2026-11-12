@@ -12,22 +12,24 @@ import { cloud } from '../lib/cloud';
 import { getIntegrationPrefs } from '../lib/integrations';
 import { askAssistant, parseSteps } from '../lib/assistant';
 import { Sparkles } from 'lucide-react';
-import { Bar, Segmented } from '../ui/kit';
+import { Bar, RowLink, Segmented } from '../ui/kit';
+import { Feather } from 'lucide-react';
 import { AddTomorrow, CoachCard, coachMessage, type Coach } from '../features/EveningCoach';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 type Tab = 'vision' | 'objectifs' | 'roue' | 'retro' | 'coach';
 
 /** Ma boussole : ce qui compte, où je vais, comment je me sens dans chaque domaine, et le chemin parcouru. */
-export function Compass({ entries, profileEntry, onCreate, onUpdate, onRemove, onEditProfile }: {
+export function Compass({ entries, profileEntry, onCreate, onUpdate, onRemove, onEditProfile, onOpenCarnet }: {
   entries: Entry[]; profileEntry: Entry | undefined; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save;
-  onRemove: (e: Entry) => Promise<void>; onEditProfile: () => void;
+  onRemove: (e: Entry) => Promise<void>; onEditProfile: () => void; onOpenCarnet?: () => void;
 }) {
   const [tab, setTab] = useState<Tab>('vision');
   return <div className="screen compass">
     <header className="tab-head"><h1>Ma boussole</h1><p>Qui je veux devenir, et le chemin parcouru</p></header>
     <Segmented label="Boussole" value={tab} onChange={setTab} options={[
       { value: 'vision', label: 'Vision' }, { value: 'objectifs', label: 'Objectifs' }, { value: 'roue', label: 'Roue' }, { value: 'retro', label: 'Rétro' }, { value: 'coach', label: 'Coach' }]} />
+    {tab === 'vision' && onOpenCarnet && <RowLink icon={Feather} title="Mon carnet de vœux" sub="Page du mois, souhaits, signes et chemin parcouru" onClick={onOpenCarnet} />}
     {tab === 'vision' && <Vision entries={entries} profileEntry={profileEntry} onCreate={onCreate} onUpdate={onUpdate} onEditProfile={onEditProfile} />}
     {tab === 'objectifs' && <Goals entries={entries} onCreate={onCreate} onUpdate={onUpdate} onRemove={onRemove} />}
     {tab === 'roue' && <Wheel entries={entries} onCreate={onCreate} onUpdate={onUpdate} />}

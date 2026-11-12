@@ -1379,6 +1379,8 @@ h2{font-size:1.55rem;line-height:1.2}
 .tool-chip{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid #e5e4e0;background:#fff;border-radius:999px;padding:9px 14px;font-weight:600;color:#7e7254;font-size:.9rem}
 .supp-card{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #e5e4e0;border-radius:18px;padding:14px}
 .supp-card.on{background:#F3F6F1}
+.supp-card .habit-check{color:#7E7254}
+.supp-card.on .habit-check{background:#5F7A59;border-color:#5F7A59;color:#fff}
 .supp-card .week-dots span{font-size:.7rem}
 .time-inline{border:1px solid #dad8d4;border-radius:999px;padding:6px 10px;font-size:16px;background:#fbfaf7}
 .search-hit{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}.search-hit .snippet{font-size:.85rem;color:#787670;line-height:1.4}
@@ -1947,3 +1949,76 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .day-switch strong{min-width:150px;text-align:center;font-size:.98rem}
 .day-switch .icon-btn:disabled{opacity:.3}
 .day-switch .link-btn{margin-left:auto}
+
+/* Compléments espacés (tous les X jours) */
+.supp-every{align-self:flex-start;padding:2px 0}
+.supp-next{font-weight:600;color:#6E6448}.supp-next.due{color:#5F7A59}
+.supp-card.later{opacity:.75}
+
+/* Mon carnet de vœux */
+.home-word{margin:2px 0 0;font-size:.85rem;font-style:italic;color:#6E6448}
+.carnet .tab-head.row{display:flex;justify-content:space-between;align-items:flex-start}
+.carnet-wish-line{margin:4px 0;font-size:.92rem;line-height:1.4}.carnet-wish-line small{color:#6F6B63;margin-right:4px}
+.tag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;background:#E3E9DE;color:#4E6449;font-size:.72rem;font-weight:700}
+.row-input{display:flex;gap:8px;align-items:center}.row-input input{flex:1;min-width:0}
+.carnet-wish.done{background:rgba(227,233,222,.7)}
+.carnet-wish-head{display:flex;gap:10px;align-items:flex-start;width:100%;border:0;background:none;padding:0;text-align:left;color:inherit;font:inherit}
+.carnet-wish-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.carnet-wish-text small{color:#6F6B63;font-size:.78rem}
+.carnet-status{flex:none;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:10px;background:#EFE8DA;color:#7E7254}.carnet-status.done{background:#5F7A59;color:#fff}
+.carnet-list{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:.88rem}.carnet-list small{color:#6F6B63;margin-right:4px}
+.carnet-dua{background:#F6F5F2;border-radius:14px;padding:10px 12px;font-size:.88rem}.carnet-dua em{color:#6E6448}.carnet-dua small{color:#6F6B63}
+.dua-ar{font-family:Amiri,serif;font-size:1.25rem;text-align:right;line-height:1.8;margin:0 0 4px}
+.carnet-tag-row{display:grid;grid-template-columns:70px 1fr 36px;gap:8px;align-items:center;font-size:.85rem;margin:6px 0}
+.carnet-year-head{display:flex;justify-content:space-between;align-items:center}
+.carnet-month .small{font-size:.88rem}.carnet-realised{display:flex;gap:6px;align-items:center;color:#4E6449;font-weight:600;font-size:.88rem;margin:4px 0}
+
+/* Livrets intégrés page par page */
+.book-pages{display:flex;flex-direction:column;gap:10px}
+.book-pages a{display:block;scroll-margin-top:12px}.book-pages img{display:block;width:100%;height:auto;border-radius:12px;box-shadow:0 4px 14px rgba(80,70,50,.1);background:#fff}
+.book-toc summary{font-weight:700;cursor:pointer}.book-toc ol{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:2px}
+.book-toc li{display:flex;justify-content:space-between;gap:8px;align-items:center}.book-toc li small{color:#6F6B63;flex:none}
+.book-toc .link-btn{text-align:left;padding:4px 0}
+
+/* Objectifs de dhikr et après la prière */
+.wird-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.wird-btn{margin:8px auto}
+.wird-quick{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.wird-pace{text-align:center;font-weight:600;color:#6E6448;margin:6px 0}.wird-pace.done{color:#4E6449}.wird-pace.late{color:#7E7254}
+.dl-btn.soft{background:#EFE8DA;color:#7E7254}
+.after-item.done{background:rgba(227,233,222,.7)}
+.after-ph{display:block;color:#6E6448;font-size:.88rem;margin:4px 0}
+.after-count{display:flex;gap:8px;align-items:center;margin-top:8px}
+.after-tap{min-width:110px;height:42px;padding:0 16px;border-radius:21px;border:0;background:#7E7254;color:#fff;font:inherit;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.after-tap.done{background:#5F7A59}
+
+.ar-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.ar-stats strong{display:block;font-size:1.4rem;color:#5F7A59}
+.ar-stats small{font-size:.75rem;color:#6E6448}
+.ar-word{font-family:'Amiri','Geeza Pro','Noto Naskh Arabic',serif;font-size:1.35rem;line-height:1.6}
+.ar-word.big{font-size:2.4rem;line-height:1.5}
+.ar-card{display:flex;flex-direction:column;gap:12px}
+.ar-card .game-top{padding:0}
+.ar-flip{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:160px;justify-content:center;border:0;border-radius:18px;background:rgba(255,255,255,.55);font:inherit;color:inherit;padding:16px}
+.ar-flip em,.ar-prompt em,.ar-line em{color:#6E6448;font-size:.92rem}
+.ar-prompt{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.ar-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ar-pairs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ar-option{min-height:56px;padding:8px;border-radius:14px;border:1px solid #e2e0db;background:#fbfaf7;color:#3A3833;font:inherit;font-size:.9rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.ar-option small{font-size:.75rem;color:#6E6448}
+.ar-option.on{border-color:#7E7254;background:#EFEADF}
+.ar-option.good{border-color:#5F7A59;background:#DDE5D7}
+.ar-option.bad{border-color:#B08A6E;background:#F1E6DE}
+.ar-verb summary{display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer;font-weight:600}
+.ar-table{display:flex;flex-direction:column;margin-top:8px}
+.ar-line{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 10px;padding:8px 0;border-top:1px solid rgba(58,56,51,.08)}
+.ar-line .ar-word{grid-column:1;text-align:right}
+.ar-line small,.ar-line em,.ar-line span:not(.ar-word){grid-column:1}
+.ar-line .icon-btn{grid-column:2;grid-row:1 / span 3}
+.ar-letters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ar-letter{display:flex;flex-direction:column;align-items:center;gap:0;padding:8px 4px;border-radius:14px;border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.6);color:#3A3833;font:inherit}
+.ar-letter strong{font-size:.85rem;color:#5F7A59}
+.ar-letter small{font-size:.66rem;line-height:1.2;color:#6E6448;text-align:center}
+.ar-letters.syl{margin-top:8px;grid-template-columns:repeat(5,1fr)}
+.ar-bloc-title{display:flex;flex-direction:column;align-items:flex-end;gap:0;margin-top:10px;padding:8px 10px;border-radius:12px;background:rgba(95,122,89,.1)}
+.ar-bloc-title strong{color:#5F7A59;font-size:.9rem;align-self:flex-start}
+.ar-bloc-title em{color:#6E6448;font-size:.85rem;align-self:flex-start}
