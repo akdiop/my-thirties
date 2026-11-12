@@ -127,7 +127,12 @@ Deno.serve(async (request) => {
       queue.push({ key: 'evening:' + now.date, title: 'Mon débriefing du soir', body: 'Ta victoire du jour, ce que tu déposes, ton intention pour demain.', url: '/?ecran=myday&moment=soir' });
     // Habitudes prévues aujourd'hui (jours de répétition : 0 = lundi … 6 = dimanche ; aucun = tous les jours).
     const scheduled = (e: Row) => { const d = Array.isArray(e.data.days) ? (e.data.days as unknown[]).map(Number) : []; return !d.length || d.length === 7 || d.includes((now.weekday + 6) % 7); };
-    const habitLeft = (e: Row) => e.kind === 'habit' && (e.data.freq ?? 'daily') === 'daily' && scheduled(e) && !(e.data.done as Record<string, boolean> | undefined)?.[now.date];
+    // « Tous les n jours » : attendue quand la dernière fois remonte à n jours ou plus.
+    const dayNo = (iso: string) => Math.round(Date.parse(iso + 'T12:00:00Z') / 86_400_000);
+    const everyDue = (e: Row) => { const n = Number(e.data.n) || 2, done = (e.data.done ?? {}) as Record<string, boolean>;
+      const last = Object.keys(done).filter((d) => done[d] && d < now.date).sort().pop(); return !last || dayNo(now.date) - dayNo(last) >= n; };
+    const habitLeft = (e: Row) => e.kind === 'habit' && !(e.data.done as Record<string, boolean> | undefined)?.[now.date]
+      && ((e.data.freq ?? 'daily') === 'daily' ? scheduled(e) : e.data.freq === 'every' && everyDue(e));
     for (const e of list.filter((x) => habitLeft(x) && (x.data.remind as { on?: boolean } | undefined)?.on)) {
       const t = mins(String((e.data.remind as { time?: string }).time ?? ''));
       if (due(now.minutes, t)) queue.push({ key: 'habit:' + e.id + ':' + now.date, title: 'Mon habitude', body: e.title.slice(0, 80), url: '/?ecran=habits' });

@@ -3,7 +3,7 @@ import { ChevronDown, Moon, Sparkles, Sun } from 'lucide-react';
 import type { Entry } from '../lib/cloud';
 import { bilanDay, isDoneOn, timeline, todayIso, toggledData } from '../lib/day';
 import { DaySwitch, dayName } from './DaySwitch';
-import { habitDone, habitFreq, habitScheduled } from '../lib/rituals';
+import { habitDone, habitDue } from '../lib/rituals';
 import { Check22, Bar } from '../ui/kit';
 
 const PRAYERS = new Set(['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']);
@@ -41,7 +41,7 @@ export function TodayCard({ entries, habits, onUpdate, onTogglePrayer, onOpenHab
       ? { key: t.id, time: t.time.slice(0, 5), title: t.title, kind: 'prayer' as const, done: prayed.has(t.title), toggle: (on: boolean) => onTogglePrayer(t.title, on, day) }
       : { key: t.id, time: t.time.slice(0, 5), title: t.title, sub: t.entry.kind === 'task' ? 'tâche' : String(t.entry.data.location ?? ''), kind: 'event' as const,
           done: isDoneOn(t.entry, day), toggle: (on: boolean) => void onUpdate(t.entry, toggledData(t.entry, day, on)) });
-  const daily = habits.filter((h) => habitFreq(h) === 'daily' && habitScheduled(h, day));
+  const daily = habits.filter((h) => habitDue(h, day));
   const left = daily.filter((h) => !habitDone(h)[day]);
   if (daily.length) items.push({ key: 'habits', time: '19:00', title: left.length ? left.length + ' habitude' + (left.length > 1 ? 's' : '') + ' à faire' : 'Habitudes du jour faites', sub: left.slice(0, 3).map((h) => h.title).join(' · '), kind: 'habits', done: !left.length, open: onOpenHabits });
   items.sort((a, b) => a.time.localeCompare(b.time));

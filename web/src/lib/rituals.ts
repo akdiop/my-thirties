@@ -143,6 +143,46 @@ export const addDays = (iso: string, n: number) => { const d = new Date(iso + 'T
 export const weekStartOf = (iso: string) => { const d = new Date(iso + 'T12:00:00'); return addDays(iso, -((d.getDay() + 6) % 7)); };
 export const habitDone = (e: Entry) => (e.data.done && typeof e.data.done === 'object' ? e.data.done as Record<string, boolean> : {});
 export const habitFreq = (e: Entry): HabitFreq => (['daily', '3w', '1w'].includes(String(e.data.freq)) ? e.data.freq as HabitFreq : 'daily');
+/** Fréquence d'une habitude : chaque jour, n fois par semaine, tous les n jours ou n fois par mois. */
+export type HabitRule = { type: 'daily' | 'week' | 'every' | 'month'; n: number };
+export const RULE_RANGE: Record<HabitRule['type'], [number, number]> = { daily: [1, 1], week: [1, 6], every: [2, 60], month: [1, 15] };
+const clampN = (type: HabitRule['type'], n: unknown) => { const [lo, hi] = RULE_RANGE[type]; const x = Math.round(Number(n)); return Number.isFinite(x) ? Math.min(hi, Math.max(lo, x)) : lo; };
+export const ruleOfFreq = (f: HabitFreq): HabitRule => (f === 'daily' ? { type: 'daily', n: 1 } : { type: 'week', n: freqTarget(f) });
+export function habitRule(e: Entry): HabitRule {
+  const f = String(e.data.freq ?? 'daily');
+  if (f === 'week' || f === 'every' || f === 'month') return { type: f, n: clampN(f, e.data.n) };
+  return ruleOfFreq(habitFreq(e));
+}
+export const ruleData = (r: HabitRule) => (r.type === 'daily' ? { freq: 'daily', n: null } : { freq: r.type, n: clampN(r.type, r.n) });
+export const ruleLabel = (r: HabitRule) => r.type === 'daily' ? 'Chaque jour' : r.type === 'every' ? 'Tous les ' + r.n + ' jours'
+  : r.n + ' fois par ' + (r.type === 'week' ? 'semaine' : 'mois');
+const dayIndex = (iso: string) => Math.round(Date.parse(iso + 'T12:00:00Z') / 86_400_000);
+const doneDates = (e: Entry) => Object.keys(habitDone(e)).filter((d) => habitDone(e)[d] && /^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
+/** Dernière fois faite avant ce jour (exclu). */
+export const lastDoneBefore = (e: Entry, iso: string) => doneDates(e).filter((d) => d < iso).pop() ?? null;
+/** Jours restants avant la prochaine fois (habitude « tous les n jours ») : 0 = à faire ce jour-là. */
+export function everyWait(e: Entry, iso: string) {
+  const r = habitRule(e), last = lastDoneBefore(e, iso);
+  return r.type !== 'every' || !last ? 0 : Math.max(0, r.n - (dayIndex(iso) - dayIndex(last)));
+}
+/** L'habitude est-elle attendue ce jour-là ? (quotidienne prévue ce jour, ou « tous les n jours » arrivée à échéance ; les objectifs par semaine ou par mois restent libres). */
+export function habitDue(e: Entry, iso: string) {
+  const r = habitRule(e);
+  return r.type === 'daily' ? habitScheduled(e, iso) : r.type === 'every' ? everyWait(e, iso) === 0 : false;
+}
+export const monthStartOf = (iso: string) => iso.slice(0, 8) + '01';
+/** Avancement sur la période en cours (semaine ou mois). */
+export function periodCount(e: Entry, iso: string) {
+  const r = habitRule(e), from = r.type === 'month' ? monthStartOf(iso) : weekStartOf(iso), to = r.type === 'month' ? iso.slice(0, 7) + '-31' : addDays(from, 6);
+  return doneDates(e).filter((d) => d >= from && d <= to).length;
+}
+/** Nombre de fois attendues sur une durée en jours (pour les statistiques). */
+export function expectedOver(r: HabitRule, span: number) {
+  return Math.max(1, r.type === 'daily' ? span : r.type === 'week' ? Math.ceil(span / 7) * r.n : r.type === 'every' ? Math.ceil(span / r.n) : Math.round(span / 30 * r.n));
+}
+/** Objectif d'une semaine (bilan hebdomadaire). */
+export const weekTarget = (r: HabitRule) => (r.type === 'daily' ? 7 : r.type === 'week' ? r.n : r.type === 'every' ? Math.ceil(7 / r.n) : Math.max(1, Math.round(r.n * 7 / 30)));
+export const streakUnit = (r: HabitRule) => ({ daily: 'jours', week: 'semaines', every: 'fois de suite', month: 'mois' })[r.type];
 /** Jours de répétition choisis (0 = lundi … 6 = dimanche) ; vide = tous les jours. */
 export const habitDays = (e: Entry) => (Array.isArray(e.data.days) ? (e.data.days as unknown[]).map(Number).filter((n) => n >= 0 && n <= 6) : []);
 const weekdayOf = (iso: string) => (new Date(iso + 'T12:00:00').getDay() + 6) % 7;
@@ -150,10 +190,10 @@ const weekdayOf = (iso: string) => (new Date(iso + 'T12:00:00').getDay() + 6) % 
 export const habitScheduled = (e: Entry, iso: string) => { const d = habitDays(e); return !d.length || d.length === 7 || d.includes(weekdayOf(iso)); };
 export const DAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 export const habitDaysLabel = (e: Entry) => { const d = habitDays(e); if (!d.length || d.length === 7) return ''; return d.length === 5 && !d.includes(5) && !d.includes(6) ? 'en semaine' : d.length === 2 && d.includes(5) && d.includes(6) ? 'le week-end' : [...d].sort().map((i) => ['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim'][i]).join(', '); };
-/** Série en cours : jours consécutifs (quotidienne, en sautant les jours non prévus) ou semaines où l'objectif est atteint (hebdomadaire). */
+/** Série en cours : jours consécutifs (quotidienne, en sautant les jours non prévus), semaines ou mois où l'objectif est atteint, ou fois faites à temps (tous les n jours). */
 export function habitStreak(e: Entry, today: string) {
-  const done = habitDone(e), f = habitFreq(e);
-  if (f === 'daily') {
+  const done = habitDone(e), r = habitRule(e);
+  if (r.type === 'daily') {
     let day = done[today] || !habitScheduled(e, today) ? today : addDays(today, -1), n = 0;
     for (let guard = 0; guard < 3660; guard++) {
       if (done[day]) n++; else if (habitScheduled(e, day)) break;
@@ -161,10 +201,24 @@ export function habitStreak(e: Entry, today: string) {
     }
     return n;
   }
+  if (r.type === 'every') {
+    const list = doneDates(e).filter((d) => d <= today);
+    if (!list.length || dayIndex(today) - dayIndex(list[list.length - 1]!) > r.n) return 0;
+    let n = 1;
+    for (let i = list.length - 1; i > 0 && dayIndex(list[i]!) - dayIndex(list[i - 1]!) <= r.n; i--) n++;
+    return n;
+  }
+  if (r.type === 'month') {
+    let month = monthStartOf(today), n = 0;
+    const prev = (m: string) => monthStartOf(addDays(m, -1));
+    if (periodCount(e, month) < r.n) month = prev(month);
+    for (let guard = 0; guard < 600 && periodCount(e, month) >= r.n; guard++) { n++; month = prev(month); }
+    return n;
+  }
   let week = weekStartOf(today), n = 0;
   const count = (w: string) => Array.from({ length: 7 }, (_, i) => addDays(w, i)).filter((d) => done[d]).length;
-  if (count(week) < freqTarget(f)) week = addDays(week, -7);
-  while (count(week) >= freqTarget(f)) { n++; week = addDays(week, -7); }
+  if (count(week) < r.n) week = addDays(week, -7);
+  while (count(week) >= r.n) { n++; week = addDays(week, -7); }
   return n;
 }
 

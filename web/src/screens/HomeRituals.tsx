@@ -4,7 +4,7 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { PandaWidget } from '../features/panda/PandaWidget';
 import { MomentBar } from '../features/MomentBar';
 import { TodayLearning, type LearningTarget } from '../features/TodayLearning';
-import { affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, habitFreq, habitScheduled, isoOf, NOTE_KIND } from '../lib/rituals';
+import { affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, habitDue, isoOf, NOTE_KIND } from '../lib/rituals';
 import type { HomeSlot } from './Home';
 import { taskBuckets } from '../features/TaskQuick';
 import { prayerDay } from '../lib/wellbeing';
@@ -59,7 +59,7 @@ export function HomeRituals({ entries, onGo, onLearn, onOpenDay, onCreate, onUpd
   const habitsDone = habits.filter((e) => habitDone(e)[today]).length;
   const part = evening && morningDone ? 'soir' : 'matin';
 
-  if (slot === 'pills') return <HomePills entries={entries} habitsLeft={habits.filter((h) => habitFreq(h) === 'daily' && habitScheduled(h, today) && !habitDone(h)[today]).length} onGo={onGo} onLearn={onLearn} />;
+  if (slot === 'pills') return <HomePills entries={entries} habitsLeft={habits.filter((h) => habitDue(h, today) && !habitDone(h)[today]).length} onGo={onGo} onLearn={onLearn} />;
   if (slot === 'learning') return <TodayLearning entries={entries} today={today} onOpen={onLearn} onCreate={onCreate} onUpdate={onUpdate} />;
   if (slot === 'top') return <>
     {(part === 'soir' ? eveningDone : morningDone)
