@@ -4,7 +4,7 @@ import type { Entry } from '../lib/cloud';
 import { bilanDay, isDoneOn, timeline, todayIso, toggledData } from '../lib/day';
 import { DaySwitch, dayName } from './DaySwitch';
 import { habitDone, habitFreq } from '../lib/rituals';
-import { Check22 } from '../ui/kit';
+import { Check22, Bar } from '../ui/kit';
 
 const PRAYERS = new Set(['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']);
 type Item = { key: string; time: string; title: string; sub?: string; kind: 'prayer' | 'event' | 'habits'; done: boolean; toggle?: (on: boolean) => void; open?: () => void };
@@ -42,6 +42,8 @@ export function TodayCard({ entries, habits, onUpdate, onTogglePrayer, onOpenHab
   const nextPrayer = prayers.find((p) => toMin(p.time) > nowMin);
   const upcoming = [...(current && !current.done ? [current] : []), ...items.filter((i) => toMin(i.time) > nowMin && !i.done && i !== current)].slice(0, 3);
   const shown = open || past ? items : upcoming;
+  const checkable = items.filter((i) => i.toggle || i.kind === 'habits'), doneCount = checkable.filter((i) => i.done).length;
+  const nextUp = past ? undefined : items.find((i) => !i.done && toMin(i.time) >= nowMin && i.kind !== 'habits');
   const nowIndex = items.findIndex((i) => toMin(i.time) > nowMin);
 
   const row = (i: Item) => <div key={i.key} className={'today-row' + (i.done ? ' done' : '') + (i === nextPrayer && !past ? ' next' : '')}>
@@ -61,8 +63,10 @@ export function TodayCard({ entries, habits, onUpdate, onTogglePrayer, onOpenHab
         {daily.length > 0 && <span className="tchip rose">{daily.length - left.length}/{daily.length} habitudes</span>}
         {events.length > 0 && <span className="tchip lilas">{events.length} rdv</span>}
       </span></div>
+    {checkable.length > 0 && <div className="today-progress"><span><strong>{doneCount}</strong> sur {checkable.length} {doneCount > 1 ? 'faits' : 'fait'}</span><Bar value={doneCount / checkable.length} /></div>}
+    {nextUp && <div className="today-next"><small>À suivre</small><strong>{nextUp.title}</strong><span>{nextUp.time}{nextUp.kind === 'prayer' ? ' · ' + inText(toMin(nextUp.time) - nowMin) : nextUp.sub ? ' · ' + nextUp.sub : ''}</span></div>}
     {!items.length ? <p className="day-empty">Rien de prévu pour l’instant. Une journée à ton rythme.</p>
-      : !shown.length ? <p className="day-empty">{'Tout est fait pour ' + dayName(day) + ', macha’Allah.'}</p>
+      : !shown.length ? <p className="day-empty">{doneCount < checkable.length && !past ? 'Plus rien de prévu d’ici ce soir.' : 'Tout est fait pour ' + dayName(day) + ', macha’Allah.'}</p>
       : <div className="today-list">{shown.map((i, k) => <div key={i.key}>{open && !past && k === nowIndex && <div className="today-now">{String(now.getHours()).padStart(2, '0')}:{String(now.getMinutes()).padStart(2, '0')} · maintenant</div>}{row(i)}</div>)}</div>}
     <div className="today-foot">
       {!past && (items.length > shown.length || open) ? <button className="link-btn small" aria-expanded={open} onClick={() => setOpen(!open)}>{open ? 'Réduire' : 'Toute ma journée'} <ChevronDown size={14} className={open ? 'flip' : ''} /></button> : <span />}
