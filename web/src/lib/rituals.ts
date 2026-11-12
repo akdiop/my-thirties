@@ -1,6 +1,6 @@
 import type { Entry } from './cloud';
 import type { GlyphName, Tint } from '../ui/Glyph';
-import { activeGap, addIso, clampN, daysOf, doneDates, doneOf, dueOn, everyWait as everyWaitOf, monthLength, monthStart, pausedOn, pauseOf, periodCount as periodCountOf, ruleOf, RULE_RANGE, scheduledOn, weekStart, type HabitRule } from '../../supabase/functions/push-reminders/habits';
+import { activeGap, addIso, autoCount, clampN, cycleRestOn, daysOf, doneDates, doneOf, dueOn, everyWait as everyWaitOf, goalOf, inSeason, monthLength, monthStart, pausedOn, pauseOf, periodCount as periodCountOf, prayerOf, restOn, ruleOf, RULE_RANGE, scheduledOn, seasonOf, weekStart, type HabitCtx, type HabitRule, type HabitSeason } from '../../supabase/functions/push-reminders/habits';
 
 /** Entrées des nouveaux écrans (Mon jour, Habitudes, Notes) : gérées par leurs propres écrans, pas par les listes des espaces. */
 export const DAILY_KIND = 'daily';
@@ -150,8 +150,20 @@ export const ruleOfFreq = (f: HabitFreq): HabitRule => (f === 'daily' ? { type: 
 export const ruleData = (r: HabitRule) => (r.type === 'daily' ? { freq: 'daily', n: null } : { freq: r.type, n: clampN(r.type, r.n) });
 export const ruleLabel = (r: HabitRule) => r.type === 'daily' ? 'Chaque jour' : r.type === 'every' ? 'Tous les ' + r.n + ' jours'
   : r.n + ' fois par ' + (r.type === 'week' ? 'semaine' : 'mois');
-export const everyWait = (e: Entry, iso: string) => everyWaitOf(e.data, iso);
-export const habitDue = (e: Entry, iso: string) => dueOn(e.data, iso);
+export { type HabitCtx, type HabitSeason };
+/** Contexte des habitudes : débuts de règles notés et données de chaque jour (pas, verres d'eau). */
+export function habitCtx(entries: Entry[]): HabitCtx {
+  const daily: Record<string, Record<string, unknown>> = {};
+  for (const e of entries) if (e.kind === DAILY_KIND && e.entry_date) daily[e.entry_date] = { ...daily[e.entry_date], ...e.data };
+  return { cycleStarts: entries.filter((e) => e.kind === 'cycle' && e.entry_date).map((e) => e.entry_date!), daily };
+}
+export const everyWait = (e: Entry, iso: string, ctx?: HabitCtx) => everyWaitOf(e.data, iso, ctx);
+export const habitDue = (e: Entry, iso: string, ctx?: HabitCtx) => dueOn(e.data, iso, ctx);
+/** Jour de repos : pause, hors saison ou repos pendant les règles. */
+export const isResting = (e: Entry, iso: string, ctx?: HabitCtx) => restOn(e.data, iso, ctx);
+export const restReason = (e: Entry, iso: string, ctx?: HabitCtx) => (pausedOn(e.data, iso) ? 'pause' : !inSeason(e.data, iso) ? 'saison' : cycleRestOn(e.data, iso, ctx?.cycleStarts) ? 'cycle' : '');
+export const habitSeason = (e: Entry) => seasonOf(e.data);
+export const habitPrayer = (e: Entry) => prayerOf(e.data);
 export const periodCount = (e: Entry, iso: string) => periodCountOf(e.data, iso);
 export const monthStartOf = monthStart;
 export const isPaused = (e: Entry, iso: string) => pausedOn(e.data, iso);
@@ -165,15 +177,33 @@ export function expectedOver(r: HabitRule, span: number) {
 }
 /** Objectif d'une semaine (bilan hebdomadaire). */
 export const weekTarget = (r: HabitRule) => (r.type === 'daily' ? 7 : r.type === 'week' ? r.n : r.type === 'every' ? Math.ceil(7 / r.n) : Math.max(1, Math.round(r.n * 7 / 30)));
+/** Une fréquence plus douce pour une habitude qui décroche. */
+export const easierRule = (r: HabitRule): HabitRule | null => r.type === 'daily' ? { type: 'week', n: 4 } : r.type === 'week' ? (r.n > 1 ? { type: 'week', n: r.n - 1 } : { type: 'month', n: 3 })
+  : r.type === 'every' ? (r.n < 60 ? { type: 'every', n: Math.min(60, r.n + Math.max(1, Math.round(r.n / 2))) } : null) : r.n > 1 ? { type: 'month', n: r.n - 1 } : null;
+/** Bilan du mois en cours : régularité de chaque habitude (jours de repos exclus), la plus régulière, celle qui décroche et une fréquence plus douce. */
+export function monthReview(habits: Entry[], today: string, ctx?: HabitCtx) {
+  const start = monthStart(today);
+  const rows = habits.map((e) => {
+    const created = String(e.created_at ?? '').slice(0, 10), from = created > start ? created : start;
+    let active = 0;
+    for (let x = from; x <= today; x = addIso(x, 1)) if (!restOn(e.data, x, ctx)) active++;
+    const count = doneDates(e.data).filter((d) => d >= from && d <= today).length;
+    return { e, count, active, rate: active ? Math.min(1, count / expectedOver(habitRule(e), active)) : 0 };
+  }).filter((x) => x.active >= 3).sort((a, b) => b.rate - a.rate);
+  const best = rows[0] ?? null, low = rows.length > 1 ? rows[rows.length - 1]! : null;
+  const struggling = low && low.rate < 0.5 ? low : null;
+  return { rows, best, struggling, suggestion: struggling ? easierRule(habitRule(struggling.e)) : null };
+}
 export const streakUnit = (r: HabitRule) => ({ daily: 'jours', week: 'semaines', every: 'fois de suite', month: 'mois' })[r.type];
 
 /** Objectif chiffré (ex. 6 verres) : compteur du jour, la coche se fait quand il est atteint. */
-export const habitGoal = (e: Entry) => { const g = e.data.goal as { target?: unknown; unit?: unknown } | undefined; const t = Math.round(Number(g?.target));
-  return g && t >= 2 ? { target: Math.min(100, t), unit: String(g.unit ?? '').slice(0, 20) } : null; };
+export const habitGoal = (e: Entry) => goalOf(e.data);
 const countMap = (e: Entry) => (e.data.count && typeof e.data.count === 'object' ? e.data.count as Record<string, number> : {});
-export const countOn = (e: Entry, iso: string) => { const g = habitGoal(e); const c = Number(countMap(e)[iso]); return Number.isFinite(c) && c > 0 ? c : g && habitDone(e)[iso] ? g.target : 0; };
+/** Compteur du jour : saisi à la main, ou rempli par la source automatique (le plus grand des deux). */
+export const countOn = (e: Entry, iso: string, ctx?: HabitCtx) => { const g = habitGoal(e); const c = Number(countMap(e)[iso]);
+  const manual = Number.isFinite(c) && c > 0 ? c : g && habitDone(e)[iso] ? g.target : 0; return Math.max(manual, autoCount(e.data, iso, ctx)); };
 export function countData(e: Entry, iso: string, n: number) {
-  const g = habitGoal(e), v = Math.max(0, Math.min(g?.target ?? 100, n));
+  const g = habitGoal(e), v = Math.max(0, Math.min(g?.target ?? 100000, n));
   return { ...e.data, count: { ...countMap(e), [iso]: v }, done: { ...habitDone(e), [iso]: Boolean(g && v >= g.target) } };
 }
 /** Routine en étapes : la coche se fait quand toutes les étapes du jour sont cochées. */
@@ -208,28 +238,28 @@ export const DAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 export const habitDaysLabel = (e: Entry) => { const d = habitDays(e); if (!d.length || d.length === 7) return ''; return d.length === 5 && !d.includes(5) && !d.includes(6) ? 'en semaine' : d.length === 2 && d.includes(5) && d.includes(6) ? 'le week-end' : [...d].sort().map((i) => ['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim'][i]).join(', '); };
 
 /** Série en cours : jours consécutifs (quotidienne), semaines ou mois où l'objectif est atteint, ou fois faites à temps (tous les n jours). Les jours non prévus et les pauses ne cassent rien. */
-export function habitStreak(e: Entry, today: string) {
+export function habitStreak(e: Entry, today: string, ctx?: HabitCtx) {
   const done = habitDone(e), r = habitRule(e), d = e.data;
   if (r.type === 'daily') {
-    let day = done[today] || !habitScheduled(e, today) || isPaused(e, today) ? today : addIso(today, -1), n = 0;
+    let day = done[today] || !habitScheduled(e, today) || isResting(e, today, ctx) ? today : addIso(today, -1), n = 0;
     for (let guard = 0; guard < 3660; guard++) {
-      if (done[day]) n++; else if (habitScheduled(e, day) && !isPaused(e, day)) break;
+      if (done[day]) n++; else if (habitScheduled(e, day) && !isResting(e, day, ctx)) break;
       day = addIso(day, -1);
     }
     return n;
   }
   if (r.type === 'every') {
     const list = doneDates(d).filter((x) => x <= today);
-    if (!list.length || activeGap(d, list[list.length - 1]!, today) > r.n) return 0;
+    if (!list.length || activeGap(d, list[list.length - 1]!, today, ctx) > r.n) return 0;
     let n = 1;
-    for (let i = list.length - 1; i > 0 && activeGap(d, list[i - 1]!, list[i]!) <= r.n; i--) n++;
+    for (let i = list.length - 1; i > 0 && activeGap(d, list[i - 1]!, list[i]!, ctx) <= r.n; i--) n++;
     return n;
   }
   const month = r.type === 'month';
   const start = (iso: string) => (month ? monthStart(iso) : weekStart(iso));
   const prev = (p: string) => start(addIso(p, -1));
   const last = (p: string) => (month ? p.slice(0, 8) + String(monthLength(p)).padStart(2, '0') : addIso(p, 6));
-  const touchesPause = (p: string) => { const ps = pauseOf(d); return Boolean(ps && ps.from <= last(p) && ps.to >= p); };
+  const touchesPause = (p: string) => { for (let x = p; x <= last(p); x = addIso(x, 1)) if (restOn(d, x, ctx)) return true; return false; };
   let p = start(today), n = 0;
   if (periodCountOf(d, p) < r.n) p = prev(p);
   for (let guard = 0; guard < 600; guard++) {

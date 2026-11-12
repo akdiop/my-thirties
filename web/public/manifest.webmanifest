@@ -87,6 +87,19 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "Mes habitudes du moment",
+      "short_name": "Habitudes",
+      "description": "Les habitudes du matin, du midi ou du soir",
+      "url": "/?ecran=habits&moment=now",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
