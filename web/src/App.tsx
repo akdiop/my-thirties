@@ -60,6 +60,7 @@ const EquilibriumInsights = lazy(() => import('./features/EquilibriumInsights').
 const KitchenPlanner = lazy(() => import('./features/KitchenPlanner').then((m) => ({ default: m.KitchenPlanner })));
 const PassionPath = lazy(() => import('./features/PassionPath').then((m) => ({ default: m.PassionPath })));
 const Carnet = lazy(() => import('./screens/Carnet').then((m) => ({ default: m.Carnet })));
+const Ressenti = lazy(() => import('./screens/Ressenti').then((m) => ({ default: m.Ressenti })));
 const Hypersensibilite = lazy(() => import('./screens/Hypersensibilite').then((m) => ({ default: m.Hypersensibilite })));
 const Tcc = lazy(() => import('./screens/Tcc').then((m) => ({ default: m.Tcc })));
 const Gratitude = lazy(() => import('./screens/Gratitude').then((m) => ({ default: m.Gratitude })));
@@ -97,7 +98,7 @@ const NotificationSettings = lazy(() => import('./features/Notifications').then(
 const JournalSettings = lazy(() => import('./features/JournalSettings').then((m) => ({ default: m.JournalSettings })));
 const IphoneCalendar = lazy(() => import('./features/IphoneCalendar').then((m) => ({ default: m.IphoneCalendar })));
 
-type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'transformation' | 'carnet' | 'gratitude' | 'tcc' | 'hsp' | ModuleId;
+type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'transformation' | 'carnet' | 'gratitude' | 'tcc' | 'hsp' | 'ressenti' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
 const today = () => new Date().toLocaleDateString('en-CA');
 const value = (obj: Record<string, unknown>, key: string) => typeof obj[key] === 'string' ? obj[key] as string : '';
@@ -463,7 +464,7 @@ export default function App() {
   useEffect(() => {
     const q = new URLSearchParams(window.location.search), target = q.get('ecran');
     if (!target) return;
-    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'assistant', 'proches', 'lectures', 'envies', 'panda', 'transformation', 'carnet', 'gratitude', 'tcc', 'hsp'].includes(target)) {
+    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'assistant', 'proches', 'lectures', 'envies', 'panda', 'transformation', 'carnet', 'gratitude', 'tcc', 'hsp', 'ressenti'].includes(target)) {
       if (target === 'myday') setDayTarget((t) => ({ part: q.get('moment') === 'soir' ? 'soir' : 'matin', n: t.n + 1 }));
       if (target === 'assistant') setAssistantIdea(q.get('idee') ?? '');
       setScreen(target as Screen);
@@ -713,6 +714,7 @@ export default function App() {
       {screen === 'proches' && <><ScreenHeader title="" onBack={() => go('home')} /><Relatives entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onEdit={editFull} onRemove={drop} /></>}
       {screen === 'lectures' && <><ScreenHeader title="" onBack={() => go('home')} /><Reading entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} /></>}
       {screen === 'panda' && <><ScreenHeader title="" onBack={() => go('home')} /><PandaScreen entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onGo={(x) => go(x as Screen)} /></>}
+      {screen === 'ressenti' && <><ScreenHeader title="" onBack={() => go('home')} /><Ressenti entries={ritualEntries} onCreate={createFromTool} onGo={(c) => { if (c === 'invocations') { setSpiritTab('invocations'); go('spiritualite'); } else go(c); }} /></>}
       {screen === 'hsp' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><Hypersensibilite entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onBreathe={() => go('calme')} /></LockGate>}
       {screen === 'tcc' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><Tcc entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} /></LockGate>}
       {screen === 'gratitude' && <><ScreenHeader title="" onBack={() => go('home')} /><Gratitude entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onOpenProches={() => go('proches')} /></>}

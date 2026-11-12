@@ -2113,3 +2113,12 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .tq-row small{font-size:.75rem;color:#6E6448;white-space:nowrap}.tq-row small.late{color:#8A5A3C}
 .tq-pill{font-size:.7rem;padding:2px 8px;border-radius:999px;background:#EFEADF;color:#6E6448;white-space:nowrap}
 .tq-foot{display:flex;justify-content:space-between;align-items:center}.tq-foot small{font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:#7E7254}
+.ress-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ress-btn{padding:16px 12px;border-radius:18px;border:1px solid rgba(255,255,255,.75);background:rgba(255,255,255,.62);color:#3A3833;font:inherit;font-size:1.05rem;font-weight:600}
+.ress-geste{padding:8px 0;border-top:1px solid rgba(58,56,51,.08)}.ress-geste p{margin:0 0 2px}
+.ress-coach .ritual-label{display:flex;align-items:center;gap:6px}
+.ress-msg{padding:10px 14px;border-radius:16px;max-width:92%}.ress-msg p{margin:0 0 6px}.ress-msg p:last-child{margin:0}
+.ress-msg.user{align-self:flex-end;background:#EFEADF}
+.ress-msg.assistant{background:rgba(95,122,89,.1)}
+.calm-pills{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.calm-pill.soft{background:#EFEADF;color:#5F5A4F}

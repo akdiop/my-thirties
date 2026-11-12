@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Lightbulb, Shield, Sparkles, Waves } from 'lucide-react';
+import { HeartHandshake, Lightbulb, Shield, Sparkles, Waves } from 'lucide-react';
 import type { Entry, ModuleId } from '../lib/cloud';
 import { isDoneOn, longDate, priorities, str, timeline, todayIso, toggledData } from '../lib/day';
 import { fmt, mainCurrency, monthReport } from '../lib/money';
@@ -9,7 +9,7 @@ import { ProfileAvatar } from '../features/PersonalProfile';
 import { Bar, Check22, SectionTitle } from '../ui/kit';
 import { ProtectionSheet } from '../features/ProtectionSheet';
 
-type Go = (screen: ModuleId | 'calme' | 'assistant' | 'settings' | 'agenda' | 'spaces') => void;
+type Go = (screen: ModuleId | 'calme' | 'ressenti' | 'assistant' | 'settings' | 'agenda' | 'spaces') => void;
 
 export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd, rituals, todayCard, tasksCard, word = '' }: {
   tasksCard?: ReactNode;
@@ -44,7 +44,8 @@ export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd,
 
     {rituals}
 
-    <button className="calm-pill" onClick={() => onGo('calme')}><Waves size={20} /> J’ai besoin de me calmer</button>
+    <div className="calm-pills"><button className="calm-pill" onClick={() => onGo('calme')}><Waves size={20} /> J’ai besoin de me calmer</button>
+      <button className="calm-pill soft" onClick={() => onGo('ressenti')}><HeartHandshake size={20} /> Je me sens mal</button></div>
 
     {todayCard}
 
