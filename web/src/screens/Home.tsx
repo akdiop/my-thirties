@@ -11,8 +11,8 @@ import { ProtectionSheet } from '../features/ProtectionSheet';
 
 type Go = (screen: ModuleId | 'calme' | 'assistant' | 'settings' | 'agenda' | 'spaces') => void;
 
-export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd, rituals, todayCard }: {
-  rituals?: ReactNode; todayCard?: ReactNode; entries: Entry[]; profileEntry: Entry | undefined; onGo: Go;
+export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd, rituals, todayCard, word = '' }: {
+  word?: string; rituals?: ReactNode; todayCard?: ReactNode; entries: Entry[]; profileEntry: Entry | undefined; onGo: Go;
   onUpdate: (entry: Entry, data: Record<string, unknown>) => Promise<void>; onAdd: () => void; onQuickAdd: (title: string) => Promise<void>;
 }) {
   const day = todayIso();
@@ -35,7 +35,7 @@ export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd,
   return <div className="screen home">
     <header className="home-head">
       <button className="avatar-btn" onClick={() => onGo('settings')} aria-label="Mon profil"><ProfileAvatar profile={profile} size={48} /></button>
-      <div className="home-hello"><h1>Bonjour{profile.firstName ? ', ' + profile.firstName : ''}</h1><p>{longDate()}</p></div>
+      <div className="home-hello"><h1>Bonjour{profile.firstName ? ', ' + profile.firstName : ''}</h1><p>{longDate()}</p>{word && <p className="home-word">« {word} »</p>}</div>
       <button className="round-btn" onClick={() => setProtection(true)} aria-label="Invocations de protection"><Shield size={20} /></button>
       <button className="round-btn" onClick={() => onGo('assistant')} aria-label="Assistant"><Sparkles size={20} /></button>
     </header>

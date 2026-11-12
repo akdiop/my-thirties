@@ -8,11 +8,12 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import webpush from 'npm:web-push@3.6.7';
 import { CalculationMethod, Coordinates, Madhab, PrayerTimes } from 'npm:adhan@4.4.3';
 import { suppStatus } from './supplements.ts';
+import { isEve, writingWindow, type CarnetSettings } from './carnet.ts';
 
 type Prefs = { morning?: { on?: boolean; time?: string }; evening?: { on?: boolean; time?: string }; habits?: { on?: boolean; time?: string };
   agenda?: { on?: boolean; minutes?: number }; weekly?: { on?: boolean; day?: number; time?: string }; supplements?: { on?: boolean };
   plan?: { on?: boolean; time?: string }; birthdays?: { on?: boolean; time?: string };
-  prayers?: { on?: boolean; minutes?: number }; fasting?: { on?: boolean; time?: string }; water?: { on?: boolean; time?: string } };
+  prayers?: { on?: boolean; minutes?: number }; fasting?: { on?: boolean; time?: string }; water?: { on?: boolean; time?: string }; carnet?: { on?: boolean; time?: string } };
 type Row = { id: string; module: string; kind: string; title: string; entry_date: string | null; data: Record<string, unknown> };
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 const json = (d: unknown, status = 200) => new Response(JSON.stringify(d), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -115,7 +116,7 @@ Deno.serve(async (request) => {
     const p = (u.prefs ?? {}) as Prefs, now = localNow(u.tz);
     const queue: { key: string; title: string; body: string; url: string }[] = [];
     const { data: rows } = await db.from('entries').select('id,module,kind,title,entry_date,data').eq('user_id', u.user_id)
-      .in('kind', ['daily', 'habit', 'task', 'event', 'appointment', 'routine', 'complement', 'proche', 'prayer_settings']);
+      .in('kind', ['daily', 'habit', 'task', 'event', 'appointment', 'routine', 'complement', 'proche', 'prayer_settings', 'cycle', 'carnet_reglages']);
     const list = (rows ?? []) as Row[];
     const today = list.find((e) => e.kind === 'daily' && e.entry_date === now.date);
 
@@ -154,6 +155,13 @@ Deno.serve(async (request) => {
       }
     }
     // Eau : l'après-midi, si l'objectif de 8 verres n'est pas atteint.
+    // Carnet de vœux : la veille de la fenêtre d'écriture, un rappel neutre (sans mention du cycle).
+    if (p.carnet?.on !== false && due(now.minutes, mins(p.carnet?.time ?? '20:00'))) {
+      const settings = (list.find((e) => e.kind === 'carnet_reglages')?.data ?? {}) as CarnetSettings;
+      const starts = list.filter((e) => e.kind === 'cycle' && e.entry_date).map((e) => e.entry_date!);
+      if (isEve(writingWindow(starts, settings, now.date), now.date))
+        queue.push({ key: 'carnet:' + now.date, title: 'Mon carnet', body: 'Demain, ta page du mois t’attend.', url: '/?ecran=carnet' });
+    }
     if (p.water?.on !== false && due(now.minutes, mins(p.water?.time ?? '16:00'))) {
       const n = Math.max(0, Number(today?.data.water) || 0);
       if (n < 8) queue.push({ key: 'water:' + now.date, title: 'Un verre d’eau ?', body: n ? n + ' verre' + (n > 1 ? 's' : '') + ' sur 8 aujourd’hui.' : 'Pas encore de verre noté aujourd’hui.', url: '/' });
