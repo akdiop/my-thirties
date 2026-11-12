@@ -30,24 +30,61 @@ export const scheduledOn = (d: Data, iso: string) => { const days = daysOf(d); r
 export const pauseOf = (d: Data) => { const p = d.pause as { from?: unknown; to?: unknown } | null | undefined;
   return p && typeof p.from === 'string' && typeof p.to === 'string' && p.from <= p.to ? { from: p.from, to: p.to } : null; };
 export const pausedOn = (d: Data, iso: string) => { const p = pauseOf(d); return Boolean(p && iso >= p.from && iso <= p.to); };
-/** Jours écoulés de a à b, sans compter les jours de pause. */
-export function activeGap(d: Data, a: string, b: string) {
-  const gap = dayNo(b) - dayNo(a), p = pauseOf(d);
-  if (!p) return gap;
-  const lo = Math.max(dayNo(a) + 1, dayNo(p.from)), hi = Math.min(dayNo(b), dayNo(p.to));
-  return gap - Math.max(0, hi - lo + 1);
+
+/** Contexte : débuts de règles notés et données du jour (pas, verres d'eau) par date. */
+export type HabitCtx = { cycleStarts?: string[]; daily?: Record<string, Data> };
+
+/** Saison : seulement pendant le Ramadan, ou entre deux dates de l'année (MM-JJ, l'hiver peut chevaucher le Nouvel An). */
+export type HabitSeason = { type: 'ramadan' } | { type: 'dates'; from: string; to: string };
+export const seasonOf = (d: Data): HabitSeason | null => { const s = d.season as { type?: unknown; from?: unknown; to?: unknown } | null | undefined;
+  if (s?.type === 'ramadan') return { type: 'ramadan' };
+  const md = /^\d{2}-\d{2}$/;
+  return s?.type === 'dates' && md.test(String(s.from)) && md.test(String(s.to)) ? { type: 'dates', from: String(s.from), to: String(s.to) } : null; };
+const hijriFmt = (() => { try { return new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { month: 'numeric', timeZone: 'UTC' }); } catch { return null; } })();
+export const hijriMonth = (iso: string) => { const m = hijriFmt?.formatToParts(new Date(iso + 'T12:00:00Z')).find((x) => x.type === 'month')?.value; return m ? parseInt(m, 10) : 0; };
+export function inSeason(d: Data, iso: string) {
+  const s = seasonOf(d);
+  if (!s) return true;
+  if (s.type === 'ramadan') return hijriMonth(iso) === 9;
+  const md = iso.slice(5);
+  return s.from <= s.to ? md >= s.from && md <= s.to : md >= s.from || md <= s.to;
+}
+/** Repos pendant les règles : les premiers jours du cycle (5 par défaut). */
+export function cycleRestOn(d: Data, iso: string, starts: string[] = []) {
+  if (d.cycleRest !== true) return false;
+  const len = Math.min(10, Math.max(1, Number(d.cycleDays) || 5)), last = starts.filter((x) => x <= iso).sort().pop();
+  return Boolean(last && dayNo(iso) - dayNo(last) < len);
+}
+/** Jour sans attente : pause, hors saison ou repos du cycle. Ces jours ne cassent jamais une série. */
+export const restOn = (d: Data, iso: string, ctx?: HabitCtx) => pausedOn(d, iso) || !inSeason(d, iso) || cycleRestOn(d, iso, ctx?.cycleStarts);
+
+/** Jours écoulés de a à b, sans compter les jours de repos. */
+export function activeGap(d: Data, a: string, b: string, ctx?: HabitCtx) {
+  const gap = dayNo(b) - dayNo(a);
+  if (!pauseOf(d) && !seasonOf(d) && d.cycleRest !== true) return gap;
+  let n = 0;
+  for (let k = 1; k <= Math.min(gap, 1000); k++) if (!restOn(d, addIso(a, k), ctx)) n++;
+  return n;
 }
 
+/** Objectif chiffré rempli automatiquement depuis Santé (pas) ou l'hydratation (verres d'eau). */
+export const goalOf = (d: Data) => { const g = d.goal as { target?: unknown; unit?: unknown; source?: unknown } | undefined; const t = Math.round(Number(g?.target));
+  return g && t >= 2 ? { target: Math.min(100000, t), unit: String(g.unit ?? '').slice(0, 20), source: (g.source === 'pas' || g.source === 'eau' ? g.source : '') as '' | 'pas' | 'eau' } : null; };
+export const autoCount = (d: Data, iso: string, ctx?: HabitCtx) => { const g = goalOf(d), day = ctx?.daily?.[iso];
+  return !g?.source || !day ? 0 : Math.max(0, Math.floor(Number(g.source === 'pas' ? day.steps : day.water) || 0)); };
+/** Faite ce jour-là : cochée, ou objectif atteint par la source automatique. */
+export const doneWith = (d: Data, iso: string, ctx?: HabitCtx) => { const g = goalOf(d); return Boolean(doneOf(d)[iso]) || Boolean(g?.source && autoCount(d, iso, ctx) >= g.target); };
+
 /** Jours restants avant la prochaine fois (« tous les n jours ») : 0 = à faire ce jour-là. */
-export function everyWait(d: Data, iso: string) {
+export function everyWait(d: Data, iso: string, ctx?: HabitCtx) {
   const r = ruleOf(d), last = doneDates(d).filter((x) => x < iso).pop();
-  return r.type !== 'every' || !last ? 0 : Math.max(0, r.n - activeGap(d, last, iso));
+  return r.type !== 'every' || !last ? 0 : Math.max(0, r.n - activeGap(d, last, iso, ctx));
 }
 /** Attendue ce jour-là : quotidienne prévue, ou « tous les n jours » arrivée à échéance ; jamais en pause ni archivée. */
-export function dueOn(d: Data, iso: string) {
-  if (d.archived || pausedOn(d, iso)) return false;
+export function dueOn(d: Data, iso: string, ctx?: HabitCtx) {
+  if (d.archived || restOn(d, iso, ctx)) return false;
   const r = ruleOf(d);
-  return r.type === 'daily' ? scheduledOn(d, iso) : r.type === 'every' ? everyWait(d, iso) === 0 : false;
+  return r.type === 'daily' ? scheduledOn(d, iso) : r.type === 'every' ? everyWait(d, iso, ctx) === 0 : false;
 }
 /** Nombre de fois sur la semaine ou le mois de ce jour. */
 export function periodCount(d: Data, iso: string) {
@@ -55,15 +92,26 @@ export function periodCount(d: Data, iso: string) {
   return doneDates(d).filter((x) => x >= from && x <= to).length;
 }
 
-export type HabitRemind = { on?: boolean; time?: string; day?: number; mday?: number };
+export type HabitRemind = { on?: boolean; time?: string; day?: number; mday?: number; after?: number };
 export const remindOf = (d: Data) => (d.remind && typeof d.remind === 'object' ? d.remind as HabitRemind : {});
 /** Le rappel individuel doit-il partir ce jour-là ? Par semaine : le jour choisi (dimanche par défaut) ; par mois : le jour choisi ou les 3 derniers jours ; seulement si l'objectif n'est pas atteint. */
-export function remindOn(d: Data, iso: string) {
-  if (d.archived || pausedOn(d, iso) || doneOf(d)[iso]) return false;
+export function remindOn(d: Data, iso: string, ctx?: HabitCtx) {
+  if (d.archived || restOn(d, iso, ctx) || doneWith(d, iso, ctx)) return false;
   const r = ruleOf(d), rem = remindOf(d);
-  if (r.type === 'daily' || r.type === 'every') return dueOn(d, iso);
+  if (r.type === 'daily' || r.type === 'every') return dueOn(d, iso, ctx);
   if (periodCount(d, iso) >= r.n) return false;
   if (r.type === 'week') return weekdayOf(iso) === (Number.isInteger(rem.day) ? rem.day : 6);
   const dom = Number(iso.slice(8)), last = monthLength(iso), mday = Number(rem.mday) || 0;
   return mday ? dom === Math.min(mday, last) : dom > last - 3;
+}
+
+/** Habitude liée à une prière (« après Fajr ») : le rappel part quelques minutes après l'heure du jour. */
+export const PRAYER_LINKS = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'] as const;
+export const prayerOf = (d: Data) => (PRAYER_LINKS as readonly string[]).includes(String(d.prayer)) ? String(d.prayer) : '';
+const toMin = (t: string) => { const m = /^(\d{2}):(\d{2})/.exec(t); return m ? Number(m[1]) * 60 + Number(m[2]) : -1; };
+/** Minute du rappel : après la prière liée si les horaires sont connus, sinon l'heure choisie. */
+export function remindMinute(d: Data, prayers: { name: string; time: string }[] = []) {
+  const rem = remindOf(d), p = prayerOf(d), at = p ? prayers.find((x) => x.name === p) : undefined;
+  if (at) { const m = toMin(at.time); return m < 0 ? -1 : m + Math.max(0, Math.min(120, Number(rem.after ?? 10))); }
+  return toMin(String(rem.time ?? ''));
 }

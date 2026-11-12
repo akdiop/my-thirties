@@ -10,7 +10,7 @@ import { CalculationMethod, Coordinates, Madhab, PrayerTimes } from 'npm:adhan@4
 import { suppStatus } from './supplements.ts';
 import { isEve, writingWindow, type CarnetSettings } from './carnet.ts';
 import { wirdPace, wirdSlots } from './wird.ts';
-import { dueOn, remindOn } from './habits.ts';
+import { doneWith, dueOn, remindMinute, remindOn, type HabitCtx } from './habits.ts';
 
 type Prefs = { morning?: { on?: boolean; time?: string }; evening?: { on?: boolean; time?: string }; habits?: { on?: boolean; time?: string };
   agenda?: { on?: boolean; minutes?: number }; weekly?: { on?: boolean; day?: number; time?: string }; supplements?: { on?: boolean };
@@ -127,10 +127,15 @@ Deno.serve(async (request) => {
     if (p.evening?.on !== false && due(now.minutes, mins(p.evening?.time ?? '21:00')) && !(today?.data.win || today?.data.tomorrow))
       queue.push({ key: 'evening:' + now.date, title: 'Mon débriefing du soir', body: 'Ta victoire du jour, ce que tu déposes, ton intention pour demain.', url: '/?ecran=myday&moment=soir' });
     // Habitudes attendues aujourd'hui (quotidiennes prévues, « tous les n jours » arrivées à échéance ; hors pause et archives).
-    const habitLeft = (e: Row) => e.kind === 'habit' && dueOn(e.data, now.date) && !(e.data.done as Record<string, boolean> | undefined)?.[now.date];
+    const hctx: HabitCtx = { cycleStarts: list.filter((e) => e.kind === 'cycle' && e.entry_date).map((e) => e.entry_date!), daily: Object.fromEntries(list.filter((e) => e.kind === 'daily' && e.entry_date).map((e) => [e.entry_date!, e.data])) };
+    const habitLeft = (e: Row) => e.kind === 'habit' && dueOn(e.data, now.date, hctx) && !doneWith(e.data, now.date, hctx);
+    // Horaires de prière du jour, pour les habitudes liées à une prière (« après Fajr »).
+    const ps0 = list.filter((e) => e.kind === 'prayer_settings').sort((a, b) => String(b.data.updated ?? '').localeCompare(String(a.data.updated ?? '')))[0];
+    let todayPrayers: { name: string; time: string }[] = [];
+    try { if (ps0) todayPrayers = prayerMinutes(ps0.data, now.date, now.zone); } catch { /* horaires indisponibles : l'heure choisie sert de repli */ }
     // Rappel propre à chaque habitude (par semaine : le jour choisi ; par mois : le jour choisi ou les 3 derniers jours, tant que l'objectif n'est pas atteint).
-    for (const e of list.filter((x) => x.kind === 'habit' && (x.data.remind as { on?: boolean } | undefined)?.on && remindOn(x.data, now.date))) {
-      const t = mins(String((e.data.remind as { time?: string }).time ?? ''));
+    for (const e of list.filter((x) => x.kind === 'habit' && (x.data.remind as { on?: boolean } | undefined)?.on && remindOn(x.data, now.date, hctx))) {
+      const t = remindMinute(e.data, todayPrayers);
       if (due(now.minutes, t)) queue.push({ key: 'habit:' + e.id + ':' + now.date, title: 'Mon habitude', body: e.title.slice(0, 80), url: '/?ecran=habits' });
     }
     if (p.habits?.on !== false && due(now.minutes, mins(p.habits?.time ?? '19:00'))) {

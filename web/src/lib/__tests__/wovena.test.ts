@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { Entry } from '../cloud';
-import { activeHabits, countData, countOn, everyWait, expectedOver, habitDaysLabel, habitDue, habitRule, habitScheduled, habitStreak, momentNow, momentRank, periodCount, ruleData, ruleLabel, stepData, toggleData, weekTarget } from '../rituals';
-import { remindOn } from '../../../supabase/functions/push-reminders/habits';
+import { activeHabits, countData, easierRule, monthReview, countOn, everyWait, expectedOver, habitDaysLabel, habitDue, habitRule, habitScheduled, habitStreak, momentNow, momentRank, periodCount, ruleData, ruleLabel, stepData, toggleData, weekTarget } from '../rituals';
+import { doneWith, dueOn, inSeason, remindMinute, remindOn } from '../../../supabase/functions/push-reminders/habits';
+import { routineMilestones } from '../../features/panda/engine';
 import { taskBuckets } from '../../features/TaskQuick';
 
 const e = (kind: string, data: Record<string, unknown>, title = 'x') => ({ id: title + JSON.stringify(data), kind, module: 'quotidien', title, entry_date: (data.date as string) ?? null, data }) as unknown as Entry;
@@ -113,5 +114,41 @@ describe('habitudes : pause, rappels, compteur, étapes, moment, archives', () =
     expect(momentRank('soir', 'soir')).toBeLessThan(momentRank('matin', 'soir'));
     expect(momentRank('', 'soir')).toBeGreaterThan(momentRank('midi', 'soir'));
     expect(activeHabits([e('habit', {}, 'a'), e('habit', { archived: '2026-11-01' }, 'b')]).map((x) => x.title)).toEqual(['a']);
+  });
+});
+
+describe('habitudes : cycle, prière, saison, Santé, bilan du mois, panda', () => {
+  it('repos pendant les règles et saison', () => {
+    const c = { freq: 'daily', cycleRest: true, done: { '2026-11-01': true, '2026-11-02': true, '2026-11-09': true } };
+    const ctx = { cycleStarts: ['2026-11-03'] };
+    expect(dueOn(c, '2026-11-05', ctx)).toBe(false);
+    expect(dueOn(c, '2026-11-08', ctx)).toBe(true);
+    expect(habitStreak(e('habit', { ...c, done: { ...c.done, '2026-11-08': true } }), '2026-11-09', ctx)).toBe(4);
+    expect(inSeason({ season: { type: 'dates', from: '12-01', to: '02-28' } }, '2027-01-15')).toBe(true);
+    expect(inSeason({ season: { type: 'dates', from: '12-01', to: '02-28' } }, '2026-11-15')).toBe(false);
+    expect(inSeason({ season: { type: 'ramadan' } }, '2027-02-20')).toBe(true);
+    expect(inSeason({ season: { type: 'ramadan' } }, '2026-11-15')).toBe(false);
+  });
+  it('rappel après la prière et objectif rempli par Santé', () => {
+    expect(remindMinute({ prayer: 'Fajr', remind: { on: true, after: 15 } }, [{ name: 'Fajr', time: '05:40' }])).toBe(5 * 60 + 55);
+    expect(remindMinute({ prayer: 'Fajr', remind: { on: true, time: '07:00' } }, [])).toBe(7 * 60);
+    const w = { goal: { target: 8000, unit: 'pas', source: 'pas' }, done: {} };
+    const ctx = { daily: { '2026-11-12': { steps: 9120 } } };
+    expect(doneWith(w, '2026-11-12', ctx)).toBe(true);
+    expect(countOn(e('habit', w), '2026-11-12', ctx)).toBe(9120);
+    expect(remindOn({ ...w, remind: { on: true } }, '2026-11-12', ctx)).toBe(false);
+  });
+  it('bilan du mois et fréquence plus douce', () => {
+    const good = e('habit', { freq: 'daily', done: Object.fromEntries(Array.from({ length: 12 }, (_, i) => ['2026-11-' + String(i + 1).padStart(2, '0'), true])) }, 'bon');
+    const low = e('habit', { freq: 'daily', done: { '2026-11-02': true } }, 'bas');
+    const m = monthReview([low, good], '2026-11-12');
+    expect(m.best?.e.title).toBe('bon');
+    expect(m.struggling?.e.title).toBe('bas');
+    expect(m.suggestion).toEqual({ type: 'week', n: 4 });
+    expect(easierRule({ type: 'week', n: 1 })).toEqual({ type: 'month', n: 3 });
+  });
+  it('panda : palier de 7 jours de routine complète', () => {
+    const done = Object.fromEntries(Array.from({ length: 15 }, (_, i) => ['2026-11-' + String(i + 1).padStart(2, '0'), true]));
+    expect(routineMilestones(done)).toEqual(['2026-11-07', '2026-11-14']);
   });
 });

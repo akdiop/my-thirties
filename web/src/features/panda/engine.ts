@@ -24,7 +24,12 @@ export function eventsFrom(entries: Entry[], prefs: PandaPreferences, today: str
     else if (e.kind === 'parcours_progressif') { const steps = e.data.done && typeof e.data.done === 'object' ? Object.keys(e.data.done as object) : []; for (const k of steps) out.push(ev(e.id + ':' + k, 'savoir', day(k) || d)); }
     else if (e.module === 'spiritualite' && e.kind !== 'prayer_schedule') out.push(ev(e.id, 'serenite', d));
     else if (e.kind === 'recipe' || (e.kind === 'meal' && d <= today)) out.push(ev(e.id, 'cuisine', d));
-    else if (e.kind === 'habit') { const done = (e.data.done ?? {}) as Record<string, boolean>; for (const k of Object.keys(done)) if (done[k]) out.push(ev(e.id + ':' + k, 'objectifs', day(k))); }
+    else if (e.kind === 'habit') {
+      const done = (e.data.done ?? {}) as Record<string, boolean>;
+      for (const k of Object.keys(done)) if (done[k]) out.push(ev(e.id + ':' + k, 'objectifs', day(k)));
+      // Routine en étapes complète 7 jours de suite : une récompense de plus à chaque palier de 7 jours.
+      if (Array.isArray(e.data.steps) && e.data.steps.length) for (const k of routineMilestones(done)) out.push(ev(e.id + ':routine7:' + k, 'objectifs', k));
+    }
     else if (e.kind === 'objectif') goalSteps(e).filter((s) => s.done).forEach((s) => out.push(ev(e.id + ':' + s.id, 'projets', day(e.updated_at) || d)));
     else if (e.module === 'challenges' && e.data.completed === true) out.push(ev(e.id, 'objectifs', day(e.updated_at) || d));
     else if (e.module === 'decouvertes' && (e.kind === 'trip' || e.kind === 'destination')) out.push(ev(e.id, 'voyages', d));
@@ -34,6 +39,18 @@ export function eventsFrom(entries: Entry[], prefs: PandaPreferences, today: str
   const seen = new Map<string, PandaEvent>();
   for (const x of out) if (x && x.date <= today && !seen.has(x.id)) seen.set(x.id, x);
   return [...seen.values()];
+}
+
+/** Jours où une suite de jours consécutifs faits atteint 7, 14, 21… */
+export function routineMilestones(done: Record<string, boolean>) {
+  const days = Object.keys(done).filter((k) => done[k] && /^\d{4}-\d{2}-\d{2}$/.test(k)).sort(), out: string[] = [];
+  let run = 0, prev = '';
+  for (const d of days) {
+    run = prev && Date.parse(d + 'T12:00:00Z') - Date.parse(prev + 'T12:00:00Z') === 86_400_000 ? run + 1 : 1;
+    if (run % 7 === 0) out.push(d);
+    prev = d;
+  }
+  return out;
 }
 
 export type Progress = { xp: number; level: (typeof LEVELS)[number]; next?: (typeof LEVELS)[number]; into: number; span: number; bamboo: number; counts: Record<Domain, number>; earnedXp: number };

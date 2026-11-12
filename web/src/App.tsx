@@ -343,7 +343,7 @@ function Appearance() {
     {opts.map((o) => <label key={o.value} className="checklist-item theme-opt"><input type="radio" name="theme" checked={mode === o.value} onChange={() => setMode(o.value)} /><span><strong>{o.label}</strong><small className="muted"> · {o.sub}</small></span></label>)}
     <details><summary>Raccourcis sur l’icône de l’app</summary>
       <p className="muted small">Sur Android et sur ordinateur, un appui long (ou clic droit) sur l’icône propose : Mon jour, Ajouter une dépense, Mes habitudes, Mon assistant.</p>
-      <p className="muted small">Sur iPhone, Apple ne permet pas encore ces raccourcis pour les apps installées depuis Safari. Astuce : dans l’app Raccourcis, crée un raccourci « Ouvrir l’URL » avec l’adresse de l’app suivie de <code>?ecran=depense</code> (ou <code>myday</code>, <code>habits</code>, <code>assistant</code>), puis ajoute-le à l’écran d’accueil. Il s’ouvre dans Safari.</p>
+      <p className="muted small">Sur iPhone, Apple ne permet pas encore ces raccourcis pour les apps installées depuis Safari. Astuce : dans l’app Raccourcis, crée un raccourci « Ouvrir l’URL » avec l’adresse de l’app suivie de <code>?ecran=depense</code> (ou <code>myday</code>, <code>habits</code>, <code>habits&amp;moment=now</code> pour les habitudes du moment, <code>assistant</code>), puis ajoute-le à l’écran d’accueil. Il s’ouvre dans Safari.</p>
     </details>
   </section>;
 }
@@ -460,6 +460,7 @@ export default function App() {
   const [assistantIdea, setAssistantIdea] = useState('');
   const [pendingExpense, setPendingExpense] = useState(false);
   const [carnetSign, setCarnetSign] = useState(0);
+  const [habitsNow, setHabitsNow] = useState(0);
   const [dayTarget, setDayTarget] = useState<{ date?: string; part?: 'matin' | 'soir'; n: number }>({ n: 0 });
   // Lien ouvert depuis une notification : ?ecran=myday&moment=soir, ?ecran=habits…
   useEffect(() => {
@@ -468,6 +469,7 @@ export default function App() {
     if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'assistant', 'proches', 'lectures', 'envies', 'panda', 'transformation', 'carnet', 'gratitude', 'tcc', 'hsp', 'ressenti', 'culture'].includes(target)) {
       if (target === 'myday') setDayTarget((t) => ({ part: q.get('moment') === 'soir' ? 'soir' : 'matin', n: t.n + 1 }));
       if (target === 'assistant') setAssistantIdea(q.get('idee') ?? '');
+      if (target === 'habits' && q.get('moment') === 'now') setHabitsNow((n) => n + 1);
       setScreen(target as Screen);
     }
     if (target === 'depense') setPendingExpense(true);
@@ -711,7 +713,7 @@ export default function App() {
       {loading && <div className="sync-status" role="status">Synchronisation…</div>}
       {screen === 'home' && <HomeScreen word={wordOfMonth(ritualEntries, today())} tasksCard={<TaskQuick entries={entries} onCreate={createFromTool} onUpdate={updateData} onOpenList={() => go('agenda')} />} todayCard={<TodayCard entries={entries} habits={activeHabits(ritualEntries)} onUpdate={updateData} onTogglePrayer={(name, on, day) => void togglePrayer(entries, name, on, createFromTool, removeQuiet, day)} onOpenHabits={() => go('habits')} onOpenAgenda={() => go('agenda')} />} ritual={(slot) => <HomeRituals slot={slot} entries={ritualEntries} onGo={(t) => go(t)} onLearn={(t) => { if (t === 'wird' || t === 'apres' || t === 'arabe') { setSpiritTab(t); go('spiritualite'); return; } if (t === 'gratitude') { go('gratitude'); return; } if (t === 'carnet' || t === 'carnet-signe') { setCarnetSign(t === 'carnet-signe' ? (n) => n + 1 : 0); go('carnet'); return; } if (t === 'passions') setPassionTab('parcours'); if (t === 'cours' || t === 'dhulhijja') setSpiritTab(t); go(t === 'cours' || t === 'dhulhijja' ? 'spiritualite' : t as Screen); }} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} onUpdate={updateData} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} cardOrder={homeCards} onCardOrder={(o) => void saveHomeCards(o)} />}
       {screen === 'myday' && <LockGate><MyDay key={dayTarget.n} entries={ritualEntries} initialDate={dayTarget.date} initialPart={dayTarget.part} onCreate={createFromTool} onUpdate={updateData} /></LockGate>}
-      {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEdit={editFull} />}
+      {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEdit={editFull} focusNow={habitsNow} />}
       {screen === 'notes' && <LockGate><Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={drop} onOpenDay={openDay} /></LockGate>}
       {screen === 'bilan' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><Review entries={ritualEntries} birthDate={readProfile(profileEntry).birthDate} /></LockGate>}
       {screen === 'boussole' && <><ScreenHeader title="" onBack={() => go('home')} /><Compass entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEditProfile={() => go('settings')} onOpenCarnet={() => go('carnet')} /></>}

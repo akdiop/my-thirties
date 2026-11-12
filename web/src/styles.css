@@ -2102,7 +2102,9 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .habit-pause input[type=date]{width:auto}
 .habit-archive-btn{align-self:flex-start;display:inline-flex;align-items:center;gap:6px}
 .habit-remind select{width:auto;margin-left:auto}
-.habit-goal-fields{display:grid;grid-template-columns:80px 1fr;gap:8px}
+.habit-goal-fields{display:grid;grid-template-columns:96px 1fr;gap:8px}
+.season-fields{grid-template-columns:1fr 1fr;margin-top:8px}
+.habit-moments{margin:4px 0 2px}
 .habit-archive{margin-top:14px;padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.55);border:1px solid #E8E2D6}
 .habit-archive summary{cursor:pointer;font-weight:600;color:#7E7254}
 .habit-archive-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid #EFEBE3}
