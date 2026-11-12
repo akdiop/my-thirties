@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
-import { Brain, Feather, HandHeart, BookHeart, BookOpen, Cake, Gift, CalendarCheck, ChevronDown, ChevronUp, Compass, Flower2, Heart, Leaf, Moon, Pill, Settings2, Sparkles, Timer } from 'lucide-react';
+import { Brain, Feather, HandHeart, Waves, BookHeart, BookOpen, Cake, Gift, CalendarCheck, ChevronDown, ChevronUp, Compass, Flower2, Heart, Leaf, Moon, Pill, Settings2, Sparkles, Timer } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { PandaWidget } from '../features/panda/PandaWidget';
 import { MomentBar } from '../features/MomentBar';
 import { TodayLearning, type LearningTarget } from '../features/TodayLearning';
 import { affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, isoOf, NOTE_KIND } from '../lib/rituals';
 
-type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'finances' | 'transformation' | 'carnet' | 'gratitude' | 'tcc';
+type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'finances' | 'transformation' | 'carnet' | 'gratitude' | 'tcc' | 'hsp';
 type Shortcut = { id: Exclude<Target, 'myday' | 'panda' | 'finances'>; label: string; sub: string; icon: typeof Heart };
 const SHORTCUTS: Shortcut[] = [
   { id: 'habits', label: 'Habitudes', sub: 'Suivi quotidien', icon: Heart },
   { id: 'transformation', label: 'Ma meilleure version', sub: 'Programme 3 mois', icon: Sparkles },
   { id: 'gratitude', label: 'Ma gratitude', sub: 'Trois gratitudes, matin et soir', icon: HandHeart },
+  { id: 'hsp', label: 'Mon hypersensibilité', sub: 'Surcharge, limites, recharge', icon: Waves },
   { id: 'tcc', label: 'Mes outils TCC', sub: 'Pensées, émotions, exercices', icon: Brain },
   { id: 'carnet', label: 'Mon carnet', sub: 'Souhaits, signes, chemin', icon: Feather },
   { id: 'notes', label: 'Mon journal', sub: 'Notes et historique', icon: BookHeart },

@@ -82,8 +82,8 @@ export const FICHES: Fiche[] = [
     'Relire ses anciennes fiches : ce qui a aidé une fois aide souvent encore.'] },
 ];
 
-export type Field = { id: string; label: string; hint?: string; type: 'text' | 'area' | 'slider' | 'emotions' | 'distorsions' | 'chips' | 'echelle' | 'forces'; options?: string[]; max?: number; min?: number };
-export type Outil = { id: string; nom: string; but: string; fields: Field[]; avant?: string; apres?: string; groupe?: 'Psychologie positive'; source?: string; intro?: string[] };
+export type Field = { id: string; label: string; hint?: string; type: 'text' | 'area' | 'slider' | 'emotions' | 'distorsions' | 'chips' | 'multi' | 'echelle' | 'forces'; options?: string[]; max?: number; min?: number };
+export type Outil = { id: string; nom: string; but: string; fields: Field[]; avant?: string; apres?: string; groupe?: string; source?: string; intro?: string[] };
 export type Force = { force: string; usage: number; potentiel: number };
 const area = (id: string, label: string, hint?: string): Field => ({ id, label, hint, type: 'area' });
 const slider = (id: string, label: string, max = 100, hint?: string): Field => ({ id, label, hint, type: 'slider', max });

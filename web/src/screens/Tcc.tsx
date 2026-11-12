@@ -33,13 +33,14 @@ export function Tcc({ entries, onCreate, onUpdate, onRemove }: Props) {
   </div>;
 }
 
-function Worksheet({ outil, entry, echelle, onSave, onClose, onRemove }: { outil: Outil; entry?: Entry; echelle: Marche[]; onSave: (v: Record<string, unknown>) => Promise<void>; onClose: () => void; onRemove?: () => Promise<void> }) {
+/** Fiche d'exercice à remplir (partagée avec le module Hypersensibilité). */
+export function Worksheet({ outil, entry, echelle, onSave, onClose, onRemove, back = 'Mes outils TCC' }: { outil: Outil; entry?: Entry; echelle: Marche[]; onSave: (v: Record<string, unknown>) => Promise<void>; onClose: () => void; onRemove?: () => Promise<void>; back?: string }) {
   const [v, setV] = useState<Record<string, unknown>>(() => ({ ...((entry?.data.values ?? {}) as Record<string, unknown>) }));
   const set = (id: string, x: unknown) => setV({ ...v, [id]: x });
   const toggle = (id: string, x: string) => { const cur = Array.isArray(v[id]) ? (v[id] as string[]) : []; set(id, cur.includes(x) ? cur.filter((y) => y !== x) : [...cur, x]); };
   const has = (id: string) => (Array.isArray(v[id]) ? (v[id] as string[]) : []);
   return <section className="stack-8">
-    <button className="link-btn back-link" onClick={onClose}>‹ Mes outils TCC</button>
+    <button className="link-btn back-link" onClick={onClose}>‹ {back}</button>
     <div className="soft-card"><strong className="serif lesson-title">{outil.nom}</strong><p className="muted">{outil.but}</p>{entry && <p className="muted small">{frDay(String(entry.entry_date))}</p>}</div>
     {outil.intro && <details className="soft-card" open={!entry}><summary className="ritual-label">Comment faire</summary>{outil.intro.map((p) => <p key={p} className="fiche-pt">{p}</p>)}</details>}
     {outil.id === 'colonnes' && <details className="soft-card"><summary className="ritual-label">Des questions pour examiner la pensée</summary>{QUESTIONS_SOCRATIQUES.map((q) => <p key={q} className="fiche-pt">{q}</p>)}</details>}
@@ -51,7 +52,7 @@ function Worksheet({ outil, entry, echelle, onSave, onClose, onRemove }: { outil
           <input type="range" min={min} max={max} step={max === 100 ? 5 : 1} value={val ?? Math.round((min + max) / 2)} onChange={(e) => set(f.id, Number(e.target.value))} /></label>; }
       if (f.type === 'forces') return <Forces key={f.id} label={f.label} rows={Array.isArray(v[f.id]) ? (v[f.id] as Force[]) : []} onChange={(r) => set(f.id, r)} />;
       const opts = f.type === 'emotions' ? EMOTIONS : f.type === 'echelle' ? echelle.map((m) => m.text) : f.type === 'distorsions' ? DISTORSIONS.map((d) => d.id) : f.options ?? [];
-      const multi = f.type === 'emotions' || f.type === 'distorsions';
+      const multi = f.type === 'emotions' || f.type === 'distorsions' || f.type === 'multi';
       return <div key={f.id}><p className="ritual-label">{f.label}</p>
         {f.type === 'echelle' && !opts.length && <p className="muted small">Ajoute d’abord des marches dans « Mon échelle ».</p>}
         <div className="chip-row">{opts.map((o) => { const on = multi ? has(f.id).includes(o) : v[f.id] === o;

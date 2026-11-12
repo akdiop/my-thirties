@@ -1,4 +1,5 @@
 import { SpiritStats } from '../features/SpiritStats';
+import { moodWeekStats } from '../lib/moodStats';
 import { allGratitudes, GRAT_SETTINGS, topWords, weatherOf } from '../lib/gratitude';
 import { realisedBetween } from '../lib/carnet';
 import { Glyph, MoodIcon, type Tint } from '../ui/Glyph';
@@ -122,7 +123,8 @@ function Week({ entries }: { entries: Entry[] }) {
       <button className="icon-btn" aria-label="Semaine suivante" disabled={days[6]! >= today} onClick={() => { setStart(addDays(start, 7)); setAi(''); }}><ChevronRight size={20} /></button>
     </div>
     <section className="ritual-card"><p className="ritual-label">Mes humeurs</p>
-      <div className="mood-week">{days.map((d, i) => <div key={d}><span className="mood-pill" style={{ background: MOOD_COLOR[s.moods[i]!] ?? '#EFEDE9' }}><MoodIcon mood={s.moods[i]} size={18} /></span><small>{LETTERS[i]}</small></div>)}</div></section>
+      <div className="mood-week">{days.map((d, i) => <div key={d}><span className="mood-pill" style={{ background: MOOD_COLOR[s.moods[i]!] ?? '#EFEDE9' }}><MoodIcon mood={s.moods[i]} size={18} /></span><small>{LETTERS[i]}</small></div>)}</div>
+      <MoodCurve moods={s.moods} /></section>
     <div className="stat-row">
       <div><strong>{s.dailies.length}/7</strong><small>jours notés</small></div>
       <div><strong>{s.doneTasks}/{s.tasks}</strong><small>tâches faites</small></div>
@@ -204,4 +206,27 @@ export function OneYearAgo({ entries, onOpenDay, onOpenNote }: { entries: Entry[
     {realised.map((w) => <div key={w.entry.id} className="note-row"><span className="note-emoji"><Glyph name="trophy" tint="or" badge={36} /></span><span><strong>Souhait réalisé, alhamdulillah</strong><small>{w.text}</small></span></div>)}
     {notes.map((n) => <button key={n.id} className="note-row" onClick={() => onOpenNote?.(n)}><span className="note-emoji"><Glyph name="notebook" badge={36} /></span><span><strong>{n.title}</strong><small>{String(n.data.body ?? '').slice(0, 100)}</small></span></button>)}
   </section>;
+}
+
+/** Courbe d'humeur de la semaine (de « épuisée » à « rayonnante ») avec l'humeur moyenne, les bons jours de suite et la plus fréquente. */
+function MoodCurve({ moods }: { moods: (string | undefined)[] }) {
+  const stats = moodWeekStats(moods);
+  if (stats.notes < 2) return null;
+  const W = 300, H = 110, x = (i: number) => 14 + (i * (W - 28)) / 6, y = (v: number) => 12 + ((4 - v) * (H - 24)) / 4;
+  const pts = stats.levels.map((v, i) => (v === null ? null : [x(i), y(v)] as const)).filter((p): p is readonly [number, number] => p !== null);
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  return <div className="mood-curve">
+    <svg viewBox={'0 0 ' + W + ' ' + H} role="img" aria-label={'Courbe d’humeur : ' + stats.average}>
+      {[0, 2, 4].map((v) => <line key={v} x1={8} x2={W - 8} y1={y(v)} y2={y(v)} className="mc-grid" />)}
+      <path d={line + ' L' + pts.at(-1)![0] + ' ' + (H - 6) + ' L' + pts[0]![0] + ' ' + (H - 6) + ' Z'} className="mc-area" />
+      <path d={line} className="mc-line" />
+      {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={4} className="mc-dot" />)}
+    </svg>
+    <div className="stat-row">
+      <div><strong>{stats.average}</strong><small>humeur moyenne</small></div>
+      <div><strong>{stats.goodStreak}</strong><small>bons jours de suite</small></div>
+      <div><strong>{stats.common || '·'}</strong><small>la plus fréquente</small></div>
+      <div><strong>{stats.notes}/7</strong><small>humeurs notées</small></div>
+    </div>
+  </div>;
 }
