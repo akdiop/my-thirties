@@ -30,3 +30,19 @@ describe('ma gratitude', () => {
     expect(gratitudeStreak(list, '2026-11-13')).toBe(3);
   });
 });
+
+describe('fréquences', () => {
+  it('relie chaque besoin à des fréquences connues et tient le journal d’écoute', async () => {
+    const { BESOINS, FREQUENCES, ecoutes, mesFrequences } = await import('../frequences');
+    const hz = new Set(FREQUENCES.map((f) => f.hz));
+    for (const b of BESOINS) for (const h of b.hz) expect(hz.has(h)).toBe(true);
+    const list = ecoutes([
+      e('meditation', '2026-11-10', { type: 'frequence', hz: 528, minutes: 10, ressentis: ['Apaisée'] }),
+      e('meditation', '2026-11-11', { type: 'frequence', hz: 528, minutes: 5, ressentis: ['Apaisée', 'Légère'] }),
+      e('meditation', '2026-11-12', { type: 'frequence', hz: 396, minutes: 10, ressentis: ['Agitée'] }),
+      e('meditation', '2026-11-12', { type: 'guided', minutes: 4 }),
+    ]);
+    expect(list).toHaveLength(3);
+    expect(mesFrequences(list)[0]).toMatchObject({ hz: 528, fois: 2, minutes: 15, ressenti: 'Apaisée', bien: 2 });
+  });
+});

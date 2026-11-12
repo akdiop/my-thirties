@@ -2028,3 +2028,16 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .grat-end{text-align:center;color:#7E7254;font-style:italic;margin:4px 0}
 .grat-quote{font-size:1.15rem;line-height:1.5;color:#3A3833;margin:6px 0}
 .grat-memory{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.freq-steps{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.freq-hz{min-width:64px;text-align:center}
+.calm-phase{text-align:center;font-size:1.1rem;color:#5F7A59;margin:8px 0 0}
+.freq-orb{width:150px;height:150px;margin:28px auto 8px;border-radius:50%;display:grid;place-items:center;color:#fff;background:radial-gradient(circle at 35% 35%,#9DB096,#5F7A59)}
+.freq-orb.breathing{animation:freqBreath 10s ease-in-out infinite}
+.freq-orb.playing{animation:freqPulse 4s ease-in-out infinite}
+@keyframes freqBreath{0%,100%{transform:scale(.85)}40%{transform:scale(1.08)}}
+@keyframes freqPulse{0%,100%{box-shadow:0 0 0 0 rgba(95,122,89,.35)}50%{box-shadow:0 0 0 22px rgba(95,122,89,0)}}
+@media (prefers-reduced-motion:reduce){.freq-orb{animation:none!important}}
+.freq-vol{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:16px}
+.freq-vol input{width:220px}
+.freq-check{display:flex;flex-direction:row;align-items:center;gap:8px;font-weight:400}
+.freq-check input{width:20px;height:20px;min-height:0;padding:0;flex:none;accent-color:#5F7A59}
