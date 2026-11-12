@@ -9,7 +9,7 @@ import type { Entry } from '../lib/cloud';
 import { cloud } from '../lib/cloud';
 import { isDoneOn } from '../lib/day';
 import { amountOf, currencyOf, fmt } from '../lib/money';
-import { addDays, DAILY_KIND, freqTarget, HABIT_KIND, habitDone, habitFreq, isoOf, MOODS, NOTE_KIND, weekStartOf } from '../lib/rituals';
+import { activeHabits, addDays, DAILY_KIND, habitDone, habitRule, isoOf, MOODS, NOTE_KIND, weekStartOf, weekTarget } from '../lib/rituals';
 import { getIntegrationPrefs } from '../lib/integrations';
 import { Bar, Segmented } from '../ui/kit';
 import { yearStats, yearWindow } from '../lib/yearStats';
@@ -81,9 +81,9 @@ function Week({ entries }: { entries: Entry[] }) {
     const wins = [...dailies.flatMap((e) => typeof e.data.win === 'string' && e.data.win.trim() ? [{ day: String(e.entry_date), text: e.data.win.trim() }] : []),
       ...realisedBetween(entries, days[0]!, days[6]!).map((w) => ({ day: w.realisedOn, text: 'Souhait réalisé, alhamdulillah : ' + w.text }))].sort((a, b) => a.day.localeCompare(b.day));
     const grats = dailies.flatMap((e) => Array.isArray(e.data.gratitudes) ? e.data.gratitudes.map(String).filter((g) => g.trim()) : []);
-    const habits = entries.filter((e) => e.kind === HABIT_KIND).map((e) => {
-      const f = habitFreq(e), done = habitDone(e);
-      return { e, count: days.filter((d) => done[d]).length, target: freqTarget(f) };
+    const habits = activeHabits(entries).map((e) => {
+      const done = habitDone(e);
+      return { e, count: days.filter((d) => done[d]).length, target: weekTarget(habitRule(e)) };
     });
     const tasks = entries.filter((e) => e.kind === 'task' && inWeek(e.entry_date));
     const doneTasks = tasks.filter((e) => isDoneOn(e, String(e.entry_date))).length;

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { isDoneOn, toggledData } from '../lib/day';
-import { addDays, affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, isoOf, MOODS } from '../lib/rituals';
+import { activeHabits, addDays, affirmationOf, DAILY_KIND, habitDone, isoOf, MOODS, toggleData } from '../lib/rituals';
 import { saveLabel, useAutosave } from '../lib/autosave';
 import { eveningQuestion } from '../lib/growth';
 import { Check22, Segmented } from '../ui/kit';
@@ -157,12 +157,12 @@ function TomorrowTodos({ date, entries, onCreate }: { date: string; entries: Ent
 
 /** Débriefing : les habitudes du jour, à cocher sans quitter le soir. */
 function HabitsOfDay({ date, entries, onUpdate }: { date: string; entries: Entry[]; onUpdate: Save }) {
-  const habits = entries.filter((e) => e.kind === HABIT_KIND);
+  const habits = activeHabits(entries);
   if (!habits.length) return null;
   const done = habits.filter((e) => habitDone(e)[date]).length;
   return <section className="ritual-card"><p className="ritual-label"><Glyph name="sprout" tint="sauge" /> Mes habitudes du jour · {done}/{habits.length}</p>
     {habits.map((e) => { const d = habitDone(e), on = Boolean(d[date]); return <div key={e.id} className="todo-row">
-      <Check22 checked={on} label={e.title} onChange={(v) => void onUpdate(e, { ...e.data, done: { ...d, [date]: v } })} />
+      <Check22 checked={on} label={e.title} onChange={(v) => void onUpdate(e, toggleData(e, date, v))} />
       <span className={on ? 'done' : ''}>{e.title}</span></div>; })}
   </section>;
 }

@@ -10,6 +10,7 @@ import { CalculationMethod, Coordinates, Madhab, PrayerTimes } from 'npm:adhan@4
 import { suppStatus } from './supplements.ts';
 import { isEve, writingWindow, type CarnetSettings } from './carnet.ts';
 import { wirdPace, wirdSlots } from './wird.ts';
+import { dueOn, remindOn } from './habits.ts';
 
 type Prefs = { morning?: { on?: boolean; time?: string }; evening?: { on?: boolean; time?: string }; habits?: { on?: boolean; time?: string };
   agenda?: { on?: boolean; minutes?: number }; weekly?: { on?: boolean; day?: number; time?: string }; supplements?: { on?: boolean };
@@ -125,10 +126,10 @@ Deno.serve(async (request) => {
       queue.push({ key: 'morning:' + now.date, title: 'Mon Daily Reset', body: '3 minutes pour poser ton intention du jour.', url: '/?ecran=myday&moment=matin' });
     if (p.evening?.on !== false && due(now.minutes, mins(p.evening?.time ?? '21:00')) && !(today?.data.win || today?.data.tomorrow))
       queue.push({ key: 'evening:' + now.date, title: 'Mon débriefing du soir', body: 'Ta victoire du jour, ce que tu déposes, ton intention pour demain.', url: '/?ecran=myday&moment=soir' });
-    // Habitudes prévues aujourd'hui (jours de répétition : 0 = lundi … 6 = dimanche ; aucun = tous les jours).
-    const scheduled = (e: Row) => { const d = Array.isArray(e.data.days) ? (e.data.days as unknown[]).map(Number) : []; return !d.length || d.length === 7 || d.includes((now.weekday + 6) % 7); };
-    const habitLeft = (e: Row) => e.kind === 'habit' && (e.data.freq ?? 'daily') === 'daily' && scheduled(e) && !(e.data.done as Record<string, boolean> | undefined)?.[now.date];
-    for (const e of list.filter((x) => habitLeft(x) && (x.data.remind as { on?: boolean } | undefined)?.on)) {
+    // Habitudes attendues aujourd'hui (quotidiennes prévues, « tous les n jours » arrivées à échéance ; hors pause et archives).
+    const habitLeft = (e: Row) => e.kind === 'habit' && dueOn(e.data, now.date) && !(e.data.done as Record<string, boolean> | undefined)?.[now.date];
+    // Rappel propre à chaque habitude (par semaine : le jour choisi ; par mois : le jour choisi ou les 3 derniers jours, tant que l'objectif n'est pas atteint).
+    for (const e of list.filter((x) => x.kind === 'habit' && (x.data.remind as { on?: boolean } | undefined)?.on && remindOn(x.data, now.date))) {
       const t = mins(String((e.data.remind as { time?: string }).time ?? ''));
       if (due(now.minutes, t)) queue.push({ key: 'habit:' + e.id + ':' + now.date, title: 'Mon habitude', body: e.title.slice(0, 80), url: '/?ecran=habits' });
     }

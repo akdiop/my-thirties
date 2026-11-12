@@ -1,9 +1,9 @@
 import { Glyph, type GlyphName, type Tint } from '../ui/Glyph';
 import { useState } from 'react';
-import { Check, Flame, Link2, Pencil, Plus, Sparkles, Trash2, Trophy, X } from 'lucide-react';
+import { Archive, Check, ChevronLeft, ChevronRight, Flame, Link2, Minus, Pencil, Plus, Sparkles, Trash2, Trophy, X } from 'lucide-react';
 import { SwipeRow } from '../ui/SwipeRow';
 import type { Entry, EntryInput } from '../lib/cloud';
-import { addDays, DAY_LETTERS, FREQ_LABEL, freqTarget, HABIT_GROUPS, HABIT_KIND, HABIT_LIBRARY, habitDays, habitDaysLabel, habitDone, habitFreq, habitScheduled, habitStreak, isoOf, weekStartOf, type HabitFreq, type HabitLevel, type HabitTemplate } from '../lib/rituals';
+import { addDays, countData, countOn, DAY_LETTERS, everyWait, expectedOver, FREQ_LABEL, HABIT_GROUPS, HABIT_KIND, HABIT_LIBRARY, habitDays, habitDaysLabel, habitDone, habitDue, habitGoal, habitNotes, habitPause, habitRule, habitSteps, habitStreak, isArchived, isoOf, isPaused, momentNow, momentOf, momentRank, MOMENTS, monthStartOf, periodCount, RULE_RANGE, ruleData, ruleLabel, ruleOfFreq, stepData, stepsOn, streakUnit, toggleData, weekStartOf, type HabitLevel, type HabitMoment, type HabitRule, type HabitTemplate } from '../lib/rituals';
 import { Bar, Segmented } from '../ui/kit';
 import { bilanDay } from '../lib/day';
 import { DaySwitch, dayName } from '../features/DaySwitch';
@@ -12,30 +12,42 @@ import { JOURNEYS, JOURNEY_KIND, journeyWeek } from '../lib/journeys';
 
 type EditFull = (id: string, patch: { title: string; data: Record<string, unknown> }) => Promise<void>;
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
+type HabitDraft = { title: string; icon: GlyphName; tint: Tint; why: string; level: HabitLevel; rule: HabitRule; moment: HabitMoment | ''; goal: { target: number; unit: string } | null; steps: string[] };
 const LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
 /** Habitudes : bibliothèque d'idées, habitudes personnelles, coche du jour, série et semaine en cours. */
 export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void>; onEdit?: EditFull }) {
-  const mine = entries.filter((e) => e.kind === HABIT_KIND);
+  const all = entries.filter((e) => e.kind === HABIT_KIND);
+  const mine = all.filter((e) => !isArchived(e)), archived = all.filter(isArchived);
   const [view, setView] = useState<'list' | 'library' | 'create'>('list');
+  const [editing, setEditing] = useState<Entry | null>(null);
   const [tab, setTab] = useState<'today' | 'parcours' | 'stats'>('today');
-  const [chainFor, setChainFor] = useState<string | null>(null);
-  const [settingsFor, setSettingsFor] = useState<string | null>(null);
   const today = isoOf(new Date());
   const [day, setDay] = useState(bilanDay);
-  const week = weekStartOf(today);
-  const days = Array.from({ length: 7 }, (_, i) => addDays(week, i));
   const doneToday = mine.filter((e) => habitDone(e)[day]).length;
-  const dueToday = mine.filter((e) => habitFreq(e) === 'daily' && habitScheduled(e, day)).length;
-  // Rangées par catégorie de la bibliothèque ; celles que j'ai créées vont dans « Mes habitudes ».
+  const dueToday = mine.filter((e) => habitDue(e, day)).length;
+  const now = momentNow(new Date().getHours());
+  // Rangées par catégorie de la bibliothèque ; celles que j'ai créées vont dans « Mes habitudes ». Celles du moment présent passent en premier.
   const groupOf = (e: Entry) => HABIT_LIBRARY.find((t) => t.id === String(e.data.templateId))?.group ?? 'Mes habitudes';
-  const groups = [...HABIT_GROUPS, 'Mes habitudes'].map((name) => ({ name, items: mine.filter((e) => groupOf(e) === name) })).filter((g) => g.items.length);
+  const groups = [...HABIT_GROUPS, 'Mes habitudes'].map((name) => ({ name, items: mine.filter((e) => groupOf(e) === name).sort((x, y) => momentRank(momentOf(x), now) - momentRank(momentOf(y), now)) }))
+    .filter((g) => g.items.length);
 
-  const add = (t: Omit<HabitTemplate, 'id' | 'group'> & { id?: string }) => onCreate({ module: 'quotidien', kind: HABIT_KIND, title: t.title, entry_date: null,
-    data: { templateId: t.id ?? '', icon: t.icon, tint: t.tint, why: t.why, level: t.level, freq: t.freq, done: {} } });
+  const add = (t: HabitDraft, templateId = '') => onCreate({ module: 'quotidien', kind: HABIT_KIND, title: t.title, entry_date: null,
+    data: { templateId, icon: t.icon, tint: t.tint, why: t.why, level: t.level, ...ruleData(t.rule), ...draftExtras(t), done: {} } });
 
-  if (view === 'library') return <Library mine={mine} onAdd={add} onClose={() => setView('list')} />;
-  if (view === 'create') return <CreateHabit onSave={async (t) => { await add(t); setView('list'); }} onClose={() => setView('list')} />;
+  if (view === 'library') return <Library mine={all} onAdd={(t) => add({ ...t, rule: ruleOfFreq(t.freq), moment: '', goal: null, steps: [] }, t.id)} onClose={() => setView('list')} />;
+  if (view === 'create') return <HabitForm onSave={async (t) => { await add(t); setView('list'); }} onClose={() => setView('list')} />;
+  if (editing) {
+    const e = editing;
+    return <HabitForm heading="Modifier mon habitude" submit="Enregistrer" onClose={() => setEditing(null)}
+      initial={{ title: e.title, icon: String(e.data.icon || 'sprout') as GlyphName, tint: (e.data.tint as Tint) || 'sauge', why: String(e.data.why ?? ''), level: (e.data.level as HabitLevel) || 'Douce', rule: habitRule(e),
+        moment: momentOf(e), goal: habitGoal(e), steps: habitSteps(e) }}
+      onSave={async (t) => {
+        const data = { ...e.data, icon: t.icon, why: t.why, level: t.level, ...ruleData(t.rule), ...draftExtras(t) };
+        if (onEdit) await onEdit(e.id, { title: t.title, data }); else await onUpdate(e, data);
+        setEditing(null);
+      }} />;
+  }
 
   return <div className="screen habits">
     {!mine.length && tab === 'today' ? <div className="habits-empty">
@@ -45,6 +57,7 @@ export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit }: { entr
       <button className="button dark wide" onClick={() => setView('library')}><Sparkles size={16} /> Choisir dans la bibliothèque</button>
       <button className="button ghost wide" onClick={() => setView('create')}><Pencil size={16} /> Créer la mienne</button>
       <button className="button ghost wide" onClick={() => setTab('parcours')}>Suivre un parcours progressif</button>
+      {archived.length > 0 && <Archived items={archived} onUpdate={onUpdate} onRemove={onRemove} />}
     </div> : <>
       <header className="tab-head"><h1>Habitudes</h1><p>{dueToday ? doneToday + ' sur ' + mine.length + ' ' + dayName(day) : 'Ton suivi de la semaine'}</p></header>
       <Segmented label="Habitudes" value={tab} onChange={setTab} options={[{ value: 'today', label: 'Aujourd’hui' }, { value: 'parcours', label: 'Parcours' }, { value: 'stats', label: 'Statistiques' }]} />
@@ -53,44 +66,118 @@ export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit }: { entr
       {tab === 'today' && <><DaySwitch day={day} onChange={setDay} /><Bar value={mine.length ? doneToday / mine.length : 0} />
       {groups.map(({ name, items }) => <section key={name} className="habit-section">
         <h2 className="habit-group">{name}</h2>
-        <div className="habit-list">{items.map((e) => {
-        const done = habitDone(e), f = habitFreq(e), on = Boolean(done[day]);
-        const weekCount = days.filter((d) => done[d]).length, streak = habitStreak(e, today);
-        const total = Object.values(done).filter(Boolean).length, badges = badgesOf(total), next = nextBadge(total);
-        const anchor = mine.find((x) => x.id === e.data.after);
-        return <SwipeRow key={e.id} className="card-swipe" actions={[
-          { label: 'Renommer', icon: <Pencil size={18} />, onClick: () => { const v = window.prompt('Nouveau nom', e.title)?.trim(); if (v && onEdit) void onEdit(e.id, { title: v.slice(0, 80), data: e.data }); } },
-          { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => void onRemove(e) },
-        ]}><article className={'habit-card' + (on ? ' on' : '') + (f === 'daily' && !habitScheduled(e, day) && !on ? ' rest' : '')}>
-          <button className="habit-check" aria-pressed={on} aria-label={(on ? 'Décocher ' : 'Fait ' + dayName(day) + ' : ') + e.title}
-            onClick={() => void onUpdate(e, { ...e.data, done: { ...done, [day]: !on } })}>{on ? <Check size={22} strokeWidth={3} /> : <Glyph name={String(e.data.icon || 'sprout')} tint={(e.data.tint as Tint) || 'sauge'} size={24} />}</button>
-          <div className="habit-body">
-            {anchor && <span className="habit-after"><Link2 size={12} /> Après « {anchor.title} »</span>}
-            <strong>{e.title}</strong>
-            <small>{FREQ_LABEL[f]}{habitDaysLabel(e) ? ' · ' + habitDaysLabel(e) : ''}{f === 'daily' && !habitScheduled(e, day) && !on ? ' · pas prévue ' + dayName(day) : ''}{(e.data.remind as { on?: boolean; time?: string } | undefined)?.on ? ' · rappel ' + String((e.data.remind as { time?: string }).time ?? '') : ''}{f !== 'daily' ? ' · ' + weekCount + '/' + freqTarget(f) + ' cette semaine' : ''}{streak > 1 ? <> · <Flame size={12} /> {streak} {f === 'daily' ? 'jours' : 'semaines'}</> : null}</small>
-            <div className="week-dots">{days.map((d, i) => <span key={d} title={d} className={(done[d] ? 'on' : '') + (d === today ? ' today' : '') + (d > today ? ' future' : '')}>{LETTERS[i]}</span>)}</div>
-            <div className="habit-meta">
-              {badges.map((b) => <span key={b} className="badge"><Trophy size={12} /> {b} jours</span>)}
-              {next && <small className="muted">{next - total} {next - total > 1 ? 'fois' : 'fois'} avant le badge {next}</small>}
-              <button className="link-btn small" onClick={() => setSettingsFor(settingsFor === e.id ? null : e.id)}>Jours et rappel</button>
-              <button className="link-btn small" onClick={() => setChainFor(chainFor === e.id ? null : e.id)}>{anchor ? 'Changer l’enchaînement' : 'Enchaîner après…'}</button>
-            </div>
-            {settingsFor === e.id && <HabitSettings habit={e} onSave={(d) => void onUpdate(e, { ...e.data, ...d })} />}
-            {chainFor === e.id && <select className="chain-select" value={String(e.data.after ?? '')} onChange={(ev) => { void onUpdate(e, { ...e.data, after: ev.target.value || null }); setChainFor(null); }}>
-              <option value="">Aucune (habitude indépendante)</option>
-              {mine.filter((x) => x.id !== e.id && x.data.after !== e.id).map((x) => <option key={x.id} value={x.id}>Après « {x.title} »</option>)}
-            </select>}
-          </div>
-          <button className="icon-btn" aria-label={'Supprimer ' + e.title} onClick={() => void onRemove(e)}><Trash2 size={16} /></button>
-        </article></SwipeRow>;
-        })}</div>
+        <div className="habit-list">{items.map((e) => <HabitCard key={e.id} e={e} mine={mine} day={day} today={today} onUpdate={onUpdate} onRemove={onRemove} onOpenEdit={() => setEditing(e)} />)}</div>
       </section>)}
       <div className="button-group">
         <button className="button secondary" onClick={() => setView('library')}><Plus size={16} /> Bibliothèque</button>
         <button className="button ghost" onClick={() => setView('create')}><Pencil size={16} /> Créer la mienne</button>
       </div>
+      {archived.length > 0 && <Archived items={archived} onUpdate={onUpdate} onRemove={onRemove} />}
       <p className="fineprint">Un jour manqué ne remet rien à zéro : tes badges restent acquis, reprends simplement le lendemain.</p></>}
     </>}
+  </div>;
+}
+
+const draftExtras = (t: HabitDraft) => ({ moment: t.moment || null, goal: t.goal, steps: t.steps.length ? t.steps : null });
+const shortDate = (iso: string) => new Date(iso + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+
+/** Une habitude : coche (ou compteur, ou étapes), semaine à toucher, note du jour, réglages, calendrier, enchaînement. */
+function HabitCard({ e, mine, day, today, onUpdate, onRemove, onOpenEdit }: { e: Entry; mine: Entry[]; day: string; today: string; onUpdate: Save; onRemove: (e: Entry) => Promise<void>; onOpenEdit: () => void }) {
+  const [panel, setPanel] = useState<'' | 'settings' | 'chain' | 'cal' | 'note'>('');
+  const open = (p: typeof panel) => setPanel(panel === p ? '' : p);
+  const days = Array.from({ length: 7 }, (_, i) => addDays(weekStartOf(today), i));
+  const done = habitDone(e), r = habitRule(e), on = Boolean(done[day]);
+  const paused = isPaused(e, day), pause = habitPause(e), goal = habitGoal(e), steps = habitSteps(e), moment = momentOf(e);
+  const streak = habitStreak(e, today), wait = r.type === 'every' && !on && !paused ? everyWait(e, day) : 0;
+  const resting = !on && (paused || (!habitDue(e, day) && (r.type === 'daily' || r.type === 'every')));
+  const total = Object.values(done).filter(Boolean).length, badges = badgesOf(total), next = nextBadge(total);
+  const anchor = mine.find((x) => x.id === e.data.after), note = habitNotes(e)[day] ?? '';
+  const save = (data: Record<string, unknown>) => void onUpdate(e, data);
+  const count = goal ? countOn(e, day) : 0, ticked = steps.length ? stepsOn(e, day) : [];
+  return <SwipeRow className="card-swipe" actions={[
+    { label: 'Modifier', icon: <Pencil size={18} />, onClick: onOpenEdit },
+    { label: 'Archiver', icon: <Archive size={18} />, onClick: () => save({ ...e.data, archived: today }) },
+    { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => void onRemove(e) },
+  ]}><article className={'habit-card' + (on ? ' on' : '') + (resting ? ' rest' : '')}>
+    <button className="habit-check" aria-pressed={on} aria-label={(on ? 'Décocher ' : 'Fait ' + dayName(day) + ' : ') + e.title}
+      onClick={() => save(toggleData(e, day, !on))}>{on ? <Check size={22} strokeWidth={3} /> : <Glyph name={String(e.data.icon || 'sprout')} tint={(e.data.tint as Tint) || 'sauge'} size={24} />}</button>
+    <div className="habit-body">
+      {anchor && <span className="habit-after"><Link2 size={12} /> Après « {anchor.title} »</span>}
+      <strong>{e.title}</strong>
+      <small>{paused && pause ? 'En pause jusqu’au ' + shortDate(pause.to) : <>{ruleLabel(r)}{moment ? ' · ' + MOMENTS.find((m) => m.id === moment)!.label : ''}{r.type === 'daily' && habitDaysLabel(e) ? ' · ' + habitDaysLabel(e) : ''}{r.type === 'daily' && resting ? ' · pas prévue ' + dayName(day) : ''}{r.type === 'every' && !on ? (wait > 1 ? ' · dans ' + wait + ' jours' : wait ? ' · demain' : ' · à faire') : ''}{(e.data.remind as { on?: boolean } | undefined)?.on ? ' · rappel ' + String((e.data.remind as { time?: string }).time ?? '') : ''}{r.type === 'week' || r.type === 'month' ? ' · ' + periodCount(e, today) + '/' + r.n + (r.type === 'week' ? ' cette semaine' : ' ce mois-ci') : ''}{streak > 1 ? <> · <Flame size={12} /> {streak} {streakUnit(r)}</> : null}</>}</small>
+      {goal && <div className="habit-count">
+        <button type="button" aria-label="Un de moins" disabled={!count} onClick={() => save(countData(e, day, count - 1))}><Minus size={16} /></button>
+        <span><b>{count}</b>/{goal.target}{goal.unit ? ' ' + goal.unit : ''}</span>
+        <button type="button" aria-label="Un de plus" disabled={count >= goal.target} onClick={() => save(countData(e, day, count + 1))}><Plus size={16} /></button>
+        <Bar value={count / goal.target} />
+      </div>}
+      {steps.length > 0 && <ul className="goal-steps habit-steps">{steps.map((st, i) => <li key={i}>
+        <button className={ticked.includes(i) ? 'on' : ''} aria-pressed={ticked.includes(i)} onClick={() => save(stepData(e, day, i))}>
+          <span className="tick">{ticked.includes(i) ? <Check size={14} strokeWidth={3} /> : null}</span><span>{st}</span></button></li>)}</ul>}
+      <div className="week-dots">{days.map((d, i) => <button key={d} type="button" disabled={d > today} aria-pressed={Boolean(done[d])} aria-label={(done[d] ? 'Décocher ' : 'Cocher ') + new Date(d + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long' })}
+        className={(done[d] ? 'on' : '') + (d === today ? ' today' : '') + (d > today ? ' future' : '') + (isPaused(e, d) ? ' paused' : '')} onClick={() => save(toggleData(e, d, !done[d]))}>{LETTERS[i]}</button>)}</div>
+      {on && note && panel !== 'note' && <p className="habit-note">{note}</p>}
+      <div className="habit-meta">
+        {badges.map((b) => <span key={b} className="badge"><Trophy size={12} /> {b} jours</span>)}
+        {next && <small className="muted">{next - total} fois avant le badge {next}</small>}
+        {on && <button className="link-btn small" onClick={() => open('note')}>{note ? 'Modifier la note' : 'Ajouter une note'}</button>}
+        <button className="link-btn small" onClick={() => open('settings')}>Réglages</button>
+        <button className="link-btn small" onClick={() => open('cal')}>Calendrier</button>
+        <button className="link-btn small" onClick={() => open('chain')}>{anchor ? 'Changer l’enchaînement' : 'Enchaîner après…'}</button>
+      </div>
+    </div>
+    <div className="habit-actions">
+      <button className="icon-btn" aria-label={'Modifier ' + e.title} onClick={onOpenEdit}><Pencil size={16} /></button>
+      <button className="icon-btn" aria-label={'Supprimer ' + e.title} onClick={() => void onRemove(e)}><Trash2 size={16} /></button>
+    </div>
+    {panel && <div className="habit-panel">
+      {panel === 'note' && <NoteEditor initial={note} onSave={(text) => { const notes = { ...habitNotes(e) }; if (text) notes[day] = text; else delete notes[day]; save({ ...e.data, notes }); setPanel(''); }} />}
+      {panel === 'settings' && <HabitSettings habit={e} today={today} onSave={(d) => save({ ...e.data, ...d })} />}
+      {panel === 'cal' && <HabitMonth habit={e} today={today} onToggle={(d, v) => save(toggleData(e, d, v))} />}
+      {panel === 'chain' && <select className="chain-select" value={String(e.data.after ?? '')} onChange={(ev) => { save({ ...e.data, after: ev.target.value || null }); setPanel(''); }}>
+        <option value="">Aucune (habitude indépendante)</option>
+        {mine.filter((x) => x.id !== e.id && x.data.after !== e.id).map((x) => <option key={x.id} value={x.id}>Après « {x.title} »</option>)}
+      </select>}
+    </div>}
+  </article></SwipeRow>;
+}
+
+function NoteEditor({ initial, onSave }: { initial: string; onSave: (text: string) => void }) {
+  const [text, setText] = useState(initial);
+  return <div className="habit-note-edit">
+    <input value={text} maxLength={200} autoFocus placeholder="Ex. le podcast écouté, le livre lu…" aria-label="Note du jour" onChange={(ev) => setText(ev.target.value)} onKeyDown={(ev) => { if (ev.key === 'Enter') onSave(text.trim()); }} />
+    <button className="button secondary small" onClick={() => onSave(text.trim())}>Enregistrer</button>
+  </div>;
+}
+
+/** Habitudes archivées : historique et badges gardés, réactivables. */
+function Archived({ items, onUpdate, onRemove }: { items: Entry[]; onUpdate: Save; onRemove: (e: Entry) => Promise<void> }) {
+  return <details className="habit-archive"><summary>Archivées ({items.length})</summary>
+    {items.map((e) => { const total = Object.values(habitDone(e)).filter(Boolean).length;
+      return <div key={e.id} className="habit-archive-row"><span><strong>{e.title}</strong><small className="muted">{total} fois · archivée le {shortDate(String(e.data.archived))}</small></span>
+        <button className="link-btn small" onClick={() => void onUpdate(e, { ...e.data, archived: null })}>Réactiver</button>
+        <button className="icon-btn" aria-label={'Supprimer ' + e.title} onClick={() => void onRemove(e)}><Trash2 size={16} /></button></div>; })}
+  </details>;
+}
+
+/** Calendrier du mois : jours faits, jours de pause, notes ; toucher un jour passé le coche ou le décoche. */
+function HabitMonth({ habit, today, onToggle }: { habit: Entry; today: string; onToggle: (d: string, on: boolean) => void }) {
+  const [month, setMonth] = useState(monthStartOf(today));
+  const done = habitDone(habit), notes = habitNotes(habit);
+  const lead = (new Date(month + 'T12:00:00').getDay() + 6) % 7, len = new Date(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0).getDate();
+  const cells = Array.from({ length: len }, (_, i) => month.slice(0, 8) + String(i + 1).padStart(2, '0'));
+  const shift = (k: number) => { const d = new Date(month + 'T12:00:00'); d.setMonth(d.getMonth() + k); setMonth(monthStartOf(isoOf(d))); };
+  const count = cells.filter((d) => done[d]).length, monthNotes = cells.filter((d) => notes[d]);
+  return <div className="habit-month">
+    <div className="habit-month-head"><button className="icon-btn" aria-label="Mois précédent" onClick={() => shift(-1)}><ChevronLeft size={18} /></button>
+      <strong>{new Date(month + 'T12:00:00').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</strong>
+      <button className="icon-btn" aria-label="Mois suivant" disabled={month >= monthStartOf(today)} onClick={() => shift(1)}><ChevronRight size={18} /></button></div>
+    <div className="habit-month-grid">{LETTERS.map((l, i) => <small key={'h' + i}>{l}</small>)}
+      {Array.from({ length: lead }, (_, i) => <span key={'b' + i} />)}
+      {cells.map((d) => <button key={d} type="button" disabled={d > today} aria-pressed={Boolean(done[d])} aria-label={(done[d] ? 'Décocher le ' : 'Cocher le ') + shortDate(d)}
+        className={(done[d] ? 'on' : '') + (isPaused(habit, d) ? ' paused' : '') + (d === today ? ' today' : '') + (notes[d] ? ' noted' : '')} onClick={() => onToggle(d, !done[d])}>{Number(d.slice(8))}</button>)}</div>
+    <p className="muted">{count} {count > 1 ? 'fois' : 'fois'} ce mois-ci</p>
+    {monthNotes.length > 0 && <ul className="habit-month-notes">{monthNotes.map((d) => <li key={d}><b>{shortDate(d)}</b> {notes[d]}</li>)}</ul>}
   </div>;
 }
 
@@ -110,28 +197,62 @@ function Library({ mine, onAdd, onClose }: { mine: Entry[]; onAdd: (t: HabitTemp
   </div>;
 }
 
-function CreateHabit({ onSave, onClose }: { onSave: (t: Omit<HabitTemplate, 'id' | 'group'>) => Promise<void>; onClose: () => void }) {
-  const [title, setTitle] = useState('');
-  const [icon, setIcon] = useState<GlyphName>('sprout');
-  const [freq, setFreq] = useState<HabitFreq>('daily');
-  const [level, setLevel] = useState<HabitLevel>('Douce');
-  const [why, setWhy] = useState('');
+const ICONS: GlyphName[] = ['sprout', 'drop', 'steps', 'book', 'stretch', 'salad', 'bed', 'phoneOff', 'heart', 'target', 'palette', 'music', 'dumbbell', 'feather'];
+const RULE_TYPES: { type: HabitRule['type']; label: string; n: number }[] = [
+  { type: 'daily', label: 'Chaque jour', n: 1 }, { type: 'week', label: 'Par semaine', n: 3 }, { type: 'every', label: 'Tous les X jours', n: 3 }, { type: 'month', label: 'Par mois', n: 1 }];
+
+/** Créer ou modifier une habitude : nom, symbole, fréquence, moment, objectif chiffré, étapes, intensité, pourquoi. */
+function HabitForm({ initial, heading = 'Ma nouvelle habitude', submit = 'Ajouter mon habitude', onSave, onClose }: { initial?: HabitDraft; heading?: string; submit?: string; onSave: (t: HabitDraft) => Promise<void>; onClose: () => void }) {
+  const [title, setTitle] = useState(initial?.title ?? '');
+  const [icon, setIcon] = useState<GlyphName>(initial?.icon ?? 'sprout');
+  const [rule, setRule] = useState<HabitRule>(initial?.rule ?? { type: 'daily', n: 1 });
+  const [moment, setMoment] = useState<HabitMoment | ''>(initial?.moment ?? '');
+  const [target, setTarget] = useState(initial?.goal ? String(initial.goal.target) : '');
+  const [unit, setUnit] = useState(initial?.goal?.unit ?? '');
+  const [steps, setSteps] = useState((initial?.steps ?? []).join('\n'));
+  const [level, setLevel] = useState<HabitLevel>(initial?.level ?? 'Douce');
+  const [why, setWhy] = useState(initial?.why ?? '');
   const [busy, setBusy] = useState(false);
+  const icons = ICONS.includes(icon) ? ICONS : [icon, ...ICONS];
+  const t = Math.round(Number(target));
+  const goal = t >= 2 ? { target: Math.min(100, t), unit: unit.trim().slice(0, 20) } : null;
   return <div className="screen habits">
-    <header className="screen-header"><button className="icon-btn back" onClick={onClose} aria-label="Retour"><X size={22} /></button><h1>Ma nouvelle habitude</h1></header>
+    <header className="screen-header"><button className="icon-btn back" onClick={onClose} aria-label="Retour"><X size={22} /></button><h1>{heading}</h1></header>
     <div className="form-stack">
       <label>Nom<input value={title} maxLength={80} placeholder="Ex. Marcher après le déjeuner" onChange={(e) => setTitle(e.target.value)} /></label>
-      <fieldset className="gfield"><legend>Symbole</legend><div className="gchips">{(['sprout', 'drop', 'steps', 'book', 'stretch', 'salad', 'bed', 'phoneOff', 'heart', 'target', 'palette', 'music', 'dumbbell', 'feather'] as GlyphName[]).map((x) =>
+      <fieldset className="gfield"><legend>Symbole</legend><div className="gchips">{icons.map((x) =>
         <button type="button" key={x} className={'gchip icon' + (icon === x ? ' on' : '')} aria-label={x} onClick={() => setIcon(x)}><Glyph name={x} tint="sauge" size={20} /></button>)}</div></fieldset>
-      <fieldset className="gfield"><legend>Fréquence</legend><div className="gchips">{(Object.keys(FREQ_LABEL) as HabitFreq[]).map((f) =>
-        <button type="button" key={f} className={'gchip' + (freq === f ? ' on' : '')} onClick={() => setFreq(f)}>{FREQ_LABEL[f]}</button>)}</div></fieldset>
+      <FreqPicker value={rule} onChange={setRule} />
+      <fieldset className="gfield"><legend>Moment de la journée</legend><div className="gchips">{[{ id: '' as const, label: 'Toute la journée' }, ...MOMENTS].map((m) =>
+        <button type="button" key={m.id || 'all'} className={'gchip' + (moment === m.id ? ' on' : '')} onClick={() => setMoment(m.id)}>{m.label}</button>)}</div></fieldset>
+      <fieldset className="gfield"><legend>Objectif chiffré (facultatif)</legend>
+        <div className="habit-goal-fields"><input inputMode="numeric" value={target} placeholder="Ex. 6" aria-label="Combien par jour" onChange={(e) => setTarget(e.target.value.replace(/[^0-9]/g, '').slice(0, 3))} />
+          <input value={unit} maxLength={20} placeholder="verres, pages, minutes…" aria-label="Unité" onChange={(e) => setUnit(e.target.value)} /></div>
+        <small className="muted">Un compteur remplace la simple coche : l’habitude est faite quand le nombre est atteint.</small></fieldset>
+      <label>Étapes (facultatif, une par ligne)<textarea rows={3} value={steps} placeholder={'Démaquiller\nSérum\nCrème de nuit'} onChange={(e) => setSteps(e.target.value)} /></label>
       <fieldset className="gfield"><legend>Intensité</legend><div className="gchips">{(['Douce', 'Modérée', 'Engagée'] as HabitLevel[]).map((l) =>
         <button type="button" key={l} className={'gchip' + (level === l ? ' on' : '')} onClick={() => setLevel(l)}>{l}</button>)}</div></fieldset>
       <label>Pourquoi elle compte pour moi (facultatif)<input value={why} maxLength={140} onChange={(e) => setWhy(e.target.value)} /></label>
-      <button className="button primary wide" disabled={busy || !title.trim()} onClick={async () => { setBusy(true); try { await onSave({ title: title.trim(), icon, tint: 'sauge', freq, level, why: why.trim() }); } finally { setBusy(false); } }}>
-        {busy ? 'Ajout…' : 'Ajouter mon habitude'}</button>
+      <button className="button primary wide" disabled={busy || !title.trim()} onClick={async () => { setBusy(true); try {
+        await onSave({ title: title.trim(), icon, tint: initial?.tint ?? 'sauge', rule, level, why: why.trim(), moment, goal, steps: steps.split('\n').map((x) => x.trim()).filter(Boolean).slice(0, 12) });
+      } finally { setBusy(false); } }}>{busy ? 'Enregistrement…' : submit}</button>
     </div>
   </div>;
+}
+
+/** Fréquence : chaque jour, n fois par semaine, tous les n jours ou n fois par mois. */
+function FreqPicker({ value, onChange }: { value: HabitRule; onChange: (r: HabitRule) => void }) {
+  const [lo, hi] = RULE_RANGE[value.type];
+  const set = (n: number) => onChange({ ...value, n: Math.min(hi, Math.max(lo, n)) });
+  return <fieldset className="gfield"><legend>Fréquence</legend>
+    <div className="gchips">{RULE_TYPES.map((t) => <button type="button" key={t.type} className={'gchip' + (value.type === t.type ? ' on' : '')}
+      onClick={() => value.type !== t.type && onChange({ type: t.type, n: t.n })}>{t.label}</button>)}</div>
+    {value.type !== 'daily' && <div className="gstepper freq-stepper">
+      <button type="button" aria-label="Moins" disabled={value.n <= lo} onClick={() => set(value.n - 1)}><Minus size={18} /></button>
+      <span className="freq-value">{ruleLabel(value)}</span>
+      <button type="button" aria-label="Plus" disabled={value.n >= hi} onClick={() => set(value.n + 1)}><Plus size={18} /></button>
+    </div>}
+  </fieldset>;
 }
 
 const WEEKDAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -142,11 +263,11 @@ function HabitStats({ habits }: { habits: Entry[] }) {
   const from = addDays(today, -89);
   if (!habits.length) return <p className="muted">Ajoute des habitudes pour voir tes statistiques.</p>;
   const rows = habits.map((e) => {
-    const done = habitDone(e), f = habitFreq(e);
+    const done = habitDone(e), r = habitRule(e);
     const start = [from, String(e.created_at ?? from).slice(0, 10)].sort().reverse()[0]!;
     const span = Math.max(1, Math.round((new Date(today + 'T12:00:00').getTime() - new Date(start + 'T12:00:00').getTime()) / 86400000) + 1);
     const count = Object.keys(done).filter((d) => done[d] && d >= start && d <= today).length;
-    const expected = f === 'daily' ? span : Math.max(1, Math.ceil(span / 7) * freqTarget(f));
+    const expected = expectedOver(r, span);
     return { e, rate: Math.min(1, count / expected), count };
   }).sort((a, b) => b.rate - a.rate);
   const byWeekday = Array.from({ length: 7 }, () => 0);
@@ -199,16 +320,32 @@ function Journeys({ entries, onCreate, onUpdate, onRemove }: { entries: Entry[];
   </div>;
 }
 
-/** Jours de répétition (pour une habitude quotidienne) et rappel à l'heure choisie. */
-function HabitSettings({ habit, onSave }: { habit: Entry; onSave: (d: Record<string, unknown>) => void }) {
-  const days = habitDays(habit), all = !days.length || days.length === 7;
-  const remind = (habit.data.remind ?? {}) as { on?: boolean; time?: string };
+const WEEKDAYS_LOWER = WEEKDAYS.map((w) => w.toLowerCase());
+
+/** Jours de répétition (quotidienne), rappel (jour de la semaine ou du mois pour les objectifs par semaine ou par mois), pause et archive. */
+function HabitSettings({ habit, today, onSave }: { habit: Entry; today: string; onSave: (d: Record<string, unknown>) => void }) {
+  const days = habitDays(habit), all = !days.length || days.length === 7, r = habitRule(habit);
+  const remind = (habit.data.remind ?? {}) as { on?: boolean; time?: string; day?: number; mday?: number };
+  const pause = habitPause(habit), [until, setUntil] = useState(addDays(today, 6));
+  const setRemind = (patch: Record<string, unknown>) => onSave({ remind: { ...remind, time: remind.time ?? '08:00', ...patch } });
   const toggle = (i: number) => { const cur = all ? [0, 1, 2, 3, 4, 5, 6] : days; const next = cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i].sort(); if (next.length) onSave({ days: next.length === 7 ? [] : next }); };
   return <div className="habit-settings">
-    {habitFreq(habit) === 'daily' && <><p className="ritual-label">Répéter le</p>
+    {r.type === 'daily' && <><p className="ritual-label">Répéter le</p>
       <div className="day-chips">{DAY_LETTERS.map((l, i) => { const on = all || days.includes(i);
-        return <button key={i} type="button" className={'day-chip' + (on ? ' on' : '')} aria-pressed={on} aria-label={['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'][i]} onClick={() => toggle(i)}>{l}</button>; })}</div></>}
-    <label className="habit-remind"><input type="checkbox" checked={Boolean(remind.on)} onChange={(ev) => onSave({ remind: { time: remind.time ?? '08:00', on: ev.target.checked } })} /> Me le rappeler
-      {remind.on && <input type="time" value={remind.time ?? '08:00'} onChange={(ev) => onSave({ remind: { on: true, time: ev.target.value } })} />}</label>
+        return <button key={i} type="button" className={'day-chip' + (on ? ' on' : '')} aria-pressed={on} aria-label={WEEKDAYS_LOWER[i]} onClick={() => toggle(i)}>{l}</button>; })}</div></>}
+    <label className="habit-remind"><input type="checkbox" checked={Boolean(remind.on)} onChange={(ev) => setRemind({ on: ev.target.checked })} /> Me le rappeler
+      {remind.on && <input type="time" value={remind.time ?? '08:00'} onChange={(ev) => setRemind({ on: true, time: ev.target.value })} />}</label>
+    {remind.on && r.type === 'week' && <label className="habit-remind">si ce n’est pas fait, le
+      <select value={Number.isInteger(remind.day) ? remind.day : 6} onChange={(ev) => setRemind({ day: Number(ev.target.value) })}>{WEEKDAYS_LOWER.map((w, i) => <option key={w} value={i}>{w}</option>)}</select></label>}
+    {remind.on && r.type === 'month' && <label className="habit-remind">si ce n’est pas fait,
+      <select value={Number(remind.mday) || 0} onChange={(ev) => setRemind({ mday: Number(ev.target.value) })}>
+        <option value={0}>les 3 derniers jours</option>
+        {Array.from({ length: 28 }, (_, i) => <option key={i + 1} value={i + 1}>le {i + 1} du mois</option>)}</select></label>}
+    <p className="ritual-label">Pause</p>
+    {pause && pause.to >= today
+      ? <div className="habit-pause"><span>En pause du {shortDate(pause.from)} au {shortDate(pause.to)}. Ta série reste intacte.</span><button className="link-btn small" onClick={() => onSave({ pause: null })}>Reprendre maintenant</button></div>
+      : <div className="habit-pause"><span>Jusqu’au</span><input type="date" value={until} min={today} onChange={(ev) => setUntil(ev.target.value)} />
+        <button className="link-btn small" disabled={!until || until < today} onClick={() => onSave({ pause: { from: today, to: until } })}>Mettre en pause</button></div>}
+    <button className="link-btn small habit-archive-btn" onClick={() => onSave({ archived: today })}><Archive size={14} /> Archiver cette habitude</button>
   </div>;
 }

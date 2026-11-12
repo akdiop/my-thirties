@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Entry } from '../cloud';
-import { habitDaysLabel, habitScheduled, habitStreak } from '../rituals';
+import { activeHabits, countData, countOn, everyWait, expectedOver, habitDaysLabel, habitDue, habitRule, habitScheduled, habitStreak, momentNow, momentRank, periodCount, ruleData, ruleLabel, stepData, toggleData, weekTarget } from '../rituals';
+import { remindOn } from '../../../supabase/functions/push-reminders/habits';
 import { taskBuckets } from '../../features/TaskQuick';
 
 const e = (kind: string, data: Record<string, unknown>, title = 'x') => ({ id: title + JSON.stringify(data), kind, module: 'quotidien', title, entry_date: (data.date as string) ?? null, data }) as unknown as Entry;
@@ -46,5 +47,71 @@ describe('recherche et mot doux', () => {
     expect(cheerOf(3, 3, 600)).toContain('Tout est fait');
     expect(cheerOf(2, 4, 600)).toBe('Joli rythme, continue.');
     expect(cheerOf(0, 4, 1200)).toBe('Une petite chose ce soir suffit.');
+  });
+});
+
+describe('habitudes : fréquences', () => {
+  it('lit les anciennes fréquences et les nouvelles', () => {
+    expect(habitRule(e('habit', { freq: '3w' }))).toEqual({ type: 'week', n: 3 });
+    expect(habitRule(e('habit', {}))).toEqual({ type: 'daily', n: 1 });
+    expect(habitRule(e('habit', { freq: 'month', n: 99 }))).toEqual({ type: 'month', n: 15 });
+    expect(ruleLabel({ type: 'every', n: 3 })).toBe('Tous les 3 jours');
+    expect(ruleLabel({ type: 'month', n: 1 })).toBe('1 fois par mois');
+    expect(ruleData({ type: 'daily', n: 1 })).toEqual({ freq: 'daily', n: null });
+  });
+  it('tous les 3 jours : échéance et série', () => {
+    const g = e('habit', { freq: 'every', n: 3, done: { '2026-11-03': true, '2026-11-06': true, '2026-11-09': true } });
+    expect(everyWait(g, '2026-11-10')).toBe(2);
+    expect(habitDue(g, '2026-11-10')).toBe(false);
+    expect(habitDue(g, '2026-11-12')).toBe(true);
+    expect(habitStreak(g, '2026-11-12')).toBe(3);
+    expect(habitStreak(g, '2026-11-13')).toBe(0);
+    expect(habitDue(e('habit', { freq: 'every', n: 3 }), '2026-11-10')).toBe(true);
+  });
+  it('par mois : avancement et série', () => {
+    const p = e('habit', { freq: 'month', n: 1, done: { '2026-09-20': true, '2026-10-02': true, '2026-11-05': true } });
+    expect(periodCount(p, '2026-11-12')).toBe(1);
+    expect(habitStreak(p, '2026-11-12')).toBe(3);
+    expect(habitDue(p, '2026-11-12')).toBe(false);
+    expect(expectedOver({ type: 'month', n: 1 }, 90)).toBe(3);
+    expect(weekTarget({ type: 'every', n: 3 })).toBe(3);
+  });
+});
+
+describe('habitudes : pause, rappels, compteur, étapes, moment, archives', () => {
+  it('la pause ne casse pas la série et retire l’habitude du jour', () => {
+    const h = e('habit', { freq: 'daily', pause: { from: '2026-11-05', to: '2026-11-08' }, done: { '2026-11-03': true, '2026-11-04': true, '2026-11-09': true } });
+    expect(habitStreak(h, '2026-11-09')).toBe(3);
+    expect(habitDue(h, '2026-11-06')).toBe(false);
+    const g = e('habit', { freq: 'every', n: 3, pause: { from: '2026-11-04', to: '2026-11-10' }, done: { '2026-11-02': true } });
+    expect(everyWait(g, '2026-11-03')).toBe(2);
+    expect(everyWait(g, '2026-11-11')).toBe(1);
+    expect(everyWait(g, '2026-11-12')).toBe(0);
+  });
+  it('rappel par semaine et par mois seulement si l’objectif manque', () => {
+    const w = e('habit', { freq: 'week', n: 1, remind: { on: true, day: 6 }, done: {} });
+    expect(remindOn(w.data, '2026-11-15')).toBe(true);
+    expect(remindOn(w.data, '2026-11-14')).toBe(false);
+    expect(remindOn({ ...w.data, done: { '2026-11-10': true } }, '2026-11-15')).toBe(false);
+    const m = e('habit', { freq: 'month', n: 1, remind: { on: true }, done: {} });
+    expect(remindOn(m.data, '2026-11-28')).toBe(true);
+    expect(remindOn(m.data, '2026-11-27')).toBe(false);
+    expect(remindOn({ ...m.data, remind: { on: true, mday: 15 } }, '2026-11-15')).toBe(true);
+    expect(remindOn({ ...m.data, archived: '2026-11-01' }, '2026-11-28')).toBe(false);
+  });
+  it('compteur et étapes cochent l’habitude une fois complets', () => {
+    const c = e('habit', { goal: { target: 3, unit: 'verres' }, done: {} });
+    expect(countData(c, '2026-11-12', 2).done).toEqual({ '2026-11-12': false });
+    expect(countData(c, '2026-11-12', 3).done).toEqual({ '2026-11-12': true });
+    expect(countOn(e('habit', { goal: { target: 3 }, done: { '2026-11-12': true } }), '2026-11-12')).toBe(3);
+    const s = e('habit', { steps: ['Démaquiller', 'Sérum'], stepsDone: { '2026-11-12': [0] }, done: {} });
+    expect(stepData(s, '2026-11-12', 1).done).toEqual({ '2026-11-12': true });
+    expect(toggleData(s, '2026-11-12', false).stepsDone).toEqual({ '2026-11-12': [] });
+  });
+  it('moment présent en premier, archives à part', () => {
+    expect(momentNow(8)).toBe('matin');
+    expect(momentRank('soir', 'soir')).toBeLessThan(momentRank('matin', 'soir'));
+    expect(momentRank('', 'soir')).toBeGreaterThan(momentRank('midi', 'soir'));
+    expect(activeHabits([e('habit', {}, 'a'), e('habit', { archived: '2026-11-01' }, 'b')]).map((x) => x.title)).toEqual(['a']);
   });
 });

@@ -1,5 +1,6 @@
 import type { Entry } from './cloud';
 import type { GlyphName, Tint } from '../ui/Glyph';
+import { activeGap, addIso, clampN, daysOf, doneDates, doneOf, dueOn, everyWait as everyWaitOf, monthLength, monthStart, pausedOn, pauseOf, periodCount as periodCountOf, ruleOf, RULE_RANGE, scheduledOn, weekStart, type HabitRule } from '../../supabase/functions/push-reminders/habits';
 
 /** Entrées des nouveaux écrans (Mon jour, Habitudes, Notes) : gérées par leurs propres écrans, pas par les listes des espaces. */
 export const DAILY_KIND = 'daily';
@@ -141,30 +142,100 @@ export const isoOf = (d: Date) => d.toLocaleDateString('en-CA');
 export const addDays = (iso: string, n: number) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return isoOf(d); };
 /** Lundi de la semaine d'une date. */
 export const weekStartOf = (iso: string) => { const d = new Date(iso + 'T12:00:00'); return addDays(iso, -((d.getDay() + 6) % 7)); };
-export const habitDone = (e: Entry) => (e.data.done && typeof e.data.done === 'object' ? e.data.done as Record<string, boolean> : {});
+export const habitDone = (e: Entry) => doneOf(e.data);
 export const habitFreq = (e: Entry): HabitFreq => (['daily', '3w', '1w'].includes(String(e.data.freq)) ? e.data.freq as HabitFreq : 'daily');
-/** Jours de répétition choisis (0 = lundi … 6 = dimanche) ; vide = tous les jours. */
-export const habitDays = (e: Entry) => (Array.isArray(e.data.days) ? (e.data.days as unknown[]).map(Number).filter((n) => n >= 0 && n <= 6) : []);
-const weekdayOf = (iso: string) => (new Date(iso + 'T12:00:00').getDay() + 6) % 7;
+export { RULE_RANGE, type HabitRule };
+export const habitRule = (e: Entry) => ruleOf(e.data);
+export const ruleOfFreq = (f: HabitFreq): HabitRule => (f === 'daily' ? { type: 'daily', n: 1 } : { type: 'week', n: freqTarget(f) });
+export const ruleData = (r: HabitRule) => (r.type === 'daily' ? { freq: 'daily', n: null } : { freq: r.type, n: clampN(r.type, r.n) });
+export const ruleLabel = (r: HabitRule) => r.type === 'daily' ? 'Chaque jour' : r.type === 'every' ? 'Tous les ' + r.n + ' jours'
+  : r.n + ' fois par ' + (r.type === 'week' ? 'semaine' : 'mois');
+export const everyWait = (e: Entry, iso: string) => everyWaitOf(e.data, iso);
+export const habitDue = (e: Entry, iso: string) => dueOn(e.data, iso);
+export const periodCount = (e: Entry, iso: string) => periodCountOf(e.data, iso);
+export const monthStartOf = monthStart;
+export const isPaused = (e: Entry, iso: string) => pausedOn(e.data, iso);
+export const habitPause = (e: Entry) => pauseOf(e.data);
+export const isArchived = (e: Entry) => Boolean(e.data.archived);
+/** Habitudes en cours (les archivées gardent leur historique mais sortent des listes du jour). */
+export const activeHabits = (entries: Entry[]) => entries.filter((e) => e.kind === HABIT_KIND && !isArchived(e));
+/** Nombre de fois attendues sur une durée en jours (pour les statistiques). */
+export function expectedOver(r: HabitRule, span: number) {
+  return Math.max(1, r.type === 'daily' ? span : r.type === 'week' ? Math.ceil(span / 7) * r.n : r.type === 'every' ? Math.ceil(span / r.n) : Math.round(span / 30 * r.n));
+}
+/** Objectif d'une semaine (bilan hebdomadaire). */
+export const weekTarget = (r: HabitRule) => (r.type === 'daily' ? 7 : r.type === 'week' ? r.n : r.type === 'every' ? Math.ceil(7 / r.n) : Math.max(1, Math.round(r.n * 7 / 30)));
+export const streakUnit = (r: HabitRule) => ({ daily: 'jours', week: 'semaines', every: 'fois de suite', month: 'mois' })[r.type];
+
+/** Objectif chiffré (ex. 6 verres) : compteur du jour, la coche se fait quand il est atteint. */
+export const habitGoal = (e: Entry) => { const g = e.data.goal as { target?: unknown; unit?: unknown } | undefined; const t = Math.round(Number(g?.target));
+  return g && t >= 2 ? { target: Math.min(100, t), unit: String(g.unit ?? '').slice(0, 20) } : null; };
+const countMap = (e: Entry) => (e.data.count && typeof e.data.count === 'object' ? e.data.count as Record<string, number> : {});
+export const countOn = (e: Entry, iso: string) => { const g = habitGoal(e); const c = Number(countMap(e)[iso]); return Number.isFinite(c) && c > 0 ? c : g && habitDone(e)[iso] ? g.target : 0; };
+export function countData(e: Entry, iso: string, n: number) {
+  const g = habitGoal(e), v = Math.max(0, Math.min(g?.target ?? 100, n));
+  return { ...e.data, count: { ...countMap(e), [iso]: v }, done: { ...habitDone(e), [iso]: Boolean(g && v >= g.target) } };
+}
+/** Routine en étapes : la coche se fait quand toutes les étapes du jour sont cochées. */
+export const habitSteps = (e: Entry) => (Array.isArray(e.data.steps) ? (e.data.steps as unknown[]).map(String).map((x) => x.trim()).filter(Boolean).slice(0, 12) : []);
+const stepsMap = (e: Entry) => (e.data.stepsDone && typeof e.data.stepsDone === 'object' ? e.data.stepsDone as Record<string, number[]> : {});
+export const stepsOn = (e: Entry, iso: string) => { const all = habitSteps(e).map((_, i) => i); const v = stepsMap(e)[iso]; return Array.isArray(v) ? v.filter((i) => i < all.length) : habitDone(e)[iso] ? all : []; };
+export function stepData(e: Entry, iso: string, i: number) {
+  const cur = stepsOn(e, iso), next = cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i].sort((a, b) => a - b);
+  return { ...e.data, stepsDone: { ...stepsMap(e), [iso]: next }, done: { ...habitDone(e), [iso]: next.length === habitSteps(e).length } };
+}
+/** Cocher ou décocher un jour en entier (compteur et étapes suivent). */
+export function toggleData(e: Entry, iso: string, on: boolean) {
+  const g = habitGoal(e), steps = habitSteps(e);
+  return { ...e.data, done: { ...habitDone(e), [iso]: on },
+    ...(g ? { count: { ...countMap(e), [iso]: on ? g.target : 0 } } : {}),
+    ...(steps.length ? { stepsDone: { ...stepsMap(e), [iso]: on ? steps.map((_, i) => i) : [] } } : {}) };
+}
+/** Note sur la coche d'un jour. */
+export const habitNotes = (e: Entry) => (e.data.notes && typeof e.data.notes === 'object' ? e.data.notes as Record<string, string> : {});
+
+/** Moment de la journée : les habitudes du moment présent passent en premier. */
+export type HabitMoment = 'matin' | 'midi' | 'soir';
+export const MOMENTS: { id: HabitMoment; label: string }[] = [{ id: 'matin', label: 'Matin' }, { id: 'midi', label: 'Midi' }, { id: 'soir', label: 'Soir' }];
+export const momentOf = (e: Entry): HabitMoment | '' => (['matin', 'midi', 'soir'].includes(String(e.data.moment)) ? e.data.moment as HabitMoment : '');
+export const momentNow = (hour: number): HabitMoment => (hour < 12 ? 'matin' : hour < 17 ? 'midi' : 'soir');
+export const momentRank = (m: HabitMoment | '', now: HabitMoment) => (m === now ? 0 : m ? 1 + MOMENTS.findIndex((x) => x.id === m) : 9);
+
+export const habitDays = (e: Entry) => daysOf(e.data);
 /** L'habitude est-elle prévue ce jour-là ? */
-export const habitScheduled = (e: Entry, iso: string) => { const d = habitDays(e); return !d.length || d.length === 7 || d.includes(weekdayOf(iso)); };
+export const habitScheduled = (e: Entry, iso: string) => scheduledOn(e.data, iso);
 export const DAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 export const habitDaysLabel = (e: Entry) => { const d = habitDays(e); if (!d.length || d.length === 7) return ''; return d.length === 5 && !d.includes(5) && !d.includes(6) ? 'en semaine' : d.length === 2 && d.includes(5) && d.includes(6) ? 'le week-end' : [...d].sort().map((i) => ['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim'][i]).join(', '); };
-/** Série en cours : jours consécutifs (quotidienne, en sautant les jours non prévus) ou semaines où l'objectif est atteint (hebdomadaire). */
+
+/** Série en cours : jours consécutifs (quotidienne), semaines ou mois où l'objectif est atteint, ou fois faites à temps (tous les n jours). Les jours non prévus et les pauses ne cassent rien. */
 export function habitStreak(e: Entry, today: string) {
-  const done = habitDone(e), f = habitFreq(e);
-  if (f === 'daily') {
-    let day = done[today] || !habitScheduled(e, today) ? today : addDays(today, -1), n = 0;
+  const done = habitDone(e), r = habitRule(e), d = e.data;
+  if (r.type === 'daily') {
+    let day = done[today] || !habitScheduled(e, today) || isPaused(e, today) ? today : addIso(today, -1), n = 0;
     for (let guard = 0; guard < 3660; guard++) {
-      if (done[day]) n++; else if (habitScheduled(e, day)) break;
-      day = addDays(day, -1);
+      if (done[day]) n++; else if (habitScheduled(e, day) && !isPaused(e, day)) break;
+      day = addIso(day, -1);
     }
     return n;
   }
-  let week = weekStartOf(today), n = 0;
-  const count = (w: string) => Array.from({ length: 7 }, (_, i) => addDays(w, i)).filter((d) => done[d]).length;
-  if (count(week) < freqTarget(f)) week = addDays(week, -7);
-  while (count(week) >= freqTarget(f)) { n++; week = addDays(week, -7); }
+  if (r.type === 'every') {
+    const list = doneDates(d).filter((x) => x <= today);
+    if (!list.length || activeGap(d, list[list.length - 1]!, today) > r.n) return 0;
+    let n = 1;
+    for (let i = list.length - 1; i > 0 && activeGap(d, list[i - 1]!, list[i]!) <= r.n; i--) n++;
+    return n;
+  }
+  const month = r.type === 'month';
+  const start = (iso: string) => (month ? monthStart(iso) : weekStart(iso));
+  const prev = (p: string) => start(addIso(p, -1));
+  const last = (p: string) => (month ? p.slice(0, 8) + String(monthLength(p)).padStart(2, '0') : addIso(p, 6));
+  const touchesPause = (p: string) => { const ps = pauseOf(d); return Boolean(ps && ps.from <= last(p) && ps.to >= p); };
+  let p = start(today), n = 0;
+  if (periodCountOf(d, p) < r.n) p = prev(p);
+  for (let guard = 0; guard < 600; guard++) {
+    if (periodCountOf(d, p) >= r.n) n++; else if (!touchesPause(p)) break;
+    p = prev(p);
+  }
   return n;
 }
 
