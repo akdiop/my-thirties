@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, BookText, Check, Feather, Languages, Mountain, Settings2, Sparkles, Trophy } from 'lucide-react';
+import { BookOpen, BookText, Check, Feather, Languages, Mountain, Settings2, Sparkles, Sun, Trophy } from 'lucide-react';
+import { useWirdCount, WIRD_KIND } from './Wird';
+import { afterEntry, currentAfterPrayer } from './AfterPrayer';
+import { afterProgress, type AfterData } from '../lib/afterPrayer';
+import { goalOf } from '../../supabase/functions/push-reminders/wird';
+import { ARABE_KIND, arabicWordOfDay, streak, type ArabeData } from '../lib/arabe/jeux';
 import { carnetWindow, pageOf, wishes } from '../lib/carnet';
 import { inWindow } from '../../supabase/functions/push-reminders/carnet';
 import type { Entry, EntryInput } from '../lib/cloud';
@@ -10,7 +15,7 @@ import { QURAN_PAGES } from '../lib/ramadan';
 import { actsDone, DH_ACTS, DH_DAYS, DHUL_HIJJA_KIND, dhulHijjaStatus, type DhData } from '../lib/dhulHijja';
 import { allahNameOfDay, challengesToday, QURAN_KIND, quranPlan, quranRead, tafsirOfDay, wordOfDay } from '../lib/todayLearning';
 
-export type LearningTarget = 'passions' | 'challenges' | 'cours' | 'dhulhijja' | 'carnet' | 'carnet-signe';
+export type LearningTarget = 'passions' | 'challenges' | 'cours' | 'dhulhijja' | 'carnet' | 'carnet-signe' | 'wird' | 'apres' | 'arabe';
 
 /** Accueil : ce que j'ai commencé et que je ne veux pas oublier aujourd'hui (défis, mot du jour, tafsir, lecture du Coran). */
 export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
@@ -21,6 +26,12 @@ export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
   const paths = entries.filter((e) => e.kind === 'path' && pathById(e.data.pathId));
   const tafsir = tafsirOfDay(today);
   const name = allahNameOfDay(today);
+  const wirds = entries.filter((e) => e.kind === WIRD_KIND);
+  const after = currentAfterPrayer(entries);
+  const afterP = afterProgress((afterEntry(entries, today)?.data ?? {}) as AfterData, after);
+  const arabe = entries.find((e) => e.kind === ARABE_KIND);
+  const arWord = arabe ? arabicWordOfDay(today) : null;
+  const arStreak = arabe ? streak(arabe.data as ArabeData, today) : 0;
   const carnetOpen = wishes(entries).filter((w) => !w.done).length;
   const carnetNow = inWindow(carnetWindow(entries, today), today) && !pageOf(entries, today.slice(0, 7))?.data.thoughts;
   const dh = dhulHijjaStatus(today);
@@ -52,6 +63,23 @@ export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
           <span className="dl-point">{DH_DAYS[dhDay - 1]!.question}</span>
         </span>
       </button>}
+
+      {wirds.map((w) => <WirdRow key={w.id} entry={w} onUpdate={onUpdate} onOpen={() => onOpen('wird')} />)}
+
+      <div className="dl-row">
+        <span className="dl-icon"><Sun size={18} /></span>
+        <button className="dl-text" onClick={() => onOpen('apres')}><small>Après la prière</small>
+          <strong>{afterP.complete === afterP.total ? 'Invocations d’après ' + after + ' récitées' : 'As-tu récité après ' + after + ' ?'}</strong>
+          <span className="dl-point">{afterP.complete}/{afterP.total} · istighfâr, tasbîh 33, Âyat al-Kursî{after === 'Fajr' || after === 'Maghrib' ? ', al-Mu‘awwidhât 3 fois' : ''}</span></button>
+      </div>
+
+      {arabe && arWord && <div className="dl-row">
+        <span className="dl-icon"><Languages size={18} /></span>
+        <button className="dl-text" onClick={() => onOpen('arabe')}><small>Mon arabe · mot du jour{arStreak > 1 ? ' · ' + arStreak + ' jours de suite' : ''}</small>
+          <strong className="dl-word"><span lang="ar">{arWord.ar}</span> <em>{arWord.ph}</em></strong>
+          <span className="dl-point">{arWord.fr}</span></button>
+        <button className="dl-btn" onClick={() => onOpen('arabe')}>Jouer</button>
+      </div>}
 
       {(carnetNow || carnetOpen > 0) && <div className="dl-row">
         <span className="dl-icon"><Feather size={18} /></span>
@@ -125,3 +153,17 @@ function PathRow({ entry, today, onOpen }: { entry: Entry; today: string; onOpen
     </button>
   </div>;
 }
+
+/** Objectif de dhikr sur l'accueil : compteur rapide sans quitter l'écran. */
+function WirdRow({ entry, onUpdate, onOpen }: { entry: Entry; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void>; onOpen: () => void }) {
+  const { count, add } = useWirdCount(entry, onUpdate);
+  const goal = goalOf(entry.data);
+  return <div className="dl-row">
+    <span className="dl-icon"><Sparkles size={18} /></span>
+    <button className="dl-text" onClick={onOpen}><small>Dhikr du jour · {count >= goal ? 'objectif atteint' : count + ' sur ' + goal}</small>
+      <strong>{entry.title}</strong></button>
+    <button className="dl-btn" aria-label={'Ajouter 1, ' + count + ' sur ' + goal} onClick={() => add(1)}>+1</button>
+    <button className="dl-btn soft" aria-label="Ajouter 10" onClick={() => add(10)}>+10</button>
+  </div>;
+}
+

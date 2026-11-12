@@ -12,7 +12,7 @@ const ICON: Record<PathCategory, typeof Languages> = { Langues: Languages, 'Pein
 const doneOf = (e: Entry) => (e.data.done && typeof e.data.done === 'object' ? e.data.done as Record<string, boolean> : {});
 
 /** Lit une phrase modèle avec la synthèse vocale du navigateur, si elle est disponible (rien n'est envoyé). */
-function speak(text: string, lang: string) {
+export function speak(text: string, lang: string) {
   try {
     const u = new SpeechSynthesisUtterance(text.split(' — ')[0]);
     u.lang = lang; u.rate = 0.85;

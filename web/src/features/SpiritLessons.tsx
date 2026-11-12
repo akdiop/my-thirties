@@ -60,7 +60,7 @@ export function SpiritLessons({ onBack }: { onBack: () => void }) {
 }
 
 /** Livret intégré page par page (images), avec son sommaire. Les pages se chargent au fil de la lecture. */
-function BookPages({ book, title }: { book: Book; title: string }) {
+export function BookPages({ book, title }: { book: Book; title: string }) {
   const src = (n: number) => '/cours/' + book.dir + '/p-' + String(n).padStart(2, '0') + '.jpg';
   const go = (n: number) => document.getElementById(book.dir + '-' + n)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   return <>
@@ -68,7 +68,7 @@ function BookPages({ book, title }: { book: Book; title: string }) {
       <ol>{book.toc.map(([t, n]) => <li key={t}><button className="link-btn" onClick={() => go(n)}>{t}</button><small>p. {n}</small></li>)}</ol></details>}
     <p className="muted small">Touche une page pour l’ouvrir en grand et zoomer.</p>
     <div className="book-pages">{Array.from({ length: book.pages }, (_, i) => <a key={i} id={book.dir + '-' + (i + 1)} href={src(i + 1)} target="_blank" rel="noreferrer">
-      <img src={src(i + 1)} loading="lazy" decoding="async" alt={title + ', page ' + (i + 1)} width={993} height={1404} /></a>)}</div>
+      <img src={src(i + 1)} loading="lazy" decoding="async" alt={title + ', page ' + (i + 1)} width={book.size?.[0] ?? 993} height={book.size?.[1] ?? 1404} /></a>)}</div>
   </>;
 }
 

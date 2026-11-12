@@ -163,3 +163,33 @@ describe('livrets intégrés', () => {
     }
   });
 });
+
+import { countOn, wirdPace, wirdSlots } from '../../../supabase/functions/push-reminders/wird';
+import { AFTER_PRAYER, afterProgress, lastPrayer } from '../afterPrayer';
+
+describe('objectifs de dhikr', () => {
+  it('répartit l’objectif dans la journée et calcule le retard', () => {
+    const d = { goal: 100, start: '07:00', end: '22:00', counts: { '2026-11-12': 20 } };
+    expect(countOn(d, '2026-11-12')).toBe(20);
+    expect(wirdPace(d, '2026-11-12', 14 * 60 + 30)).toMatchObject({ expected: 50, behind: 30, left: 80, finished: false });
+    expect(wirdPace(d, '2026-11-12', 6 * 60)).toMatchObject({ expected: 0, behind: 0 });
+    expect(wirdSlots(d)).toEqual([600, 780, 960, 1140]);
+  });
+});
+
+describe('après la prière', () => {
+  it('adapte les répétitions à Fajr et Maghrib', () => {
+    const fajr = afterProgress({}, 'Fajr'), dhuhr = afterProgress({}, 'Dhuhr');
+    expect(fajr.total).toBe(AFTER_PRAYER.length);
+    expect(dhuhr.total).toBe(AFTER_PRAYER.length - 1);
+    expect(AFTER_PRAYER.find((d) => d.id === 'ikhlas')!.times('Maghrib')).toBe(3);
+    expect(AFTER_PRAYER.find((d) => d.id === 'ikhlas')!.times('Isha')).toBe(1);
+    expect(afterProgress({ done: { Isha: { istighfar: 3, subhanallah: 10 } } }, 'Isha').complete).toBe(1);
+  });
+  it('trouve la dernière prière passée', () => {
+    const t = [{ name: 'Fajr', time: '05:40' }, { name: 'Dhuhr', time: '13:30' }, { name: 'Asr', time: '16:45' }, { name: 'Maghrib', time: '19:10' }, { name: 'Isha', time: '20:30' }];
+    expect(lastPrayer(t, 14 * 60)).toBe('Dhuhr');
+    expect(lastPrayer(t, 3 * 60)).toBe('Isha');
+    expect(lastPrayer([], 6 * 60)).toBe('Fajr');
+  });
+});
