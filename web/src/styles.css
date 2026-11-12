@@ -2122,3 +2122,4 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .ress-msg.assistant{background:rgba(95,122,89,.1)}
 .calm-pills{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .calm-pill.soft{background:#EFEADF;color:#5F5A4F}
+.today-cheer{margin:-2px 0 6px;font-size:.85rem;color:#7E7254;font-style:italic}

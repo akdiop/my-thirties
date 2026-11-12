@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { HeartHandshake, Lightbulb, Shield, Sparkles, Waves } from 'lucide-react';
+import { HeartHandshake, Lightbulb, Search, Shield, Sparkles, Waves } from 'lucide-react';
 import type { Entry, ModuleId } from '../lib/cloud';
 import { isDoneOn, longDate, priorities, str, timeline, todayIso, toggledData } from '../lib/day';
 import { fmt, mainCurrency, monthReport } from '../lib/money';
@@ -9,7 +9,7 @@ import { ProfileAvatar } from '../features/PersonalProfile';
 import { Bar, Check22, SectionTitle } from '../ui/kit';
 import { ProtectionSheet } from '../features/ProtectionSheet';
 
-type Go = (screen: ModuleId | 'calme' | 'ressenti' | 'assistant' | 'settings' | 'agenda' | 'spaces') => void;
+type Go = (screen: ModuleId | 'calme' | 'ressenti' | 'recherche' | 'assistant' | 'settings' | 'agenda' | 'spaces') => void;
 
 export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd, rituals, todayCard, tasksCard, word = '' }: {
   tasksCard?: ReactNode;
@@ -37,6 +37,7 @@ export function Home({ entries, profileEntry, onGo, onUpdate, onAdd, onQuickAdd,
     <header className="home-head">
       <button className="avatar-btn" onClick={() => onGo('settings')} aria-label="Mon profil"><ProfileAvatar profile={profile} size={48} /></button>
       <div className="home-hello"><h1>Bonjour{profile.firstName ? ', ' + profile.firstName : ''}</h1><p>{longDate()}</p>{word && <p className="home-word">« {word} »</p>}</div>
+      <button className="round-btn" onClick={() => onGo('recherche')} aria-label="Rechercher partout"><Search size={20} /></button>
       <button className="round-btn" onClick={() => setProtection(true)} aria-label="Invocations de protection"><Shield size={20} /></button>
       <button className="round-btn" onClick={() => onGo('assistant')} aria-label="Assistant"><Sparkles size={20} /></button>
     </header>

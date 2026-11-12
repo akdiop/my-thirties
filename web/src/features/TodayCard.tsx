@@ -15,6 +15,17 @@ const inText = (m: number) => m >= 60 ? 'dans ' + Math.floor(m / 60) + ' h ' + S
  * Accueil · « Aujourd'hui » : une seule ligne du temps (prières, rendez-vous, habitudes).
  * Compacte par défaut (les 3 prochaines choses) ; « Toute ma journée » déroule le reste.
  */
+/** Un mot doux selon l'avancée de la journée (sans jamais culpabiliser). */
+export function cheerOf(done: number, total: number, minutes: number, past = false) {
+  if (!total) return '';
+  const r = done / total;
+  if (r >= 1) return 'Tout est fait, macha’Allah. Tu peux souffler.';
+  if (past) return done ? 'Chaque case cochée compte.' : 'Un jour plus léger, ça arrive aussi.';
+  if (r >= 0.7) return 'Presque au bout, continue doucement.';
+  if (r >= 0.4) return 'Joli rythme, continue.';
+  if (done > 0) return 'C’est parti, un pas après l’autre.';
+  return minutes < 12 * 60 ? 'Une chose à la fois, à ton rythme.' : minutes < 18 * 60 ? 'Il reste du temps : choisis une seule chose pour commencer.' : 'Une petite chose ce soir suffit.';
+}
 export function TodayCard({ entries, habits, onUpdate, onTogglePrayer, onOpenHabits, onOpenAgenda }: {
   entries: Entry[]; habits: Entry[]; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void>;
   onTogglePrayer: (name: string, on: boolean, day: string) => void; onOpenHabits: () => void; onOpenAgenda: () => void;
@@ -64,6 +75,7 @@ export function TodayCard({ entries, habits, onUpdate, onTogglePrayer, onOpenHab
         {events.length > 0 && <span className="tchip lilas">{events.length} rdv</span>}
       </span></div>
     {checkable.length > 0 && <div className="today-progress"><span><strong>{doneCount}</strong> sur {checkable.length} {doneCount > 1 ? 'faits' : 'fait'}</span><Bar value={doneCount / checkable.length} /></div>}
+    {checkable.length > 0 && <p className="today-cheer">{cheerOf(doneCount, checkable.length, nowMin, past)}</p>}
     {nextUp && <div className="today-next"><small>À suivre</small><strong>{nextUp.title}</strong><span>{nextUp.time}{nextUp.kind === 'prayer' ? ' · ' + inText(toMin(nextUp.time) - nowMin) : nextUp.sub ? ' · ' + nextUp.sub : ''}</span></div>}
     {!items.length ? <p className="day-empty">Rien de prévu pour l’instant. Une journée à ton rythme.</p>
       : !shown.length ? <p className="day-empty">{doneCount < checkable.length && !past ? 'Plus rien de prévu d’ici ce soir.' : 'Tout est fait pour ' + dayName(day) + ', macha’Allah.'}</p>

@@ -32,3 +32,19 @@ describe('tâches de l’accueil', () => {
     expect(b.doneToday.map((x) => x.title)).toEqual(['faite']);
   });
 });
+
+describe('recherche et mot doux', () => {
+  it('ouvre chaque résultat au bon endroit', async () => {
+    const { targetOf } = await import('../../screens/GlobalSearch');
+    expect(targetOf(e('note', {})).screen).toBe('notes');
+    expect(targetOf(e('daily', { date: '2026-11-12' }))).toEqual({ screen: 'myday', day: '2026-11-12' });
+    expect(targetOf(e('series', {})).screen).toBe('culture');
+    expect(targetOf(e('expense', {})).screen).toBe('entry');
+  });
+  it('encourage selon l’avancée', async () => {
+    const { cheerOf } = await import('../../features/TodayCard');
+    expect(cheerOf(3, 3, 600)).toContain('Tout est fait');
+    expect(cheerOf(2, 4, 600)).toBe('Joli rythme, continue.');
+    expect(cheerOf(0, 4, 1200)).toBe('Une petite chose ce soir suffit.');
+  });
+});
