@@ -125,8 +125,15 @@ Deno.serve(async (request) => {
       queue.push({ key: 'morning:' + now.date, title: 'Mon Daily Reset', body: '3 minutes pour poser ton intention du jour.', url: '/?ecran=myday&moment=matin' });
     if (p.evening?.on !== false && due(now.minutes, mins(p.evening?.time ?? '21:00')) && !(today?.data.win || today?.data.tomorrow))
       queue.push({ key: 'evening:' + now.date, title: 'Mon débriefing du soir', body: 'Ta victoire du jour, ce que tu déposes, ton intention pour demain.', url: '/?ecran=myday&moment=soir' });
+    // Habitudes prévues aujourd'hui (jours de répétition : 0 = lundi … 6 = dimanche ; aucun = tous les jours).
+    const scheduled = (e: Row) => { const d = Array.isArray(e.data.days) ? (e.data.days as unknown[]).map(Number) : []; return !d.length || d.length === 7 || d.includes((now.weekday + 6) % 7); };
+    const habitLeft = (e: Row) => e.kind === 'habit' && (e.data.freq ?? 'daily') === 'daily' && scheduled(e) && !(e.data.done as Record<string, boolean> | undefined)?.[now.date];
+    for (const e of list.filter((x) => habitLeft(x) && (x.data.remind as { on?: boolean } | undefined)?.on)) {
+      const t = mins(String((e.data.remind as { time?: string }).time ?? ''));
+      if (due(now.minutes, t)) queue.push({ key: 'habit:' + e.id + ':' + now.date, title: 'Mon habitude', body: e.title.slice(0, 80), url: '/?ecran=habits' });
+    }
     if (p.habits?.on !== false && due(now.minutes, mins(p.habits?.time ?? '19:00'))) {
-      const left = list.filter((e) => e.kind === 'habit' && (e.data.freq ?? 'daily') === 'daily' && !(e.data.done as Record<string, boolean> | undefined)?.[now.date]);
+      const left = list.filter(habitLeft);
       if (left.length) queue.push({ key: 'habits:' + now.date, title: 'Mes habitudes', body: left.length === 1 ? 'Il te reste « ' + left[0]!.title + ' » aujourd’hui.' : 'Il te reste ' + left.length + ' habitudes aujourd’hui : ' + left.slice(0, 3).map((e) => e.title).join(', ') + '.', url: '/?ecran=habits' });
     }
     // Compléments : à l'heure choisie, tant que la prise du jour n'est pas cochée et que la cure est en cours.

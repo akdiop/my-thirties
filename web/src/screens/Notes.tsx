@@ -1,5 +1,5 @@
 import { Glyph, MoodIcon, type GlyphName, type Tint } from '../ui/Glyph';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { ArrowLeft, Flame, Pin, PinOff, Plus, Search, Trash2 } from 'lucide-react';
 import { SwipeRow, type SwipeAction } from '../ui/SwipeRow';
 import type { Entry, EntryInput } from '../lib/cloud';
@@ -23,6 +23,7 @@ const FOLDER_INTRO: Record<string, string> = {
 const monthOf = (iso: string) => { const d = new Date(iso); const m = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }); return m[0]!.toUpperCase() + m.slice(1); };
 
 type Edit = (id: string, patch: { title: string; data: Record<string, unknown> }) => Promise<void>;
+const cardDate = (iso: string) => { const d = new Date(iso.slice(0, 10) + 'T12:00:00'); return d.toLocaleDateString('fr-FR', { weekday: 'long' }).toUpperCase() + ' · ' + d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }); };
 const when = (iso: string) => new Date(iso).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
 const textOf = (e: Entry) => [e.title, e.data.body, e.data.intention, e.data.win, e.data.letgo, e.data.tomorrow, e.data.selfcare,
   ...(Array.isArray(e.data.gratitudes) ? e.data.gratitudes : []), ...(Array.isArray(e.data.priorities) ? e.data.priorities : [])].filter(Boolean).join(' ');
@@ -54,11 +55,16 @@ export function Notes({ entries, onCreate, onEdit, onRemove, onOpenDay }: {
   const open = (e: Entry) => e.kind === DAILY_KIND ? onOpenDay(String(e.entry_date)) : setEditing({ noteId: String(e.data.noteId), type: noteType(e.data.type) });
   const start = (t: NoteType) => { setPicker(false); if (t.to) onOpenDay(new Date().toLocaleDateString('en-CA'), t.to); else setEditing({ noteId: crypto.randomUUID(), type: t }); };
 
+  // Chaque note en carte : la date, le titre, un extrait et ses étiquettes.
+  const card = (e: Entry, date: string, title: string, excerpt: string, tags: string[], icon: ReactNode, pinned = false) =>
+    <JournalCard onClick={() => open(e)} date={date} title={title} excerpt={excerpt} tags={tags} icon={icon} pinned={pinned} />;
   const list = (items: Entry[]) => <div className="note-list">{items.map((e) => e.kind === DAILY_KIND
-    ? <button key={e.id} className="note-row" onClick={() => open(e)}><span className="note-emoji">{e.data.mood ? <MoodIcon mood={e.data.mood} badge={36} /> : <Glyph name="calendar" tint="caramel" badge={36} />}</span>
-      <span><strong>Mon jour · {when(String(e.entry_date) + 'T12:00:00')}</strong><small>{String(e.data.intention || e.data.win || 'Daily Reset')}</small></span></button>
-    : <SwipeRow key={e.id} className="note-swipe" actions={actions(e)}><button className="note-row" onClick={() => open(e)}><span className="note-emoji"><Glyph name={noteType(e.data.type).icon} tint={noteType(e.data.type).tint} badge={36} /></span>
-      <span><strong>{e.data.pinned ? <Pin size={13} className="pin-mark" /> : null}{e.title}</strong><small>{String(e.data.body ?? '').slice(0, 90)}</small><small className="muted">{when(e.created_at)}</small></span></button></SwipeRow>)}</div>;
+    ? <div key={e.id}>{card(e, String(e.entry_date), 'Mon jour', String(e.data.intention || e.data.win || 'Daily Reset'),
+        [...(e.data.mood ? [String(e.data.mood)] : []), ...(Array.isArray(e.data.gratitudes) && e.data.gratitudes.some((g) => String(g).trim()) ? ['gratitude'] : []), ...(e.data.intention ? ['matin'] : []), ...(e.data.win ? ['soir'] : [])],
+        e.data.mood ? <MoodIcon mood={e.data.mood} size={14} /> : null)}</div>
+    : <SwipeRow key={e.id} className="note-swipe" actions={actions(e)}>{card(e, String(e.entry_date ?? e.created_at.slice(0, 10)), e.title, String(e.data.body ?? '').slice(0, 140),
+        [noteType(e.data.type).label.toLowerCase(), ...(e.data.media && Array.isArray(e.data.media) && e.data.media.length ? ['photo ou mémo'] : [])],
+        <Glyph name={noteType(e.data.type).icon} tint={noteType(e.data.type).tint} size={14} />, Boolean(e.data.pinned))}</SwipeRow>)}</div>;
 
   // Glisser une note vers la gauche : l'épingler en haut ou la supprimer.
   const actions = (e: Entry): SwipeAction[] => [
@@ -175,10 +181,18 @@ function FolderView({ folder, notes, onOpen, onStart, actions }: { folder: { id:
         ? <SwipeRow key={e.id} className="note-swipe quote" actions={actions(e)}><button className="note-quote" onClick={() => onOpen(e)}>
             <span className="quote-mark" aria-hidden="true">“</span>
             <span><em>{String(e.data.body ?? '')}</em><small>{seen.get(String(e.data.body ?? ''))! > 1 ? 'Gardée ' + seen.get(String(e.data.body ?? '')) + ' fois · ' : ''}{when(e.created_at)}</small></span></button></SwipeRow>
-        : <SwipeRow key={e.id} className="note-swipe" actions={actions(e)}><button className="note-row" onClick={() => onOpen(e)}>
-            <span className="note-emoji"><Glyph name={noteType(e.data.type).icon} tint={noteType(e.data.type).tint} badge={36} /></span>
-            <span><strong>{e.title}</strong><small>{String(e.data.body ?? '').slice(0, 120)}</small><small className="muted">{when(String(e.data.updated ?? e.created_at))}</small></span></button></SwipeRow>)}</div>
+        : <SwipeRow key={e.id} className="note-swipe" actions={actions(e)}><JournalCard onClick={() => onOpen(e)} date={String(e.data.updated ?? e.created_at)} title={e.title} excerpt={String(e.data.body ?? '').slice(0, 140)}
+            tags={[noteType(e.data.type).label.toLowerCase(), ...(Array.isArray(e.data.media) && e.data.media.length ? ['photo ou mémo'] : [])]} icon={<Glyph name={noteType(e.data.type).icon} tint={noteType(e.data.type).tint} size={14} />} pinned={Boolean(e.data.pinned)} /></SwipeRow>)}</div>
     </section>)}
     {ideas.length > 0 && <details className="folder-more"><summary>Écrire une nouvelle page</summary>{start}</details>}
   </div>;
+}
+
+/** Une page du journal en carte : la date, le titre, un extrait et ses étiquettes. */
+function JournalCard({ onClick, date, title, excerpt, tags, icon, pinned }: { onClick: () => void; date: string; title: string; excerpt: string; tags: string[]; icon: ReactNode; pinned?: boolean }) {
+  return <button className="journal-card" onClick={onClick}>
+    <span className="jc-date">{icon}{cardDate(date)}</span>
+    <strong className="jc-title">{pinned ? <Pin size={13} className="pin-mark" /> : null}{title}</strong>
+    {excerpt && <em className="jc-excerpt">{excerpt}</em>}
+    {tags.length > 0 && <span className="jc-tags">{tags.map((t) => <span key={t}>{t}</span>)}</span>}</button>;
 }

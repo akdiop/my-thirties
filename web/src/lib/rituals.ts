@@ -143,12 +143,22 @@ export const addDays = (iso: string, n: number) => { const d = new Date(iso + 'T
 export const weekStartOf = (iso: string) => { const d = new Date(iso + 'T12:00:00'); return addDays(iso, -((d.getDay() + 6) % 7)); };
 export const habitDone = (e: Entry) => (e.data.done && typeof e.data.done === 'object' ? e.data.done as Record<string, boolean> : {});
 export const habitFreq = (e: Entry): HabitFreq => (['daily', '3w', '1w'].includes(String(e.data.freq)) ? e.data.freq as HabitFreq : 'daily');
-/** Série en cours : jours consécutifs (quotidienne) ou semaines où l'objectif est atteint (hebdomadaire). */
+/** Jours de répétition choisis (0 = lundi … 6 = dimanche) ; vide = tous les jours. */
+export const habitDays = (e: Entry) => (Array.isArray(e.data.days) ? (e.data.days as unknown[]).map(Number).filter((n) => n >= 0 && n <= 6) : []);
+const weekdayOf = (iso: string) => (new Date(iso + 'T12:00:00').getDay() + 6) % 7;
+/** L'habitude est-elle prévue ce jour-là ? */
+export const habitScheduled = (e: Entry, iso: string) => { const d = habitDays(e); return !d.length || d.length === 7 || d.includes(weekdayOf(iso)); };
+export const DAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+export const habitDaysLabel = (e: Entry) => { const d = habitDays(e); if (!d.length || d.length === 7) return ''; return d.length === 5 && !d.includes(5) && !d.includes(6) ? 'en semaine' : d.length === 2 && d.includes(5) && d.includes(6) ? 'le week-end' : [...d].sort().map((i) => ['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim'][i]).join(', '); };
+/** Série en cours : jours consécutifs (quotidienne, en sautant les jours non prévus) ou semaines où l'objectif est atteint (hebdomadaire). */
 export function habitStreak(e: Entry, today: string) {
   const done = habitDone(e), f = habitFreq(e);
   if (f === 'daily') {
-    let day = done[today] ? today : addDays(today, -1), n = 0;
-    while (done[day]) { n++; day = addDays(day, -1); }
+    let day = done[today] || !habitScheduled(e, today) ? today : addDays(today, -1), n = 0;
+    for (let guard = 0; guard < 3660; guard++) {
+      if (done[day]) n++; else if (habitScheduled(e, day)) break;
+      day = addDays(day, -1);
+    }
     return n;
   }
   let week = weekStartOf(today), n = 0;
