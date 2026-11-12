@@ -2046,3 +2046,16 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .grat-day.on{background:#DDE5D7;color:#4e6449;font-weight:700}
 .grat-star{color:#B9B2A2}.grat-star.on{color:#7E7254}.grat-star.on svg{fill:#7E7254}
 .grat-name .dl-word{margin:0}
+.tcc-slider{display:flex;flex-direction:column;gap:6px}
+.tcc-slider strong{color:#5F7A59}
+.tcc-slider input{width:100%;accent-color:#5F7A59;padding:0;min-height:0}
+.tcc-q{margin:6px 0 0;padding:8px 12px;border-radius:12px;background:rgba(95,122,89,.1);font-size:.9rem}
+.tcc-dist{padding:8px 0;border-top:1px solid rgba(58,56,51,.08)}
+.tcc-dist p{margin:2px 0}
+.tcc-step{display:flex;align-items:center;gap:12px}
+.tcc-force{padding:10px 0;border-top:1px solid rgba(58,56,51,.08);display:flex;flex-direction:column;gap:6px}
+.tcc-force-head{display:flex;align-items:center;gap:8px}.tcc-force-head strong{flex:1}
+.pill.warn{background:#F1E6DE;color:#8A5A3C}
+.tcc-bar{position:relative;height:8px;border-radius:4px;background:#ECE9E2}
+.tcc-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:#5F7A59}
+.tcc-bar b{position:absolute;top:-3px;width:3px;height:14px;margin-left:-1px;background:#7E7254;border-radius:2px}
