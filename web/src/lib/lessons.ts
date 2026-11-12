@@ -13,7 +13,9 @@ export type LessonPart = {
   avoid?: string[];
   duas?: { arabic: string; phonetic: string; french: string; note?: string }[];
 };
-export type Lesson = { id: string; title: string; sub: string; intro: string; parts: LessonPart[]; retain?: string[]; quiz?: { q: string; a: boolean }[] };
+/** Livret intégré tel quel : ses pages (images dans public/cours/<dir>/p-01.jpg…) et son sommaire (titre, page). */
+export type Book = { dir: string; pages: number; toc?: [string, number][] };
+export type Lesson = { id: string; title: string; sub: string; intro: string; parts: LessonPart[]; retain?: string[]; quiz?: { q: string; a: boolean }[]; book?: Book };
 
 export const LESSONS: Lesson[] = [
   { id: 'tafsir-fatiha', title: 'Tafsir d’Al-Fâtiha', sub: 'l’Ouverture · amour, espoir, crainte, guidée',
@@ -295,6 +297,17 @@ export const LESSONS: Lesson[] = [
       ] },
     ],
     retain: ['Commencer par la prochaine prière, sans se juger.', 'Chaque jour : une obligation + un acte volontaire.', 'Après une chute : wudû’, prière, istighfâr, une petite action.'] },
+  { id: 'invocations-mot-a-mot', title: 'Les invocations du quotidien mot à mot', sub: 'comprendre chaque mot de ce que tu récites, du matin au soir',
+    intro: 'Livret « Les invocations du quotidien mot à mot » d’Apprendre l’arabe facilement (apprendre-larabe-facilement.com), intégré tel quel. Textes arabes de Hisn al-Muslim (Sa‘îd ibn ‘Alî ibn Wahf al-Qahtânî), revus sur les recueils de hadith cités en source à la fin de chaque invocation.',
+    parts: [], book: { dir: 'invocations', pages: 63, toc: [['Introduction', 3], ['Comment étudier ce livret', 5], ['Les dix mots clés', 6], ['Le matin · Âyat al-Kursî', 7],
+      ['Le matin · Les trois dernières sourates', 10], ['Le matin · Sayyid al-istighfâr', 13], ['Le matin · Asbahnâ wa asbaha l-mulku li-llâh', 16], ['Le matin · Allâhumma bika asbahnâ', 19],
+      ['Le matin · Bismi llâhi lladhî lâ yadurru', 21], ['Le soir · Les mots qui changent', 23], ['Avant de dormir et au réveil', 26], ['Le repas', 28], ['Sortir de chez soi et rentrer', 30],
+      ['Les toilettes', 32], ['L’éternuement', 34], ['Après les ablutions', 36], ['Entrer à la mosquée et en sortir', 38], ['Après la prière', 40], ['L’Istikhara', 42], ['Le voyage', 46],
+      ['La visite du cimetière', 49], ['La tristesse et l’angoisse', 51], ['L’épreuve difficile', 53], ['Quand une chose paraît difficile', 55], ['La douleur', 57], ['La protection', 59],
+      ['Les mots qui reviennent partout', 61], ['Pour aller plus loin', 63]] } },
+  { id: 'calligraphie-coran', title: 'Tout comprendre sur la calligraphie du Coran', sub: 'apprendre à lire le Coran · les signes propres au Mushaf',
+    intro: 'Livret de Bastien / Yaseen Ibn Adam, intégré tel quel : des passages du « Moushaf Tajwid » commentés pour aider les débutants à lire la calligraphie propre au Coran.',
+    parts: [], book: { dir: 'calligraphie', pages: 24 } },
   { id: 'kursi', title: 'Ayat al-Kursî', sub: 'le plus immense verset du Coran · 2:255',
     intro: 'Verset 255 d’Al-Baqara, sourate médinoise. Le plus immense et le plus noble verset du Coran : il réunit cinq noms d’Allah et plus de vingt de Ses attributs, et aucun autre verset ne concentre autant de tawhîd.',
     parts: [

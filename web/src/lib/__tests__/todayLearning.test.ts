@@ -151,3 +151,15 @@ describe('carnet de vœux', () => {
     expect(tagCounts(wishes(list))).toEqual([{ tag: 'Moi', total: 1, done: 0 }, { tag: 'Travail', total: 1, done: 1 }]);
   });
 });
+
+import { existsSync } from 'node:fs';
+
+describe('livrets intégrés', () => {
+  it('chaque page du sommaire existe', () => {
+    for (const l of LESSONS.filter((x) => x.book)) {
+      const b = l.book!;
+      for (let n = 1; n <= b.pages; n++) expect(existsSync('public/cours/' + b.dir + '/p-' + String(n).padStart(2, '0') + '.jpg')).toBe(true);
+      for (const [, n] of b.toc ?? []) expect(n).toBeLessThanOrEqual(b.pages);
+    }
+  });
+});

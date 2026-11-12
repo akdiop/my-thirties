@@ -1972,3 +1972,10 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .carnet-year-head{display:flex;justify-content:space-between;align-items:center}
 .carnet-month .small{font-size:.88rem}.carnet-realised{display:flex;gap:6px;align-items:center;color:#4E6449;font-weight:600;font-size:.88rem;margin:4px 0}
 
+/* Livrets intégrés page par page */
+.book-pages{display:flex;flex-direction:column;gap:10px}
+.book-pages a{display:block;scroll-margin-top:12px}.book-pages img{display:block;width:100%;height:auto;border-radius:12px;box-shadow:0 4px 14px rgba(80,70,50,.1);background:#fff}
+.book-toc summary{font-weight:700;cursor:pointer}.book-toc ol{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:2px}
+.book-toc li{display:flex;justify-content:space-between;gap:8px;align-items:center}.book-toc li small{color:#6F6B63;flex:none}
+.book-toc .link-btn{text-align:left;padding:4px 0}
+
