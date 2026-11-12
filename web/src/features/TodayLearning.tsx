@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, BookText, Check, Feather, Languages, Mountain, Settings2, Sparkles, Sun, Trophy } from 'lucide-react';
+import { BookOpen, BookText, Check, Feather, HandHeart, Languages, Mountain, Settings2, Sparkles, Sun, Trophy } from 'lucide-react';
 import { useWirdCount, WIRD_KIND } from './Wird';
 import { afterEntry, currentAfterPrayer } from './AfterPrayer';
 import { afterProgress, type AfterData } from '../lib/afterPrayer';
 import { goalOf } from '../../supabase/functions/push-reminders/wird';
+import { GRAT_KIND, type GratData } from '../lib/gratitude';
 import { ARABE_KIND, arabicWordOfDay, streak, type ArabeData } from '../lib/arabe/jeux';
 import { carnetWindow, pageOf, wishes } from '../lib/carnet';
 import { inWindow } from '../../supabase/functions/push-reminders/carnet';
@@ -15,7 +16,7 @@ import { QURAN_PAGES } from '../lib/ramadan';
 import { actsDone, DH_ACTS, DH_DAYS, DHUL_HIJJA_KIND, dhulHijjaStatus, type DhData } from '../lib/dhulHijja';
 import { allahNameOfDay, challengesToday, QURAN_KIND, quranPlan, quranRead, tafsirOfDay, wordOfDay } from '../lib/todayLearning';
 
-export type LearningTarget = 'passions' | 'challenges' | 'cours' | 'dhulhijja' | 'carnet' | 'carnet-signe' | 'wird' | 'apres' | 'arabe';
+export type LearningTarget = 'passions' | 'challenges' | 'cours' | 'dhulhijja' | 'carnet' | 'carnet-signe' | 'wird' | 'apres' | 'arabe' | 'gratitude';
 
 /** Accueil : ce que j'ai commencé et que je ne veux pas oublier aujourd'hui (défis, mot du jour, tafsir, lecture du Coran). */
 export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
@@ -29,6 +30,8 @@ export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
   const wirds = entries.filter((e) => e.kind === WIRD_KIND);
   const after = currentAfterPrayer(entries);
   const afterP = afterProgress((afterEntry(entries, today)?.data ?? {}) as AfterData, after);
+  const gMoment = new Date().getHours() < 14 ? 'matin' as const : 'soir' as const;
+  const gDone = ((entries.find((e) => e.kind === GRAT_KIND && e.entry_date === today)?.data ?? {}) as GratData)[gMoment]?.filter((x) => x.trim()).length ?? 0;
   const arabe = entries.find((e) => e.kind === ARABE_KIND);
   const arWord = arabe ? arabicWordOfDay(today) : null;
   const arStreak = arabe ? streak(arabe.data as ArabeData, today) : 0;
@@ -72,6 +75,12 @@ export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
           <strong>{afterP.complete === afterP.total ? 'Invocations d’après ' + after + ' récitées' : 'As-tu récité après ' + after + ' ?'}</strong>
           <span className="dl-point">{afterP.complete}/{afterP.total} · istighfâr, tasbîh 33, Âyat al-Kursî{after === 'Fajr' || after === 'Maghrib' ? ', al-Mu‘awwidhât 3 fois' : ''}</span></button>
       </div>
+
+      <button className="dl-row" onClick={() => onOpen('gratitude')}>
+        <span className="dl-icon"><HandHeart size={18} /></span>
+        <span className="dl-text"><small>Ma gratitude · {gMoment === 'matin' ? 'ce matin' : 'ce soir'} · {gDone}/3</small>
+          <strong>{gDone >= 3 ? 'Trois gratitudes notées, alhamdulillah' : gMoment === 'matin' ? 'Pour quoi es-tu reconnaissante ce matin ?' : 'Qu’est-ce que tu gardes de ta journée ?'}</strong></span>
+      </button>
 
       {arabe && arWord && <div className="dl-row">
         <span className="dl-icon"><Languages size={18} /></span>
