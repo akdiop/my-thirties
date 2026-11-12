@@ -2123,3 +2123,14 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .calm-pills{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .calm-pill.soft{background:#EFEADF;color:#5F5A4F}
 .today-cheer{margin:-2px 0 6px;font-size:.85rem;color:#7E7254;font-style:italic}
+.tq-pill.prio{background:#E8D9C6;color:#7A5233}
+.dl-more{width:100%;padding:10px;border:0;background:transparent;color:#7E7254;font:inherit;font-weight:700;font-size:.85rem}
+.home-search{display:flex;align-items:center;gap:10px;width:100%;height:44px;padding:0 16px;border-radius:22px;border:1px solid rgba(255,255,255,.75);background:rgba(255,255,255,.62);color:#8A857A;font:inherit;font-size:.95rem;text-align:left}
+.home-pills{display:flex;gap:8px;overflow-x:auto;padding:2px 0;scrollbar-width:none}
+.home-pills::-webkit-scrollbar{display:none}
+.home-pills button{flex:none;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.75);background:rgba(255,255,255,.62);color:#5F5A4F;font:inherit;font-size:.82rem;white-space:nowrap}
+.home-pills strong{color:#3A3833}
+.home-fold{display:flex;flex-direction:column;gap:8px;scroll-margin-top:12px}
+.fold-head{display:flex;justify-content:space-between;align-items:center;width:100%;padding:2px 2px 0;border:0;background:transparent;color:#7E7254;font:inherit;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.fold-head svg{transition:transform .2s}.fold-head svg.flip{transform:rotate(180deg)}
+.home-fold.closed{gap:0}

@@ -29,7 +29,7 @@ import { BUDGETS_KIND } from './lib/money';
 import { TodayCard } from './features/TodayCard';
 import { ListCard } from './features/ListCard';
 import { togglePrayer } from './lib/wellbeing';
-import { HomeRituals } from './screens/HomeRituals';
+import { HOME_CFG_KIND, HomeRituals } from './screens/HomeRituals';
 import { LockGate } from './features/LockGate';
 import { removeLock } from './lib/journalLock';
 import { applyOutbox, flushOutbox, pendingCount } from './lib/outbox';
@@ -487,6 +487,11 @@ export default function App() {
   const [spiritTab, setSpiritTab] = useState<SpiritTab>('home');
   const [passionTab, setPassionTab] = useState<'parcours' | 'series' | 'libre' | 'idees'>('parcours');
   const [cultureTab, setCultureTab] = useState<'lectures' | 'series'>('lectures');
+  // Ordre des cartes de l'accueil, gardé avec les réglages de l'accueil.
+  const homeCfg = ritualEntries.find((e) => e.kind === HOME_CFG_KIND);
+  const homeCards = Array.isArray(homeCfg?.data.cards) ? (homeCfg!.data.cards as string[]) : undefined;
+  const saveHomeCards = (cards: string[]) => homeCfg ? updateData(homeCfg, { ...homeCfg.data, cards })
+    : createFromTool({ module: 'quotidien', kind: HOME_CFG_KIND, title: 'Réglages de l’accueil', entry_date: null, data: { cards } });
   const [search, setSearch] = useState('');
   const userIdRef = useRef<string | undefined>(undefined);
 
@@ -704,7 +709,7 @@ export default function App() {
       {undoEntry && <div className="undo-toast" role="status"><span>« {undoEntry.title.slice(0, 40)} » supprimé</span><button onClick={undoRemove}>Annuler</button></div>}
       {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
       {loading && <div className="sync-status" role="status">Synchronisation…</div>}
-      {screen === 'home' && <HomeScreen word={wordOfMonth(ritualEntries, today())} tasksCard={<TaskQuick entries={entries} onCreate={createFromTool} onUpdate={updateData} onOpenList={() => go('agenda')} />} todayCard={<TodayCard entries={entries} habits={ritualEntries.filter((e) => e.kind === HABIT_KIND)} onUpdate={updateData} onTogglePrayer={(name, on, day) => void togglePrayer(entries, name, on, createFromTool, removeQuiet, day)} onOpenHabits={() => go('habits')} onOpenAgenda={() => go('agenda')} />} rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onLearn={(t) => { if (t === 'wird' || t === 'apres' || t === 'arabe') { setSpiritTab(t); go('spiritualite'); return; } if (t === 'gratitude') { go('gratitude'); return; } if (t === 'carnet' || t === 'carnet-signe') { setCarnetSign(t === 'carnet-signe' ? (n) => n + 1 : 0); go('carnet'); return; } if (t === 'passions') setPassionTab('parcours'); if (t === 'cours' || t === 'dhulhijja') setSpiritTab(t); go(t === 'cours' || t === 'dhulhijja' ? 'spiritualite' : t as Screen); }} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} onUpdate={updateData} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} onQuickAdd={(title) => createFromTool({ module: 'quotidien', kind: 'task', title, entry_date: today(), data: { date: today(), priority: 'Haute' } })} />}
+      {screen === 'home' && <HomeScreen word={wordOfMonth(ritualEntries, today())} tasksCard={<TaskQuick entries={entries} onCreate={createFromTool} onUpdate={updateData} onOpenList={() => go('agenda')} />} todayCard={<TodayCard entries={entries} habits={ritualEntries.filter((e) => e.kind === HABIT_KIND)} onUpdate={updateData} onTogglePrayer={(name, on, day) => void togglePrayer(entries, name, on, createFromTool, removeQuiet, day)} onOpenHabits={() => go('habits')} onOpenAgenda={() => go('agenda')} />} ritual={(slot) => <HomeRituals slot={slot} entries={ritualEntries} onGo={(t) => go(t)} onLearn={(t) => { if (t === 'wird' || t === 'apres' || t === 'arabe') { setSpiritTab(t); go('spiritualite'); return; } if (t === 'gratitude') { go('gratitude'); return; } if (t === 'carnet' || t === 'carnet-signe') { setCarnetSign(t === 'carnet-signe' ? (n) => n + 1 : 0); go('carnet'); return; } if (t === 'passions') setPassionTab('parcours'); if (t === 'cours' || t === 'dhulhijja') setSpiritTab(t); go(t === 'cours' || t === 'dhulhijja' ? 'spiritualite' : t as Screen); }} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} onUpdate={updateData} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} cardOrder={homeCards} onCardOrder={(o) => void saveHomeCards(o)} />}
       {screen === 'myday' && <LockGate><MyDay key={dayTarget.n} entries={ritualEntries} initialDate={dayTarget.date} initialPart={dayTarget.part} onCreate={createFromTool} onUpdate={updateData} /></LockGate>}
       {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEdit={editFull} />}
       {screen === 'notes' && <LockGate><Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={drop} onOpenDay={openDay} /></LockGate>}

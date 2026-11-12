@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Children, useEffect, useState } from 'react';
 import { BookOpen, BookText, Check, Feather, HandHeart, Languages, Mountain, Settings2, Sparkles, Sun, Trophy } from 'lucide-react';
 import { useWirdCount, WIRD_KIND } from './Wird';
 import { afterEntry, currentAfterPrayer } from './AfterPrayer';
@@ -23,6 +23,7 @@ export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
   entries: Entry[]; today: string; onOpen: (t: LearningTarget) => void;
   onCreate: (i: EntryInput) => Promise<void>; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void>;
 }) {
+  const [showAll, setShowAll] = useState(false);
   const challenges = challengesToday(entries, today);
   const paths = entries.filter((e) => e.kind === 'path' && pathById(e.data.pathId));
   const tafsir = tafsirOfDay(today);
@@ -57,9 +58,7 @@ export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
     return onUpdate(e, { ...e.data, progress: { ...progress, [day]: { ...(progress[String(day)] ?? {}), status: 'done' } } });
   };
 
-  return <section className="today-learning" aria-label="Aujourd’hui, je n’oublie pas">
-    <p className="eyebrow-s">Aujourd’hui, je n’oublie pas</p>
-    <div className="soft-card dl-list">
+  const rows = Children.toArray((<>
       {dhDay > 0 && <button className="dl-row" onClick={() => onOpen('dhulhijja')}>
         <span className="dl-icon"><Mountain size={18} /></span>
         <span className="dl-text"><small>Dhu al-Hijja · jour {dhDay} sur 10 · {actsDone(dhData, dhDay)}/{DH_ACTS.length} actes</small>
@@ -140,6 +139,11 @@ export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
           {tafsir.point && <span className="dl-point">{tafsir.point}</span>}
         </span>
       </button>}
+  </>).props.children);
+  const shown = showAll ? rows : rows.slice(0, 3);
+  return <section className="today-learning" aria-label="Aujourd’hui, je n’oublie pas">
+    <div className="soft-card dl-list">{shown}
+      {rows.length > 3 && <button className="dl-more" onClick={() => setShowAll(!showAll)}>{showAll ? 'Réduire' : 'Voir les ' + (rows.length - 3) + ' autre' + (rows.length - 3 > 1 ? 's' : '')}</button>}
     </div>
   </section>;
 }

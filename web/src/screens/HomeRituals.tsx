@@ -4,7 +4,11 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { PandaWidget } from '../features/panda/PandaWidget';
 import { MomentBar } from '../features/MomentBar';
 import { TodayLearning, type LearningTarget } from '../features/TodayLearning';
-import { affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, isoOf, NOTE_KIND } from '../lib/rituals';
+import { affirmationOf, DAILY_KIND, HABIT_KIND, habitDone, habitFreq, habitScheduled, isoOf, NOTE_KIND } from '../lib/rituals';
+import type { HomeSlot } from './Home';
+import { taskBuckets } from '../features/TaskQuick';
+import { prayerDay } from '../lib/wellbeing';
+import { GRAT_KIND, type GratData } from '../lib/gratitude';
 
 type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'finances' | 'transformation' | 'carnet' | 'gratitude' | 'tcc' | 'hsp' | 'culture';
 type Shortcut = { id: Exclude<Target, 'myday' | 'panda' | 'finances'>; label: string; sub: string; icon: typeof Heart };
@@ -31,7 +35,8 @@ const SHORTCUTS: Shortcut[] = [
 export const HOME_CFG_KIND = 'reglages_accueil';
 
 /** Accueil : carte « Mon jour », micro-rituels (respiration, affirmation) et raccourcis. */
-export function HomeRituals({ entries, onGo, onLearn, onOpenDay, onCreate, onUpdate }: {
+export function HomeRituals({ entries, onGo, onLearn, onOpenDay, onCreate, onUpdate, slot }: {
+  slot: HomeSlot;
   entries: Entry[]; onGo: (t: Target) => void; onLearn: (t: LearningTarget) => void; onOpenDay: (part: 'matin' | 'soir') => void; onCreate: (i: EntryInput) => Promise<void>;
   onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void>;
 }) {
@@ -54,7 +59,9 @@ export function HomeRituals({ entries, onGo, onLearn, onOpenDay, onCreate, onUpd
   const habitsDone = habits.filter((e) => habitDone(e)[today]).length;
   const part = evening && morningDone ? 'soir' : 'matin';
 
-  return <>
+  if (slot === 'pills') return <HomePills entries={entries} habitsLeft={habits.filter((h) => habitFreq(h) === 'daily' && habitScheduled(h, today) && !habitDone(h)[today]).length} onGo={onGo} onLearn={onLearn} />;
+  if (slot === 'learning') return <TodayLearning entries={entries} today={today} onOpen={onLearn} onCreate={onCreate} onUpdate={onUpdate} />;
+  if (slot === 'top') return <>
     {(part === 'soir' ? eveningDone : morningDone)
       // Une fois fait : une ligne discrète au lieu de la grande carte.
       ? <button className="reset-mini" onClick={() => onOpenDay(part)}>
@@ -70,10 +77,8 @@ export function HomeRituals({ entries, onGo, onLearn, onOpenDay, onCreate, onUpd
     </section>}
 
     <MomentBar entries={entries} onGo={onGo} onCreate={onCreate} onUpdate={onUpdate} />
-
-    <TodayLearning entries={entries} today={today} onOpen={onLearn} onCreate={onCreate} onUpdate={onUpdate} />
-
-    <p className="eyebrow-s">Micro-rituels</p>
+  </>;
+  if (slot === 'micro') return <>
     <div className="ritual-grid">
       <Breathing />
       <Affirmation day={today} kept={(text) => entries.some((e) => e.kind === NOTE_KIND && e.data.body === text)} onKeep={(text) => onCreate({ module: 'equilibre', kind: NOTE_KIND, title: 'Affirmation', entry_date: today,
@@ -81,7 +86,9 @@ export function HomeRituals({ entries, onGo, onLearn, onOpenDay, onCreate, onUpd
     </div>
 
     <PandaWidget entries={entries} onOpen={() => onGo('panda')} />
-    <div className="shortcut-head"><span className="ritual-label">Mes raccourcis</span><button className="link-btn small" onClick={() => setEditing(!editing)}><Settings2 size={14} /> {editing ? 'Terminé' : 'Personnaliser'}</button></div>
+  </>;
+  return <>
+    <div className="shortcut-head"><span /><button className="link-btn small" onClick={() => setEditing(!editing)}><Settings2 size={14} /> {editing ? 'Terminé' : 'Personnaliser'}</button></div>
     {editing ? <div className="shortcut-edit">
       {order.map((id, i) => { const sc = SHORTCUTS.find((x) => x.id === id)!; const on = shown.includes(id);
         return <div key={id} className={'sc-row' + (on ? '' : ' off')}>
@@ -128,5 +135,22 @@ function Affirmation({ day, kept: already, onKeep }: { day: string; kept: (text:
       <button className="link-btn" onClick={() => { setShift(shift + 1); setKept(false); }}>Une autre</button>
       <button className="button soft small" disabled={kept} onClick={() => void onKeep(text).then(() => setKept(true))}>{kept ? 'Gardée ✓' : 'La garder'}</button>
     </div>
+  </div>;
+}
+
+/** Pastilles en haut de l'accueil : un coup d'œil, et un geste pour aller à la bonne carte. */
+function HomePills({ entries, habitsLeft, onGo, onLearn }: { entries: Entry[]; habitsLeft: number; onGo: (t: Target) => void; onLearn: (t: LearningTarget) => void }) {
+  const today = isoOf(new Date()), now = new Date(), mins = now.getHours() * 60 + now.getMinutes();
+  const tasks = taskBuckets(entries, today).jour.length;
+  const times = prayerDay(entries)?.times ?? [];
+  const next = times.find((t: { name: string; time: string }) => Number(t.time.slice(0, 2)) * 60 + Number(t.time.slice(3, 5)) > mins);
+  const moment = now.getHours() < 14 ? 'matin' : 'soir';
+  const grat = ((entries.find((e) => e.kind === GRAT_KIND && e.entry_date === today)?.data ?? {}) as GratData)[moment]?.filter((x) => x.trim()).length ?? 0;
+  const jump = (id: string) => { const el = document.getElementById('home-' + id); el?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  return <div className="home-pills" role="navigation" aria-label="En un coup d’œil">
+    <button onClick={() => jump('taches')}><strong>{tasks}</strong> tâche{tasks > 1 ? 's' : ''}</button>
+    {next && <button onClick={() => jump('journee')}>{next.name} <strong>{next.time}</strong></button>}
+    {habitsLeft > 0 && <button onClick={() => onGo('habits')}><strong>{habitsLeft}</strong> habitude{habitsLeft > 1 ? 's' : ''}</button>}
+    <button onClick={() => onLearn('gratitude')}><strong>{grat}/3</strong> gratitude</button>
   </div>;
 }
