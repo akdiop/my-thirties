@@ -6,8 +6,9 @@ import { isoOf } from '../lib/rituals';
 import { unlockSound } from '../lib/sound';
 import { BreathPlayer, GuidedPlayer, TimerPlayer } from '../features/MeditationPlayers';
 import { Segmented } from '../ui/kit';
+import { Frequences } from '../features/Frequences';
 
-type Tab = 'bases' | 'respirer' | 'guidees' | 'minuteur';
+type Tab = 'bases' | 'respirer' | 'guidees' | 'frequences' | 'minuteur';
 type Playing = { kind: 'breath' | 'guided' | 'timer'; id: string; minutes: number; name: string; basicsDay?: number } | null;
 
 /** Méditer : « Les bases » en 10 jours, respirations, séances guidées et minuteur avec cloche. */
@@ -41,7 +42,8 @@ export function Meditate({ entries, onCreate }: { entries: Entry[]; onCreate: (i
 
   return <div className="screen meditate">
     <header className="tab-head"><h1>Méditer</h1><p>{weekMinutes ? weekMinutes + ' min cette semaine' : 'Quelques minutes suffisent'}</p></header>
-    <Segmented label="Méditer" value={tab} onChange={setTab} options={[{ value: 'bases', label: 'Les bases' }, { value: 'respirer', label: 'Respirer' }, { value: 'guidees', label: 'Guidées' }, { value: 'minuteur', label: 'Minuteur' }]} />
+    <Segmented label="Méditer" value={tab} onChange={setTab} options={[{ value: 'bases', label: 'Les bases' }, { value: 'respirer', label: 'Respirer' }, { value: 'guidees', label: 'Guidées' }, { value: 'frequences', label: 'Fréquences' }, { value: 'minuteur', label: 'Minuteur' }]} />
+    {tab === 'frequences' && <Frequences entries={entries} onCreate={onCreate} />}
     {tab === 'bases' && <div className="stack-8">
       <p className="muted">Dix jours pour installer une pratique, quelques minutes par jour. Un jour manqué n’efface rien.</p>
       {BASICS.map((b) => { const done = basicsDone.has(b.day), next = nextBasic?.day === b.day;

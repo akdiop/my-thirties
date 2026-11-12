@@ -36,6 +36,7 @@ import { applyOutbox, flushOutbox, pendingCount } from './lib/outbox';
 import { clearOffline, isNetworkError, knownOwner, loadOffline, rememberOwner, saveOffline } from './lib/offline';
 import { Sparkles } from 'lucide-react';
 import { useIntegrationCloudSync } from './lib/integrations';
+import { allGratitudes, gratitudeToReread } from './lib/gratitude';
 
 // Écrans chargés à la demande : l'app s'ouvre plus vite.
 const Agenda = lazy(() => import('./screens/Agenda').then((m) => ({ default: m.Agenda })));
@@ -58,6 +59,8 @@ const EquilibriumInsights = lazy(() => import('./features/EquilibriumInsights').
 const KitchenPlanner = lazy(() => import('./features/KitchenPlanner').then((m) => ({ default: m.KitchenPlanner })));
 const PassionPath = lazy(() => import('./features/PassionPath').then((m) => ({ default: m.PassionPath })));
 const Carnet = lazy(() => import('./screens/Carnet').then((m) => ({ default: m.Carnet })));
+const Tcc = lazy(() => import('./screens/Tcc').then((m) => ({ default: m.Tcc })));
+const Gratitude = lazy(() => import('./screens/Gratitude').then((m) => ({ default: m.Gratitude })));
 const Transformation = lazy(() => import('./screens/Transformation').then((m) => ({ default: m.Transformation })));
 const PassionIdeas = lazy(() => import('./features/PassionIdeas').then((m) => ({ default: m.PassionIdeas })));
 const TravelPlanner = lazy(() => import('./features/TravelPlanner').then((m) => ({ default: m.TravelPlanner })));
@@ -92,7 +95,7 @@ const NotificationSettings = lazy(() => import('./features/Notifications').then(
 const JournalSettings = lazy(() => import('./features/JournalSettings').then((m) => ({ default: m.JournalSettings })));
 const IphoneCalendar = lazy(() => import('./features/IphoneCalendar').then((m) => ({ default: m.IphoneCalendar })));
 
-type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'transformation' | 'carnet' | ModuleId;
+type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'transformation' | 'carnet' | 'gratitude' | 'tcc' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
 const today = () => new Date().toLocaleDateString('en-CA');
 const value = (obj: Record<string, unknown>, key: string) => typeof obj[key] === 'string' ? obj[key] as string : '';
@@ -458,7 +461,7 @@ export default function App() {
   useEffect(() => {
     const q = new URLSearchParams(window.location.search), target = q.get('ecran');
     if (!target) return;
-    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'assistant', 'proches', 'lectures', 'envies', 'panda', 'transformation', 'carnet'].includes(target)) {
+    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'assistant', 'proches', 'lectures', 'envies', 'panda', 'transformation', 'carnet', 'gratitude', 'tcc'].includes(target)) {
       if (target === 'myday') setDayTarget((t) => ({ part: q.get('moment') === 'soir' ? 'soir' : 'matin', n: t.n + 1 }));
       if (target === 'assistant') setAssistantIdea(q.get('idee') ?? '');
       setScreen(target as Screen);
@@ -696,7 +699,7 @@ export default function App() {
       {undoEntry && <div className="undo-toast" role="status"><span>« {undoEntry.title.slice(0, 40)} » supprimé</span><button onClick={undoRemove}>Annuler</button></div>}
       {error && <div role="alert" className="error-banner"><span>{error}</span><button onClick={() => setError('')} aria-label="Fermer l'erreur"><X size={17} /></button></div>}
       {loading && <div className="sync-status" role="status">Synchronisation…</div>}
-      {screen === 'home' && <HomeScreen word={wordOfMonth(ritualEntries, today())} todayCard={<TodayCard entries={entries} habits={ritualEntries.filter((e) => e.kind === HABIT_KIND)} onUpdate={updateData} onTogglePrayer={(name, on, day) => void togglePrayer(entries, name, on, createFromTool, removeQuiet, day)} onOpenHabits={() => go('habits')} onOpenAgenda={() => go('agenda')} />} rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onLearn={(t) => { if (t === 'wird' || t === 'apres' || t === 'arabe') { setSpiritTab(t); go('spiritualite'); return; } if (t === 'carnet' || t === 'carnet-signe') { setCarnetSign(t === 'carnet-signe' ? (n) => n + 1 : 0); go('carnet'); return; } if (t === 'passions') setPassionTab('parcours'); if (t === 'cours' || t === 'dhulhijja') setSpiritTab(t); go(t === 'cours' || t === 'dhulhijja' ? 'spiritualite' : t as Screen); }} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} onUpdate={updateData} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} onQuickAdd={(title) => createFromTool({ module: 'quotidien', kind: 'task', title, entry_date: today(), data: { date: today(), priority: 'Haute' } })} />}
+      {screen === 'home' && <HomeScreen word={wordOfMonth(ritualEntries, today())} todayCard={<TodayCard entries={entries} habits={ritualEntries.filter((e) => e.kind === HABIT_KIND)} onUpdate={updateData} onTogglePrayer={(name, on, day) => void togglePrayer(entries, name, on, createFromTool, removeQuiet, day)} onOpenHabits={() => go('habits')} onOpenAgenda={() => go('agenda')} />} rituals={<HomeRituals entries={ritualEntries} onGo={(t) => go(t)} onLearn={(t) => { if (t === 'wird' || t === 'apres' || t === 'arabe') { setSpiritTab(t); go('spiritualite'); return; } if (t === 'gratitude') { go('gratitude'); return; } if (t === 'carnet' || t === 'carnet-signe') { setCarnetSign(t === 'carnet-signe' ? (n) => n + 1 : 0); go('carnet'); return; } if (t === 'passions') setPassionTab('parcours'); if (t === 'cours' || t === 'dhulhijja') setSpiritTab(t); go(t === 'cours' || t === 'dhulhijja' ? 'spiritualite' : t as Screen); }} onOpenDay={(part) => openDay(undefined, part)} onCreate={createFromTool} onUpdate={updateData} />} entries={entries} profileEntry={profileEntry} onGo={(s) => go(s as Screen)} onUpdate={updateData} onAdd={() => addIn('quotidien', 'task', { date: today() })} onQuickAdd={(title) => createFromTool({ module: 'quotidien', kind: 'task', title, entry_date: today(), data: { date: today(), priority: 'Haute' } })} />}
       {screen === 'myday' && <LockGate><MyDay key={dayTarget.n} entries={ritualEntries} initialDate={dayTarget.date} initialPart={dayTarget.part} onCreate={createFromTool} onUpdate={updateData} /></LockGate>}
       {screen === 'habits' && <Habits entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEdit={editFull} />}
       {screen === 'notes' && <LockGate><Notes entries={ritualEntries} onCreate={createFromTool} onEdit={editFull} onRemove={drop} onOpenDay={openDay} /></LockGate>}
@@ -708,6 +711,8 @@ export default function App() {
       {screen === 'proches' && <><ScreenHeader title="" onBack={() => go('home')} /><Relatives entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onEdit={editFull} onRemove={drop} /></>}
       {screen === 'lectures' && <><ScreenHeader title="" onBack={() => go('home')} /><Reading entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} /></>}
       {screen === 'panda' && <><ScreenHeader title="" onBack={() => go('home')} /><PandaScreen entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onGo={(x) => go(x as Screen)} /></>}
+      {screen === 'tcc' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><Tcc entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} /></LockGate>}
+      {screen === 'gratitude' && <><ScreenHeader title="" onBack={() => go('home')} /><Gratitude entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onOpenProches={() => go('proches')} /></>}
       {screen === 'carnet' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><Carnet key={carnetSign} entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} signFirst={carnetSign > 0} /></LockGate>}
       {screen === 'transformation' && <><ScreenHeader title="" onBack={() => go('home')} /><Transformation entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onGo={(t) => go(t as Screen)} /></>}
       {screen === 'envies' && <><ScreenHeader title="" onBack={() => go('home')} /><Wishes entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onEdit={editFull} /></>}
@@ -715,7 +720,7 @@ export default function App() {
       {screen === 'agenda' && <Agenda entries={entries} onAdd={() => addIn('quotidien', 'event', { date: today() })} onOpen={openEntry} onUpdate={updateData} onCreate={createFromTool} onRemove={remove} onImported={() => void refresh()} />}
       {screen === 'bienetre' && <Wellbeing entries={entries} onGo={(s) => go(s as Screen)} onCreate={createFromTool} onUpdate={updateData} />}
       {screen === 'spaces' && <Spaces entries={entries} onGo={(s) => go(s as Screen)} onOpen={openEntry} />}
-      {screen === 'calme' && <Calm onQuit={() => go('home')} onWrite={() => addIn('equilibre', 'emotion', { date: today() })} />}
+      {screen === 'calme' && <Calm gratitude={gratitudeToReread(allGratitudes(ritualEntries), today(), true)?.text} onQuit={() => go('home')} onWrite={() => addIn('equilibre', 'emotion', { date: today() })} />}
       {screen === 'assistant' && <div className="screen"><ScreenHeader title="Assistant" onBack={() => go('home')} /><PersonalBrief entries={entries} onGo={go} /><PersonalAssistant key={assistantIdea} entries={ritualEntries} onCreate={createFromTool} initialIdea={assistantIdea} /></div>}
       {screen === 'settings' && <div className="screen"><Profile view="profile" onSettings={() => go('parametres')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); clearOffline(); await signOut(); setEntries([]); }} /></div>}
       {screen === 'parametres' && <div className="screen"><Profile view="settings" onSettings={() => go('settings')} email={session.user.email ?? ''} entries={allEntries} profileEntry={profileEntry} onSaveProfile={async (input, id) => { if (id) await editEntry(id, { title: input.title, data: input.data }); else await createEntry(input); await refresh(); }} onRestored={refresh} onLogout={async () => { removeLock(); clearOffline(); await signOut(); setEntries([]); }} /></div>}

@@ -29,3 +29,21 @@ export function unlockSound() {
     if (ctx.state === 'suspended') void ctx.resume();
   } catch { /* rien */ }
 }
+
+/** Son continu à une fréquence donnée, qui monte et s'éteint en douceur. Rend de quoi régler le volume et l'arrêter. */
+export function tone(hz: number, volume = 0.25) {
+  try {
+    const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AC) return null;
+    ctx ??= new AC();
+    if (ctx.state === 'suspended') void ctx.resume();
+    const c = ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine'; o.frequency.value = hz;
+    g.gain.setValueAtTime(0.0001, c.currentTime); g.gain.exponentialRampToValueAtTime(Math.max(0.001, volume), c.currentTime + 3);
+    o.connect(g).connect(c.destination); o.start();
+    return {
+      volume: (v: number) => g.gain.setTargetAtTime(Math.max(0.0001, v), c.currentTime, 0.2),
+      stop: () => { g.gain.cancelScheduledValues(c.currentTime); g.gain.setValueAtTime(Math.max(0.0001, g.gain.value), c.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 2.5); o.stop(c.currentTime + 2.6); },
+    };
+  } catch { return null; }
+}

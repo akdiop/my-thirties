@@ -14,7 +14,7 @@ import { wirdPace, wirdSlots } from './wird.ts';
 type Prefs = { morning?: { on?: boolean; time?: string }; evening?: { on?: boolean; time?: string }; habits?: { on?: boolean; time?: string };
   agenda?: { on?: boolean; minutes?: number }; weekly?: { on?: boolean; day?: number; time?: string }; supplements?: { on?: boolean };
   plan?: { on?: boolean; time?: string }; birthdays?: { on?: boolean; time?: string };
-  prayers?: { on?: boolean; minutes?: number }; fasting?: { on?: boolean; time?: string }; water?: { on?: boolean; time?: string }; carnet?: { on?: boolean; time?: string }; wird?: { on?: boolean } };
+  prayers?: { on?: boolean; minutes?: number }; fasting?: { on?: boolean; time?: string }; water?: { on?: boolean; time?: string }; carnet?: { on?: boolean; time?: string }; wird?: { on?: boolean }; gratitude?: { on?: boolean; time?: string } };
 type Row = { id: string; module: string; kind: string; title: string; entry_date: string | null; data: Record<string, unknown> };
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 const json = (d: unknown, status = 200) => new Response(JSON.stringify(d), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -117,7 +117,7 @@ Deno.serve(async (request) => {
     const p = (u.prefs ?? {}) as Prefs, now = localNow(u.tz);
     const queue: { key: string; title: string; body: string; url: string }[] = [];
     const { data: rows } = await db.from('entries').select('id,module,kind,title,entry_date,data').eq('user_id', u.user_id)
-      .in('kind', ['daily', 'habit', 'task', 'event', 'appointment', 'routine', 'complement', 'proche', 'prayer_settings', 'cycle', 'carnet_reglages', 'wird']);
+      .in('kind', ['daily', 'habit', 'task', 'event', 'appointment', 'routine', 'complement', 'proche', 'prayer_settings', 'cycle', 'carnet_reglages', 'wird', 'gratitude_jour']);
     const list = (rows ?? []) as Row[];
     const today = list.find((e) => e.kind === 'daily' && e.entry_date === now.date);
 
@@ -155,7 +155,13 @@ Deno.serve(async (request) => {
         else if (day === in7) queue.push({ key: 'bday7:' + e.id + ':' + now.date, title: 'Anniversaire dans une semaine', body: e.title.slice(0, 60) + (e.data.gifts ? ' · tes idées de cadeaux t’attendent' : ' · le temps de trouver une attention'), url: '/?ecran=proches' });
       }
     }
-    // Eau : l'après-midi, si l'objectif de 8 verres n'est pas atteint.
+    // Gratitude : le soir, seulement si rien n'a été noté aujourd'hui (ni dans Ma gratitude, ni dans Mon jour).
+    if (p.gratitude?.on !== false && due(now.minutes, mins(p.gratitude?.time ?? '21:30'))) {
+      const g = list.find((e) => e.kind === 'gratitude_jour' && e.entry_date === now.date)?.data ?? {};
+      const any = (v: unknown) => Array.isArray(v) && v.some((x) => String(x).trim());
+      if (!any(g.matin) && !any(g.soir) && !any(g.p7) && !any(today?.data.gratitudes))
+        queue.push({ key: 'gratitude:' + now.date, title: 'Ma gratitude', body: 'Qu’est-ce que tu gardes de ta journée ? Une ligne suffit.', url: '/?ecran=gratitude' });
+    }
     // Objectifs de dhikr : à 4 moments répartis dans la plage choisie, seulement si j'ai du retard.
     if (p.wird?.on !== false) {
       for (const e of list.filter((x) => x.kind === 'wird')) {
@@ -173,6 +179,7 @@ Deno.serve(async (request) => {
       if (isEve(writingWindow(starts, settings, now.date), now.date))
         queue.push({ key: 'carnet:' + now.date, title: 'Mon carnet', body: 'Demain, ta page du mois t’attend.', url: '/?ecran=carnet' });
     }
+    // Eau : l'après-midi, si l'objectif de 8 verres n'est pas atteint.
     if (p.water?.on !== false && due(now.minutes, mins(p.water?.time ?? '16:00'))) {
       const n = Math.max(0, Number(today?.data.water) || 0);
       if (n < 8) queue.push({ key: 'water:' + now.date, title: 'Un verre d’eau ?', body: n ? n + ' verre' + (n > 1 ? 's' : '') + ' sur 8 aujourd’hui.' : 'Pas encore de verre noté aujourd’hui.', url: '/' });
