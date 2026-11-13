@@ -4,6 +4,7 @@
  * activation comportementale, exposition graduée, bienveillance envers soi) et suivi de l'intensité des émotions.
  */
 import type { Entry } from './cloud';
+import { OUTILS_ACCORDS } from './quatreAccords';
 
 export const TCC_KIND = 'tcc';
 export const TCC_ECHELLE = 'tcc_echelle';
@@ -173,7 +174,7 @@ export const PSYCHO_POSITIVE: Outil[] = [
     { id: 'q3', label: 'Une troisième qualité', type: 'text' }, area('s3', 'Le moment où elle s’est montrée'),
     area('dire', 'Ce que je vais lui dire', '« J’apprécie que tu sois… Je l’ai remarqué quand… »'), area('ressenti', 'Ce que l’exercice m’a fait ressentir')] },
 ];
-export const outilOf = (id: string) => [...OUTILS, ...PSYCHO_POSITIVE].find((o) => o.id === id);
+export const outilOf = (id: string) => [...OUTILS, ...PSYCHO_POSITIVE, ...OUTILS_ACCORDS].find((o) => o.id === id);
 
 export type Marche = { text: string; suds: number; faite?: number };
 export const echelleOf = (entries: Entry[]) => {

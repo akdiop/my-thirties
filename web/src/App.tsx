@@ -38,7 +38,7 @@ import { Sparkles } from 'lucide-react';
 import { useIntegrationCloudSync } from './lib/integrations';
 import { allGratitudes, gratitudeToReread } from './lib/gratitude';
 import { TaskQuick } from './features/TaskQuick';
-import { OUVRIR_CORAN } from './ui/CoranLien';
+import { OUVRIR_CORAN, OUVRIR_JARDIN } from './ui/CoranLien';
 import { CORAN_KIND } from './lib/coran';
 
 // Écrans chargés à la demande : l'app s'ouvre plus vite.
@@ -470,8 +470,10 @@ export default function App() {
   const [coranStart, setCoranStart] = useState<{ at?: [number, number]; k: number }>({ k: 0 });
   useEffect(() => {
     const open = (ev: Event) => { const at = (ev as CustomEvent<[number, number] | null>).detail ?? undefined; setCoranStart((c) => ({ at, k: c.k + 1 })); setScreen('coran'); window.scrollTo({ top: 0 }); };
+    const jardin = (ev: Event) => { const c = Number((ev as CustomEvent<number>).detail) || undefined; setJardinStart((j) => ({ c, k: j.k + 1 })); setScreen('jardin'); window.scrollTo({ top: 0 }); };
     window.addEventListener(OUVRIR_CORAN, open);
-    return () => window.removeEventListener(OUVRIR_CORAN, open);
+    window.addEventListener(OUVRIR_JARDIN, jardin);
+    return () => { window.removeEventListener(OUVRIR_CORAN, open); window.removeEventListener(OUVRIR_JARDIN, jardin); };
   }, []);
   const [dayTarget, setDayTarget] = useState<{ date?: string; part?: 'matin' | 'soir'; n: number }>({ n: 0 });
   // Lien ouvert depuis une notification : ?ecran=myday&moment=soir, ?ecran=habits…

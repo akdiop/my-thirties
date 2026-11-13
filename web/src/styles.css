@@ -2281,3 +2281,5 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .coran-jour-row .checklist-item{flex:1;min-width:0}
 .coran-lu{display:flex;align-items:center;gap:12px;padding:12px 16px}
 .coran-lu .workout-title{flex:1;min-width:0}
+.accord-semaine{display:flex;flex-direction:column;gap:2px;padding:12px 14px;margin:6px 0 10px;border-radius:14px;background:rgba(126,114,84,.08)}
+.accord-semaine strong{font-size:1rem}
