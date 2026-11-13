@@ -21,7 +21,7 @@ type Go = (s: 'tcc' | 'boussole' | 'bilan' | 'habits' | 'agenda' | 'parametres')
 type Write = (question: string, answer: string) => Promise<void>;
 
 /** Mon thème astral : roue du ciel de naissance, planètes, maisons, aspects, pistes concrètes et repères pour comprendre. */
-export function Astro({ entries, profile, onCreate, onUpdate, onRemove, onGo }: { entries: Entry[]; profile?: Entry; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void>; onGo: (s: 'tcc' | 'boussole' | 'bilan' | 'habits' | 'agenda' | 'parametres') => void }) {
+export function Astro({ entries, profile, onCreate, onUpdate, onRemove, onGo, onJardin }: { entries: Entry[]; profile?: Entry; onJardin?: (c: number) => void; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void>; onGo: (s: 'tcc' | 'boussole' | 'bilan' | 'habits' | 'agenda' | 'parametres') => void }) {
   const saved = chartOf(entries);
   const [tab, setTab] = useState<Tab>('theme');
   const [importing, setImporting] = useState(false);
@@ -55,7 +55,7 @@ export function Astro({ entries, profile, onCreate, onUpdate, onRemove, onGo }: 
     {tab === 'numero' && <Numerologie numero={numero} chart={chart} />}
     {tab === 'lunes' && <Lunes chart={chart} entries={entries} onWrite={write} onCreate={onCreate} onGo={onGo} />}
     {tab === 'proches' && <Proches chart={chart} entries={entries} onCreate={onCreate} onUpdate={onUpdate} onRemove={onRemove} />}
-    {tab === 'pistes' && <Pistes chart={chart} entries={entries} numero={numero} onWrite={write} onCreate={onCreate} onGo={onGo} />}
+    {tab === 'pistes' && <Pistes chart={chart} entries={entries} numero={numero} onWrite={write} onCreate={onCreate} onGo={onGo} onJardin={onJardin} />}
     {tab === 'comprendre' && <Reperes />}
     {printing && <PrintChart chart={chart} numero={numero} onDone={() => setPrinting(false)} />}
   </div>;
@@ -178,7 +178,7 @@ function Aspects({ chart, onWrite }: { chart: Chart; onWrite: Write }) {
       </details>; })}</div>;
 }
 
-function Pistes({ chart, entries, numero, onWrite, onCreate, onGo }: { chart: Chart; entries: Entry[]; numero: MaNumerologie; onWrite: Write; onCreate: (i: EntryInput) => Promise<void>; onGo: Go }) {
+function Pistes({ chart, entries, numero, onWrite, onCreate, onGo, onJardin }: { chart: Chart; entries: Entry[]; numero: MaNumerologie; onWrite: Write; onCreate: (i: EntryInput) => Promise<void>; onGo: Go; onJardin?: (c: number) => void }) {
   const questions = chart.placements.flatMap((p) => [lectureSigne(p), lectureMaison(p)]).filter((l): l is Lecture => Boolean(l));
   const habits = new Set(entries.filter((e) => e.kind === HABIT_KIND).map((e) => e.title));
   const [added, setAdded] = useState<string[]>([]);
@@ -195,7 +195,8 @@ function Pistes({ chart, entries, numero, onWrite, onCreate, onGo }: { chart: Ch
       <button className="link-btn small" onClick={() => onGo('habits')}>Voir mes habitudes</button></section>
     <section className="ritual-card"><p className="ritual-label">Mes points de vigilance, avec mes outils TCC</p>
       {TCC_THEME.map((t) => <div key={t.vigilance} className="astro-def"><strong>{t.vigilance}</strong><small className="muted">{t.source}</small><p>Piège de pensée à repérer : <em>{t.distorsion}</em>. Outil : <strong>{t.outil}</strong>.</p>
-        {(() => { const n = ALLAH_NAMES.find((x) => x.tr === t.nom); return n ? <p className="astro-nom">Un Nom d’Allah à méditer : <span lang="ar" dir="rtl">{n.ar}</span> <strong>{n.tr}</strong>, {n.fr.charAt(0).toLowerCase() + n.fr.slice(1)}</p> : null; })()}</div>)}
+        {(() => { const n = ALLAH_NAMES.find((x) => x.tr === t.nom); return n ? <p className="astro-nom">Un Nom d’Allah à méditer : <span lang="ar" dir="rtl">{n.ar}</span> <strong>{n.tr}</strong>, {n.fr.charAt(0).toLowerCase() + n.fr.slice(1)}</p> : null; })()}
+        {onJardin && <button className="link-btn small" onClick={() => onJardin(t.jardin)}>Lire le chapitre {t.jardin} du Jardin des vertueux</button>}</div>)}
       <button className="button secondary small" onClick={() => onGo('tcc')}>Ouvrir mes outils TCC</button></section>
     <CoachTheme chart={chart} numero={numero} />
     <section className="ritual-card"><p className="ritual-label">Questions pour mon journal</p>

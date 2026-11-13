@@ -63,6 +63,7 @@ const Carnet = lazy(() => import('./screens/Carnet').then((m) => ({ default: m.C
 const GlobalSearch = lazy(() => import('./screens/GlobalSearch').then((m) => ({ default: m.GlobalSearch })));
 const Ressenti = lazy(() => import('./screens/Ressenti').then((m) => ({ default: m.Ressenti })));
 const Astro = lazy(() => import('./screens/Astro').then((m) => ({ default: m.Astro })));
+const Jardin = lazy(() => import('./screens/Jardin').then((m) => ({ default: m.Jardin })));
 const Hypersensibilite = lazy(() => import('./screens/Hypersensibilite').then((m) => ({ default: m.Hypersensibilite })));
 const Tcc = lazy(() => import('./screens/Tcc').then((m) => ({ default: m.Tcc })));
 const Gratitude = lazy(() => import('./screens/Gratitude').then((m) => ({ default: m.Gratitude })));
@@ -100,7 +101,7 @@ const NotificationSettings = lazy(() => import('./features/Notifications').then(
 const JournalSettings = lazy(() => import('./features/JournalSettings').then((m) => ({ default: m.JournalSettings })));
 const IphoneCalendar = lazy(() => import('./features/IphoneCalendar').then((m) => ({ default: m.IphoneCalendar })));
 
-type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'transformation' | 'carnet' | 'gratitude' | 'tcc' | 'hsp' | 'ressenti' | 'recherche' | 'culture' | 'astro' | ModuleId;
+type Screen = 'home' | 'agenda' | 'bienetre' | 'spaces' | 'settings' | 'calme' | 'assistant' | 'myday' | 'habits' | 'notes' | 'bilan' | 'parametres' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'transformation' | 'carnet' | 'gratitude' | 'tcc' | 'hsp' | 'ressenti' | 'recherche' | 'culture' | 'astro' | 'jardin' | ModuleId;
 type DataValue = string | Record<string, string> | { id: string; text: string; checked: boolean }[];
 const today = () => new Date().toLocaleDateString('en-CA');
 const value = (obj: Record<string, unknown>, key: string) => typeof obj[key] === 'string' ? obj[key] as string : '';
@@ -462,12 +463,13 @@ export default function App() {
   const [pendingExpense, setPendingExpense] = useState(false);
   const [carnetSign, setCarnetSign] = useState(0);
   const [habitsNow, setHabitsNow] = useState(0);
+  const [jardinStart, setJardinStart] = useState<{ c?: number; k: number }>({ k: 0 });
   const [dayTarget, setDayTarget] = useState<{ date?: string; part?: 'matin' | 'soir'; n: number }>({ n: 0 });
   // Lien ouvert depuis une notification : ?ecran=myday&moment=soir, ?ecran=habits…
   useEffect(() => {
     const q = new URLSearchParams(window.location.search), target = q.get('ecran');
     if (!target) return;
-    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'assistant', 'proches', 'lectures', 'envies', 'panda', 'transformation', 'carnet', 'gratitude', 'tcc', 'hsp', 'ressenti', 'culture', 'astro'].includes(target)) {
+    if (['myday', 'habits', 'bilan', 'agenda', 'notes', 'boussole', 'focus', 'sommeil', 'mediter', 'complements', 'assistant', 'proches', 'lectures', 'envies', 'panda', 'transformation', 'carnet', 'gratitude', 'tcc', 'hsp', 'ressenti', 'culture', 'astro', 'jardin'].includes(target)) {
       if (target === 'myday') setDayTarget((t) => ({ part: q.get('moment') === 'soir' ? 'soir' : 'matin', n: t.n + 1 }));
       if (target === 'assistant') setAssistantIdea(q.get('idee') ?? '');
       if (target === 'habits' && q.get('moment') === 'now') setHabitsNow((n) => n + 1);
@@ -725,7 +727,8 @@ export default function App() {
       {screen === 'lectures' && <><ScreenHeader title="" onBack={() => go('home')} /><Reading entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} /></>}
       {screen === 'panda' && <><ScreenHeader title="" onBack={() => go('home')} /><PandaScreen entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onGo={(x) => go(x as Screen)} /></>}
       {screen === 'recherche' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><GlobalSearch entries={ritualEntries} onOpen={(t) => { if (t.screen === 'entry' && t.entry) openEntry(t.entry); else if (t.screen === 'myday') openDay(t.day); else if (t.screen === 'spiritualite') { setSpiritTab('wird'); go('spiritualite'); } else go(t.screen as Screen); }} /></LockGate>}
-      {screen === 'astro' && <><ScreenHeader title="" onBack={() => go('home')} /><Astro entries={ritualEntries} profile={profileEntry} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onGo={(s) => go(s)} /></>}
+      {screen === 'jardin' && <><ScreenHeader title="" onBack={() => go('home')} /><Jardin key={jardinStart.k} entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} start={jardinStart.c} /></>}
+      {screen === 'astro' && <><ScreenHeader title="" onBack={() => go('home')} /><Astro entries={ritualEntries} profile={profileEntry} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onGo={(s) => go(s)} onJardin={(c) => { setJardinStart((j) => ({ c, k: j.k + 1 })); go('jardin'); }} /></>}
       {screen === 'culture' && <><ScreenHeader title="" onBack={() => go('home')} /><div className="screen culture"><header className="tab-head"><h1>Ma culture</h1><p>Ce que je lis, ce que je regarde</p></header>
         <Segmented label="Culture" value={cultureTab} onChange={setCultureTab} options={[{ value: 'lectures', label: 'Lectures' }, { value: 'series', label: 'Séries et films' }]} />
         {cultureTab === 'lectures' ? <Reading entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} />

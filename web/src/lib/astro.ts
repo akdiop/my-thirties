@@ -359,14 +359,14 @@ export const HABITUDES_THEME: HabitIdea[] = [
   { title: 'Trois lignes sur ce que je ressens', why: 'Nommer et apaiser les émotions intenses avant d’agir.', icon: 'feather', freq: 'daily', source: 'Lune en quinconce avec Pluton' },
   { title: '20 minutes d’apprentissage approfondi', why: 'Donner un fil conducteur à ma curiosité.', icon: 'book', freq: 'daily', source: 'Lune en Gémeaux' },
 ];
-export type TccLien = { vigilance: string; source: string; distorsion: string; outil: string; nom: string };
+export type TccLien = { vigilance: string; source: string; distorsion: string; outil: string; nom: string; jardin: number };
 export const TCC_THEME: TccLien[] = [
-  { vigilance: 'Perfectionnisme, sévérité envers moi', source: 'Soleil en maison VI, Mars en Capricorne', distorsion: 'Les « il faut », « je dois »', outil: 'Colonnes de Beck', nom: 'ar-Rahîm' },
-  { vigilance: 'Peur de manquer', source: 'Soleil en Capricorne', distorsion: 'Erreur de voyance', outil: 'Trier une inquiétude', nom: 'ar-Razzâq' },
-  { vigilance: 'Soupçonner des intentions cachées', source: 'Mercure en semi-carré avec Pluton', distorsion: 'Lecture de pensée', outil: 'Colonnes de Beck', nom: 'al-‘Alîm' },
-  { vigilance: 'Émotions très intenses', source: 'Lune en quinconce avec Pluton', distorsion: 'Raisonnement émotionnel', outil: 'Analyse ABC', nom: 'as-Salâm' },
-  { vigilance: 'Difficulté à recevoir une critique', source: 'Ascendant Lion', distorsion: 'Étiquetage', outil: 'Expérience comportementale', nom: 'al-Hakîm' },
-  { vigilance: 'Surcharge, difficulté à poser des limites', source: 'Neptune en maison VI, Lune en maison XI', distorsion: 'Personnalisation', outil: 'Résolution de problèmes', nom: 'al-Wakîl' },
+  { vigilance: 'Perfectionnisme, sévérité envers moi', source: 'Soleil en maison VI, Mars en Capricorne', distorsion: 'Les « il faut », « je dois »', outil: 'Colonnes de Beck', nom: 'ar-Rahîm', jardin: 14 },
+  { vigilance: 'Peur de manquer', source: 'Soleil en Capricorne', distorsion: 'Erreur de voyance', outil: 'Trier une inquiétude', nom: 'ar-Razzâq', jardin: 7 },
+  { vigilance: 'Soupçonner des intentions cachées', source: 'Mercure en semi-carré avec Pluton', distorsion: 'Lecture de pensée', outil: 'Colonnes de Beck', nom: 'al-‘Alîm', jardin: 272 },
+  { vigilance: 'Émotions très intenses', source: 'Lune en quinconce avec Pluton', distorsion: 'Raisonnement émotionnel', outil: 'Analyse ABC', nom: 'as-Salâm', jardin: 74 },
+  { vigilance: 'Difficulté à recevoir une critique', source: 'Ascendant Lion', distorsion: 'Étiquetage', outil: 'Expérience comportementale', nom: 'al-Hakîm', jardin: 71 },
+  { vigilance: 'Surcharge, difficulté à poser des limites', source: 'Neptune en maison VI, Lune en maison XI', distorsion: 'Personnalisation', outil: 'Résolution de problèmes', nom: 'al-Wakîl', jardin: 14 },
 ];
 
 /** Le cadre donné au coach IA quand je lui pose une question sur mon thème (seulement à ma demande). */
