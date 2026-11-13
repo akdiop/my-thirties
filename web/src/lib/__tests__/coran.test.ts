@@ -1,8 +1,8 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { coranOf, refCoran, versetDuJourRef, VERSETS_DU_JOUR, type SourateIndex } from '../coran';
+import data from '../../../public/coran/index.json';
 
-const index = JSON.parse(readFileSync('public/coran/index.json', 'utf8')) as SourateIndex[];
+const index = data as SourateIndex[];
 
 describe('Coran', () => {
   it('contient les 114 sourates et les 6236 versets', () => {
