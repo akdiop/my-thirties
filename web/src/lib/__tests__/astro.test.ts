@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { aspectsOf, balanceOf, housesOf, lectureAspect, lectureMaison, lectureSigne, parseEvozen, syntheseOf } from '../astro';
+import type { Entry } from '../cloud';
+import { aspectsOf, balanceOf, bilanLunaire, cleDuJourKey, housesOf, lectureAspect, lectureMaison, lectureSigne, lunaisons, moonLongitude, moonPhaseOf, parseEvozen, solarReturn, sunLongitude, synastry, syntheseOf, transitsOf } from '../astro';
+import { cheminDeVie, nombresDuNom } from '../numerologie';
 
 const TEXTE = `Ascendant Lion
         Situé en Lion à 09°17
@@ -43,5 +45,57 @@ describe('thème astral', () => {
     expect(lectureSigne(p('venus'))?.titre).toBe('Vénus en Sagittaire');
     expect(lectureMaison(p('lune'))?.titre).toBe('Lune en maison XI');
     expect(lectureAspect('uranus', 'trigone', 'jupiter')?.titre).toBe('Jupiter en trigone avec Uranus');
+  });
+});
+
+describe('lunes, anniversaire solaire, compatibilité', () => {
+  const chart = parseEvozen(TEXTE)!;
+  it('nouvelles et pleines lunes à quelques minutes près', () => {
+    const l = lunaisons(new Date('2024-04-01T00:00:00Z'), 2);
+    expect(l[0]!.type).toBe('nouvelle');
+    expect(Math.abs(l[0]!.date.getTime() - Date.parse('2024-04-08T18:21:00Z'))).toBeLessThan(20 * 60_000);
+    expect(l[0]!.sign.id).toBe('belier');
+    const p = lunaisons(new Date('2024-09-10T00:00:00Z'), 2).find((x) => x.type === 'pleine')!;
+    expect(Math.abs(p.date.getTime() - Date.parse('2024-09-18T02:34:00Z'))).toBeLessThan(20 * 60_000);
+    expect(p.sign.id).toBe('poissons');
+  });
+  it('anniversaire solaire', () => {
+    expect(solarReturn({ ...chart, naissance: '17 janvier 1992 à 18h25 à Paris, France' }, '2026-11-13')).toEqual({ date: '2027-01-17', days: 65, age: 35 });
+  });
+  it('compatibilité : mêmes éléments et aspects', () => {
+    const s = synastry(chart, chart);
+    expect(s.score).toBe(5);
+    expect(s.aspects[0]!.type.id).toBe('conjonction');
+  });
+});
+
+describe('ciel du jour, bilan lunaire, nombres', () => {
+  it('Lune pleine au moment de la pleine lune de septembre 2024', () => {
+    const d = new Date('2024-09-18T02:34:00Z');
+    expect(moonPhaseOf(d).phase).toBe('pleine');
+    expect(moonPhaseOf(d).eclat).toBeGreaterThan(97);
+    expect(Math.abs(((moonLongitude(d) - sunLongitude(d) + 360) % 360) - 180)).toBeLessThan(2);
+  });
+  it('transits et invocation du jour', () => {
+    const chart = parseEvozen(TEXTE)!;
+    const t = transitsOf(chart, new Date('2027-01-17T12:00:00Z'));
+    expect(t.soleil.sign.id).toBe('capricorne');
+    expect(t.transits.some((x) => x.astre === 'Soleil' && x.cible.id === 'soleil' && x.type.id === 'conjonction')).toBe(true);
+    const k = cleDuJourKey(chart, '2026-11-13')!;
+    expect(k.lecture).toBeTruthy();
+  });
+  it('bilan lunaire', () => {
+    const e = (date: string, mood: string) => ({ id: date, kind: 'daily', module: 'quotidien', title: '', entry_date: date, data: { mood } }) as unknown as Entry;
+    const b = bilanLunaire([e('2024-09-18', 'Rayonnante'), e('2024-10-02', 'Fatiguée'), e('2024-09-17', 'Bien')]);
+    expect(b.total).toBe(3);
+    expect(b.rows.find((r) => r.phase === 'pleine')!.moyenne).toBe(4.5);
+    expect(b.rows.find((r) => r.phase === 'nouvelle')!.moyenne).toBe(2);
+  });
+  it('numérologie : chemin de vie et nombres du nom', () => {
+    expect(cheminDeVie('1992-01-17')).toEqual({ n: 3 });
+    expect(cheminDeVie('1990-09-29')).toEqual({ n: 3 });
+    expect(nombresDuNom('Ana')).toEqual({ expression: { n: 7 }, intime: { n: 2 } });
+    expect(nombresDuNom('Kkk')?.expression).toEqual({ n: 6 });
+    expect(nombresDuNom('')).toBeNull();
   });
 });
