@@ -72,3 +72,29 @@ export const numerologieOf = (data: Record<string, unknown> | undefined): MaNume
   const n = (data?.numerologie ?? {}) as Record<string, unknown>;
   return { expression: ok(n.expression), affectif: ok(n.affectif) };
 };
+
+/* ---------- Calculs (méthode pythagoricienne) : expression, nombre intime, chemin de vie ---------- */
+const reduce = (n: number): number => (n <= 9 || n === 11 || n === 22 || n === 33 ? n : reduce([...String(n)].reduce((a, c) => a + Number(c), 0)));
+const letters = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z]/g, '');
+const valueOf = (c: string) => ((c.charCodeAt(0) - 65) % 9) + 1;
+const base = (n: number) => (n > 9 ? [...String(n)].reduce((a, c) => a + Number(c), 0) : n);
+/** Nombre d'expression (toutes les lettres du nom complet) et nombre intime (les voyelles), avec le nombre maître éventuel. */
+export function nombresDuNom(nom: string) {
+  const l = letters(nom), v = [...l].filter((c) => 'AEIOUY'.includes(c));
+  const exp = reduce([...l].reduce((a, c) => a + valueOf(c), 0)), intime = reduce(v.reduce((a, c) => a + valueOf(c), 0));
+  const fmt = (n: number): Numero => (n > 9 ? { n: base(n), maitre: n } : { n });
+  return l ? { expression: fmt(exp), intime: fmt(intime) } : null;
+}
+/** Chemin de vie : somme des chiffres de la date de naissance, réduite (nombres maîtres gardés). */
+export function cheminDeVie(iso: string): Numero | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
+  const n = reduce([...iso.replace(/-/g, '')].reduce((a, c) => a + Number(c), 0));
+  return n > 9 ? { n: base(n), maitre: n } : { n };
+}
+/** Le sens général de chaque nombre, pour mes proches et mon chemin de vie (repères de numérologie, en quelques mots). */
+export const SENS_NOMBRES: Record<number, string> = {
+  1: 'L’initiative, l’indépendance, le leadership : ouvrir la voie.', 2: 'L’écoute, la coopération, la sensibilité : relier et apaiser.', 3: 'L’expression, la créativité, la joie de communiquer.',
+  4: 'La construction, la rigueur, la fiabilité : bâtir solide.', 5: 'La liberté, le mouvement, la curiosité, le changement.', 6: 'L’harmonie, le foyer, la responsabilité envers les autres.',
+  7: 'La réflexion, la quête de sens, la vie intérieure.', 8: 'L’ambition, la réussite matérielle, l’autorité.', 9: 'L’altruisme, l’idéal, l’ouverture au monde.',
+  11: 'Nombre maître : intuition, inspiration, exigence élevée.', 22: 'Nombre maître : le grand bâtisseur, des réalisations concrètes et durables.', 33: 'Nombre maître : le don de soi, la compassion à grande échelle.',
+};

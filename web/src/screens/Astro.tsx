@@ -2,22 +2,26 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { ASPECTS, aspectsOf, ASTRO_KIND, balanceOf, chartOf, cleDuJour, degLabel, ELEMENT_SENS, HOUSES, housesOf, lectureAspect, lectureGenerique, lectureMaison, lectureSigne, lonOf, MODE_SENS, parseEvozen,
-  PISTES, PLANETS, planetOf, ROMAN, SIGNS, signOf, syntheseOf, coachTheme, HABITUDES_THEME, lunaisons, prochesCharts, solarReturn, synastry, TCC_THEME, type Chart, type HabitIdea, type Lecture, type Placement } from '../lib/astro';
+  PISTES, PLANETS, planetOf, ROMAN, SIGNS, signOf, syntheseOf, coachTheme, HABITUDES_THEME, bilanLunaire, birthOf, cleDuJourKey, moonPhaseOf, PHASE_LABEL, transitsOf, lunaisons, prochesCharts, solarReturn, synastry, TCC_THEME, type Chart, type HabitIdea, type Lecture, type Placement } from '../lib/astro';
 import { HABIT_KIND, isoOf, NOTE_KIND, ruleData } from '../lib/rituals';
 import { askAssistant } from '../lib/assistant';
 import { useIntegrationPrefs } from '../lib/integrations';
 import { ALLAH_NAMES } from '../lib/asmaUlHusna';
+import { DUAS } from '../lib/duas';
+import { readProfile } from '../lib/profile';
+import { VISION_KIND } from '../lib/growth';
+import { exercicesHsp, progresHsp } from '../lib/hypersensibilite';
 import { hijriLabel, hijriOf, spiritualDay } from '../lib/hijri';
-import { ficheAffectif, ficheExpression, ficheIslam, numerologieOf, type Fiche, type MaNumerologie } from '../lib/numerologie';
+import { cheminDeVie, ficheAffectif, ficheExpression, ficheIslam, nombresDuNom, numerologieOf, SENS_NOMBRES, type Numero, type Fiche, type MaNumerologie } from '../lib/numerologie';
 import { Bar } from '../ui/kit';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
-type Tab = 'theme' | 'planetes' | 'maisons' | 'aspects' | 'numero' | 'lunes' | 'proches' | 'pistes' | 'comprendre';
-type Go = (s: 'tcc' | 'boussole' | 'bilan' | 'habits' | 'agenda') => void;
+type Tab = 'theme' | 'portrait' | 'ciel' | 'planetes' | 'maisons' | 'aspects' | 'numero' | 'lunes' | 'proches' | 'pistes' | 'comprendre';
+type Go = (s: 'tcc' | 'boussole' | 'bilan' | 'habits' | 'agenda' | 'parametres') => void;
 type Write = (question: string, answer: string) => Promise<void>;
 
 /** Mon thème astral : roue du ciel de naissance, planètes, maisons, aspects, pistes concrètes et repères pour comprendre. */
-export function Astro({ entries, onCreate, onUpdate, onRemove, onGo }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void>; onGo: (s: 'tcc' | 'boussole' | 'bilan' | 'habits' | 'agenda') => void }) {
+export function Astro({ entries, profile, onCreate, onUpdate, onRemove, onGo }: { entries: Entry[]; profile?: Entry; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void>; onGo: (s: 'tcc' | 'boussole' | 'bilan' | 'habits' | 'agenda' | 'parametres') => void }) {
   const saved = chartOf(entries);
   const [tab, setTab] = useState<Tab>('theme');
   const [importing, setImporting] = useState(false);
@@ -37,18 +41,20 @@ export function Astro({ entries, onCreate, onUpdate, onRemove, onGo }: { entries
     <ImportChart onSave={store} onCancel={saved ? () => setImporting(false) : undefined} />
   </div>;
   const chart = saved.chart, numero = numerologieOf(saved.entry.data);
-  const TABS: [Tab, string][] = [['theme', 'Thème'], ['planetes', 'Planètes'], ['maisons', 'Maisons'], ['aspects', 'Aspects'], ['numero', 'Numérologie'], ['lunes', 'Lunes'], ['proches', 'Proches'], ['pistes', 'Pistes'], ['comprendre', 'Repères']];
+  const TABS: [Tab, string][] = [['theme', 'Thème'], ['portrait', 'Portrait'], ['ciel', 'Ciel du jour'], ['planetes', 'Planètes'], ['maisons', 'Maisons'], ['aspects', 'Aspects'], ['numero', 'Numérologie'], ['lunes', 'Lunes'], ['proches', 'Proches'], ['pistes', 'Pistes'], ['comprendre', 'Repères']];
   return <div className="screen astro">
     <header className="tab-head"><h1>Mon thème astral</h1><p>{syntheseOf(chart).trio}</p></header>
     <div className="gchips small astro-tabs" role="tablist" aria-label="Thème astral">{TABS.map(([v, l]) =>
       <button key={v} type="button" role="tab" aria-selected={tab === v} className={'gchip' + (tab === v ? ' on' : '')} onClick={() => setTab(v)}>{l}</button>)}</div>
-    {tab === 'theme' && <Overview chart={chart} today={today} onWrite={write} onReimport={() => setImporting(true)} onPrint={() => setPrinting(true)} onGo={onGo} />}
+    {tab === 'portrait' && <Portrait chart={chart} numero={numero} entries={entries} profile={profile} onCreate={onCreate} onRemove={onRemove} />}
+    {tab === 'ciel' && <Ciel chart={chart} />}
+    {tab === 'theme' && <Overview chart={chart} entries={entries} today={today} onWrite={write} onReimport={() => setImporting(true)} onPrint={() => setPrinting(true)} onGo={onGo} />}
     {tab === 'planetes' && <Planets chart={chart} onWrite={write} />}
     {tab === 'maisons' && <Houses chart={chart} />}
     {tab === 'aspects' && <Aspects chart={chart} onWrite={write} />}
-    {tab === 'numero' && <Numerologie numero={numero} />}
-    {tab === 'lunes' && <Lunes chart={chart} onWrite={write} onCreate={onCreate} />}
-    {tab === 'proches' && <Proches chart={chart} entries={entries} onCreate={onCreate} onRemove={onRemove} />}
+    {tab === 'numero' && <Numerologie numero={numero} chart={chart} />}
+    {tab === 'lunes' && <Lunes chart={chart} entries={entries} onWrite={write} onCreate={onCreate} onGo={onGo} />}
+    {tab === 'proches' && <Proches chart={chart} entries={entries} onCreate={onCreate} onUpdate={onUpdate} onRemove={onRemove} />}
     {tab === 'pistes' && <Pistes chart={chart} entries={entries} numero={numero} onWrite={write} onCreate={onCreate} onGo={onGo} />}
     {tab === 'comprendre' && <Reperes />}
     {printing && <PrintChart chart={chart} numero={numero} onDone={() => setPrinting(false)} />}
@@ -114,7 +120,7 @@ function LectureCard({ l, onWrite }: { l: Lecture; onWrite?: Write }) {
   </div>;
 }
 
-function Overview({ chart, today, onWrite, onReimport, onPrint, onGo }: { chart: Chart; today: string; onWrite: Write; onReimport: () => void; onPrint: () => void; onGo: Go }) {
+function Overview({ chart, entries, today, onWrite, onReimport, onPrint, onGo }: { chart: Chart; entries: Entry[]; today: string; onWrite: Write; onReimport: () => void; onPrint: () => void; onGo: Go }) {
   const solaire = solarReturn(chart, today);
   const s = syntheseOf(chart), b = balanceOf(chart), cle = cleDuJour(chart, today);
   const big = (['soleil', 'lune', 'ascendant'] as const).map((id) => chart.placements.find((p) => p.id === id)).filter((p): p is Placement => Boolean(p));
@@ -122,7 +128,8 @@ function Overview({ chart, today, onWrite, onReimport, onPrint, onGo }: { chart:
   return <div className="stack-8">
     <section className="ritual-card astro-wheel-card"><Wheel chart={chart} />
       <p className="fineprint">Ascendant à gauche · lignes vertes : aspects fluides · lignes caramel : tensions · {chart.naissance}</p></section>
-    {cle && <section className="ritual-card"><p className="ritual-label">Ma clé du jour</p><p className="astro-essentiel">{cle.conseil}</p><small className="muted">{cle.titre}</small></section>}
+    {cle && <section className="ritual-card"><p className="ritual-label">Ma clé du jour</p><p className="astro-essentiel">{cle.conseil}</p><small className="muted">{cle.titre}</small>
+      <DuaDuJour chart={chart} today={today} /><CitationDuJour entries={entries} today={today} /></section>}
     <div className="astro-trio">{big.map((p) => { const sg = signOf(p.sign)!; return <div key={p.id} className="soft-card">
       <small className="ritual-label">{planetOf(p.id)!.label}</small><strong>{sg.label}</strong><small className="muted">{sg.mots.join(' · ')}</small></div>; })}</div>
     <section className="ritual-card"><p className="ritual-label">Ma synthèse</p>
@@ -212,10 +219,88 @@ function CoachTheme({ chart, numero }: { chart: Chart; numero: MaNumerologie }) 
   </section>;
 }
 
+/** L'invocation du jour, choisie parmi mes invocations enregistrées selon la clé du jour. */
+function DuaDuJour({ chart, today }: { chart: Chart; today: string }) {
+  const k = cleDuJourKey(chart, today), d = k?.dua ? DUAS.find((x) => x.id === k.dua) : undefined;
+  if (!d) return null;
+  return <details className="astro-dua"><summary><span className="ritual-label">Mon invocation du jour</span> <strong>{d.title}</strong></summary>
+    <p className="astro-ar" lang="ar" dir="rtl">{d.arabic}</p><p className="muted"><em>{d.phonetic}</em></p><p className="astro-essentiel">{d.french}</p>
+    <small className="muted">{d.ref ? d.ref + ' · ' : ''}{d.source}</small></details>;
+}
+
+export const CITATION_KIND = 'citation_perso';
+/** Une de mes citations enregistrées (avec leur source), qui change chaque jour. */
+function CitationDuJour({ entries, today }: { entries: Entry[]; today: string }) {
+  const list = entries.filter((e) => e.kind === CITATION_KIND);
+  if (!list.length) return null;
+  const c = list[Math.floor(Date.parse(today + 'T12:00:00Z') / 86_400_000) % list.length]!;
+  return <blockquote className="astro-citation">« {String(c.data.texte)} »<small className="muted">{String(c.data.source)}</small></blockquote>;
+}
+
+/** Le ciel du jour : le Soleil et la Lune en ce moment, et les transits sur mon thème. */
+function Ciel({ chart }: { chart: Chart }) {
+  const t = transitsOf(chart, new Date()), ph = moonPhaseOf(new Date());
+  return <div className="stack-8">
+    <section className="ritual-card"><p className="ritual-label">En ce moment</p>
+      <p className="astro-essentiel">Le Soleil est en <strong>{t.soleil.sign.label}</strong> ({degLabel(t.soleil.deg)}) : {t.soleil.sign.mots.join(', ')} colorent la période.</p>
+      <p className="astro-essentiel">La Lune est en <strong>{t.lune.sign.label}</strong> ({PHASE_LABEL[ph.phase].toLowerCase()}, {ph.eclat} % éclairée) : une humeur du jour plutôt tournée vers {t.lune.sign.mots[0]}.</p></section>
+    <section className="ritual-card"><p className="ritual-label">Mes transits du jour</p>
+      {!t.transits.length && <p className="muted">Aucun transit serré du Soleil ou de la Lune sur ton thème aujourd’hui : une journée sans accent particulier.</p>}
+      {t.transits.map((x) => <div key={x.astre + x.cible.id} className="astro-def"><strong>{x.astre} {x.type.label.toLowerCase()} ton {planetOf(x.cible.id)!.label}</strong>
+        <small className="muted">{x.astre} en {x.sign.label} · ton {planetOf(x.cible.id)!.label} en {signOf(x.cible.sign)!.label} · écart {x.orb}°</small>
+        <p>{x.astre === 'Soleil' ? 'Pendant quelques jours, la lumière se pose sur ' : 'Aujourd’hui, l’émotion touche '}{planetOf(x.cible.id)!.domaine.charAt(0).toLowerCase() + planetOf(x.cible.id)!.domaine.slice(1)} {x.type.sens}</p></div>)}
+    </section>
+    <details className="soft-card"><summary className="ritual-label">Qu’est-ce qu’un transit ?</summary>
+      <p className="astro-essentiel">Ton thème est une photo du ciel à ta naissance ; les planètes, elles, continuent de tourner. Un transit, c’est le moment où une planète du ciel actuel forme un angle avec une planète de ta photo de naissance.</p>
+      <p className="astro-essentiel">La Lune fait le tour du zodiaque en environ 27 jours : ses transits durent quelques heures et colorent l’humeur du jour. Le Soleil met un an : ses transits durent quelques jours et mettent en lumière un domaine de ta vie (l’anniversaire, c’est le Soleil qui revient sur ton Soleil).</p>
+      <p className="astro-essentiel">Une conjonction réunit les énergies, un trigone ou un sextile les rend fluides, un carré ou une opposition crée une tension qui pousse à ajuster. C’est un outil de réflexion sur soi, pas une prédiction.</p></details>
+  </div>;
+}
+
+/** Mon portrait : thème, nombres, forces, valeurs, vision, hypersensibilité et mes citations. */
+function Portrait({ chart, numero, entries, profile, onCreate, onRemove }: { chart: Chart; numero: MaNumerologie; entries: Entry[]; profile?: Entry; onCreate: (i: EntryInput) => Promise<void>; onRemove: (e: Entry) => Promise<void> }) {
+  const s = syntheseOf(chart), me = readProfile(profile), vision = entries.find((e) => e.kind === VISION_KIND)?.data ?? {};
+  const b = birthOf(chart), chemin = b ? cheminDeVie(b.year + '-' + String(b.month).padStart(2, '0') + '-' + String(b.day).padStart(2, '0')) : null;
+  const forces = (['soleil', 'lune', 'ascendant'] as const).flatMap((id) => { const p = chart.placements.find((x) => x.id === id); const l = p && lectureSigne(p); return l ? l.forces.slice(0, 2) : []; });
+  const hsp = progresHsp(exercicesHsp(entries));
+  const nb = (label: string, n?: Numero) => n && <span key={label}><small className="muted">{label}</small><strong>{n.n}{n.maitre ? ' / ' + n.maitre : ''}</strong></span>;
+  return <div className="stack-8">
+    <section className="ritual-card"><p className="ritual-label">Qui je suis, en un regard</p>
+      <p className="astro-essentiel"><strong>{s.trio}</strong>. Dominante {s.element.toLowerCase()} ({ELEMENT_SENS[s.element]}), mode {s.mode.toLowerCase()}{s.maison ? ', avec une maison ' + ROMAN[s.maison.n] + ' très habitée : ' + HOUSES[s.maison.n - 1]!.domaine.charAt(0).toLowerCase() + HOUSES[s.maison.n - 1]!.domaine.slice(1) : '.'}</p>
+      <div className="astro-reperes">{nb('Chiffre d’expression', numero.expression)}{nb('Vie affective', numero.affectif)}{nb('Chemin de vie', chemin ?? undefined)}</div></section>
+    {forces.length > 0 && <section className="ritual-card"><p className="ritual-label">Mes forces</p><ul className="astro-list">{forces.map((f) => <li key={f}>{f}</li>)}</ul></section>}
+    {(me.values.length > 0 || typeof vision.words === 'string' && vision.words) && <section className="ritual-card"><p className="ritual-label">Mes valeurs et ma vision</p>
+      {me.values.length > 0 && <div className="chip-row">{me.values.map((v) => <span key={v} className="chip on static">{v}</span>)}</div>}
+      {typeof vision.words === 'string' && vision.words && <p className="astro-essentiel">{vision.words}</p>}</section>}
+    {(hsp.aide.length > 0 || hsp.declencheurs.length > 0) && <section className="ritual-card"><p className="ritual-label">Ma sensibilité</p>
+      {hsp.aide.length > 0 && <p className="astro-essentiel">Ce qui m’aide : {hsp.aide.slice(0, 4).map((x) => x.nom).join(', ')}.</p>}
+      {hsp.declencheurs.length > 0 && <p className="astro-essentiel">Ce qui me vide : {hsp.declencheurs.slice(0, 4).map((x) => x.nom).join(', ')}.</p>}</section>}
+    <Citations entries={entries} chart={chart} onCreate={onCreate} onRemove={onRemove} />
+  </div>;
+}
+
+/** Mes citations : seulement celles que j'ajoute, toujours avec leur source. */
+function Citations({ entries, chart, onCreate, onRemove }: { entries: Entry[]; chart: Chart; onCreate: (i: EntryInput) => Promise<void>; onRemove: (e: Entry) => Promise<void> }) {
+  const list = entries.filter((e) => e.kind === CITATION_KIND);
+  const [texte, setTexte] = useState(''), [source, setSource] = useState(''), [lien, setLien] = useState('');
+  const liens = [...new Set(chart.placements.filter((p) => ['soleil', 'lune', 'ascendant'].includes(p.id)).map((p) => signOf(p.sign)!.label)), 'Le 2', 'Le 11'];
+  return <section className="ritual-card form-stack"><p className="ritual-label">Mes citations inspirantes</p>
+    <p className="muted">Ajoute une citation, un verset ou un hadith avec sa source exacte : il apparaîtra avec ta clé du jour.</p>
+    {list.map((c) => <div key={c.id} className="astro-citation-row"><blockquote className="astro-citation">« {String(c.data.texte)} »<small className="muted">{String(c.data.source)}{c.data.lien ? ' · ' + String(c.data.lien) : ''}</small></blockquote>
+      <button className="link-btn small" onClick={() => void onRemove(c)}>Retirer</button></div>)}
+    <label>Citation<textarea rows={3} value={texte} maxLength={600} onChange={(e) => setTexte(e.target.value)} /></label>
+    <label>Source (livre, sourate et verset, recueil et numéro…)<input value={source} maxLength={160} onChange={(e) => setSource(e.target.value)} /></label>
+    <label>Liée à<select value={lien} onChange={(e) => setLien(e.target.value)}><option value="">Rien de particulier</option>{liens.map((l) => <option key={l} value={l}>{l}</option>)}</select></label>
+    <button className="button secondary small" disabled={!texte.trim() || !source.trim()} onClick={async () => {
+      await onCreate({ module: 'equilibre', kind: CITATION_KIND, title: texte.trim().slice(0, 80), entry_date: null, data: { texte: texte.trim(), source: source.trim(), lien } }); setTexte(''); setSource(''); setLien(''); }}>Ajouter la citation</button>
+  </section>;
+}
+
 const SOLAIRE_QUESTIONS = ['Qu’est-ce que cette année m’a appris sur moi ?', 'De quoi suis-je fière ?', 'Qu’est-ce que je laisse derrière moi ?', 'Quelle intention je pose pour ma nouvelle année ?'];
 
 /** Ma numérologie : chiffre d'expression et chiffre de vie affective. */
-function Numerologie({ numero }: { numero: MaNumerologie }) {
+function Numerologie({ numero, chart }: { numero: MaNumerologie; chart: Chart }) {
+  const b = birthOf(chart), chemin = b ? cheminDeVie(b.year + '-' + String(b.month).padStart(2, '0') + '-' + String(b.day).padStart(2, '0')) : null;
   const blocs = [{ titre: 'Mon chiffre d’expression', n: numero.expression, fiche: ficheExpression }, { titre: 'Mon chiffre de vie affective', n: numero.affectif, fiche: ficheAffectif }];
   if (!numero.expression && !numero.affectif) return <p className="muted">Ta numérologie n’est pas encore enregistrée.</p>;
   return <div className="stack-8">{blocs.map((b) => b.n && <section key={b.titre} className="ritual-card">
@@ -228,6 +313,9 @@ function Numerologie({ numero }: { numero: MaNumerologie }) {
       {f.offrir && <><p className="ritual-label">Ce qui me touche comme cadeau</p><ul className="astro-list">{f.offrir.map((o) => <li key={o}>{o}</li>)}</ul></>}
     </details>)}
   </section>)}
+    {chemin && <section className="ritual-card"><p className="ritual-label">Mon chemin de vie (calculé avec ma date de naissance)</p>
+      <div className="astro-numero"><strong>{chemin.n}</strong>{chemin.maitre && <span>Nombre maître {chemin.maitre}</span>}</div>
+      <p className="astro-essentiel">{SENS_NOMBRES[chemin.maitre ?? chemin.n]}</p></section>}
     {ficheIslam(numero.expression?.n ?? numero.affectif?.n) && (() => { const f = ficheIslam(numero.expression?.n ?? numero.affectif?.n)!;
       return <section className="ritual-card"><p className="ritual-label">Dans la tradition islamique</p><p className="astro-essentiel"><strong>{f.titre}</strong></p>
         {f.sections.map((x) => <div key={x.titre} className="astro-detail"><p className="ritual-label">{x.titre}</p><p>{x.texte}</p></div>)}</section>; })()}
@@ -235,10 +323,17 @@ function Numerologie({ numero }: { numero: MaNumerologie }) {
 }
 
 /** Nouvelles et pleines lunes à venir : signe, planètes de mon thème touchées, intention et agenda. */
-function Lunes({ chart, onWrite, onCreate }: { chart: Chart; onWrite: Write; onCreate: (i: EntryInput) => Promise<void> }) {
+function Lunes({ chart, entries, onWrite, onCreate, onGo }: { chart: Chart; entries: Entry[]; onWrite: Write; onCreate: (i: EntryInput) => Promise<void>; onGo: Go }) {
+  const bilan = useMemo(() => bilanLunaire(entries), [entries]), now = moonPhaseOf(new Date());
   const list = useMemo(() => lunaisons(new Date(Date.now() - 86_400_000), 8, chart), [chart]);
   const [added, setAdded] = useState<string[]>([]);
   return <div className="stack-8"><p className="muted">Dates calculées par l’app (calcul astronomique), à l’heure de ton téléphone. La nouvelle lune invite à poser une intention, la pleine lune à faire le bilan et à lâcher.</p>
+    <section className="ritual-card"><p className="ritual-label">Aujourd’hui : {PHASE_LABEL[now.phase].toLowerCase()} ({now.eclat} % éclairée)</p>
+      <p className="ritual-label">Mon humeur selon la Lune</p>
+      {bilan.total < 8 ? <p className="muted">Note ton humeur dans Mon jour : dès une dizaine de jours, tu verras ici si certaines phases te réussissent mieux.</p>
+        : bilan.rows.map((r) => <div key={r.phase} className="habit-rate"><span>{r.label}</span><Bar value={(r.moyenne ?? 0) / 5} tone="sauge" /><small>{r.moyenne === null ? '·' : r.moyenne + '/5'} · {r.n} j</small></div>)}
+      {bilan.total >= 8 && <p className="fineprint">Moyenne de tes humeurs notées (1 = épuisée, 5 = rayonnante) selon la phase de la Lune ce jour-là.</p>}</section>
+    <p className="astro-nom">Les jours blancs (13, 14 et 15 du mois hégirien, autour de la pleine lune) sont déjà rappelés la veille au soir par la notification « Jeûnes recommandés ». <button className="link-btn small" onClick={() => onGo('parametres')}>Mes notifications</button></p>
     {list.map((l) => { const iso = isoOf(l.date), hm = l.date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }), key = l.type + iso;
       const titre = (l.type === 'nouvelle' ? 'Nouvelle lune' : 'Pleine lune') + ' en ' + l.sign.label;
       const q = l.type === 'nouvelle' ? 'Quelle intention je pose pour ce cycle (' + l.sign.mots.join(', ') + ') ?' : 'Qu’est-ce que je récolte, et qu’est-ce que je lâche ?';
@@ -265,7 +360,7 @@ function IslamLune({ iso, type }: { iso: string; type: 'nouvelle' | 'pleine' }) 
 }
 
 /** Les thèmes de mes proches et nos affinités. */
-function Proches({ chart, entries, onCreate, onRemove }: { chart: Chart; entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onRemove: (e: Entry) => Promise<void> }) {
+function Proches({ chart, entries, onCreate, onUpdate, onRemove }: { chart: Chart; entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void> }) {
   const list = prochesCharts(entries);
   const [adding, setAdding] = useState(false);
   const ELEM: Record<string, string> = { soleil: 'Soleil', lune: 'Lune', ascendant: 'Ascendant', venus: 'Vénus', mars: 'Mars' };
@@ -274,12 +369,27 @@ function Proches({ chart, entries, onCreate, onRemove }: { chart: Chart; entries
       return <details key={entry.id} className="soft-card"><summary className="astro-sum"><span className="astro-abbr">{nom.slice(0, 2)}</span><span className="workout-title"><strong>{nom}</strong><small>{syntheseOf(c).trio} · {s.score}/{s.pairs.length} affinités d’éléments</small></span></summary>
         {s.pairs.map((p) => <p key={p.id} className="astro-essentiel">{ELEM[p.id]} : toi en {signOf(p.a.sign)!.label}, {nom} en {signOf(p.b.sign)!.label}, {p.accord ? 'des éléments qui s’entendent (' + signOf(p.a.sign)!.element + ' et ' + signOf(p.b.sign)!.element + ').' : 'des éléments différents, à apprivoiser (' + signOf(p.a.sign)!.element + ' et ' + signOf(p.b.sign)!.element + ').'}</p>)}
         {s.aspects.length > 0 && <><p className="ritual-label">Vos liens les plus forts</p><ul className="astro-list">{s.aspects.slice(0, 6).map((x) => <li key={x.a.id + x.b.id}>Ton {planetOf(x.a.id)!.label} {x.type.label.toLowerCase()} son {planetOf(x.b.id)!.label} ({x.power} %) : {x.type.sens.charAt(0).toLowerCase() + x.type.sens.slice(1)}</li>)}</ul></>}
+        <ProcheNumero entry={entry} nom={nom} onUpdate={onUpdate} />
         <button className="link-btn small" onClick={() => void onRemove(entry)}>Retirer ce thème</button>
       </details>; })}
     {adding ? <ImportChart title="Ajouter le thème d’un proche" withName onCancel={() => setAdding(false)} onSave={async (c, nom) => {
       await onCreate({ module: 'equilibre', kind: ASTRO_KIND, title: 'Thème de ' + nom, entry_date: null, data: { proche: nom, placements: c.placements, naissance: c.naissance ?? '' } }); setAdding(false); }} />
       : <button className="button secondary" onClick={() => setAdding(true)}>Ajouter le thème d’un proche</button>}
     {!list.length && !adding && <p className="muted">Colle le texte d’un thème Evozen d’un proche pour découvrir vos affinités : éléments du Soleil, de la Lune, de l’ascendant, de Vénus et de Mars, et les liens entre vos planètes.</p>}
+  </div>;
+}
+
+/** La numérologie d'un proche, calculée avec son nom complet et sa date de naissance. */
+function ProcheNumero({ entry, nom, onUpdate }: { entry: Entry; nom: string; onUpdate: Save }) {
+  const saved = (entry.data.numero ?? {}) as { nom?: string; date?: string };
+  const [full, setFull] = useState(saved.nom ?? ''), [date, setDate] = useState(saved.date ?? '');
+  const n = saved.nom ? nombresDuNom(saved.nom) : null, chemin = saved.date ? cheminDeVie(saved.date) : null;
+  const line = (label: string, x?: Numero | null) => x && <div key={label} className="astro-def"><strong>{label} : {x.n}{x.maitre ? ' / ' + x.maitre : ''}</strong><p>{SENS_NOMBRES[x.maitre ?? x.n]}</p></div>;
+  return <div className="form-stack astro-proche-num"><p className="ritual-label">Numérologie de {nom}</p>
+    {line('Chiffre d’expression', n?.expression)}{line('Nombre intime', n?.intime)}{line('Chemin de vie', chemin)}
+    <label>Nom complet (prénoms et nom de naissance)<input value={full} maxLength={120} onChange={(e) => setFull(e.target.value)} /></label>
+    <label>Date de naissance<input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></label>
+    <button className="button ghost small" disabled={!full.trim() && !date} onClick={() => void onUpdate(entry, { ...entry.data, numero: { nom: full.trim(), date } })}>Calculer</button>
   </div>;
 }
 

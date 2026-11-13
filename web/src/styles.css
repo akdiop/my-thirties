@@ -2239,3 +2239,10 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .astro-key span{font-size:.92rem;line-height:1.45}
 .astro-nom{margin:6px 0 0;padding:8px 12px;border-radius:12px;background:rgba(126,114,84,.08);font-size:.85rem;color:#3A3833}
 .astro-nom span[lang=ar]{font-size:1.05rem;color:#7E7254;margin-right:4px}
+.astro-dua{margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(95,122,89,.07)}
+.astro-dua summary{display:flex;flex-direction:column;gap:2px;font-size:.88rem}
+.astro-ar{font-size:1.25rem;line-height:1.9;color:#3A3833;margin:8px 0 4px;text-align:right}
+.astro-citation{margin:10px 0 0;padding:10px 14px;border-left:3px solid #C2B48C;font-style:italic;font-size:.9rem;color:#3A3833;display:flex;flex-direction:column;gap:4px}
+.astro-citation small{font-style:normal}
+.astro-citation-row{display:flex;flex-direction:column;gap:2px}
+.astro-proche-num{margin-top:10px;padding-top:8px;border-top:1px solid #EFEBE3}

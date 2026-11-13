@@ -379,3 +379,63 @@ export function coachTheme(chart: Chart, numero?: string) {
     'Lectures de son thème :', cles, numero ? 'Numérologie : ' + numero + '.' : '',
     'Réponds en français, chaleureusement, en 150 à 250 mots, avec des phrases courtes et des pistes concrètes pour sa vie de tous les jours. Pas de prédiction, pas de citation religieuse précise.'].filter(Boolean).join('\n');
 }
+
+/* ---------- Dou'â du jour : une invocation de mes invocations enregistrées, liée à la clé du jour ---------- */
+/** Placement → invocation (identifiant dans duas.ts) dont le thème répond au conseil. */
+export const DUA_POUR: Record<string, string> = {
+  'soleil-capricorne': 'hasbi', 'mars-capricorne': 'hasbi', 'saturne-m6': 'hasbi', 'soleil-m6': 'sayyid-istighfar', 'mercure-m6': 'facilite', 'jupiter-m2': 'reussite',
+  'jupiter-vierge': 'facilite', 'lune-gemeaux': 'reussite', 'mercure-capricorne': 'reussite', 'venus-sagittaire': 'mariage', 'venus-m5': 'mariage', 'mars-m5': 'facilite',
+  'pluton-m4': 'mariage', 'lune-m11': 'detresse', 'neptune-m6': 'detresse', 'uranus-m6': 'facilite', 'ascendant-lion': 'yunus', 'saturne-verseau': 'facilite',
+};
+/** La clé du jour avec la clé de lecture (pour retrouver l'invocation). */
+export function cleDuJourKey(chart: Chart, day: string) {
+  const keys = chart.placements.flatMap((p) => [p.id + '-' + p.sign, p.house ? p.id + '-m' + p.house : '']).filter((k) => LECTURES[k]);
+  if (!keys.length) return null;
+  const n = Math.floor(Date.parse(day + 'T12:00:00Z') / 86_400_000), key = keys[((n % keys.length) + keys.length) % keys.length]!;
+  return { key, lecture: LECTURES[key]!, dua: DUA_POUR[key] };
+}
+
+/* ---------- Ciel du jour : Lune et Soleil en transit sur mon thème ---------- */
+/** Longitude écliptique de la Lune (termes principaux de Meeus, précision d'environ un degré). */
+export function moonLongitude(date: Date) {
+  const T = ((date.getTime() / 86_400_000 + 2440587.5) - 2451545) / 36525;
+  const L = 218.3164477 + 481267.88123421 * T, D = rad(297.8501921 + 445267.1114034 * T), M = rad(357.5291092 + 35999.0502909 * T);
+  const Mp = rad(134.9633964 + 477198.8675055 * T), F = rad(93.272095 + 483202.0175233 * T);
+  const lon = L + 6.288774 * Math.sin(Mp) + 1.274027 * Math.sin(2 * D - Mp) + 0.658314 * Math.sin(2 * D) + 0.213618 * Math.sin(2 * Mp) - 0.185116 * Math.sin(M)
+    - 0.114332 * Math.sin(2 * F) + 0.058793 * Math.sin(2 * D - 2 * Mp) + 0.057066 * Math.sin(2 * D - M - Mp) + 0.053322 * Math.sin(2 * D + Mp) + 0.045758 * Math.sin(2 * D - M);
+  return ((lon % 360) + 360) % 360;
+}
+/** Âge de la Lune (jours depuis la dernière nouvelle lune) et phase. */
+export function moonPhaseOf(date: Date) {
+  const elong = (((moonLongitude(date) - sunLongitude(date)) % 360) + 360) % 360, age = (elong / 360) * 29.530588861;
+  const phase = elong < 45 || elong >= 315 ? 'nouvelle' : elong < 135 ? 'croissante' : elong < 225 ? 'pleine' : 'decroissante';
+  return { age, phase: phase as 'nouvelle' | 'croissante' | 'pleine' | 'decroissante', eclat: Math.round(((1 - Math.cos(rad(elong))) / 2) * 100) };
+}
+export const PHASE_LABEL = { nouvelle: 'Nouvelle lune', croissante: 'Lune croissante', pleine: 'Pleine lune', decroissante: 'Lune décroissante' } as const;
+export type Transit = { astre: 'Soleil' | 'Lune'; sign: Sign; deg: number; cible: Placement; type: AspectType; orb: number };
+/** Transits du jour : le Soleil (orbe 2°) et la Lune (orbe 4°) en aspect majeur avec mes planètes. */
+export function transitsOf(chart: Chart, date: Date) {
+  const majors = ASPECTS.filter((t) => ['conjonction', 'sextile', 'carre', 'trigone', 'opposition'].includes(t.id));
+  const out: Transit[] = [];
+  for (const [astre, lon, max] of [['Soleil', sunLongitude(date), 2], ['Lune', moonLongitude(date), 4]] as const) {
+    for (const p of chart.placements.filter((x) => x.id !== 'noeud_sud')) {
+      let d = Math.abs(lon - lonOf(p)) % 360; if (d > 180) d = 360 - d;
+      for (const t of majors) { const orb = Math.abs(d - t.angle); if (orb <= max) { out.push({ astre, sign: signAt(lon), deg: lon % 30, cible: p, type: t, orb: Math.round(orb * 10) / 10 }); break; } }
+    }
+  }
+  return { soleil: { sign: signAt(sunLongitude(date)), deg: sunLongitude(date) % 30 }, lune: { sign: signAt(moonLongitude(date)), deg: moonLongitude(date) % 30 }, transits: out.sort((a, b) => a.orb - b.orb) };
+}
+
+/* ---------- Bilan lunaire : mon humeur selon la phase de la Lune ---------- */
+const MOOD_SCORE: Record<string, number> = { 'Épuisée': 1, 'Fatiguée': 2, 'Stressée': 1, 'Neutre': 3, 'Bien': 4, 'Sereine': 4, 'Joyeuse': 5, 'Rayonnante': 5 };
+/** Moyenne de mes humeurs notées (Mon jour) pour chaque phase de la Lune. */
+export function bilanLunaire(entries: Entry[]) {
+  const acc: Record<string, number[]> = { nouvelle: [], croissante: [], pleine: [], decroissante: [] };
+  for (const e of entries) {
+    if (e.kind !== 'daily' || !e.entry_date) continue;
+    const s = MOOD_SCORE[String(e.data.mood ?? '')];
+    if (s) acc[moonPhaseOf(new Date(e.entry_date + 'T12:00:00Z')).phase]!.push(s);
+  }
+  const rows = (Object.keys(acc) as (keyof typeof PHASE_LABEL)[]).map((ph) => ({ phase: ph, label: PHASE_LABEL[ph], n: acc[ph]!.length, moyenne: acc[ph]!.length ? Math.round((acc[ph]!.reduce((a, b) => a + b, 0) / acc[ph]!.length) * 10) / 10 : null }));
+  return { rows, total: rows.reduce((a, r) => a + r.n, 0) };
+}
