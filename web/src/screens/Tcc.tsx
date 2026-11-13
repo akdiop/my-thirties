@@ -5,6 +5,7 @@ import { DISTORSIONS, echelleOf, EMOTIONS, exercices, FICHES, OUTILS, progres, P
 import { isoOf } from '../lib/rituals';
 import { Segmented } from '../ui/kit';
 import { QuatreAccords } from '../features/QuatreAccords';
+import { OUTILS_ACCORDS } from '../lib/quatreAccords';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 type Props = { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void> };
@@ -25,10 +26,13 @@ export function Tcc({ entries, onCreate, onUpdate, onRemove }: Props) {
     <Segmented label="TCC" value={tab} onChange={setTab} options={[{ value: 'outils', label: 'Exercices' }, { value: 'comprendre', label: 'Comprendre' }, { value: 'echelle', label: 'Mon échelle' }, { value: 'journal', label: 'Mon suivi' }]} />
     {tab === 'outils' && <div className="stack-8">{OUTILS.map((o) => <button key={o.id} className="med-row" onClick={() => setOpen({ outil: o })}>
       <span className="workout-title"><strong>{o.nom}</strong><small>{o.but}</small></span><ChevronRight size={16} /></button>)}
+      <p className="ritual-label">Les Quatre Accords</p>
+      {OUTILS_ACCORDS.map((o) => <button key={o.id} className="med-row" onClick={() => setOpen({ outil: o })}>
+        <span className="workout-title"><strong>{o.nom}</strong><small>{o.but}</small></span><ChevronRight size={16} /></button>)}
       <p className="ritual-label">Psychologie positive</p>
       {PSYCHO_POSITIVE.map((o) => <button key={o.id} className="med-row" onClick={() => setOpen({ outil: o })}>
         <span className="workout-title"><strong>{o.nom}</strong><small>{o.but}</small></span><ChevronRight size={16} /></button>)}</div>}
-    {tab === 'comprendre' && <Understand />}
+    {tab === 'comprendre' && <Understand entries={entries} />}
     {tab === 'echelle' && <Ladder entries={entries} onCreate={onCreate} onUpdate={onUpdate} />}
     {tab === 'journal' && <Journal list={list} onOpen={(x) => setOpen({ outil: x.outil, entry: x.entry })} />}
   </div>;
@@ -67,13 +71,13 @@ export function Worksheet({ outil, entry, echelle, onSave, onClose, onRemove, ba
   </section>;
 }
 
-function Understand() {
+function Understand({ entries }: { entries: Entry[] }) {
   return <div className="stack-8">
     {FICHES.map((f) => <details key={f.id} className="soft-card"><summary className="ritual-label">{f.titre}</summary>{f.points.map((p) => <p key={p} className="fiche-pt">{p}</p>)}</details>)}
     <details className="soft-card"><summary className="ritual-label">Les 12 pièges de pensée</summary>
       {DISTORSIONS.map((d) => <div key={d.id} className="tcc-dist"><strong>{d.nom}</strong><p className="muted small">{d.def} {d.ex}</p><p className="tcc-q">{d.question}</p></div>)}</details>
     <details className="soft-card"><summary className="ritual-label">Questions pour examiner une pensée</summary>{QUESTIONS_SOCRATIQUES.map((q) => <p key={q} className="fiche-pt">{q}</p>)}</details>
-    <QuatreAccords />
+    <QuatreAccords entries={entries} />
   </div>;
 }
 

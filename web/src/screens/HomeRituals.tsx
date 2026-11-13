@@ -10,6 +10,7 @@ import type { HomeSlot } from './Home';
 import { taskBuckets } from '../features/TaskQuick';
 import { prayerDay } from '../lib/wellbeing';
 import { GRAT_KIND, type GratData } from '../lib/gratitude';
+import { accordDeLaSemaine } from '../lib/quatreAccords';
 
 type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'finances' | 'transformation' | 'carnet' | 'gratitude' | 'tcc' | 'hsp' | 'culture' | 'astro' | 'jardin' | 'coran';
 type Shortcut = { id: Exclude<Target, 'myday' | 'panda' | 'finances'>; label: string; sub: string; icon: typeof Heart };
@@ -91,6 +92,8 @@ export function HomeRituals({ entries, onGo, onLearn, onOpenDay, onCreate, onUpd
 
     {(() => { const c = chartOf(entries), cle = c && cleDuJour(c.chart, today); return cle ? <button className="soft-card astro-key" onClick={() => onGo('astro')}>
       <small className="ritual-label">Ma clé du jour</small><span>{cle.conseil}</span><small className="muted">{cle.titre}</small></button> : null; })()}
+    {(() => { const a = accordDeLaSemaine(today); return <button className="soft-card astro-key" onClick={() => onGo('tcc')}>
+      <small className="ritual-label">Mon accord de la semaine</small><span>{a.n}. {a.titre}</span><small className="muted">{a.question}</small></button>; })()}
     <PandaWidget entries={entries} onOpen={() => onGo('panda')} />
   </>;
   return <>

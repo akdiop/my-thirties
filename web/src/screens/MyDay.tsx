@@ -9,6 +9,7 @@ import { saveLabel, useAutosave } from '../lib/autosave';
 import { eveningQuestion } from '../lib/growth';
 import { Check22, Segmented } from '../ui/kit';
 import { EveningCoach, RELANCES, type Coach } from '../features/EveningCoach';
+import { ACCORD_REPONSES, accordDeLaSemaine } from '../lib/quatreAccords';
 
 type Part = 'matin' | 'soir';
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
@@ -49,13 +50,16 @@ function DayForm({ date, part, entry, entries, onCreate, onUpdate }: { date: str
   const [letgo, setLetgo] = useState(String(init('letgo') ?? ''));
   const [tomorrow, setTomorrow] = useState(String(init('tomorrow') ?? ''));
   const [answer, setAnswer] = useState(String(init('answer') ?? ''));
+  const [accord, setAccord] = useState(String(init('accord') ?? ''));
+  const [accordNote, setAccordNote] = useState(String(init('accordNote') ?? ''));
+  const accordSemaine = accordDeLaSemaine(date);
   const [coach, setCoach] = useState<Coach | null>(() => { const c = init('coach') as Coach | undefined; return c && Array.isArray(c.pistes) ? c : null; });
   const question = typeof entry?.data.question === 'string' && entry.data.question ? entry.data.question : eveningQuestion(date);
   const [touched, setTouched] = useState(false);
   const t = <A,>(f: (v: A) => void) => (v: A) => { f(v); setTouched(true); };
 
-  const draft = useMemo(() => touched ? { date, mood, intention, priorities: prios, gratitudes: grats, selfcare, win, different, letgo, tomorrow, ...(answer ? { question, answer } : {}), ...(coach ? { coach } : {}) } : null,
-    [touched, date, mood, intention, prios, grats, selfcare, win, different, letgo, tomorrow, answer, question, coach]);
+  const draft = useMemo(() => touched ? { date, mood, intention, priorities: prios, gratitudes: grats, selfcare, win, different, letgo, tomorrow, ...(answer ? { question, answer } : {}), ...(accord ? { accord, accordNo: accordSemaine.n, accordNote } : {}), ...(coach ? { coach } : {}) } : null,
+    [touched, date, mood, intention, prios, grats, selfcare, win, different, letgo, tomorrow, answer, question, accord, accordNote, accordSemaine.n, coach]);
   const state = useAutosave(entry, draft,
     () => onCreate({ module: 'equilibre', kind: DAILY_KIND, title: 'Mon jour · ' + date, entry_date: date, data: draft! }), onUpdate);
 
@@ -94,6 +98,10 @@ function DayForm({ date, part, entry, entries, onCreate, onUpdate }: { date: str
         <textarea className="soft-input" rows={3} value={answer} placeholder="Réponds librement…" onChange={(e) => t(setAnswer)(e.target.value)} /><Dictate onText={(x) => t(setAnswer)(appendText(answer, x))} />
         {answer.trim() && <div className="relances"><small className="muted">Pour aller plus loin</small>
           <div className="chip-row">{RELANCES.map((r) => <button key={r} className="chip" disabled={answer.includes(r)} onClick={() => t(setAnswer)(answer.trimEnd() + '\n' + r + ' ')}>{r}</button>)}</div></div>}</section>
+      <section className="ritual-card"><p className="ritual-label">Mon accord de la semaine</p>
+        <p className="evening-q">As-tu honoré ton accord aujourd’hui : {accordSemaine.titre.charAt(0).toLowerCase() + accordSemaine.titre.slice(1)} ?</p>
+        <div className="chip-row">{ACCORD_REPONSES.map((r) => <button key={r} className={'chip' + (accord === r ? ' on' : '')} aria-pressed={accord === r} onClick={() => t(setAccord)(accord === r ? '' : r)}>{r}</button>)}</div>
+        {accord && <input className="soft-input" value={accordNote} maxLength={300} placeholder="Un mot sur ce qui s’est passé (facultatif)" onChange={(e) => t(setAccordNote)(e.target.value)} />}</section>
       <section><p className="ritual-label">Ce que je dépose ce soir</p>
         <textarea className="soft-input" rows={3} value={letgo} placeholder="Je le pose ici pour ne plus y penser…" onChange={(e) => t(setLetgo)(e.target.value)} /><Dictate onText={(x) => t(setLetgo)(appendText(letgo, x))} /></section>
       <HabitsOfDay date={date} entries={entries} onUpdate={onUpdate} />
