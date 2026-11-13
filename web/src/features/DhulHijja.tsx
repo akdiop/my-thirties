@@ -4,6 +4,7 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { actsDone, DH_ACTS, DH_DAYS, DH_EXTRAS, DH_KNOWLEDGE, DHUL_HIJJA_KIND, dhulHijjaStatus, type DhData } from '../lib/dhulHijja';
 import { isoOf } from '../lib/rituals';
 import { Bar, Check22 } from '../ui/kit';
+import { AvecCoran } from '../ui/CoranLien';
 
 const frDay = (iso: string) => new Date(iso + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
 
@@ -58,12 +59,12 @@ export function DhulHijja({ entries, onCreate, onUpdate }: { entries: Entry[]; o
       <p className="ritual-label"><Quote size={16} /> Citation du jour</p>
       {d.quote.phonetic && <em>{d.quote.phonetic}</em>}
       <p>{d.quote.text}</p>
-      <small>{d.quote.ref}</small>
+      <small><AvecCoran texte={d.quote.ref} /></small>
     </section>
 
     <details className="soft-card dhul-know">
       <summary><BookOpen size={16} /> Pourquoi ces dix jours comptent</summary>
-      {DH_KNOWLEDGE.map((k) => <p key={k.text} className="fiche-pt">{k.text}{k.ref && <small> ({k.ref})</small>}</p>)}
+      {DH_KNOWLEDGE.map((k) => <p key={k.text} className="fiche-pt"><AvecCoran texte={k.text} />{k.ref && <small> (<AvecCoran texte={k.ref} />)</small>}</p>)}
       <p className="fineprint">D’après le « Dhu al-Hijjah Planner » de Towards Faith, traduit et reformulé.</p>
     </details>
   </section>;

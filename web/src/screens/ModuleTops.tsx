@@ -149,7 +149,7 @@ function SpiritCalendar() {
   </div>;
 }
 
-export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }: { tab: SpiritTab; onTab: (t: SpiritTab) => void; entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void>; onRemove: (e: Entry) => Promise<void> }) {
+export function SpiritTop({ tab, onTab, entries, extra = [], onCreate, onUpdate, onRemove }: { tab: SpiritTab; onTab: (t: SpiritTab) => void; entries: Entry[]; extra?: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void>; onRemove: (e: Entry) => Promise<void> }) {
   usePrayerAutoLocation(entries, onCreate, onUpdate);
   const day = todayIso();
   const p = prayerDay(entries);
@@ -190,7 +190,7 @@ export function SpiritTop({ tab, onTab, entries, onCreate, onUpdate, onRemove }:
       </div>
     </>}
     {tab !== 'home' && tab !== 'cours' && <button className="link-btn back-link" onClick={() => onTab('home')}>‹ Ma spiritualité</button>}
-    {tab === 'regularite' && <SpiritStats entries={entries} days={30} />}
+    {tab === 'regularite' && <SpiritStats entries={[...entries, ...extra]} days={30} />}
     {tab === 'dhikr' && <DhikrCounter day={day} entries={entries} onCreate={onCreate} />}
     {tab === 'hijri' && <SpiritCalendar />}
     {tab === 'cours' && <SpiritLessons onBack={() => onTab('home')} />}

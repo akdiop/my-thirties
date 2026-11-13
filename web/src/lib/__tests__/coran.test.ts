@@ -18,7 +18,13 @@ describe('Coran', () => {
     expect(refCoran('3.200')).toEqual([3, 200]);
     expect(refCoran('Coran 200:1')).toBeNull();
   });
+  it('chaque référence « Coran X:Y » de l’app existe', () => {
+    const files = import.meta.glob(['../*.ts', '../../features/*.tsx', '../../screens/*.tsx'], { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+    const refs = Object.values(files).flatMap((t) => [...t.matchAll(/Coran (\d{1,3}):(\d{1,3})(?:-(\d{1,3}))?/g)]);
+    expect(refs.length).toBeGreaterThan(30);
+    for (const m of refs) { const nb = index[Number(m[1]) - 1]?.[2] ?? 0; expect(Number(m[3] ?? m[2]), m[0]).toBeLessThanOrEqual(nb); }
+  });
   it('relit un état incomplet', () => {
-    expect(coranOf([]).state).toEqual({ lus: [], favoris: [], marque: undefined, khatm: 0 });
+    expect(coranOf([]).state).toEqual({ lus: [], favoris: [], marque: undefined, khatm: 0, jours: [] });
   });
 });

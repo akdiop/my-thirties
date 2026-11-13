@@ -26,7 +26,9 @@ export function Coran({ entries, onCreate, onUpdate, start }: Props) {
   };
   const isFav = (s: number, v: number) => state.favoris.some(([a, b]) => a === s && b === v);
   const fav: Fav = { isFav, onFav: (s, v) => void save({ favoris: isFav(s, v) ? state.favoris.filter(([a, b]) => !(a === s && b === v)) : [...state.favoris, [s, v]] }) };
-  if (open) return <Lecteur key={open.s} s={open.s} highlight={open.v} index={index} state={state} fav={fav} onOpen={(s) => setOpen({ s })} onBack={() => setOpen(null)}
+  const today = isoOf(new Date()), luJour = state.jours.includes(today);
+  const toggleJour = () => void save({ jours: luJour ? state.jours.filter((d) => d !== today) : [...state.jours, today].slice(-400) });
+  if (open) return <Lecteur key={open.s} s={open.s} highlight={open.v} index={index} state={state} fav={fav} luJour={luJour} onJour={toggleJour} onOpen={(s) => setOpen({ s })} onBack={() => setOpen(null)}
     onMark={(s, v) => void save({ marque: [s, v] })} onRead={(s, lu) => void save({ lus: lu ? [...new Set([...state.lus, s])] : state.lus.filter((x) => x !== s) })} />;
   const done = state.lus.length >= SOURATES;
   const vendredi = new Date().getDay() === 5;
@@ -38,6 +40,7 @@ export function Coran({ entries, onCreate, onUpdate, start }: Props) {
       <span className="workout-title"><strong>Reprendre ma lecture</strong><small>Sourate {state.marque[0]} · {nom(index, state.marque[0])} · verset {state.marque[1]}</small></span><ChevronRight size={16} /></button>}
     {vendredi && <button className="soft-card jardin-resume" onClick={() => setOpen({ s: 18 })}><BookOpen size={18} />
       <span className="workout-title"><strong>C’est vendredi</strong><small>Sourate 18 · al-Kahf (La Caverne)</small></span><ChevronRight size={16} /></button>}
+    <LuJour on={luJour} onToggle={toggleJour} />
     <div className="habit-rate"><span>Sourates lues</span><Bar value={state.lus.length / SOURATES} tone="sauge" /><small>{state.lus.length}/{SOURATES}</small></div>
     {state.khatm > 0 && <p className="muted small">{state.khatm} lecture{state.khatm > 1 ? 's' : ''} complète{state.khatm > 1 ? 's' : ''} du Coran</p>}
     {done && <section className="ritual-card"><p className="ritual-label">Lecture complète</p><p>Tu as lu les 114 sourates. Al-hamdulillah.</p>
@@ -96,7 +99,12 @@ function Liste({ index, lus, onOpen }: { index: SourateIndex[]; lus: number[]; o
       <span className="astro-abbr">{lus.includes(n) ? <Check size={14} /> : n}</span><span className="workout-title"><strong>{t}</strong><small>{nb} verset{nb > 1 ? 's' : ''}</small></span></button>)}</div></div>;
 }
 
-function Lecteur({ s, highlight, index, state, fav, onOpen, onBack, onMark, onRead }: { s: number; highlight?: number; index: SourateIndex[]; state: CoranState; fav: Fav;
+function LuJour({ on, onToggle }: { on: boolean; onToggle: () => void }) {
+  return <div className="soft-card coran-lu"><span className="workout-title"><strong>Ma lecture du jour</strong><small>{on ? 'Comptée dans ma régularité' : 'Coche quand tu as lu, défiler ne compte pas'}</small></span>
+    <button className={'button small ' + (on ? 'ghost' : 'secondary')} aria-pressed={on} onClick={onToggle}>{on ? <><Check size={14} /> Lu aujourd’hui</> : 'Lu'}</button></div>;
+}
+
+function Lecteur({ s, highlight, index, state, fav, luJour, onJour, onOpen, onBack, onMark, onRead }: { s: number; highlight?: number; index: SourateIndex[]; state: CoranState; fav: Fav; luJour: boolean; onJour: () => void;
   onOpen: (s: number) => void; onBack: () => void; onMark: (s: number, v: number) => void; onRead: (s: number, lu: boolean) => void }) {
   const [so, setSo] = useState<Sourate | null>(null), [error, setError] = useState('');
   const target = useRef<HTMLElement | null>(null);
@@ -116,6 +124,7 @@ function Lecteur({ s, highlight, index, state, fav, onOpen, onBack, onMark, onRe
           <button className="icon-btn" aria-pressed={marked(v)} aria-label={marked(v) ? 'Marque-page ici' : 'Mettre le marque-page ici'} onClick={() => onMark(s, v)}><Bookmark size={15} fill={marked(v) ? '#C2B48C' : 'none'} /></button>
           <button className="icon-btn" aria-pressed={fav.isFav(s, v)} aria-label={fav.isFav(s, v) ? 'Retirer des favoris' : 'Ajouter aux favoris'} onClick={() => fav.onFav(s, v)}><Star size={15} fill={fav.isFav(s, v) ? '#C2B48C' : 'none'} /></button>
         </span></p>; })}</section>}
+    {so && <LuJour on={luJour} onToggle={onJour} />}
     {so && <button className={'button wide ' + (lu ? 'ghost' : 'secondary')} onClick={() => onRead(s, !lu)}>{lu ? 'Sourate lue (retirer)' : 'J’ai lu cette sourate'}</button>}
     <div className="button-group jardin-nav">{s > 1 && <button className="button ghost small" onClick={() => onOpen(s - 1)}><ChevronLeft size={14} /> Sourate {s - 1}</button>}
       {s < SOURATES && <button className="button ghost small" onClick={() => onOpen(s + 1)}>Sourate {s + 1} <ChevronRight size={14} /></button>}</div>

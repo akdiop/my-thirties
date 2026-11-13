@@ -4,9 +4,11 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { isoOf } from '../lib/rituals';
 import { DHIKR_ROUTINE, DUA_CATEGORIES, DUAS, type Dua, type DuaCategory } from '../lib/duas';
 import { AFFIRMATIONS, AKHIRA_GOALS, FICHES, QURAN_DAILY } from '../lib/mindset';
+import { AvecCoran, ouvrirCoran } from '../ui/CoranLien';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 export const DUA_PREFS_KIND = 'invocations';
+const QURAN_DAILY_AT: Record<string, [number, number]> = { fatiha: [1, 1], quls: [112, 1], baqara: [2, 1], mulk: [67, 1] };
 
 /** Mes invocations : arabe, phonétique, traduction française, référence ; favoris et routine de dhikr du jour. */
 export function Duas({ entries, onCreate, onUpdate }: { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save }) {
@@ -49,7 +51,7 @@ export function Duas({ entries, onCreate, onUpdate }: { entries: Entry[]; onCrea
       {DHIKR_ROUTINE.map((d) => { const on = doneToday.has(d.id), c = counts[d.id] ?? 0;
         return <div key={d.id} className={'routine-row' + (on ? ' done' : '')}>
           <button className="habit-check" aria-pressed={on} aria-label={(on ? 'Décocher ' : 'Fait : ') + d.phonetic} onClick={() => toggleDone(d.id)}>{on ? <Check size={18} strokeWidth={3} /> : null}</button>
-          <div className="routine-text"><strong>{d.phonetic} <span className="times">×{d.times}</span></strong><small>{d.french}{d.ref ? ' · ' + d.ref : ''}</small></div>
+          <div className="routine-text"><strong>{d.phonetic} <span className="times">×{d.times}</span></strong><small>{d.french}{d.ref ? <> · <AvecCoran texte={d.ref} /></> : null}</small></div>
           {d.times > 1 && !on && <button className="count-btn" aria-label={'Compter ' + d.phonetic} onClick={() => { const n = c + 1; setCounts((x) => ({ ...x, [d.id]: n })); if (n >= d.times) { toggleDone(d.id); setCounts((x) => ({ ...x, [d.id]: 0 })); } }}>{c}/{d.times}</button>}
         </div>; })}
       <p className="muted small">Source : @your._habibtii</p>
@@ -64,7 +66,7 @@ export function Duas({ entries, onCreate, onUpdate }: { entries: Entry[]; onCrea
         <p className="dua-ar" lang="ar" dir="rtl">{d.arabic}</p>
         <p className="dua-ph">{d.phonetic}</p>
         <p className="dua-fr">{d.french}</p>
-        <small className="muted">{[d.ref, d.source].filter(Boolean).join(' · ')}</small>
+        <small className="muted"><AvecCoran texte={[d.ref, d.source].filter(Boolean).join(' · ')} /></small>
         {d.uses && <details className="dua-uses"><summary>Quand la réciter</summary>
           {d.uses.map((u) => <div key={u.title}><strong>{u.title}</strong><ul>{u.items.map((i) => <li key={i}>{i}</li>)}</ul></div>)}</details>}
         <div className="repeat-row">{d.repeat && <RepeatCounter key={d.id} total={d.repeat} />}
@@ -124,7 +126,7 @@ function Study({ dua, state, today, onDone, onClose }: { dua: Dua; state?: Learn
     <p className="dua-ar" lang="ar" dir="rtl">{masked(dua.arabic, step, reveal)}</p>
     <p className="dua-ph">{masked(dua.phonetic, step, reveal)}</p>
     {step <= 2 || reveal ? <p className="dua-fr">{dua.french}</p> : null}
-    <small className="muted">{[dua.ref, dua.source].filter(Boolean).join(' · ')}</small>
+    <small className="muted"><AvecCoran texte={[dua.ref, dua.source].filter(Boolean).join(' · ')} /></small>
     <div className="repeat-row">
       {step >= 2 && <button className="button ghost small" onClick={() => setReveal(!reveal)}><Eye size={14} /> {reveal ? 'Cacher' : 'Voir la réponse'}</button>}
     </div>
@@ -155,7 +157,8 @@ function Carnet({ data, today, onSave }: { data: Record<string, unknown>; today:
   return <div className="stack-8">
     <div className="soft-card dhikr-routine">
       <div className="routine-head"><strong>Mon Coran du jour</strong><small className="muted">{qToday.size} / {QURAN_DAILY.length}</small></div>
-      {QURAN_DAILY.map((q) => <label key={q.id} className="checklist-item routine-check"><input type="checkbox" checked={qToday.has(q.id)} onChange={() => toggleQ(q.id)} /> {q.label}</label>)}
+      {QURAN_DAILY.map((q) => <div key={q.id} className="coran-jour-row"><label className="checklist-item routine-check"><input type="checkbox" checked={qToday.has(q.id)} onChange={() => toggleQ(q.id)} /> {q.label}</label>
+        {QURAN_DAILY_AT[q.id] && <button type="button" className="link-btn small" onClick={() => ouvrirCoran(QURAN_DAILY_AT[q.id])}>Lire</button>}</div>)}
     </div>
     <div className="soft-card dhikr-routine">
       <div className="routine-head"><strong>Mes objectifs pour l’au-delà</strong><small className="muted">{Object.keys(akhira).length} / {AKHIRA_GOALS.length}</small></div>
@@ -174,8 +177,8 @@ function Carnet({ data, today, onSave }: { data: Record<string, unknown>; today:
     <div className="soft-card"><strong>Mes affirmations</strong>{AFFIRMATIONS.map((a) => <p key={a} className="dua-fr affirm">« {a} »</p>)}</div>
     {FICHES.map((f) => <article key={f.id} className="dua-card">
       <button className="fiche-head" aria-expanded={open === f.id} onClick={() => setOpen(open === f.id ? null : f.id)}><strong>{f.title}</strong><span>{open === f.id ? '−' : '+'}</span></button>
-      {open === f.id && <>{f.points.map((p) => <p key={p} className="fiche-pt">{p}</p>)}
-        {f.quote && <blockquote className="book-quote">« {f.quote.text} »<br /><small>{f.quote.ref}</small></blockquote>}</>}
+      {open === f.id && <>{f.points.map((p) => <p key={p} className="fiche-pt"><AvecCoran texte={p} /></p>)}
+        {f.quote && <blockquote className="book-quote">« {f.quote.text} »<br /><small><AvecCoran texte={f.quote.ref} /></small></blockquote>}</>}
     </article>)}
     <p className="muted small">D’après ma lecture de Muslima Mindset Reset (Muslima Glow).</p>
   </div>;

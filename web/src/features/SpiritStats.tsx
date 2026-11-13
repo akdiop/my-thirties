@@ -2,6 +2,7 @@ import type { Entry } from '../lib/cloud';
 import { isoOf } from '../lib/rituals';
 import { PRAYERS } from '../lib/wellbeing';
 import { DHIKR_ROUTINE } from '../lib/duas';
+import { coranOf } from '../lib/coran';
 
 const addDays = (iso: string, n: number) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return isoOf(d); };
 
@@ -22,7 +23,8 @@ export function SpiritStats({ entries, days: span, end = isoOf(new Date()), comp
   const routine = (prefs.routine && typeof prefs.routine === 'object' ? prefs.routine : {}) as Record<string, string[]>;
   const quran = (prefs.quran && typeof prefs.quran === 'object' ? prefs.quran : {}) as Record<string, string[]>;
   const routineDays = days.filter((d) => (routine[d]?.length ?? 0) >= DHIKR_ROUTINE.length).length;
-  const quranDays = days.filter((d) => (quran[d]?.length ?? 0) > 0).length;
+  const coranJours = new Set(coranOf(entries).state.jours);
+  const quranDays = days.filter((d) => (quran[d]?.length ?? 0) > 0 || coranJours.has(d)).length;
   const has = total || dhikr || routineDays || quranDays;
 
   return <section className="soft-card spirit-stats">

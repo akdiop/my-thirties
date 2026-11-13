@@ -38,6 +38,8 @@ import { Sparkles } from 'lucide-react';
 import { useIntegrationCloudSync } from './lib/integrations';
 import { allGratitudes, gratitudeToReread } from './lib/gratitude';
 import { TaskQuick } from './features/TaskQuick';
+import { OUVRIR_CORAN } from './ui/CoranLien';
+import { CORAN_KIND } from './lib/coran';
 
 // Écrans chargés à la demande : l'app s'ouvre plus vite.
 const Agenda = lazy(() => import('./screens/Agenda').then((m) => ({ default: m.Agenda })));
@@ -466,6 +468,11 @@ export default function App() {
   const [habitsNow, setHabitsNow] = useState(0);
   const [jardinStart, setJardinStart] = useState<{ c?: number; k: number }>({ k: 0 });
   const [coranStart, setCoranStart] = useState<{ at?: [number, number]; k: number }>({ k: 0 });
+  useEffect(() => {
+    const open = (ev: Event) => { const at = (ev as CustomEvent<[number, number] | null>).detail ?? undefined; setCoranStart((c) => ({ at, k: c.k + 1 })); setScreen('coran'); window.scrollTo({ top: 0 }); };
+    window.addEventListener(OUVRIR_CORAN, open);
+    return () => window.removeEventListener(OUVRIR_CORAN, open);
+  }, []);
   const [dayTarget, setDayTarget] = useState<{ date?: string; part?: 'matin' | 'soir'; n: number }>({ n: 0 });
   // Lien ouvert depuis une notification : ?ecran=myday&moment=soir, ?ecran=habits…
   useEffect(() => {
@@ -777,7 +784,7 @@ export default function App() {
             booster={<div className="entries">{allModuleEntries.filter((e) => e.kind === 'booster').map((e) => <EntryCard key={e.id} entry={e} module={currentModule} onEdit={openEntry} onDelete={(x) => void remove(x)} onUpdate={updateData} />)}</div>} />
           {equilibreTab === 'journal' && <><EquilibriumInsights entries={allModuleEntries} /><BalanceReview entries={allModuleEntries} onCreate={createFromTool} /></>}
           <button className="calm-pill" onClick={() => go('calme')}>J’ai besoin de me calmer</button></>}
-        {currentModule.id === 'spiritualite' && <><SpiritTop tab={spiritTab} onTab={setSpiritTab} entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />
+        {currentModule.id === 'spiritualite' && <><SpiritTop tab={spiritTab} onTab={setSpiritTab} entries={allModuleEntries} extra={ritualEntries.filter((e) => e.kind === CORAN_KIND || e.kind === 'invocations')} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />
           {spiritTab === 'invocations' && <Duas entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} />}
           {spiritTab === 'qibla' && <Qibla entries={allModuleEntries} />}
           {spiritTab === 'horaires' && <AutomaticPrayerTimes entries={allModuleEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={removeQuiet} />}</>}

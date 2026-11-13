@@ -9,6 +9,7 @@ import { isoOf, MOODS } from '../lib/rituals';
 import { Glyph } from '../ui/Glyph';
 import { Dictate } from '../ui/Dictate';
 import { Bar, Segmented } from '../ui/kit';
+import { AvecCoran } from '../ui/CoranLien';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 type Props = { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void>; signFirst?: boolean };
@@ -134,7 +135,7 @@ function WishCard({ w, open, onToggle, onUpdate, onRemove, today }: { w: Wish; o
 
       <label>Une invocation pour ce souhait<select value={w.duaId} onChange={(e) => void set({ duaId: e.target.value })}>
         <option value="">Aucune</option>{DUAS.map((d) => <option key={d.id} value={d.id}>{d.title}</option>)}</select></label>
-      {dua && <div className="carnet-dua"><p className="dua-ar" lang="ar" dir="rtl">{dua.arabic}</p><em>{dua.phonetic}</em><p>{dua.french}</p>{dua.ref && <small>{dua.ref}</small>}</div>}
+      {dua && <div className="carnet-dua"><p className="dua-ar" lang="ar" dir="rtl">{dua.arabic}</p><em>{dua.phonetic}</em><p>{dua.french}</p>{dua.ref && <small><AvecCoran texte={dua.ref} /></small>}</div>}
 
       <label>Étiquette<select value={w.tag} onChange={(e) => void set({ tag: e.target.value })}><option value="">Sans étiquette</option>{TAGS.map((t) => <option key={t} value={t}>{t}</option>)}</select></label>
       <div className="button-group">

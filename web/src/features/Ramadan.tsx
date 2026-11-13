@@ -5,6 +5,7 @@ import { computeTimes, readSettings } from '../lib/prayertimes';
 import { fastingSummary, QURAN_PAGES, RAMADAN_KIND, ramadanStatus, targetPage, type RamadanData } from '../lib/ramadan';
 import { isoOf } from '../lib/rituals';
 import { Bar } from '../ui/kit';
+import { ouvrirCoran } from '../ui/CoranLien';
 
 const addDays = (iso: string, n: number) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 const frDay = (iso: string) => new Date(iso + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -65,6 +66,7 @@ export function Ramadan({ entries, onCreate, onUpdate }: { entries: Entry[]; onC
       <p className="muted small">Juz’ du jour : {Math.min(30, st.day)} · objectif page {goal} sur {QURAN_PAGES} (environ 20 pages par jour)</p>
       <Bar value={read / QURAN_PAGES} tone="caramel" />
       <label>J’en suis à la page<input type="number" inputMode="numeric" min={0} max={QURAN_PAGES} value={page} onChange={(e) => setPage(e.target.value)} onBlur={() => { const n = Math.max(0, Math.min(QURAN_PAGES, Number(page) || 0)); setPage(String(n)); void save({ page: n }); }} /></label>
+      <button type="button" className="button secondary small" onClick={() => ouvrirCoran()}><BookOpen size={14} /> Lire dans le Coran</button>
       {read > 0 && <p className="small">{read >= goal ? 'Tu es dans les temps, qu’Allah t’en facilite la suite.' : 'Encore ' + (goal - read) + ' pages pour rattraper le rythme du jour.'}</p>}
     </section>}
 

@@ -15,6 +15,7 @@ import type { LangCourse } from '../lib/langCourses/types';
 import { QURAN_PAGES } from '../lib/ramadan';
 import { actsDone, DH_ACTS, DH_DAYS, DHUL_HIJJA_KIND, dhulHijjaStatus, type DhData } from '../lib/dhulHijja';
 import { allahNameOfDay, challengesToday, QURAN_KIND, quranPlan, quranRead, tafsirOfDay, wordOfDay } from '../lib/todayLearning';
+import { ouvrirCoran } from '../ui/CoranLien';
 
 export type LearningTarget = 'passions' | 'challenges' | 'cours' | 'dhulhijja' | 'carnet' | 'carnet-signe' | 'wird' | 'apres' | 'arabe' | 'gratitude';
 
@@ -117,6 +118,7 @@ export function TodayLearning({ entries, today, onOpen, onCreate, onUpdate }: {
             <strong>{plan.from === plan.to ? 'Page ' + plan.from : 'Pages ' + plan.from + ' à ' + plan.to}</strong>
           </button>
           : <button className="dl-text" onClick={() => void setupQuran()}><small>Lecture du Coran</small><strong>Choisir ma page et mon rythme</strong></button>}
+        <button className="dl-btn soft" aria-label="Lire dans le Coran" onClick={() => ouvrirCoran()}><BookOpen size={16} /></button>
         {plan ? (plan.doneToday ? <span className="dl-done" aria-label="Lu aujourd’hui"><Check size={16} strokeWidth={3} /></span>
           : <button className="dl-btn" onClick={() => void onUpdate(quran!, quranRead(quran!.data, today))}>Lu</button>)
           : <button className="dl-btn" aria-label="Régler ma lecture du Coran" onClick={() => void setupQuran()}><Settings2 size={16} /></button>}

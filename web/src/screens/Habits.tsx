@@ -13,6 +13,7 @@ import { bilanDay } from '../lib/day';
 import { DaySwitch, dayName } from '../features/DaySwitch';
 import { badgesOf, nextBadge } from '../lib/growth';
 import { JOURNEYS, JOURNEY_KIND, journeyWeek } from '../lib/journeys';
+import { ouvrirCoran } from '../ui/CoranLien';
 
 type EditFull = (id: string, patch: { title: string; data: Record<string, unknown> }) => Promise<void>;
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
@@ -117,6 +118,7 @@ async function shareHabit(e: Entry, streak: number, unit: string) {
   try { if (navigator.share) { await navigator.share({ text }); return ''; } } catch { return ''; }
   try { await navigator.clipboard.writeText(text); return 'Message copié : colle-le dans WhatsApp ou tes messages.'; } catch { return text; }
 }
+const CORAN_HABITS: Record<string, { label: string; at?: [number, number] }> = { coran: { label: 'Ouvrir le Coran' }, sourate: { label: 'Ouvrir le Coran' }, kahf: { label: 'Lire al-Kahf', at: [18, 1] } };
 const shortDate = (iso: string) => new Date(iso + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 
 /** Une habitude : coche (ou compteur, ou étapes), semaine à toucher, note du jour, réglages, calendrier, enchaînement. */
@@ -165,6 +167,7 @@ function HabitCard({ e, mine, day, today, ctx, prayers, onUpdate, onRemove, onOp
         {next && <small className="muted">{next - total} fois avant le badge {next}</small>}
         {steps.length > 0 && streak >= 7 && <span className="badge"><Trophy size={12} /> Routine complète {streak} jours · panda récompensé</span>}
         {on && <button className="link-btn small" onClick={() => open('note')}>{note ? 'Modifier la note' : 'Ajouter une note'}</button>}
+        {CORAN_HABITS[String(e.data.templateId)] && <button className="link-btn small" onClick={() => ouvrirCoran(CORAN_HABITS[String(e.data.templateId)]!.at)}>{CORAN_HABITS[String(e.data.templateId)]!.label}</button>}
         <button className="link-btn small" onClick={() => open('settings')}>Réglages</button>
         <button className="link-btn small" onClick={() => open('cal')}>Calendrier</button>
         <button className="link-btn small" onClick={() => open('chain')}>{anchor ? 'Changer l’enchaînement' : 'Enchaîner après…'}</button>
