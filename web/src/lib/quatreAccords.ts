@@ -8,7 +8,7 @@ export const ACCORDS: Accord[] = [
     sens: ['Ma parole crée : ce que je dis, aux autres comme à moi-même, façonne ce que je vis.', 'Impeccable veut dire sans faute contre moi-même : ne pas utiliser les mots contre moi ni contre les autres.', 'La médisance et l’autocritique sont des poisons qui se transmettent : une phrase entendue enfant peut devenir une croyance pour des années.'],
     pratique: ['Ne dire que ce que je pense vraiment, avec douceur.', 'Ne pas répéter un ragot, même pour « juste en parler ».', 'Remarquer ma voix intérieure : est-ce que je me parlerais ainsi si je m’aimais ?', 'Utiliser mes mots pour la vérité et l’amour, envers moi d’abord.'],
     piege: 'etiquette', question: 'Quelle phrase ai-je dite aujourd’hui, à moi ou à quelqu’un, que je ne voudrais pas recevoir ?' },
-  { n: 2, titre: 'N’en faire une affaire personnelle',
+  { n: 2, titre: 'Ne pas en faire une affaire personnelle',
     sens: ['Ce que les autres disent ou font vient de leur propre monde : leurs croyances, leurs blessures, leur humeur.', 'Prendre les choses pour soi, c’est croire que tout nous concerne : c’est une forme d’importance que l’on se donne.', 'C’est valable pour les critiques comme pour les compliments : ni l’un ni l’autre ne dit qui je suis.'],
     pratique: ['Devant une remarque blessante, me dire : cela parle d’abord de la personne.', 'Ne pas avaler le « poison » : je peux l’entendre sans le faire mien.', 'Ne pas non plus prendre personnellement ce que je me dis dans ma tête.', 'Me rappeler que je ne suis pas responsable des actes des autres, seulement des miens.'],
     piege: 'personnalisation', question: 'Qu’ai-je pris pour moi cette semaine qui ne me concernait pas vraiment ?' },
