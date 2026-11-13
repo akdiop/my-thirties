@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Entry } from '../cloud';
 import { activeHabits, countData, easierRule, monthReview, countOn, everyWait, expectedOver, habitDaysLabel, habitDue, habitRule, habitScheduled, habitStreak, momentNow, momentRank, periodCount, ruleData, ruleLabel, stepData, toggleData, weekTarget } from '../rituals';
-import { doneWith, dueOn, inSeason, remindMinute, remindOn } from '../../../supabase/functions/push-reminders/habits';
+import { doneWith, dueOn, inSeason, remindMinute, remindOn, weekRecap } from '../../../supabase/functions/push-reminders/habits';
 import { routineMilestones } from '../../features/panda/engine';
 import { taskBuckets } from '../../features/TaskQuick';
 
@@ -150,5 +150,16 @@ describe('habitudes : cycle, prière, saison, Santé, bilan du mois, panda', () 
   it('panda : palier de 7 jours de routine complète', () => {
     const done = Object.fromEntries(Array.from({ length: 15 }, (_, i) => ['2026-11-' + String(i + 1).padStart(2, '0'), true]));
     expect(routineMilestones(done)).toEqual(['2026-11-07', '2026-11-14']);
+  });
+});
+
+describe('habitudes : récap du dimanche', () => {
+  it('compte les coches de la semaine et trouve la plus belle série', () => {
+    const r = weekRecap([
+      { title: 'Lire', data: { freq: 'daily', done: { '2026-11-12': true, '2026-11-13': true, '2026-11-14': true, '2026-11-15': true } } },
+      { title: 'Yoga', data: { freq: 'daily', done: { '2026-11-15': true } } },
+      { title: 'Archivée', data: { archived: '2026-11-01', done: { '2026-11-15': true } } },
+    ], '2026-11-15');
+    expect(r).toEqual({ count: 2, done: 5, best: { title: 'Lire', streak: 4, unit: 'jours' } });
   });
 });

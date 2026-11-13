@@ -8,14 +8,14 @@ export type NotifPrefs = {
   agenda: { on: boolean; minutes: number }; weekly: { on: boolean; day: number; time: string }; supplements: { on: boolean };
   plan: { on: boolean; time: string }; birthdays: { on: boolean; time: string };
   prayers: { on: boolean; minutes: number }; fasting: { on: boolean; time: string }; water: { on: boolean; time: string };
-  carnet: { on: boolean; time: string }; wird: { on: boolean }; gratitude: { on: boolean; time: string };
+  carnet: { on: boolean; time: string }; wird: { on: boolean }; gratitude: { on: boolean; time: string }; habitsWeek: { on: boolean; time: string };
 };
 export const DEFAULT_PREFS: NotifPrefs = {
   morning: { on: true, time: '08:00' }, evening: { on: true, time: '21:00' }, habits: { on: true, time: '19:00' },
   agenda: { on: true, minutes: 15 }, weekly: { on: true, day: 0, time: '18:00' }, supplements: { on: true },
   plan: { on: true, time: '19:30' }, birthdays: { on: true, time: '09:00' },
   prayers: { on: true, minutes: 5 }, fasting: { on: true, time: '20:30' }, water: { on: true, time: '16:00' },
-  carnet: { on: true, time: '20:00' }, wird: { on: true }, gratitude: { on: true, time: '21:30' },
+  carnet: { on: true, time: '20:00' }, wird: { on: true }, gratitude: { on: true, time: '21:30' }, habitsWeek: { on: true, time: '18:30' },
 };
 const DAYS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 const pushSupported = () => typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window && typeof Notification !== 'undefined';
@@ -27,7 +27,7 @@ const merge = (v: unknown): NotifPrefs => {
   return { morning: { ...DEFAULT_PREFS.morning, ...p.morning }, evening: { ...DEFAULT_PREFS.evening, ...p.evening }, habits: { ...DEFAULT_PREFS.habits, ...p.habits },
     agenda: { ...DEFAULT_PREFS.agenda, ...p.agenda }, weekly: { ...DEFAULT_PREFS.weekly, ...p.weekly }, supplements: { ...DEFAULT_PREFS.supplements, ...p.supplements },
     plan: { ...DEFAULT_PREFS.plan, ...p.plan }, birthdays: { ...DEFAULT_PREFS.birthdays, ...p.birthdays },
-    prayers: { ...DEFAULT_PREFS.prayers, ...p.prayers }, fasting: { ...DEFAULT_PREFS.fasting, ...p.fasting }, water: { ...DEFAULT_PREFS.water, ...p.water }, carnet: { ...DEFAULT_PREFS.carnet, ...p.carnet }, wird: { ...DEFAULT_PREFS.wird, ...p.wird }, gratitude: { ...DEFAULT_PREFS.gratitude, ...p.gratitude } };
+    prayers: { ...DEFAULT_PREFS.prayers, ...p.prayers }, fasting: { ...DEFAULT_PREFS.fasting, ...p.fasting }, water: { ...DEFAULT_PREFS.water, ...p.water }, carnet: { ...DEFAULT_PREFS.carnet, ...p.carnet }, wird: { ...DEFAULT_PREFS.wird, ...p.wird }, gratitude: { ...DEFAULT_PREFS.gratitude, ...p.gratitude }, habitsWeek: { ...DEFAULT_PREFS.habitsWeek, ...p.habitsWeek } };
 };
 
 export function NotificationSettings() {
@@ -112,6 +112,8 @@ export function NotificationSettings() {
       time(prefs.evening.time, (v) => void save({ ...prefs, evening: { ...prefs.evening, time: v } })))}
     {row('Mes habitudes', 'Rappel des habitudes du jour pas encore cochées.', prefs.habits.on, (on) => void save({ ...prefs, habits: { ...prefs.habits, on } }),
       time(prefs.habits.time, (v) => void save({ ...prefs, habits: { ...prefs.habits, time: v } })))}
+    {row('Ma semaine en habitudes', 'Le dimanche : habitudes cochées sur la semaine et ta plus belle série.', prefs.habitsWeek.on, (on) => void save({ ...prefs, habitsWeek: { ...prefs.habitsWeek, on } }),
+      time(prefs.habitsWeek.time, (v) => void save({ ...prefs, habitsWeek: { ...prefs.habitsWeek, time: v } })))}
     {row('Agenda', 'Avant chaque rendez-vous, événement ou tâche avec une heure.', prefs.agenda.on, (on) => void save({ ...prefs, agenda: { ...prefs.agenda, on } }),
       <select value={prefs.agenda.minutes} onChange={(e) => void save({ ...prefs, agenda: { ...prefs.agenda, minutes: Number(e.target.value) } })}>
         {[0, 5, 15, 30, 60].map((m) => <option key={m} value={m}>{m ? m + ' min avant' : 'À l’heure'}</option>)}</select>)}

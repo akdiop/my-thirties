@@ -2105,6 +2105,11 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .habit-goal-fields{display:grid;grid-template-columns:96px 1fr;gap:8px}
 .season-fields{grid-template-columns:1fr 1fr;margin-top:8px}
 .habit-moments{margin:4px 0 2px}
+.habit-toast{position:fixed;left:16px;right:16px;bottom:calc(96px + env(safe-area-inset-bottom));z-index:40;max-width:560px;margin:0 auto;padding:12px 44px 12px 14px;border-radius:18px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid #E8E2D6;box-shadow:0 10px 30px rgba(58,56,51,.14);display:flex;flex-direction:column;gap:8px}
+.habit-toast > .icon-btn{position:absolute;top:2px;right:2px}
+.habit-toast p{margin:0;display:flex;flex-direction:column;gap:2px;font-size:.88rem;color:#3A3833}
+.habit-toast-next{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.86rem}
+.coach-answer{white-space:pre-wrap;font-size:.88rem;line-height:1.5;color:#3A3833;margin:8px 0 0}
 .habit-archive{margin-top:14px;padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.55);border:1px solid #E8E2D6}
 .habit-archive summary{cursor:pointer;font-weight:600;color:#7E7254}
 .habit-archive-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid #EFEBE3}
@@ -2176,3 +2181,43 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .fold-head{display:flex;justify-content:space-between;align-items:center;width:100%;padding:2px 2px 0;border:0;background:transparent;color:#7E7254;font:inherit;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .fold-head svg{transition:transform .2s}.fold-head svg.flip{transform:rotate(180deg)}
 .home-fold.closed{gap:0}
+.astro-wheel-card{display:flex;flex-direction:column;align-items:center;gap:6px}
+.astro-wheel{width:100%;max-width:340px;height:auto}
+.astro-wheel .w-outer{fill:rgba(255,255,255,.7);stroke:#D8D1C2;stroke-width:1}
+.astro-wheel .w-ring{fill:#FBFAF7;stroke:#E2DCD0;stroke-width:1}
+.astro-wheel .w-inner{fill:rgba(95,122,89,.05);stroke:#E2DCD0;stroke-width:1}
+.astro-wheel .w-tick{stroke:#D8D1C2;stroke-width:1}
+.astro-wheel .w-axis{stroke:#7E7254;stroke-width:1.2;stroke-dasharray:3 3}
+.astro-wheel text{font-family:inherit;text-anchor:middle;dominant-baseline:central}
+.astro-wheel .w-sign{font-size:10px;font-weight:600;fill:#8B8576}
+.astro-wheel .w-sign.el-feu{fill:#B08A6E}.astro-wheel .w-sign.el-terre{fill:#7E7254}.astro-wheel .w-sign.el-air{fill:#8B8576}.astro-wheel .w-sign.el-eau{fill:#5F7A59}
+.astro-wheel .w-planet{font-size:11px;font-weight:700;fill:#3A3833}
+.astro-wheel .w-dot{fill:#7E7254}
+.astro-wheel .w-asc{font-size:10px;font-weight:700;fill:#7E7254;text-anchor:start}
+.astro-trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.astro-trio .soft-card{display:flex;flex-direction:column;gap:2px;padding:12px 10px}
+.astro-trio strong{font-size:1rem;color:#3A3833}
+.astro-trio small{font-size:.72rem}
+.astro-essentiel{margin:0 0 6px;font-size:.92rem;line-height:1.5;color:#3A3833}
+.astro-list{margin:4px 0 8px;padding-left:18px;display:flex;flex-direction:column;gap:3px;font-size:.88rem;color:#3A3833}
+.astro-list.soft{color:#6F6B63}
+.astro-conseil{margin:6px 0;padding:10px 12px;border-radius:12px;background:rgba(95,122,89,.08);font-size:.88rem;color:#3A3833}
+.astro-conseil strong{color:#5F7A59;margin-right:4px}
+.astro-lecture{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+.astro-planet summary,.astro-house{display:flex;align-items:center;gap:10px}
+.astro-planet summary{cursor:pointer;list-style:none}
+.astro-abbr{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#F2EFE8;color:#7E7254;font-weight:700;font-size:.78rem}
+.astro-house.on .astro-abbr{background:#5F7A59;color:#fff}
+.astro-house:not(.on){opacity:.7}
+.astro-sub{margin-top:12px}
+.astro-q{padding:8px 0;border-top:1px solid #EFEBE3}
+.astro-q summary{cursor:pointer;font-size:.9rem;color:#3A3833}
+.astro-def{padding:8px 0;border-top:1px solid #EFEBE3;display:flex;flex-direction:column;gap:2px}
+.astro-def p{margin:0;font-size:.86rem;color:#3A3833}
+.astro-def em{color:#6F6B63}
+.astro-wheel .w-lead{stroke:#C9C1B0;stroke-width:.8}
+.astro summary{list-style:none;cursor:pointer}
+.astro summary::-webkit-details-marker{display:none}
+.astro-sum{display:flex;align-items:center;gap:10px}
+.astro-detail p{margin:0 0 6px;font-size:.9rem;line-height:1.5;color:#3A3833}
+.astro-detail .ritual-label{margin:8px 0 2px}

@@ -1,12 +1,12 @@
 import type { Entry } from './cloud';
 import type { GlyphName, Tint } from '../ui/Glyph';
-import { activeGap, addIso, autoCount, clampN, cycleRestOn, daysOf, doneDates, doneOf, dueOn, everyWait as everyWaitOf, goalOf, inSeason, monthLength, monthStart, pausedOn, pauseOf, periodCount as periodCountOf, prayerOf, restOn, ruleOf, RULE_RANGE, scheduledOn, seasonOf, weekStart, type HabitCtx, type HabitRule, type HabitSeason } from '../../supabase/functions/push-reminders/habits';
+import { addIso, autoCount, streakOf, streakUnit, clampN, cycleRestOn, daysOf, doneDates, doneOf, dueOn, everyWait as everyWaitOf, goalOf, inSeason, monthStart, pausedOn, pauseOf, periodCount as periodCountOf, prayerOf, restOn, ruleOf, RULE_RANGE, scheduledOn, seasonOf, type HabitCtx, type HabitRule, type HabitSeason } from '../../supabase/functions/push-reminders/habits';
 
 /** Entrées des nouveaux écrans (Mon jour, Habitudes, Notes) : gérées par leurs propres écrans, pas par les listes des espaces. */
 export const DAILY_KIND = 'daily';
 export const NOTE_KIND = 'note';
 export const HABIT_KIND = 'habit';
-export const RITUAL_KINDS = [DAILY_KIND, NOTE_KIND, HABIT_KIND, 'vision', 'objectif', 'roue', 'parcours_progressif', 'meditation', 'focus', 'sommeil', 'complement', 'reglages_accueil', 'reglages_integrations', 'proche', 'lecture', 'envie', 'panda', 'invocations', 'programme_3mois', 'lecture_coran', 'carnet_page', 'voeu', 'carnet_reglages', 'gratitude_jour', 'gratitude_reglages', 'tcc', 'tcc_echelle', 'hsp', 'ressenti'];
+export const RITUAL_KINDS = [DAILY_KIND, NOTE_KIND, HABIT_KIND, 'vision', 'objectif', 'roue', 'parcours_progressif', 'meditation', 'focus', 'sommeil', 'complement', 'reglages_accueil', 'reglages_integrations', 'proche', 'lecture', 'envie', 'panda', 'invocations', 'programme_3mois', 'lecture_coran', 'carnet_page', 'voeu', 'carnet_reglages', 'gratitude_jour', 'gratitude_reglages', 'tcc', 'tcc_echelle', 'hsp', 'ressenti', 'theme_astral'];
 
 export const MOODS: { value: string; icon: GlyphName; tint: Tint }[] = [
   { value: 'Épuisée', icon: 'battery', tint: 'rose' }, { value: 'Fatiguée', icon: 'rain', tint: 'ardoise' }, { value: 'Neutre', icon: 'meh', tint: 'or' },
@@ -194,7 +194,7 @@ export function monthReview(habits: Entry[], today: string, ctx?: HabitCtx) {
   const struggling = low && low.rate < 0.5 ? low : null;
   return { rows, best, struggling, suggestion: struggling ? easierRule(habitRule(struggling.e)) : null };
 }
-export const streakUnit = (r: HabitRule) => ({ daily: 'jours', week: 'semaines', every: 'fois de suite', month: 'mois' })[r.type];
+export { streakUnit };
 
 /** Objectif chiffré (ex. 6 verres) : compteur du jour, la coche se fait quand il est atteint. */
 export const habitGoal = (e: Entry) => goalOf(e.data);
@@ -238,36 +238,8 @@ export const DAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 export const habitDaysLabel = (e: Entry) => { const d = habitDays(e); if (!d.length || d.length === 7) return ''; return d.length === 5 && !d.includes(5) && !d.includes(6) ? 'en semaine' : d.length === 2 && d.includes(5) && d.includes(6) ? 'le week-end' : [...d].sort().map((i) => ['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim'][i]).join(', '); };
 
 /** Série en cours : jours consécutifs (quotidienne), semaines ou mois où l'objectif est atteint, ou fois faites à temps (tous les n jours). Les jours non prévus et les pauses ne cassent rien. */
-export function habitStreak(e: Entry, today: string, ctx?: HabitCtx) {
-  const done = habitDone(e), r = habitRule(e), d = e.data;
-  if (r.type === 'daily') {
-    let day = done[today] || !habitScheduled(e, today) || isResting(e, today, ctx) ? today : addIso(today, -1), n = 0;
-    for (let guard = 0; guard < 3660; guard++) {
-      if (done[day]) n++; else if (habitScheduled(e, day) && !isResting(e, day, ctx)) break;
-      day = addIso(day, -1);
-    }
-    return n;
-  }
-  if (r.type === 'every') {
-    const list = doneDates(d).filter((x) => x <= today);
-    if (!list.length || activeGap(d, list[list.length - 1]!, today, ctx) > r.n) return 0;
-    let n = 1;
-    for (let i = list.length - 1; i > 0 && activeGap(d, list[i - 1]!, list[i]!, ctx) <= r.n; i--) n++;
-    return n;
-  }
-  const month = r.type === 'month';
-  const start = (iso: string) => (month ? monthStart(iso) : weekStart(iso));
-  const prev = (p: string) => start(addIso(p, -1));
-  const last = (p: string) => (month ? p.slice(0, 8) + String(monthLength(p)).padStart(2, '0') : addIso(p, 6));
-  const touchesPause = (p: string) => { for (let x = p; x <= last(p); x = addIso(x, 1)) if (restOn(d, x, ctx)) return true; return false; };
-  let p = start(today), n = 0;
-  if (periodCountOf(d, p) < r.n) p = prev(p);
-  for (let guard = 0; guard < 600; guard++) {
-    if (periodCountOf(d, p) >= r.n) n++; else if (!touchesPause(p)) break;
-    p = prev(p);
-  }
-  return n;
-}
+/** Série en cours (voir streakOf). */
+export const habitStreak = (e: Entry, today: string, ctx?: HabitCtx) => streakOf(e.data, today, ctx);
 
 /* ---------- Notes ---------- */
 export const NOTE_FOLDERS: { id: string; icon: GlyphName; tint: Tint; label: string }[] = [

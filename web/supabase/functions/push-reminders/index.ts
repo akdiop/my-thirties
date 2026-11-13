@@ -10,12 +10,12 @@ import { CalculationMethod, Coordinates, Madhab, PrayerTimes } from 'npm:adhan@4
 import { suppStatus } from './supplements.ts';
 import { isEve, writingWindow, type CarnetSettings } from './carnet.ts';
 import { wirdPace, wirdSlots } from './wird.ts';
-import { doneWith, dueOn, remindMinute, remindOn, type HabitCtx } from './habits.ts';
+import { doneWith, dueOn, remindMinute, remindOn, weekRecap, type HabitCtx } from './habits.ts';
 
 type Prefs = { morning?: { on?: boolean; time?: string }; evening?: { on?: boolean; time?: string }; habits?: { on?: boolean; time?: string };
   agenda?: { on?: boolean; minutes?: number }; weekly?: { on?: boolean; day?: number; time?: string }; supplements?: { on?: boolean };
   plan?: { on?: boolean; time?: string }; birthdays?: { on?: boolean; time?: string };
-  prayers?: { on?: boolean; minutes?: number }; fasting?: { on?: boolean; time?: string }; water?: { on?: boolean; time?: string }; carnet?: { on?: boolean; time?: string }; wird?: { on?: boolean }; gratitude?: { on?: boolean; time?: string } };
+  prayers?: { on?: boolean; minutes?: number }; fasting?: { on?: boolean; time?: string }; water?: { on?: boolean; time?: string }; carnet?: { on?: boolean; time?: string }; wird?: { on?: boolean }; gratitude?: { on?: boolean; time?: string }; habitsWeek?: { on?: boolean; time?: string } };
 type Row = { id: string; module: string; kind: string; title: string; entry_date: string | null; data: Record<string, unknown> };
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 const json = (d: unknown, status = 200) => new Response(JSON.stringify(d), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -141,6 +141,12 @@ Deno.serve(async (request) => {
     if (p.habits?.on !== false && due(now.minutes, mins(p.habits?.time ?? '19:00'))) {
       const left = list.filter(habitLeft);
       if (left.length) queue.push({ key: 'habits:' + now.date, title: 'Mes habitudes', body: left.length === 1 ? 'Il te reste « ' + left[0]!.title + ' » aujourd’hui.' : 'Il te reste ' + left.length + ' habitudes aujourd’hui : ' + left.slice(0, 3).map((e) => e.title).join(', ') + '.', url: '/?ecran=habits' });
+    }
+    // Dimanche : ma semaine en habitudes (nombre de coches et plus belle série en cours).
+    if (p.habitsWeek?.on !== false && now.weekday === 0 && due(now.minutes, mins(p.habitsWeek?.time ?? '18:30'))) {
+      const r = weekRecap(list.filter((e) => e.kind === 'habit'), now.date, hctx);
+      if (r.count && r.done) queue.push({ key: 'habitsweek:' + now.date, title: 'Ma semaine en habitudes', url: '/?ecran=habits',
+        body: r.done + ' habitude' + (r.done > 1 ? 's' : '') + ' cochée' + (r.done > 1 ? 's' : '') + ' cette semaine.' + (r.best ? ' Plus belle série : « ' + r.best.title.slice(0, 50) + ' », ' + r.best.streak + ' ' + r.best.unit + '.' : '') });
     }
     // Compléments : à l'heure choisie, tant que la prise du jour n'est pas cochée et que la cure est en cours.
     if (p.supplements?.on !== false) {

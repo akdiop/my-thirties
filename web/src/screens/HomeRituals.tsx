@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Brain, Clapperboard, Feather, HandHeart, Waves, BookHeart, BookOpen, Cake, Gift, CalendarCheck, ChevronDown, ChevronUp, Compass, Flower2, Heart, Leaf, Moon, Pill, Settings2, Sparkles, Timer } from 'lucide-react';
+import { Brain, Clapperboard, Star, Feather, HandHeart, Waves, BookHeart, BookOpen, Cake, Gift, CalendarCheck, ChevronDown, ChevronUp, Compass, Flower2, Heart, Leaf, Moon, Pill, Settings2, Sparkles, Timer } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { PandaWidget } from '../features/panda/PandaWidget';
 import { MomentBar } from '../features/MomentBar';
@@ -10,7 +10,7 @@ import { taskBuckets } from '../features/TaskQuick';
 import { prayerDay } from '../lib/wellbeing';
 import { GRAT_KIND, type GratData } from '../lib/gratitude';
 
-type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'finances' | 'transformation' | 'carnet' | 'gratitude' | 'tcc' | 'hsp' | 'culture';
+type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'finances' | 'transformation' | 'carnet' | 'gratitude' | 'tcc' | 'hsp' | 'culture' | 'astro';
 type Shortcut = { id: Exclude<Target, 'myday' | 'panda' | 'finances'>; label: string; sub: string; icon: typeof Heart };
 const SHORTCUTS: Shortcut[] = [
   { id: 'habits', label: 'Habitudes', sub: 'Suivi quotidien', icon: Heart },
@@ -29,6 +29,7 @@ const SHORTCUTS: Shortcut[] = [
   { id: 'complements', label: 'Mes compléments', sub: 'Vitamines, cures, rappels', icon: Pill },
   { id: 'proches', label: 'Mes proches', sub: 'Anniversaires et idées de cadeaux', icon: Cake },
   { id: 'culture', label: 'Ma culture', sub: 'Lectures, séries et films', icon: Clapperboard },
+  { id: 'astro', label: 'Mon thème astral', sub: 'Planètes, maisons, aspects, pistes', icon: Star },
   { id: 'lectures', label: 'Mes lectures', sub: 'Livres et citations', icon: BookOpen },
   { id: 'envies', label: 'Mes envies', sub: 'Ce que je veux m’offrir', icon: Gift },
 ];
