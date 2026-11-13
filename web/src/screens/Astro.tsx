@@ -14,6 +14,7 @@ import { exercicesHsp, progresHsp } from '../lib/hypersensibilite';
 import { hijriLabel, hijriOf, spiritualDay } from '../lib/hijri';
 import { cheminDeVie, ficheAffectif, ficheExpression, ficheIslam, nombresDuNom, numerologieOf, SENS_NOMBRES, type Numero, type Fiche, type MaNumerologie } from '../lib/numerologie';
 import { Bar } from '../ui/kit';
+import { AvecCoran } from '../ui/CoranLien';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 type Tab = 'theme' | 'portrait' | 'ciel' | 'planetes' | 'maisons' | 'aspects' | 'numero' | 'lunes' | 'proches' | 'pistes' | 'comprendre';
@@ -226,7 +227,7 @@ function DuaDuJour({ chart, today }: { chart: Chart; today: string }) {
   if (!d) return null;
   return <details className="astro-dua"><summary><span className="ritual-label">Mon invocation du jour</span> <strong>{d.title}</strong></summary>
     <p className="astro-ar" lang="ar" dir="rtl">{d.arabic}</p><p className="muted"><em>{d.phonetic}</em></p><p className="astro-essentiel">{d.french}</p>
-    <small className="muted">{d.ref ? d.ref + ' · ' : ''}{d.source}</small></details>;
+    <small className="muted">{d.ref ? <><AvecCoran texte={d.ref} /> · </> : null}{d.source}</small></details>;
 }
 
 export const CITATION_KIND = 'citation_perso';

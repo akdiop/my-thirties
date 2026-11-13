@@ -42,7 +42,8 @@ export function refCoran(ref: string): [number, number] | null {
   return s >= 1 && s <= SOURATES && v >= 1 ? [s, v] : null;
 }
 
-export type CoranState = { lus: number[]; favoris: [number, number][]; marque?: [number, number]; khatm: number };
+/** jours : les jours où j'ai coché « Lu aujourd'hui » (défiler ne compte pas). */
+export type CoranState = { lus: number[]; favoris: [number, number][]; marque?: [number, number]; khatm: number; jours: string[] };
 const pair = (x: unknown): x is [number, number] => Array.isArray(x) && x.length === 2 && x.every((n) => typeof n === 'number');
 export function coranOf(entries: Entry[]): { entry?: Entry; state: CoranState } {
   const e = entries.find((x) => x.kind === CORAN_KIND);
@@ -52,5 +53,6 @@ export function coranOf(entries: Entry[]): { entry?: Entry; state: CoranState } 
     favoris: Array.isArray(d.favoris) ? d.favoris.filter(pair) : [],
     marque: pair(d.marque) ? d.marque : undefined,
     khatm: Number(d.khatm) || 0,
+    jours: Array.isArray(d.jours) ? d.jours.filter((x): x is string => typeof x === 'string') : [],
   } };
 }

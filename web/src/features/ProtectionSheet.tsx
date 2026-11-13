@@ -1,6 +1,7 @@
 import { X } from 'lucide-react';
 import { DUAS } from '../lib/duas';
 import { RepeatCounter } from './Duas';
+import { AvecCoran } from '../ui/CoranLien';
 
 const FIRST = ['laqad', 'kursi', 'baqara-fin'];
 const PROTECTION = [...FIRST.flatMap((id) => DUAS.filter((d) => d.id === id)), ...DUAS.filter((d) => d.category === 'Protection' && !FIRST.includes(d.id))];
@@ -16,7 +17,7 @@ export function ProtectionSheet({ onClose }: { onClose: () => void }) {
         <p className="dua-ar" lang="ar" dir="rtl">{d.arabic}</p>
         <p className="dua-ph">{d.phonetic}</p>
         <p className="dua-fr">{d.french}</p>
-        <small className="muted">{[d.ref, d.source].filter(Boolean).join(' · ')}</small>
+        <small className="muted"><AvecCoran texte={[d.ref, d.source].filter(Boolean).join(' · ')} /></small>
         {d.repeat && <RepeatCounter total={d.repeat} />}
       </article>)}</div>
     </div>

@@ -6,6 +6,7 @@ import { isoOf } from '../lib/rituals';
 import { FICHES_SPI } from '../lib/fichesSpirituelles';
 import { refCoran } from '../lib/coran';
 import { Bar } from '../ui/kit';
+import { AvecCoran } from '../ui/CoranLien';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 type Props = { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; start?: number; onCoran?: (s: number, v: number) => void };
@@ -41,7 +42,7 @@ export function Jardin({ entries, onCreate, onUpdate, start, onCoran }: Props) {
     <section className="ritual-card"><p className="ritual-label">Fiches de spiritualité</p>
       {FICHES_SPI.map((f) => <details key={f.id} className="astro-q"><summary><strong>{f.titre}</strong></summary>
         <p className="astro-essentiel">{f.intro}</p>
-        {f.sections.map((x) => <div key={x.titre} className="astro-detail"><p className="ritual-label">{x.titre}</p><ul className="astro-list">{x.points.map((p) => <li key={p}>{p}</li>)}</ul></div>)}
+        {f.sections.map((x) => <div key={x.titre} className="astro-detail"><p className="ritual-label">{x.titre}</p><ul className="astro-list">{x.points.map((p) => <li key={p}><AvecCoran texte={p} /></li>)}</ul></div>)}
         <p className="ritual-label">Pour moi, aujourd’hui</p><ul className="astro-list">{f.questions.map((q) => <li key={q}>{q}</li>)}</ul>
         <p className="fineprint">{f.source}. <a href={f.lien} target="_blank" rel="noreferrer">Lire l’article complet</a></p></details>)}
     </section>

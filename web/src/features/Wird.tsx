@@ -3,6 +3,7 @@ import { Minus, Plus, Settings2, Trash2 } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { isoOf } from '../lib/rituals';
 import { countOn, goalOf, wirdPace } from '../../supabase/functions/push-reminders/wird';
+import { AvecCoran } from '../ui/CoranLien';
 
 export const WIRD_KIND = 'wird';
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
@@ -71,7 +72,7 @@ function WirdCard({ entry, onUpdate, onRemove }: { entry: Entry; onUpdate: Save;
   return <article className="soft-card wird-card">
     <div className="wird-head"><strong>{entry.title}</strong><button className="icon-btn" aria-label="Réglages de l’objectif" onClick={() => setSettings(!settings)}><Settings2 size={18} /></button></div>
     {typeof d.arabic === 'string' && d.arabic && <p className="dua-ar" lang="ar" dir="rtl">{d.arabic}</p>}
-    {typeof d.french === 'string' && d.french && <p className="muted small">{d.french}{d.ref ? ' (' + String(d.ref) + ')' : ''}</p>}
+    {typeof d.french === 'string' && d.french && <p className="muted small">{d.french}{d.ref ? <> (<AvecCoran texte={String(d.ref)} />)</> : null}</p>}
     <button className="dhikr-btn wird-btn" onClick={() => add(1)} aria-label={'Compter, ' + count + ' sur ' + p.goal}>
       <strong>{count}</strong><small>sur {p.goal}</small>
       <span className="dhikr-ring" style={{ background: `conic-gradient(#5F7A59 ${Math.min(1, count / p.goal) * 360}deg, #DDE5D7 0)` }} /></button>
