@@ -134,7 +134,7 @@ export function parseEvozen(text: string): Chart | null {
 
 /** Mon thème enregistré (le plus récent). */
 export function chartOf(entries: Entry[]): { entry: Entry; chart: Chart } | null {
-  const e = entries.filter((x) => x.kind === ASTRO_KIND).sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
+  const e = entries.filter((x) => x.kind === ASTRO_KIND && !x.data.proche).sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
   const ps = e && Array.isArray(e.data.placements) ? (e.data.placements as Placement[]).filter((p) => signOf(p.sign) && planetOf(p.id)) : [];
   return e && ps.length ? { entry: e, chart: { placements: ps, label: String(e.data.label ?? ''), naissance: String(e.data.naissance ?? '') } } : null;
 }
@@ -269,3 +269,113 @@ export const PISTES: { domaine: string; points: string[] }[] = [
   { domaine: 'Bien-être et santé', points: ['Intérêt naturel pour la santé, la nutrition et les routines saines.', 'Risque de surmenage et d’inquiétude : prévois de vrais temps de repos.', 'Des activités créatives et des moments de retrait te ressourcent.'] },
   { domaine: 'Croissance personnelle', points: ['Jupiter en trigone avec Uranus et Neptune : chance, intuition, idées neuves qui se concrétisent.', 'Mars en semi-sextile avec Saturne : de petits pas réguliers te mènent loin.', 'Mars et Lune en tension avec Pluton : apprendre à canaliser l’intensité et le besoin de contrôle.'] },
 ];
+
+/* ---------- Cycles de la Lune (Meeus, Astronomical Algorithms, chap. 49) et Soleil ---------- */
+const rad = (d: number) => (d * Math.PI) / 180;
+/** Date (UTC) d'une nouvelle lune (phase 0) ou d'une pleine lune (phase 0.5) pour le lunaison k depuis janvier 2000. */
+export function moonPhaseDate(k: number, phase: 0 | 0.5) {
+  const kk = k + phase, T = kk / 1236.85, T2 = T * T;
+  const M = rad(2.5534 + 29.1053567 * kk - 0.0000014 * T2), Mp = rad(201.5643 + 385.81693528 * kk + 0.0107582 * T2);
+  const F = rad(160.7108 + 390.67050284 * kk - 0.0016118 * T2), Om = rad(124.7746 - 1.56375588 * kk + 0.0020672 * T2), E = 1 - 0.002516 * T - 0.0000074 * T2;
+  const c = phase === 0 ? [-0.4072, 0.17241, 0.01608, 0.01039, 0.00739, -0.00514, 0.00208] : [-0.40614, 0.17302, 0.01614, 0.01043, 0.00734, -0.00515, 0.00209];
+  const corr = c[0]! * Math.sin(Mp) + c[1]! * E * Math.sin(M) + c[2]! * Math.sin(2 * Mp) + c[3]! * Math.sin(2 * F) + c[4]! * E * Math.sin(Mp - M) + c[5]! * E * Math.sin(Mp + M) + c[6]! * E * E * Math.sin(2 * M)
+    - 0.00111 * Math.sin(Mp - 2 * F) - 0.00057 * Math.sin(Mp + 2 * F) + 0.00056 * E * Math.sin(2 * Mp + M) - 0.00042 * Math.sin(3 * Mp) + 0.00042 * E * Math.sin(M + 2 * F)
+    + 0.00038 * E * Math.sin(M - 2 * F) - 0.00024 * E * Math.sin(2 * Mp - M) - 0.00017 * Math.sin(Om);
+  const jde = 2451550.09766 + 29.530588861 * kk + 0.00015437 * T2 + corr;
+  return new Date((jde - 2440587.5) * 86_400_000 - 69_000);
+}
+/** Longitude écliptique apparente du Soleil (précision de l'ordre du centième de degré). */
+export function sunLongitude(date: Date) {
+  const T = ((date.getTime() / 86_400_000 + 2440587.5) - 2451545) / 36525;
+  const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T, M = rad(357.52911 + 35999.05029 * T - 0.0001537 * T * T);
+  const C = (1.914602 - 0.004817 * T) * Math.sin(M) + (0.019993 - 0.000101 * T) * Math.sin(2 * M) + 0.000289 * Math.sin(3 * M);
+  return (((L0 + C - 0.00569 - 0.00478 * Math.sin(rad(125.04 - 1934.136 * T))) % 360) + 360) % 360;
+}
+const signAt = (lon: number) => SIGNS[Math.floor(lon / 30) % 12]!;
+export type Lunaison = { type: 'nouvelle' | 'pleine'; date: Date; sign: Sign; deg: number; touche: Placement[] };
+/** Les nouvelles et pleines lunes à venir, avec leur signe et les planètes de mon thème qu'elles touchent (à moins de 5°). */
+export function lunaisons(from: Date, count: number, chart?: Chart): Lunaison[] {
+  let k = Math.floor((from.getTime() - Date.UTC(2000, 0, 6)) / (29.530588861 * 86_400_000)) - 1;
+  const out: Lunaison[] = [];
+  while (out.length < count && k < 100000) {
+    for (const phase of [0, 0.5] as const) {
+      const date = moonPhaseDate(k, phase);
+      if (date < from) continue;
+      const lon = (sunLongitude(date) + (phase ? 180 : 0)) % 360;
+      const touche = (chart?.placements ?? []).filter((p) => p.id !== 'noeud_sud' && Math.min(Math.abs(lonOf(p) - lon), 360 - Math.abs(lonOf(p) - lon)) <= ORB);
+      out.push({ type: phase ? 'pleine' : 'nouvelle', date, sign: signAt(lon), deg: lon % 30, touche });
+    }
+    k++;
+  }
+  return out.slice(0, count);
+}
+
+/* ---------- Anniversaire solaire ---------- */
+const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+/** Date de naissance lue dans « 17 janvier 1992 à 18h25… ». */
+export function birthOf(chart: Chart) {
+  const m = /(\d{1,2})\s+([a-zéû]+)\s+(\d{4})/i.exec(chart.naissance ?? '');
+  const mo = m ? MONTHS.indexOf(m[2]!.toLowerCase()) : -1;
+  return m && mo >= 0 ? { day: Number(m[1]), month: mo + 1, year: Number(m[3]) } : null;
+}
+/** Jours avant mon prochain anniversaire solaire (0 = aujourd'hui) et l'âge que j'aurai. */
+export function solarReturn(chart: Chart, today: string) {
+  const b = birthOf(chart);
+  if (!b) return null;
+  const y = Number(today.slice(0, 4)), at = (yy: number) => yy + '-' + String(b.month).padStart(2, '0') + '-' + String(b.day).padStart(2, '0');
+  const next = at(y) >= today ? at(y) : at(y + 1);
+  return { date: next, days: Math.round((Date.parse(next + 'T12:00:00Z') - Date.parse(today + 'T12:00:00Z')) / 86_400_000), age: Number(next.slice(0, 4)) - b.year };
+}
+
+/* ---------- Compatibilité avec un proche ---------- */
+const COMPATIBLES: Record<Element, Element[]> = { Feu: ['Feu', 'Air'], Air: ['Air', 'Feu'], Terre: ['Terre', 'Eau'], Eau: ['Eau', 'Terre'] };
+const PERSO: PlanetId[] = ['soleil', 'lune', 'mercure', 'venus', 'mars', 'ascendant'];
+/** Affinités entre deux thèmes : éléments des points personnels et aspects majeurs entre nos planètes personnelles. */
+export function synastry(me: Chart, other: Chart) {
+  const get = (c: Chart, id: PlanetId) => c.placements.find((p) => p.id === id);
+  const pairs = (['soleil', 'lune', 'ascendant', 'venus', 'mars'] as PlanetId[]).flatMap((id) => { const a = get(me, id), b = get(other, id); if (!a || !b) return [];
+    const ea = signOf(a.sign)!.element, eb = signOf(b.sign)!.element; return [{ id, a, b, accord: COMPATIBLES[ea].includes(eb) }]; });
+  const majors = ASPECTS.filter((t) => ['conjonction', 'sextile', 'carre', 'trigone', 'opposition'].includes(t.id));
+  const aspects: { a: Placement; b: Placement; type: AspectType; power: number }[] = [];
+  for (const a of me.placements.filter((p) => PERSO.includes(p.id))) for (const b of other.placements.filter((p) => PERSO.includes(p.id))) {
+    let d = Math.abs(lonOf(a) - lonOf(b)) % 360; if (d > 180) d = 360 - d;
+    for (const t of majors) { const orb = Math.abs(d - t.angle); if (orb <= ORB) { aspects.push({ a, b, type: t, power: Math.round((1 - orb / ORB) * 100) }); break; } }
+  }
+  return { pairs, aspects: aspects.sort((x, y) => y.power - x.power), score: pairs.filter((p) => p.accord).length };
+}
+/** Les thèmes de mes proches (même format, avec leur prénom). */
+export const prochesCharts = (entries: Entry[]) => entries.filter((e) => e.kind === ASTRO_KIND && typeof e.data.proche === 'string' && e.data.proche)
+  .map((e) => ({ entry: e, nom: String(e.data.proche), chart: { placements: ((e.data.placements as Placement[]) ?? []).filter((p) => signOf(p.sign) && planetOf(p.id)), naissance: String(e.data.naissance ?? '') } as Chart }));
+
+/* ---------- Habitudes et outils inspirés de mon thème ---------- */
+export type HabitIdea = { title: string; why: string; icon: string; freq: 'daily' | 'week'; n?: number; source: string };
+export const HABITUDES_THEME: HabitIdea[] = [
+  { title: 'Une vraie pause par jour', why: 'Pour que ma détermination ne devienne pas du surmenage.', icon: 'bed', freq: 'daily', source: 'Mars et Soleil en Capricorne, Saturne en maison VI' },
+  { title: 'Une activité créative', why: 'Dessiner, écrire, danser, photographier : ma joie de vivre s’y exprime.', icon: 'palette', freq: 'week', n: 2, source: 'Vénus et Mars en maison V, Jupiter trigone Neptune' },
+  { title: 'Appeler ou voir une amie', why: 'Mes amis sont ma famille choisie.', icon: 'heart', freq: 'week', n: 2, source: 'Lune en maison XI' },
+  { title: 'Un moment calme sans écran', why: 'Me protéger de la surcharge et poser des limites.', icon: 'phoneOff', freq: 'daily', source: 'Neptune en maison VI' },
+  { title: 'Faire le point sur mon budget', why: 'Allier mon flair et ma prudence : un plan, puis l’audace.', icon: 'target', freq: 'week', n: 1, source: 'Jupiter en maison II, Soleil en Capricorne' },
+  { title: 'Un moment spontané', why: 'Laisser de la place à l’imprévu, là où je planifie tout.', icon: 'sprout', freq: 'week', n: 1, source: 'Jupiter en Vierge' },
+  { title: 'Trois lignes sur ce que je ressens', why: 'Nommer et apaiser les émotions intenses avant d’agir.', icon: 'feather', freq: 'daily', source: 'Lune en quinconce avec Pluton' },
+  { title: '20 minutes d’apprentissage approfondi', why: 'Donner un fil conducteur à ma curiosité.', icon: 'book', freq: 'daily', source: 'Lune en Gémeaux' },
+];
+export type TccLien = { vigilance: string; source: string; distorsion: string; outil: string; nom: string };
+export const TCC_THEME: TccLien[] = [
+  { vigilance: 'Perfectionnisme, sévérité envers moi', source: 'Soleil en maison VI, Mars en Capricorne', distorsion: 'Les « il faut », « je dois »', outil: 'Colonnes de Beck', nom: 'ar-Rahîm' },
+  { vigilance: 'Peur de manquer', source: 'Soleil en Capricorne', distorsion: 'Erreur de voyance', outil: 'Trier une inquiétude', nom: 'ar-Razzâq' },
+  { vigilance: 'Soupçonner des intentions cachées', source: 'Mercure en semi-carré avec Pluton', distorsion: 'Lecture de pensée', outil: 'Colonnes de Beck', nom: 'al-‘Alîm' },
+  { vigilance: 'Émotions très intenses', source: 'Lune en quinconce avec Pluton', distorsion: 'Raisonnement émotionnel', outil: 'Analyse ABC', nom: 'as-Salâm' },
+  { vigilance: 'Difficulté à recevoir une critique', source: 'Ascendant Lion', distorsion: 'Étiquetage', outil: 'Expérience comportementale', nom: 'al-Hakîm' },
+  { vigilance: 'Surcharge, difficulté à poser des limites', source: 'Neptune en maison VI, Lune en maison XI', distorsion: 'Personnalisation', outil: 'Résolution de problèmes', nom: 'al-Wakîl' },
+];
+
+/** Le cadre donné au coach IA quand je lui pose une question sur mon thème (seulement à ma demande). */
+export function coachTheme(chart: Chart, numero?: string) {
+  const s = syntheseOf(chart);
+  const pos = chart.placements.map((p) => planetOf(p.id)!.label + ' en ' + signOf(p.sign)!.label + (p.house ? ' (maison ' + ROMAN[p.house] + ')' : '')).join(', ');
+  const cles = chart.placements.flatMap((p) => [lectureSigne(p), lectureMaison(p)]).filter((l): l is Lecture => Boolean(l)).map((l) => '- ' + l.titre + ' : ' + l.essentiel).join('\n');
+  return ['Tu accompagnes Aïda (34 ans, Dakar, musulmane pratiquante) qui explore son thème astral comme un outil de connaissance de soi, sans fatalisme ni prédiction.',
+    'Son thème : ' + s.trio + '. Positions : ' + pos + '. Dominante ' + s.element + ', mode ' + s.mode + (s.maison ? ', maison ' + ROMAN[s.maison.n] + ' la plus habitée' : '') + '.',
+    'Lectures de son thème :', cles, numero ? 'Numérologie : ' + numero + '.' : '',
+    'Réponds en français, chaleureusement, en 150 à 250 mots, avec des phrases courtes et des pistes concrètes pour sa vie de tous les jours. Pas de prédiction, pas de citation religieuse précise.'].filter(Boolean).join('\n');
+}

@@ -725,7 +725,7 @@ export default function App() {
       {screen === 'lectures' && <><ScreenHeader title="" onBack={() => go('home')} /><Reading entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} /></>}
       {screen === 'panda' && <><ScreenHeader title="" onBack={() => go('home')} /><PandaScreen entries={ritualEntries} profileEntry={profileEntry} onCreate={createFromTool} onUpdate={updateData} onGo={(x) => go(x as Screen)} /></>}
       {screen === 'recherche' && <LockGate><ScreenHeader title="" onBack={() => go('home')} /><GlobalSearch entries={ritualEntries} onOpen={(t) => { if (t.screen === 'entry' && t.entry) openEntry(t.entry); else if (t.screen === 'myday') openDay(t.day); else if (t.screen === 'spiritualite') { setSpiritTab('wird'); go('spiritualite'); } else go(t.screen as Screen); }} /></LockGate>}
-      {screen === 'astro' && <><ScreenHeader title="" onBack={() => go('home')} /><Astro entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} /></>}
+      {screen === 'astro' && <><ScreenHeader title="" onBack={() => go('home')} /><Astro entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} onGo={(s) => go(s)} /></>}
       {screen === 'culture' && <><ScreenHeader title="" onBack={() => go('home')} /><div className="screen culture"><header className="tab-head"><h1>Ma culture</h1><p>Ce que je lis, ce que je regarde</p></header>
         <Segmented label="Culture" value={cultureTab} onChange={setCultureTab} options={[{ value: 'lectures', label: 'Lectures' }, { value: 'series', label: 'Séries et films' }]} />
         {cultureTab === 'lectures' ? <Reading entries={ritualEntries} onCreate={createFromTool} onUpdate={updateData} onRemove={drop} />

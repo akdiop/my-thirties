@@ -2221,3 +2221,21 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .astro-sum{display:flex;align-items:center;gap:10px}
 .astro-detail p{margin:0 0 6px;font-size:.9rem;line-height:1.5;color:#3A3833}
 .astro-detail .ritual-label{margin:8px 0 2px}
+.astro-tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.astro-tabs::-webkit-scrollbar{display:none}
+.astro-tabs .gchip{flex:none}
+.astro-habit{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #EFEBE3}
+.astro-habit .workout-title{flex:1;min-width:0}
+.astro-numero{display:flex;align-items:baseline;gap:10px;margin:2px 0 8px}
+.astro-numero strong{font-size:2.4rem;line-height:1;color:#7E7254}
+.astro-numero span{font-size:.85rem;color:#5F7A59;font-weight:600}
+.astro-reperes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:6px 0}
+.astro-reperes span{display:flex;flex-direction:column;font-size:.86rem;color:#3A3833}
+.astro-lune{display:flex;align-items:center;gap:10px}
+.astro-moon{flex:none;width:30px;height:30px;border-radius:50%;border:1.5px solid #7E7254}
+.astro-moon.nouvelle{background:#3A3833}
+.astro-moon.pleine{background:#F4EFE2}
+.astro-key{display:flex;flex-direction:column;gap:4px;text-align:left;width:100%;border:0;font:inherit;color:#3A3833;padding:14px 16px}
+.astro-key span{font-size:.92rem;line-height:1.45}
+.astro-nom{margin:6px 0 0;padding:8px 12px;border-radius:12px;background:rgba(126,114,84,.08);font-size:.85rem;color:#3A3833}
+.astro-nom span[lang=ar]{font-size:1.05rem;color:#7E7254;margin-right:4px}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { aspectsOf, balanceOf, housesOf, lectureAspect, lectureMaison, lectureSigne, parseEvozen, syntheseOf } from '../astro';
+import { aspectsOf, balanceOf, housesOf, lectureAspect, lectureMaison, lectureSigne, lunaisons, parseEvozen, solarReturn, synastry, syntheseOf } from '../astro';
 
 const TEXTE = `Ascendant Lion
         Situé en Lion à 09°17
@@ -43,5 +43,26 @@ describe('thème astral', () => {
     expect(lectureSigne(p('venus'))?.titre).toBe('Vénus en Sagittaire');
     expect(lectureMaison(p('lune'))?.titre).toBe('Lune en maison XI');
     expect(lectureAspect('uranus', 'trigone', 'jupiter')?.titre).toBe('Jupiter en trigone avec Uranus');
+  });
+});
+
+describe('lunes, anniversaire solaire, compatibilité', () => {
+  const chart = parseEvozen(TEXTE)!;
+  it('nouvelles et pleines lunes à quelques minutes près', () => {
+    const l = lunaisons(new Date('2024-04-01T00:00:00Z'), 2);
+    expect(l[0]!.type).toBe('nouvelle');
+    expect(Math.abs(l[0]!.date.getTime() - Date.parse('2024-04-08T18:21:00Z'))).toBeLessThan(20 * 60_000);
+    expect(l[0]!.sign.id).toBe('belier');
+    const p = lunaisons(new Date('2024-09-10T00:00:00Z'), 2).find((x) => x.type === 'pleine')!;
+    expect(Math.abs(p.date.getTime() - Date.parse('2024-09-18T02:34:00Z'))).toBeLessThan(20 * 60_000);
+    expect(p.sign.id).toBe('poissons');
+  });
+  it('anniversaire solaire', () => {
+    expect(solarReturn({ ...chart, naissance: '17 janvier 1992 à 18h25 à Paris, France' }, '2026-11-13')).toEqual({ date: '2027-01-17', days: 65, age: 35 });
+  });
+  it('compatibilité : mêmes éléments et aspects', () => {
+    const s = synastry(chart, chart);
+    expect(s.score).toBe(5);
+    expect(s.aspects[0]!.type.id).toBe('conjonction');
   });
 });
