@@ -88,6 +88,7 @@ function LectureCard({ l, onWrite }: { l: Lecture; onWrite?: Write }) {
   const [answer, setAnswer] = useState(''), [open, setOpen] = useState(false), [done, setDone] = useState(false);
   return <div className="astro-lecture">
     <p className="astro-essentiel">{l.essentiel}</p>
+    {l.details?.map((d) => <div key={d.titre} className="astro-detail"><p className="ritual-label">{d.titre}</p><p>{d.texte}</p></div>)}
     {l.forces.length > 0 && <><p className="ritual-label">Mes forces</p><ul className="astro-list">{l.forces.map((f) => <li key={f}>{f}</li>)}</ul></>}
     {l.vigilance.length > 0 && <><p className="ritual-label">Points de vigilance</p><ul className="astro-list soft">{l.vigilance.map((f) => <li key={f}>{f}</li>)}</ul></>}
     <p className="astro-conseil"><strong>Conseil</strong> {l.conseil}</p>
