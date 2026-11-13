@@ -115,3 +115,45 @@ export function remindMinute(d: Data, prayers: { name: string; time: string }[] 
   if (at) { const m = toMin(at.time); return m < 0 ? -1 : m + Math.max(0, Math.min(120, Number(rem.after ?? 10))); }
   return toMin(String(rem.time ?? ''));
 }
+
+export const streakUnit = (r: HabitRule) => ({ daily: 'jours', week: 'semaines', every: 'fois de suite', month: 'mois' })[r.type];
+/** Série en cours : jours consécutifs (quotidienne), semaines ou mois où l'objectif est atteint, ou fois faites à temps (tous les n jours). Les jours non prévus et les jours de repos ne cassent rien. */
+export function streakOf(d: Data, today: string, ctx?: HabitCtx) {
+  const done = doneOf(d), r = ruleOf(d);
+  if (r.type === 'daily') {
+    let day = done[today] || !scheduledOn(d, today) || restOn(d, today, ctx) ? today : addIso(today, -1), n = 0;
+    for (let guard = 0; guard < 3660; guard++) {
+      if (done[day]) n++; else if (scheduledOn(d, day) && !restOn(d, day, ctx)) break;
+      day = addIso(day, -1);
+    }
+    return n;
+  }
+  if (r.type === 'every') {
+    const list = doneDates(d).filter((x) => x <= today);
+    if (!list.length || activeGap(d, list[list.length - 1]!, today, ctx) > r.n) return 0;
+    let n = 1;
+    for (let i = list.length - 1; i > 0 && activeGap(d, list[i - 1]!, list[i]!, ctx) <= r.n; i--) n++;
+    return n;
+  }
+  const month = r.type === 'month';
+  const start = (iso: string) => (month ? monthStart(iso) : weekStart(iso));
+  const prev = (p: string) => start(addIso(p, -1));
+  const last = (p: string) => (month ? p.slice(0, 8) + String(monthLength(p)).padStart(2, '0') : addIso(p, 6));
+  const touchesRest = (p: string) => { for (let x = p; x <= last(p); x = addIso(x, 1)) if (restOn(d, x, ctx)) return true; return false; };
+  let p = start(today), n = 0;
+  if (periodCount(d, p) < r.n) p = prev(p);
+  for (let guard = 0; guard < 600; guard++) {
+    if (periodCount(d, p) >= r.n) n++; else if (!touchesRest(p)) break;
+    p = prev(p);
+  }
+  return n;
+}
+
+/** Récap du dimanche : habitudes cochées sur les 7 derniers jours et plus belle série en cours (habitudes non archivées). */
+export function weekRecap(habits: { title: string; data: Data }[], today: string, ctx?: HabitCtx) {
+  const from = addIso(today, -6), active = habits.filter((h) => !h.data.archived);
+  const done = active.reduce((n, h) => n + doneDates(h.data).filter((x) => x >= from && x <= today).length, 0);
+  let best: { title: string; streak: number; unit: string } | null = null;
+  for (const h of active) { const s = streakOf(h.data, today, ctx); if (s > 1 && (!best || s > best.streak)) best = { title: h.title, streak: s, unit: streakUnit(ruleOf(h.data)) }; }
+  return { count: active.length, done, best };
+}

@@ -6,6 +6,8 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { addDays, countData, countOn, DAY_LETTERS, everyWait, expectedOver, FREQ_LABEL, HABIT_GROUPS, HABIT_KIND, HABIT_LIBRARY, habitCtx, habitDays, habitDaysLabel, habitDone, habitDue, habitGoal, habitNotes, habitPause, habitPrayer, habitRule, habitSeason, habitSteps, habitStreak, isArchived, isoOf, isResting, momentNow, monthReview, momentOf, momentRank, MOMENTS, monthStartOf, periodCount, restReason, RULE_RANGE, ruleData, ruleLabel, ruleOfFreq, stepData, stepsOn, streakUnit, toggleData, weekStartOf, type HabitCtx, type HabitLevel, type HabitMoment, type HabitRule, type HabitSeason, type HabitTemplate } from '../lib/rituals';
 import { PRAYER_LINKS } from '../../supabase/functions/push-reminders/habits';
 import { prayerDay } from '../lib/wellbeing';
+import { askAssistant } from '../lib/assistant';
+import { useIntegrationPrefs } from '../lib/integrations';
 import { Bar, Segmented } from '../ui/kit';
 import { bilanDay } from '../lib/day';
 import { DaySwitch, dayName } from '../features/DaySwitch';
@@ -15,7 +17,7 @@ import { JOURNEYS, JOURNEY_KIND, journeyWeek } from '../lib/journeys';
 type EditFull = (id: string, patch: { title: string; data: Record<string, unknown> }) => Promise<void>;
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 type Goal = { target: number; unit: string; source: '' | 'pas' | 'eau' };
-type HabitDraft = { title: string; icon: GlyphName; tint: Tint; why: string; level: HabitLevel; rule: HabitRule; moment: HabitMoment | ''; goal: Goal | null; steps: string[]; prayer: string; season: HabitSeason | null; cycleRest: boolean };
+type HabitDraft = { title: string; icon: GlyphName; tint: Tint; why: string; level: HabitLevel; rule: HabitRule; moment: HabitMoment | ''; goal: Goal | null; steps: string[]; prayer: string; season: HabitSeason | null; cycleRest: boolean; niyya: string };
 type Prayers = { name: string; time: string }[];
 const LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
@@ -29,6 +31,8 @@ export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit, focusNow
   // Habitudes saisonnières hors de leur saison : en sommeil, elles reviennent seules.
   const sleeping = current.filter((e) => habitSeason(e) && restReason(e, today, ctx) === 'saison'), mine = current.filter((e) => !sleeping.includes(e));
   const [only, setOnly] = useState<HabitMoment | ''>('');
+  const [justDone, setJustDone] = useState<{ id: string; day: string } | null>(null);
+  useEffect(() => { if (!justDone) return; const t = window.setTimeout(() => setJustDone(null), 12000); return () => window.clearTimeout(t); }, [justDone]);
   useEffect(() => { if (focusNow) setOnly(momentNow(new Date().getHours())); }, [focusNow]);
   const [view, setView] = useState<'list' | 'library' | 'create'>('list');
   const [editing, setEditing] = useState<Entry | null>(null);
@@ -45,13 +49,13 @@ export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit, focusNow
   const add = (t: HabitDraft, templateId = '') => onCreate({ module: 'quotidien', kind: HABIT_KIND, title: t.title, entry_date: null,
     data: { templateId, icon: t.icon, tint: t.tint, why: t.why, level: t.level, ...ruleData(t.rule), ...draftExtras(t), done: {} } });
 
-  if (view === 'library') return <Library mine={all} onAdd={(t) => add({ ...t, rule: ruleOfFreq(t.freq), moment: '', goal: null, steps: [], prayer: '', season: null, cycleRest: false }, t.id)} onClose={() => setView('list')} />;
+  if (view === 'library') return <Library mine={all} onAdd={(t) => add({ ...t, rule: ruleOfFreq(t.freq), moment: '', goal: null, steps: [], prayer: '', season: null, cycleRest: false, niyya: '' }, t.id)} onClose={() => setView('list')} />;
   if (view === 'create') return <HabitForm onSave={async (t) => { await add(t); setView('list'); }} onClose={() => setView('list')} />;
   if (editing) {
     const e = editing;
     return <HabitForm heading="Modifier mon habitude" submit="Enregistrer" onClose={() => setEditing(null)}
       initial={{ title: e.title, icon: String(e.data.icon || 'sprout') as GlyphName, tint: (e.data.tint as Tint) || 'sauge', why: String(e.data.why ?? ''), level: (e.data.level as HabitLevel) || 'Douce', rule: habitRule(e),
-        moment: momentOf(e), goal: habitGoal(e), steps: habitSteps(e), prayer: habitPrayer(e), season: habitSeason(e), cycleRest: e.data.cycleRest === true }}
+        moment: momentOf(e), goal: habitGoal(e), steps: habitSteps(e), prayer: habitPrayer(e), season: habitSeason(e), cycleRest: e.data.cycleRest === true, niyya: String(e.data.niyya ?? '') }}
       onSave={async (t) => {
         const data = { ...e.data, icon: t.icon, why: t.why, level: t.level, ...ruleData(t.rule), ...draftExtras(t) };
         if (onEdit) await onEdit(e.id, { title: t.title, data }); else await onUpdate(e, data);
@@ -79,7 +83,7 @@ export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit, focusNow
         <button type="button" key={m.id || 'all'} className={'gchip' + (only === m.id ? ' on' : '')} aria-pressed={only === m.id} onClick={() => setOnly(m.id)}>{m.label}</button>)}</div>}
       {groups.map(({ name, items }) => <section key={name} className="habit-section">
         <h2 className="habit-group">{name}</h2>
-        <div className="habit-list">{items.map((e) => <HabitCard key={e.id} e={e} mine={mine} day={day} today={today} ctx={ctx} prayers={prayers} onUpdate={onUpdate} onRemove={onRemove} onOpenEdit={() => setEditing(e)} />)}</div>
+        <div className="habit-list">{items.map((e) => <HabitCard key={e.id} e={e} mine={mine} day={day} today={today} ctx={ctx} prayers={prayers} onUpdate={onUpdate} onRemove={onRemove} onOpenEdit={() => setEditing(e)} onChecked={() => setJustDone({ id: e.id, day })} />)}</div>
       </section>)}
       <div className="button-group">
         <button className="button secondary" onClick={() => setView('library')}><Plus size={16} /> Bibliothèque</button>
@@ -87,14 +91,25 @@ export function Habits({ entries, onCreate, onUpdate, onRemove, onEdit, focusNow
       </div>
       {sleeping.length > 0 && <Sleeping items={sleeping} />}
       {archived.length > 0 && <Archived items={archived} onUpdate={onUpdate} onRemove={onRemove} />}
+      {justDone && <AfterCheck done={all.find((x) => x.id === justDone.id)} next={mine.filter((x) => x.data.after === justDone.id && !habitDone(x)[justDone.day])}
+        onDo={(x) => { void onUpdate(x, toggleData(x, justDone.day, true)); setJustDone({ id: x.id, day: justDone.day }); }} onClose={() => setJustDone(null)} />}
       <p className="fineprint">Un jour manqué ne remet rien à zéro : tes badges restent acquis, reprends simplement le lendemain.</p></>}
     </>}
   </div>;
 }
 
-const draftExtras = (t: HabitDraft) => ({ moment: t.moment || null, goal: t.goal, steps: t.steps.length ? t.steps : null, prayer: t.prayer || null, season: t.season, cycleRest: t.cycleRest || null });
+const draftExtras = (t: HabitDraft) => ({ moment: t.moment || null, goal: t.goal, steps: t.steps.length ? t.steps : null, prayer: t.prayer || null, season: t.season, cycleRest: t.cycleRest || null, niyya: t.niyya.trim() || null });
 const seasonLabel = (s: HabitSeason) => (s.type === 'ramadan' ? 'pendant le Ramadan' : 'du ' + mdLabel(s.from) + ' au ' + mdLabel(s.to));
 const mdLabel = (md: string) => new Date('2000-' + md + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+
+/** Le cadre donné au coach IA des habitudes : seulement les habitudes, leur fréquence et leur régularité. */
+function coachHabits(habits: Entry[], rows: { e: Entry; rate: number; count: number }[], today: string, ctx: HabitCtx) {
+  const lines = habits.map((e) => { const r = rows.find((x) => x.e.id === e.id), m = momentOf(e);
+    return '- ' + e.title.slice(0, 60) + ' : ' + ruleLabel(habitRule(e)).toLowerCase() + (m ? ', ' + m : '') + ', série ' + habitStreak(e, today, ctx) + ' ' + streakUnit(habitRule(e))
+      + (r ? ', ' + Math.round(r.rate * 100) + ' % ce mois-ci (' + r.count + ' fois)' : '') + (e.data.why ? ', pourquoi : ' + String(e.data.why).slice(0, 80) : ''); });
+  return ['Tu es un coach d’habitudes bienveillant pour Aïda (34 ans, Dakar, musulmane pratiquante). Voici ses habitudes et leur régularité ce mois-ci :', ...lines,
+    'Réponds en français, chaleureusement, en 150 à 250 mots, avec des phrases courtes : ce qui marche, ce qui décroche et pourquoi c’est humain, puis 2 ou 3 ajustements concrets (fréquence plus douce, moment de la journée, enchaînement après une autre habitude, version minimale). Pas de jugement, pas de citation religieuse précise.'].join('\n');
+}
 
 /** Partager une habitude comme un défi à relever ensemble (texte seulement, envoyé par moi). */
 async function shareHabit(e: Entry, streak: number, unit: string) {
@@ -105,7 +120,7 @@ async function shareHabit(e: Entry, streak: number, unit: string) {
 const shortDate = (iso: string) => new Date(iso + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 
 /** Une habitude : coche (ou compteur, ou étapes), semaine à toucher, note du jour, réglages, calendrier, enchaînement. */
-function HabitCard({ e, mine, day, today, ctx, prayers, onUpdate, onRemove, onOpenEdit }: { e: Entry; mine: Entry[]; day: string; today: string; ctx: HabitCtx; prayers: Prayers; onUpdate: Save; onRemove: (e: Entry) => Promise<void>; onOpenEdit: () => void }) {
+function HabitCard({ e, mine, day, today, ctx, prayers, onUpdate, onRemove, onOpenEdit, onChecked }: { e: Entry; mine: Entry[]; day: string; today: string; ctx: HabitCtx; prayers: Prayers; onUpdate: Save; onRemove: (e: Entry) => Promise<void>; onOpenEdit: () => void; onChecked: () => void }) {
   const [panel, setPanel] = useState<'' | 'settings' | 'chain' | 'cal' | 'note'>('');
   const [shared, setShared] = useState('');
   const open = (p: typeof panel) => setPanel(panel === p ? '' : p);
@@ -128,7 +143,7 @@ function HabitCard({ e, mine, day, today, ctx, prayers, onUpdate, onRemove, onOp
     { label: 'Supprimer', icon: <Trash2 size={18} />, tone: 'danger', onClick: () => void onRemove(e) },
   ]}><article className={'habit-card' + (on ? ' on' : '') + (resting ? ' rest' : '')}>
     <button className="habit-check" aria-pressed={on} aria-label={(on ? 'Décocher ' : 'Fait ' + dayName(day) + ' : ') + e.title}
-      onClick={() => save(toggleData(e, day, !on))}>{on ? <Check size={22} strokeWidth={3} /> : <Glyph name={String(e.data.icon || 'sprout')} tint={(e.data.tint as Tint) || 'sauge'} size={24} />}</button>
+      onClick={() => { save(toggleData(e, day, !on)); if (!on) onChecked(); }}>{on ? <Check size={22} strokeWidth={3} /> : <Glyph name={String(e.data.icon || 'sprout')} tint={(e.data.tint as Tint) || 'sauge'} size={24} />}</button>
     <div className="habit-body">
       {anchor && <span className="habit-after"><Link2 size={12} /> Après « {anchor.title} »</span>}
       <strong>{e.title}</strong>
@@ -189,6 +204,18 @@ function Archived({ items, onUpdate, onRemove }: { items: Entry[]; onUpdate: Sav
         <button className="link-btn small" onClick={() => void onUpdate(e, { ...e.data, archived: null })}>Réactiver</button>
         <button className="icon-btn" aria-label={'Supprimer ' + e.title} onClick={() => void onRemove(e)}><Trash2 size={16} /></button></div>; })}
   </details>;
+}
+
+/** Juste après avoir coché : mon intention (niyya) et l'habitude enchaînée qui suit. */
+function AfterCheck({ done, next, onDo, onClose }: { done?: Entry; next: Entry[]; onDo: (e: Entry) => void; onClose: () => void }) {
+  const niyya = String(done?.data.niyya ?? '').trim();
+  if (!done || (!niyya && !next.length)) return null;
+  return <div className="habit-toast" role="status">
+    <button className="icon-btn" aria-label="Fermer" onClick={onClose}><X size={16} /></button>
+    {niyya && <p><span className="muted">Mon intention</span><em>« {niyya} »</em></p>}
+    {next.map((x) => <div key={x.id} className="habit-toast-next"><span>Et maintenant : <strong>{x.title}</strong></span>
+      <button className="button secondary small" onClick={() => onDo(x)}>C’est fait</button></div>)}
+  </div>;
 }
 
 /** Habitudes saisonnières en sommeil : elles reviennent seules à leur saison. */
@@ -255,6 +282,7 @@ function HabitForm({ initial, heading = 'Ma nouvelle habitude', submit = 'Ajoute
   const year = new Date().getFullYear();
   const [level, setLevel] = useState<HabitLevel>(initial?.level ?? 'Douce');
   const [why, setWhy] = useState(initial?.why ?? '');
+  const [niyya, setNiyya] = useState(initial?.niyya ?? '');
   const [busy, setBusy] = useState(false);
   const icons = ICONS.includes(icon) ? ICONS : [icon, ...ICONS];
   const t = Math.round(Number(target));
@@ -290,8 +318,9 @@ function HabitForm({ initial, heading = 'Ma nouvelle habitude', submit = 'Ajoute
       <fieldset className="gfield"><legend>Intensité</legend><div className="gchips">{(['Douce', 'Modérée', 'Engagée'] as HabitLevel[]).map((l) =>
         <button type="button" key={l} className={'gchip' + (level === l ? ' on' : '')} onClick={() => setLevel(l)}>{l}</button>)}</div></fieldset>
       <label>Pourquoi elle compte pour moi (facultatif)<input value={why} maxLength={140} onChange={(e) => setWhy(e.target.value)} /></label>
+      <label>Mon intention, ma niyya (facultatif)<input value={niyya} maxLength={160} placeholder="Ex. Prendre soin du corps qu’Allah m’a confié" onChange={(e) => setNiyya(e.target.value)} /></label>
       <button className="button primary wide" disabled={busy || !title.trim()} onClick={async () => { setBusy(true); try {
-        await onSave({ title: title.trim(), icon, tint: initial?.tint ?? 'sauge', rule, level, why: why.trim(), moment, goal, steps: steps.split('\n').map((x) => x.trim()).filter(Boolean).slice(0, 12), prayer, season, cycleRest });
+        await onSave({ title: title.trim(), icon, tint: initial?.tint ?? 'sauge', rule, level, why: why.trim(), moment, goal, steps: steps.split('\n').map((x) => x.trim()).filter(Boolean).slice(0, 12), prayer, season, cycleRest, niyya });
       } finally { setBusy(false); } }}>{busy ? 'Enregistrement…' : submit}</button>
     </div>
   </div>;
@@ -320,6 +349,13 @@ function HabitStats({ habits, ctx, onUpdate }: { habits: Entry[]; ctx: HabitCtx;
   const from = addDays(today, -89);
   if (!habits.length) return <p className="muted">Ajoute des habitudes pour voir tes statistiques.</p>;
   const month = monthReview(habits, today, ctx);
+  const { prefs } = useIntegrationPrefs();
+  const [question, setQuestion] = useState(''), [answer, setAnswer] = useState(''), [asking, setAsking] = useState(false), [askError, setAskError] = useState('');
+  const ask = async () => {
+    setAsking(true); setAskError('');
+    try { setAnswer(await askAssistant(question.trim() || 'Analyse mon mois d’habitudes et propose-moi un ajustement.', { context: coachHabits(habits, month.rows, today, ctx) })); }
+    catch { setAskError('Le coach n’a pas pu répondre. Réessaie dans un moment.'); } finally { setAsking(false); }
+  };
   const rows = habits.map((e) => {
     const done = habitDone(e), r = habitRule(e);
     const start = [from, String(e.created_at ?? from).slice(0, 10)].sort().reverse()[0]!;
@@ -342,6 +378,14 @@ function HabitStats({ habits, ctx, onUpdate }: { habits: Entry[]; ctx: HabitCtx;
         {month.suggestion ? <> Et si tu passais à « {ruleLabel(month.suggestion).toLowerCase()} » ? Plus doux, et ça compte autant.</> : <> Une pause ou un autre moment de la journée l’aiderait peut-être.</>}</p>}
       {month.struggling && month.suggestion && <button className="button secondary small" onClick={() => void onUpdate(month.struggling!.e, { ...month.struggling!.e.data, ...ruleData(month.suggestion!) })}>Ajuster à « {ruleLabel(month.suggestion).toLowerCase()} »</button>}
       {month.rows.map(({ e, rate, count }) => <div key={e.id} className="habit-rate"><span>{e.title}</span><Bar value={rate} tone="olive" /><small>{Math.round(rate * 100)} % · {count} fois</small></div>)}</section>}
+    <section className="ritual-card"><p className="ritual-label">Mon coach habitudes</p>
+      {!prefs.assistant ? <p className="privacy-hint">Le coach utilise l’assistant IA. Active-le dans Profil → Centre de confidentialité pour lui demander un bilan.</p> : <>
+        <p className="muted">Il lit seulement tes habitudes (noms, fréquences, régularité du mois) quand tu lui demandes.</p>
+        <input value={question} maxLength={300} placeholder="Ta question (facultatif) : pourquoi je décroche le soir ?" aria-label="Question au coach" onChange={(e) => setQuestion(e.target.value)} />
+        <button className="button secondary small" disabled={asking} onClick={() => void ask()}>{asking ? 'Le coach réfléchit…' : 'Demander au coach'}</button>
+        {askError && <p className="fineprint" role="alert">{askError}</p>}
+        {answer && <p className="coach-answer">{answer}</p>}</>}
+    </section>
     <section className="ritual-card"><p className="ritual-label">Taux de réussite sur 3 mois</p>
       {rows.map(({ e, rate, count }) => <div key={e.id} className="habit-rate"><span>{e.title}</span><Bar value={rate} /><small>{Math.round(rate * 100)} % · {count} fois</small></div>)}</section>
     <section className="ritual-card"><p className="ritual-label">Mes meilleurs jours</p>
