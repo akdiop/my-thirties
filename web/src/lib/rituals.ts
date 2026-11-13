@@ -6,7 +6,7 @@ import { addIso, autoCount, streakOf, streakUnit, clampN, cycleRestOn, daysOf, d
 export const DAILY_KIND = 'daily';
 export const NOTE_KIND = 'note';
 export const HABIT_KIND = 'habit';
-export const RITUAL_KINDS = [DAILY_KIND, NOTE_KIND, HABIT_KIND, 'vision', 'objectif', 'roue', 'parcours_progressif', 'meditation', 'focus', 'sommeil', 'complement', 'reglages_accueil', 'reglages_integrations', 'proche', 'lecture', 'envie', 'panda', 'invocations', 'programme_3mois', 'lecture_coran', 'carnet_page', 'voeu', 'carnet_reglages', 'gratitude_jour', 'gratitude_reglages', 'tcc', 'tcc_echelle', 'hsp', 'ressenti', 'theme_astral', 'citation_perso', 'jardin'];
+export const RITUAL_KINDS = [DAILY_KIND, NOTE_KIND, HABIT_KIND, 'vision', 'objectif', 'roue', 'parcours_progressif', 'meditation', 'focus', 'sommeil', 'complement', 'reglages_accueil', 'reglages_integrations', 'proche', 'lecture', 'envie', 'panda', 'invocations', 'programme_3mois', 'lecture_coran', 'carnet_page', 'voeu', 'carnet_reglages', 'gratitude_jour', 'gratitude_reglages', 'tcc', 'tcc_echelle', 'hsp', 'ressenti', 'theme_astral', 'citation_perso', 'jardin', 'coran'];
 
 export const MOODS: { value: string; icon: GlyphName; tint: Tint }[] = [
   { value: 'Épuisée', icon: 'battery', tint: 'rose' }, { value: 'Fatiguée', icon: 'rain', tint: 'ardoise' }, { value: 'Neutre', icon: 'meh', tint: 'or' },

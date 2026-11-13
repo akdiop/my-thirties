@@ -2267,3 +2267,12 @@ body,.app{background:linear-gradient(160deg,#EFECE6 0%,#E4E0D8 55%,#DCD7CD 100%)
 .jardin-titre{font-size:1.5rem;line-height:1.2}
 .jardin-back{display:inline-flex;align-items:center;gap:4px;margin-bottom:4px}
 .jardin-nav{justify-content:space-between}
+.coran-basmala{text-align:center;font-style:italic;color:#7E7254;margin:4px 0 10px;font-size:.95rem}
+.coran-texte{display:flex;flex-direction:column;gap:2px}
+.coran-verset{margin:0;padding:10px 0;border-top:1px solid #EFEBE3;font-size:.98rem;line-height:1.65;color:#3A3833}
+.coran-verset:first-child{border-top:0}
+.coran-verset.on{background:rgba(194,180,140,.18);border-radius:10px;padding:10px 8px}
+.coran-num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;margin-right:8px;padding:0 5px;border-radius:12px;background:#F1EDE4;color:#7E7254;font-size:.72rem;font-weight:700;vertical-align:1px}
+.coran-actions{display:flex;justify-content:flex-end;gap:2px;margin-top:2px}
+.coran-actions .icon-btn{width:30px;height:30px;color:#9A927F}
+.jardin-ref{border:0;background:none;padding:0;font:inherit;text-align:left;text-decoration:underline;text-underline-offset:2px;cursor:pointer}

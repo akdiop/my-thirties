@@ -4,13 +4,14 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { chercher, hadithDuJourRef, JARDIN_KIND, JARDIN_SOURCE, jardinOf, loadChapitre, loadCourts, loadIndex, loadRecherche, THEMES_JARDIN, versets, type Chapitre, type ChapitreIndex, type JardinState } from '../lib/jardin';
 import { isoOf } from '../lib/rituals';
 import { FICHES_SPI } from '../lib/fichesSpirituelles';
+import { refCoran } from '../lib/coran';
 import { Bar } from '../ui/kit';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
-type Props = { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; start?: number };
+type Props = { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; start?: number; onCoran?: (s: number, v: number) => void };
 
 /** Le Jardin des vertueux : le livre entier, un hadith du jour, des thèmes choisis pour moi, la recherche, mes favoris et ma progression. */
-export function Jardin({ entries, onCreate, onUpdate, start }: Props) {
+export function Jardin({ entries, onCreate, onUpdate, start, onCoran }: Props) {
   const { entry, state } = jardinOf(entries);
   const [open, setOpen] = useState<{ c: number; h?: number } | null>(start ? { c: start } : null);
   const [index, setIndex] = useState<ChapitreIndex[]>([]);
@@ -24,7 +25,7 @@ export function Jardin({ entries, onCreate, onUpdate, start }: Props) {
   const toggleFav = (c: number, n: number) => void save({ favoris: fav(c, n) ? state.favoris.filter(([a, b]) => !(a === c && b === n)) : [...state.favoris, [c, n]] });
   if (open) return <Lecteur key={open.c} n={open.c} highlight={open.h} index={index} state={state} isFav={fav} onFav={toggleFav}
     onOpen={(c) => setOpen({ c })} onRead={(c, lu) => void save({ lus: lu ? [...new Set([...state.lus, c])] : state.lus.filter((x) => x !== c) })}
-    onBack={() => setOpen(null)} onMount={(c) => { if (state.dernier !== c) void save({ dernier: c }); }} />;
+    onBack={() => setOpen(null)} onCoran={onCoran} onMount={(c) => { if (state.dernier !== c) void save({ dernier: c }); }} />;
   return <div className="screen jardin">
     <header className="tab-head"><h1>Le Jardin des vertueux</h1><p>Riyâd as-Sâlihîn de l’imam an-Nawawî</p></header>
     {error && <p className="fineprint" role="alert">{error}</p>}
@@ -98,8 +99,8 @@ function Chapitres({ index, lus, onOpen }: { index: ChapitreIndex[]; lus: number
       <span className="astro-abbr">{lus.includes(n) ? <Check size={14} /> : n}</span><span className="workout-title"><strong>{t}</strong><small>{nb ? nb + ' hadith' + (nb > 1 ? 's' : '') : 'Versets'}</small></span></button>)}</div></div>;
 }
 
-function Lecteur({ n, highlight, index, state, isFav, onFav, onOpen, onRead, onBack, onMount }: { n: number; highlight?: number; index: ChapitreIndex[]; state: JardinState; isFav: (c: number, n: number) => boolean;
-  onFav: (c: number, n: number) => void; onOpen: (c: number) => void; onRead: (c: number, lu: boolean) => void; onBack: () => void; onMount: (c: number) => void }) {
+function Lecteur({ n, highlight, index, state, isFav, onFav, onOpen, onRead, onBack, onMount, onCoran }: { n: number; highlight?: number; index: ChapitreIndex[]; state: JardinState; isFav: (c: number, n: number) => boolean;
+  onFav: (c: number, n: number) => void; onOpen: (c: number) => void; onRead: (c: number, lu: boolean) => void; onBack: () => void; onMount: (c: number) => void; onCoran?: (s: number, v: number) => void }) {
   const [ch, setCh] = useState<Chapitre | null>(null), [error, setError] = useState('');
   const target = useRef<HTMLElement | null>(null);
   useEffect(() => { onMount(n); loadChapitre(n).then(setCh).catch(() => setError('Ce chapitre n’a pas pu se charger. Vérifie ta connexion.')); }, [n]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -109,7 +110,8 @@ function Lecteur({ n, highlight, index, state, isFav, onFav, onOpen, onRead, onB
     <button className="link-btn small jardin-back" onClick={onBack}><ChevronLeft size={16} /> Le Jardin des vertueux</button>
     <header className="tab-head"><p className="ritual-label">Chapitre {n}</p><h1 className="jardin-titre">{ch?.t ?? index.find((x) => x[0] === n)?.[1] ?? ''}</h1></header>
     {error && <p className="fineprint" role="alert">{error}</p>}
-    {ch && ch.v.length > 0 && <section className="ritual-card jardin-versets">{ch.v.flatMap((v) => versets(v)).map((v, i) => <p key={i}>{v.ref && <small className="ritual-label">{v.ref}</small>}{v.texte}</p>)}</section>}
+    {ch && ch.v.length > 0 && <section className="ritual-card jardin-versets">{ch.v.flatMap((v) => versets(v)).map((v, i) => { const r = onCoran ? refCoran(v.ref) : null;
+      return <p key={i}>{v.ref && (r ? <button className="ritual-label jardin-ref" onClick={() => onCoran!(r[0], r[1])}>{v.ref}</button> : <small className="ritual-label">{v.ref}</small>)}{v.texte}</p>; })}</section>}
     {ch?.h.map(([k, t]) => <article key={k} ref={k === highlight ? (el) => { target.current = el; } : undefined} className={'soft-card jardin-hadith' + (k === highlight ? ' on' : '')}>
       <div className="jardin-hadith-head"><span className="ritual-label">Hadith {k}</span>
         <button className="icon-btn" aria-pressed={isFav(n, k)} aria-label={isFav(n, k) ? 'Retirer des favoris' : 'Ajouter aux favoris'} onClick={() => onFav(n, k)}><Star size={16} fill={isFav(n, k) ? '#C2B48C' : 'none'} /></button></div>
