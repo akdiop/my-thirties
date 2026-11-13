@@ -4,6 +4,7 @@ import type { Entry, EntryInput } from '../lib/cloud';
 import { DISTORSIONS, echelleOf, EMOTIONS, exercices, FICHES, OUTILS, progres, PSYCHO_POSITIVE, QUESTIONS_SOCRATIQUES, TCC_ECHELLE, TCC_KIND, type Force, type Marche, type Outil } from '../lib/tcc';
 import { isoOf } from '../lib/rituals';
 import { Segmented } from '../ui/kit';
+import { QuatreAccords } from '../features/QuatreAccords';
 
 type Save = (e: Entry, d: Record<string, unknown>) => Promise<void>;
 type Props = { entries: Entry[]; onCreate: (i: EntryInput) => Promise<void>; onUpdate: Save; onRemove: (e: Entry) => Promise<void> };
@@ -72,6 +73,7 @@ function Understand() {
     <details className="soft-card"><summary className="ritual-label">Les 12 pièges de pensée</summary>
       {DISTORSIONS.map((d) => <div key={d.id} className="tcc-dist"><strong>{d.nom}</strong><p className="muted small">{d.def} {d.ex}</p><p className="tcc-q">{d.question}</p></div>)}</details>
     <details className="soft-card"><summary className="ritual-label">Questions pour examiner une pensée</summary>{QUESTIONS_SOCRATIQUES.map((q) => <p key={q} className="fiche-pt">{q}</p>)}</details>
+    <QuatreAccords />
   </div>;
 }
 
