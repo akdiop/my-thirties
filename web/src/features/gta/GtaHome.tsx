@@ -78,7 +78,7 @@ function Backup({ ctx }: { ctx: GtaCtx }) {
     <p className="g-muted">Ta progression est enregistrée avec tes autres données My Thirties, y compris hors connexion. Tu peux aussi l’exporter en fichier.</p>
     <div className="g-row"><button className="g-btn ghost" onClick={download}><Download size={16} /> Exporter</button>
       <button className="g-btn ghost" onClick={() => input.current?.click()}><Upload size={16} /> Importer</button>
-      <input ref={input} type="file" accept="application/json,.json" hidden onChange={(e) => void load(e)} /></div>
+      <input ref={input} type="file" accept="application/json,.json" hidden style={{ display: 'none' }} onChange={(e) => void load(e)} /></div>
     {msg && <p className="g-muted" role="status">{msg}</p>}
   </section>;
 }

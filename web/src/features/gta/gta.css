@@ -112,7 +112,6 @@
 .g-pin.argent { background: #9A3B24; } .g-pin.mission { background: #0B6E7A; } .g-pin.repere { background: #182938; }
 .g-map-tools { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
 .g-map-hint { position: absolute; left: 8px; bottom: 8px; right: 8px; z-index: 2; background: rgba(255,249,242,.94); color: #182938; border-radius: 12px; padding: 6px 10px; font-size: .8rem; }
-.g-import { border: 2px dashed var(--g-line); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: var(--g-paper); }
 
 /* Galerie */
 .g-mosaic { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
@@ -121,7 +120,6 @@
 .g-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .gta-vi input[hidden] { display: none; }
 .g-tile .g-cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 6px 8px; background: rgba(24,41,56,.82); color: #FFF9F2; font-size: .78rem; font-weight: 600; }
-.g-tile .empty { display: grid; place-items: center; height: 100%; color: var(--g-muted); font-size: .8rem; padding: 8px; text-align: center; }
 .g-lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(15,22,30,.92); display: flex; flex-direction: column; padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)); gap: 10px; color: #FFF9F2; }
 .g-lightbox .g-map { flex: 1; height: auto; background: #0F161E; border-color: #2A3542; }
 .g-lightbox .g-muted, .g-lightbox p { color: #E8DFD3; }

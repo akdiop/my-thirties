@@ -4,14 +4,13 @@ import { LOCATIONS, MONEY_PLACES } from './data';
 import { cellAt, cellsRect, gridLines, parseGrid, type Rect } from './mapGrid';
 import { MARKER_CATEGORIES, type MarkerCategory } from './progress';
 import { ZoomView } from './ZoomView';
-import { ImportSlot } from './GtaGallery';
 import type { GtaCtx, MapFocus } from './ctx';
 
 const CAT_LABEL: Record<MarkerCategory, string> = { repere: 'Repère', argent: 'Argent', mission: 'Mission', perso: 'Perso' };
 type Layer = 'lieux' | 'argent' | 'mes';
 
 export function GtaMap(ctx: GtaCtx & { focus: MapFocus | null }) {
-  const src = ctx.images.urlFor('leonida-map');
+  const src = ctx.images.urlFor('leonida-map') ?? '';
   const [chapter, setChapter] = useState(5);
   const [layers, setLayers] = useState<Set<Layer>>(new Set(['lieux', 'argent', 'mes']));
   const [grid, setGrid] = useState(true);
@@ -22,13 +21,6 @@ export function GtaMap(ctx: GtaCtx & { focus: MapFocus | null }) {
   const [focusLabel, setFocusLabel] = useState(ctx.focus?.label ?? '');
   const lines = useMemo(gridLines, []);
   const toggle = (l: Layer) => setLayers((s) => { const n = new Set(s); if (n.has(l)) n.delete(l); else n.add(l); return n; });
-
-  if (!src) return <section className="g-import">
-    <h2 className="g-title" style={{ margin: 0, fontSize: '1.1rem' }}>Ma carte de Leonida</h2>
-    <p>Importe ta carte une fois sur cet appareil : elle reste ici, hors ligne, et n’est publiée nulle part.</p>
-    <p className="g-muted">Pourquoi pas directement dans l’app ? La carte ressemble à une création officielle dont les droits ne sont pas confirmés : la mettre dans l’app la rendrait accessible en ligne. Choisis « Leonida_Map_Poster.jpg » dans le dossier du kit.</p>
-    <ImportSlot ctx={ctx} assetId="leonida-map" label="Importer la carte complète" />
-  </section>;
 
   const places = LOCATIONS.filter((l) => l.first_chapter_relevant <= chapter);
   const money = MONEY_PLACES.filter((m) => m.chapter_min <= chapter);
@@ -51,7 +43,7 @@ export function GtaMap(ctx: GtaCtx & { focus: MapFocus | null }) {
       {layers.has('lieux') && places.filter((l) => !focusLabel || l.name === focusLabel).map((l) => { const r = cellsRect(l.grid_row_approx, l.grid_row_approx, Number(l.grid_col_approx), Number(l.grid_col_approx));
         return r && <div key={l.name} className="g-zone" style={{ left: r.x + '%', top: r.y + '%', width: r.w + '%', height: r.h + '%', borderStyle: 'dashed' }}><span>{l.name}</span></div>; })}
       {layers.has('argent') && money.filter((m) => !focusLabel || m.title === focusLabel).map((m) => { const r = parseGrid(m.grid);
-        return r && <div key={m.id} className="g-zone" style={{ left: r.x + '%', top: r.y + '%', width: r.w + '%', height: r.h + '%' }}><span>{m.title}</span></div>; })}
+        return r && <div key={m.id} className="g-zone" style={{ left: r.x + '%', top: r.y + '%', width: r.w + '%', height: r.h + '%', opacity: focusLabel ? 1 : .55 }}>{focusLabel && <span>{m.title}</span>}</div>; })}
       {layers.has('mes') && markers.map((m) => <i key={m.id} className={'g-pin ' + m.category} style={{ left: m.x + '%', top: m.y + '%' }}><span>{m.label}</span></i>)}
       {draft && <i className="g-pin perso" style={{ left: draft.x + '%', top: draft.y + '%' }} />}
     </ZoomView>
