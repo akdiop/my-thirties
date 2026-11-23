@@ -29,14 +29,17 @@ export type GtaProgress = {
   recent: string[];
   /** Cases des listes « Astuces » (préparatifs, voitures rares…), par identifiant stable. */
   checks: Record<string, boolean>;
+  /** Compteurs de la liste des 100 % (nombre ou montant en dollars du jeu), par identifiant stable. */
+  counts: Record<string, number>;
   settings: GtaSettings;
 };
 
-export const emptyProgress = (): GtaProgress => ({ version: PROGRESS_VERSION, missions: {}, money: {}, markers: [], collections: [], recent: [], checks: {}, settings: { theme: true, hideSpoilers: true } });
+export const emptyProgress = (): GtaProgress => ({ version: PROGRESS_VERSION, missions: {}, money: {}, markers: [], collections: [], recent: [], checks: {}, counts: {}, settings: { theme: true, hideSpoilers: true } });
 
 const obj = (v: unknown): v is Record<string, unknown> => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
 const optStr = (v: unknown, max = 2000) => (typeof v === 'string' && v ? v.slice(0, max) : undefined);
 const optNum = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? Math.round(v) : undefined);
+const MAX_COUNT = 100_000_000;
 const clamp = (n: number) => Math.min(100, Math.max(0, n));
 export const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 
@@ -77,6 +80,7 @@ export function migrateProgress(input: unknown): GtaProgress {
     if (!out.collections.some((c) => collectionKey(c.name, c.type) === collectionKey(item.name, item.type))) out.collections.push(item);
   }
   if (obj(input.checks)) for (const [k, v] of Object.entries(input.checks)) if (v === true && k.length <= 40) out.checks[k] = true;
+  if (obj(input.counts)) for (const [k, v] of Object.entries(input.counts)) { const n = optNum(v); if (n && k.length <= 40) out.counts[k] = Math.min(n, MAX_COUNT); }
   if (Array.isArray(input.recent)) out.recent = [...new Set(input.recent.filter((x): x is string => typeof x === 'string'))].slice(0, 8);
   if (obj(input.settings)) out.settings = { theme: input.settings.theme !== false, hideSpoilers: input.settings.hideSpoilers !== false };
   return out;
@@ -162,11 +166,19 @@ export function mergeProgress(current: GtaProgress, incoming: GtaProgress): GtaP
     const cur = money[id];
     money[id] = cur ? { ...cur, ...Object.fromEntries(Object.entries(v).filter(([, x]) => x !== undefined)), steps: [...new Set([...cur.steps, ...v.steps])].sort((a, b) => a - b) } as MoneyProgress : v;
   }
-  return migrateProgress({ ...current, missions, money, markers: [...current.markers, ...incoming.markers], collections: [...current.collections, ...incoming.collections], checks: { ...current.checks, ...incoming.checks }, recent: current.recent, settings: current.settings });
+  return migrateProgress({ ...current, missions, money, markers: [...current.markers, ...incoming.markers], collections: [...current.collections, ...incoming.collections], checks: { ...current.checks, ...incoming.checks }, counts: { ...current.counts, ...incoming.counts }, recent: current.recent, settings: current.settings });
 }
 
 export function toggleCheck(p: GtaProgress, id: string): GtaProgress {
   const checks = { ...p.checks };
   if (checks[id]) delete checks[id]; else checks[id] = true;
   return { ...p, checks };
+}
+
+export function setCount(p: GtaProgress, id: string, value: number): GtaProgress {
+  const n = Number.isFinite(value) ? Math.min(MAX_COUNT, Math.max(0, Math.round(value))) : 0;
+  if ((p.counts[id] ?? 0) === n) return p;
+  const counts = { ...p.counts };
+  if (n) counts[id] = n; else delete counts[id];
+  return { ...p, counts };
 }
