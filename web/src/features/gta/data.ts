@@ -1,7 +1,8 @@
 import raw from './data/gta_vi_data.json';
 import rawMoney from './data/money_locations.json';
 import rawGallery from './data/gallery.json';
-import type { GalleryAsset, Location, Mission, MissionReward, MoneyLocation, Questline } from './types';
+import rawDetails from './data/powerpyx_fr.json';
+import type { GalleryAsset, Location, Mission, MissionDetail, MissionReward, MoneyLocation, Questline, SideMission } from './types';
 
 const str = (v: unknown) => typeof v === 'string';
 const num = (v: unknown) => typeof v === 'number' && Number.isFinite(v);
@@ -47,9 +48,18 @@ export const GALLERY: GalleryAsset[] = (rawGallery as Record<string, unknown>[])
 
 export const CHAPTERS = [1, 2, 3, 4, 5] as const;
 
+const det = rawDetails as unknown as { source: string; consulte: string; missions: Record<string, MissionDetail>; annexes: SideMission[] };
+const isDetail = (x: Record<string, unknown>) => str(x.lieu) && str(x.recompense) && strs(x.etapes) && str(x.url) && (x.montant === null || num(x.montant));
+/** Fiches individuelles PowerPyx traduites, par identifiant de mission du kit. */
+export const DETAILS: Record<string, MissionDetail> = Object.fromEntries(Object.entries(det.missions ?? {}).filter(([, v]) => isDetail(v as unknown as Record<string, unknown>)));
+export const SIDE_MISSIONS: SideMission[] = keep<SideMission>(det.annexes, (x) => isDetail(x) && str(x.id) && str(x.titre) && str(x.arc) && num(x.chapitre), 'annexes');
+export const DETAILS_SOURCE = det.source;
+export const DETAILS_DATE = det.consulte;
+export const detailOf = (id: string): MissionDetail | undefined => DETAILS[id];
+
 /** Une mission est « vérifiée » seulement si sa fiche individuelle a été contrôlée. */
-export const missionVerified = (m: Mission) => m.status_verification === 'vérifié sur fiche individuelle';
-export const missionMissable = (m: Mission) => m.time_sensitive || m.tags.includes('risque de manquer');
+export const missionVerified = (m: Mission) => m.status_verification === 'vérifié sur fiche individuelle' || Boolean(DETAILS[m.id]);
+export const missionMissable = (m: Mission) => m.time_sensitive || m.tags.includes('risque de manquer') || DETAILS[m.id]?.manquable === true;
 export const missionOptional = (m: Mission) => m.type === 'facultative';
 
 /** Zone approximative de la carte pour une région de mission (aucune coordonnée précise n'est déduite). */
@@ -57,6 +67,8 @@ export const REGION_PLACE: Record<string, string> = { 'Key Lento et les Keys': '
 
 /** Récompense annoncée pour une mission : celle de la liste des gains, sinon le champ de la fiche ; vérifiée seulement si la source le dit. */
 export function rewardOf(m: Mission): { amount: number; verified: boolean; source: string } | null {
+  const d = DETAILS[m.id];
+  if (d?.montant) return { amount: d.montant, verified: true, source: d.url };
   const listed = REWARDS.find((r) => m.title === r.title || m.title.startsWith(r.title + ' ') || m.title.includes('] ' + r.title));
   if (listed) return { amount: listed.amount_usd, verified: listed.verified, source: listed.source };
   if (m.reward_usd_verified !== null) return { amount: m.reward_usd_verified, verified: missionVerified(m), source: m.source_detail_url ?? m.source_index };
@@ -64,3 +76,9 @@ export function rewardOf(m: Mission): { amount: number; verified: boolean; sourc
 }
 
 export const SIDE_CHARACTERS = QUESTLINES.map((q) => q.character);
+
+/** Toutes les récompenses connues (missions du kit et missions annexes), pour le tableau et les totaux. */
+export const REWARD_ROWS = [
+  ...MISSIONS.flatMap((m) => { const r = rewardOf(m); return r ? [{ missionId: m.id, title: m.title.replace(/^\[[^\]]+\]\s*/, ''), chapter: m.chapter, amount: r.amount, verified: r.verified, source: r.source }] : []; }),
+  ...SIDE_MISSIONS.flatMap((x) => (x.montant ? [{ missionId: x.id, title: x.titre, chapter: x.chapitre, amount: x.montant, verified: true, source: x.url }] : [])),
+];

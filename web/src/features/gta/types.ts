@@ -66,3 +66,8 @@ export type GalleryAsset = {
   caption?: string;
   precision?: string;
 };
+
+/** Détails d'une fiche individuelle PowerPyx, traduits et reformulés (data/powerpyx_fr.json). */
+export type MissionDetail = { lieu: string; donneur: string; condition: string; perso: string; recompense: string; synopsis?: string; etapes: string[]; url: string; montant: number | null; manquable: boolean };
+/** Mission annexe (Strangers & Freaks, arcs de personnages) absente de l'index du kit. */
+export type SideMission = MissionDetail & { id: string; arc: string; titre: string; chapitre: number; synopsis: string };

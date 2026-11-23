@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { AlertTriangle, Check, ChevronLeft, ExternalLink, Eye, KeyRound, MapPin } from 'lucide-react';
-import { MISSIONS, MONEY_PLACES, MONEY_UNIT, rewardOf } from './data';
+import { MISSIONS, MONEY_PLACES, MONEY_UNIT, REWARD_ROWS } from './data';
 import { parseGrid } from './mapGrid';
-import { MONEY_STATUS_LABEL, MONEY_STATUSES, missionDone, missionStats, moneyOf, moneyTotals, rewardLinks, setMoney, toggleStep, type MoneyStatus } from './progress';
+import { MONEY_STATUS_LABEL, MONEY_STATUSES, missionDone, missionStats, moneyOf, moneyTotals, setMoney, toggleStep, type MoneyStatus } from './progress';
 import { PELICAN, PELICAN_ID } from './pelican';
 import type { GtaCtx } from './ctx';
 import type { MoneyLocation } from './types';
@@ -15,8 +15,7 @@ const recovered = (ctx: GtaCtx, id: string) => { const m = moneyOf(ctx.p, id); r
 
 export function GtaMoney(ctx: GtaCtx & { openId: string | null; setOpenId: (id: string | null) => void }) {
   const [filter, setFilter] = useState<'tous' | 'recupere' | 'non' | 'secrets'>('tous');
-  const links = useMemo(() => rewardLinks(MISSIONS, rewardOf), []);
-  const totals = moneyTotals(MONEY_PLACES, ctx.p, links);
+  const totals = moneyTotals(MONEY_PLACES, ctx.p, REWARD_ROWS);
   const current = missionStats(MISSIONS, ctx.p).current;
   const open = ctx.openId ? MONEY_PLACES.find((x) => x.id === ctx.openId) : undefined;
   if (open) return open.id === PELICAN_ID ? <PelicanSheet ctx={ctx} pl={open} onClose={() => ctx.setOpenId(null)} /> : <PlaceSheet ctx={ctx} pl={open} onClose={() => ctx.setOpenId(null)} />;
@@ -42,8 +41,8 @@ export function GtaMoney(ctx: GtaCtx & { openId: string | null; setOpenId: (id: 
     {later.length > 0 && <><h2 className="g-title" style={{ margin: 0, fontSize: '1.05rem' }}>Plus tard dans l’histoire</h2>{later.map((pl) => <PlaceCard key={pl.id} pl={pl} ctx={ctx} />)}</>}
     {!list.length && <p className="g-muted">Aucune cache dans ce filtre.</p>}
     <section className="g-card"><p className="g-label">Récompenses de missions</p>
-      <div className="g-table">{links.map((r) => { const m = MISSIONS.find((x) => x.id === r.missionId)!, src = rewardOf(m)!.source;
-        return <div key={r.missionId}><span><button className="link-btn" style={{ textAlign: 'left', minHeight: 44 }} onClick={() => ctx.openMission(m.id)}>{m.title.replace(/^\[[^\]]+\]\s*/, '')}</button><br /><span className="g-muted">Ch. {m.chapter} · <a href={src} target="_blank" rel="noreferrer">source</a>{missionDone(ctx.p, m.id) ? ' · terminée' : ''}</span></span>
+      <div className="g-table">{REWARD_ROWS.map((r) => { const inKit = MISSIONS.some((x) => x.id === r.missionId);
+        return <div key={r.missionId}><span>{inKit ? <button className="link-btn" style={{ textAlign: 'left', minHeight: 44 }} onClick={() => ctx.openMission(r.missionId)}>{r.title}</button> : <b>{r.title}</b>}<br /><span className="g-muted">{r.chapter ? 'Ch. ' + r.chapter : 'Tous chapitres'}{inKit ? '' : ' · annexe'} · <a href={r.source} target="_blank" rel="noreferrer">source</a>{missionDone(ctx.p, r.missionId) ? ' · terminée' : ''}</span></span>
           <span style={{ textAlign: 'right' }}>{fmt(r.amount)}<br />{r.verified ? <span className="g-badge ok">vérifiée</span> : <span className="g-badge warn">à confirmer</span>}</span></div>; })}</div>
     </section>
   </>;

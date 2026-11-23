@@ -1,7 +1,7 @@
-import { useMemo, useRef, useState, type ChangeEvent } from 'react';
+import { useRef, useState, type ChangeEvent } from 'react';
 import { AlertTriangle, Car, Coins, Compass, Download, Play, Upload } from 'lucide-react';
-import { DATA_VERSION, MISSIONS, MONEY_PLACES, MONEY_UNIT, missionMissable, rewardOf } from './data';
-import { exportProgress, mergeProgress, missionDone, missionStats, moneyOf, moneyTotals, parseExport, rewardLinks } from './progress';
+import { DATA_VERSION, MISSIONS, MONEY_PLACES, MONEY_UNIT, REWARD_ROWS, missionMissable } from './data';
+import { exportProgress, mergeProgress, missionDone, missionStats, moneyOf, moneyTotals, parseExport } from './progress';
 import { PELICAN_ID } from './pelican';
 import type { GtaCtx } from './ctx';
 
@@ -11,10 +11,11 @@ const clean = (t: string) => t.replace(/^\[[^\]]+\]\s*/, '');
 export function GtaHome(ctx: GtaCtx) {
   const { p } = ctx;
   const stats = missionStats(MISSIONS, p);
-  const totals = moneyTotals(MONEY_PLACES, p, useMemo(() => rewardLinks(MISSIONS, rewardOf), []));
+  const totals = moneyTotals(MONEY_PLACES, p, REWARD_ROWS);
   const next = MISSIONS.find((m) => m.chapter === stats.current && !missionDone(p, m.id)) ?? MISSIONS.find((m) => !missionDone(p, m.id));
   const resume = p.recent.map((id) => MISSIONS.find((m) => m.id === id)).find((m) => m && !missionDone(p, m.id)) ?? next;
   const missables = MISSIONS.filter((m) => missionMissable(m) && !missionDone(p, m.id) && m.chapter <= stats.current);
+  const cards = stats.current === 2 && !missionDone(p, 'C02-27') && (!p.checks['astuce:co02'] || !p.checks['astuce:co03']);
   const recent = p.recent.map((id) => MISSIONS.find((m) => m.id === id)).filter((m): m is NonNullable<typeof m> => Boolean(m)).slice(0, 4);
   const progress = pct(stats.done, stats.total);
   const pel = moneyOf(p, PELICAN_ID), pelPlace = MONEY_PLACES.find((x) => x.id === PELICAN_ID);
@@ -44,8 +45,9 @@ export function GtaHome(ctx: GtaCtx) {
     <section className="g-card"><p className="g-label">Par chapitre</p>
       {stats.byChapter.map((c) => <div key={c.chapter} className="g-field"><span>Chapitre {c.chapter} · {c.done}/{c.total} · {pct(c.done, c.total)} %</span><div className="g-bar"><span style={{ width: pct(c.done, c.total) + '%' }} /></div></div>)}
     </section>
-    {missables.length > 0 && <section className="g-card" aria-labelledby="g-missables"><p className="g-label" id="g-missables"><AlertTriangle size={14} aria-hidden="true" /> Potentiellement manquable</p>
+    {(missables.length > 0 || cards) && <section className="g-card" aria-labelledby="g-missables"><p className="g-label" id="g-missables"><AlertTriangle size={14} aria-hidden="true" /> Potentiellement manquable</p>
       {missables.map((m) => <button key={m.id} className="g-reveal" onClick={() => ctx.openMission(m.id)}><b>{clean(m.title)}</b> · chapitre {m.chapter}</button>)}
+      {cards && <button className="g-reveal" onClick={() => ctx.go('astuces')}><b>Cartes de Vicki et Victor</b> · à prendre au motel avant « Checking Out »</button>}
     </section>}
     {pelPlace && <button className="g-place featured" onClick={() => ctx.openMoney(PELICAN_ID)}>
       <span className="g-row" style={{ gap: 4 }}><Coins size={16} aria-hidden="true" /><span className="g-badge ok">Fiche détaillée</span></span>

@@ -27,10 +27,12 @@ export type GtaProgress = {
   markers: Marker[];
   collections: CollectionItem[];
   recent: string[];
+  /** Cases des listes « Astuces » (préparatifs, voitures rares…), par identifiant stable. */
+  checks: Record<string, boolean>;
   settings: GtaSettings;
 };
 
-export const emptyProgress = (): GtaProgress => ({ version: PROGRESS_VERSION, missions: {}, money: {}, markers: [], collections: [], recent: [], settings: { theme: true, hideSpoilers: true } });
+export const emptyProgress = (): GtaProgress => ({ version: PROGRESS_VERSION, missions: {}, money: {}, markers: [], collections: [], recent: [], checks: {}, settings: { theme: true, hideSpoilers: true } });
 
 const obj = (v: unknown): v is Record<string, unknown> => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
 const optStr = (v: unknown, max = 2000) => (typeof v === 'string' && v ? v.slice(0, max) : undefined);
@@ -74,6 +76,7 @@ export function migrateProgress(input: unknown): GtaProgress {
     const item = { id: typeof v.id === 'string' ? v.id : collectionKey(v.name, type), name: v.name.trim().slice(0, 120), type, done: v.done === true, note: optStr(v.note, 500) };
     if (!out.collections.some((c) => collectionKey(c.name, c.type) === collectionKey(item.name, item.type))) out.collections.push(item);
   }
+  if (obj(input.checks)) for (const [k, v] of Object.entries(input.checks)) if (v === true && k.length <= 40) out.checks[k] = true;
   if (Array.isArray(input.recent)) out.recent = [...new Set(input.recent.filter((x): x is string => typeof x === 'string'))].slice(0, 8);
   if (obj(input.settings)) out.settings = { theme: input.settings.theme !== false, hideSpoilers: input.settings.hideSpoilers !== false };
   return out;
@@ -159,10 +162,11 @@ export function mergeProgress(current: GtaProgress, incoming: GtaProgress): GtaP
     const cur = money[id];
     money[id] = cur ? { ...cur, ...Object.fromEntries(Object.entries(v).filter(([, x]) => x !== undefined)), steps: [...new Set([...cur.steps, ...v.steps])].sort((a, b) => a - b) } as MoneyProgress : v;
   }
-  return migrateProgress({ ...current, missions, money, markers: [...current.markers, ...incoming.markers], collections: [...current.collections, ...incoming.collections], recent: current.recent, settings: current.settings });
+  return migrateProgress({ ...current, missions, money, markers: [...current.markers, ...incoming.markers], collections: [...current.collections, ...incoming.collections], checks: { ...current.checks, ...incoming.checks }, recent: current.recent, settings: current.settings });
 }
 
-export type RewardLink = { missionId: string; amount: number; verified: boolean };
-export function rewardLinks(missions: Mission[], rewardOf: (m: Mission) => { amount: number; verified: boolean } | null): RewardLink[] {
-  return missions.flatMap((m) => { const r = rewardOf(m); return r ? [{ missionId: m.id, amount: r.amount, verified: r.verified }] : []; });
+export function toggleCheck(p: GtaProgress, id: string): GtaProgress {
+  const checks = { ...p.checks };
+  if (checks[id]) delete checks[id]; else checks[id] = true;
+  return { ...p, checks };
 }

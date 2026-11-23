@@ -11,13 +11,14 @@ import { GtaMap } from '../features/gta/GtaMap';
 import { GtaMoney } from '../features/gta/GtaMoney';
 import { GtaGallery } from '../features/gta/GtaGallery';
 import { GtaCollections } from '../features/gta/GtaCollections';
+import { GtaAstuces } from '../features/gta/GtaAstuces';
 import type { GtaCtx, GtaTab, MapFocus } from '../features/gta/ctx';
 import '../features/gta/gta.css';
 
 type Props = { entries: Entry[]; ownerId: string; onCreate: (i: EntryInput) => Promise<void>; onUpdate: (e: Entry, d: Record<string, unknown>) => Promise<void> };
 const TABS: { id: GtaTab; label: string }[] = [
   { id: 'accueil', label: 'Accueil' }, { id: 'missions', label: 'Missions' }, { id: 'carte', label: 'Carte' },
-  { id: 'argent', label: 'Argent et trésors' }, { id: 'galerie', label: 'Galerie' }, { id: 'collections', label: 'Collections' },
+  { id: 'argent', label: 'Argent et trésors' }, { id: 'astuces', label: 'Astuces' }, { id: 'galerie', label: 'Galerie' }, { id: 'collections', label: 'Collections' },
 ];
 
 /** Mes loisirs · Jeux vidéo · GTA VI : missions, carte, argent et trésors, galerie et collections, avec un thème propre au module. */
@@ -77,6 +78,7 @@ export function Gta({ entries, ownerId, onCreate, onUpdate }: Props) {
     {tab === 'missions' && <GtaMissions {...ctx} openId={missionId} setOpenId={setMissionId} />}
     {tab === 'carte' && <GtaMap key={focus?.key ?? 0} {...ctx} focus={focus} />}
     {tab === 'argent' && <GtaMoney {...ctx} openId={moneyId} setOpenId={setMoneyId} />}
+    {tab === 'astuces' && <GtaAstuces {...ctx} />}
     {tab === 'galerie' && <GtaGallery {...ctx} />}
     {tab === 'collections' && <GtaCollections {...ctx} />}
     <p className="g-muted" style={{ fontSize: '.75rem' }}>Noms du jeu conservés pour le repérage ; résumés originaux, non affiliés à Rockstar Games. Données du kit v{DATA_VERSION}, vérifiées le 23/11/2026.</p>

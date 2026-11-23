@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { GALLERY, MISSIONS, MONEY_PLACES, QUESTLINES, rewardOf } from '../data';
-import { addCollection, emptyProgress, exportProgress, mergeProgress, migrateProgress, missionDone, missionStats, moneyTotals, parseExport, rewardLinks, setMission, setMoney, toggleStep } from '../progress';
+import { DETAILS, GALLERY, MISSIONS, MONEY_PLACES, QUESTLINES, REWARD_ROWS, SIDE_MISSIONS, rewardOf } from '../data';
+import { toggleCheck, addCollection, emptyProgress, exportProgress, mergeProgress, migrateProgress, missionDone, missionStats, moneyTotals, parseExport, setMission, setMoney, toggleStep } from '../progress';
 import { PELICAN, PELICAN_ID } from '../pelican';
 
 const today = '2026-11-23';
@@ -19,8 +19,15 @@ describe('Référentiel GTA VI', () => {
   it('ne déclare vérifiée qu’une récompense confirmée par la source', () => {
     const vcia = MISSIONS.find((m) => m.id === 'C04-34')!;
     expect(rewardOf(vcia)).toMatchObject({ amount: 250000, verified: true });
-    expect(rewardOf(MISSIONS.find((m) => m.id === 'C02-12')!)?.verified).toBe(false);
-    expect(rewardOf(MISSIONS.find((m) => m.title.startsWith('Island Dreams'))!)?.verified).toBe(false);
+    expect(rewardOf(MISSIONS.find((m) => m.title.startsWith('Thrillbillies'))!)).toMatchObject({ amount: 2500, verified: false });
+    expect(rewardOf(MISSIONS.find((m) => m.title.startsWith('Island Dreams'))!)).toMatchObject({ amount: 400, verified: true });
+  });
+  it('relie les fiches PowerPyx traduites aux missions et ajoute les annexes', () => {
+    expect(Object.keys(DETAILS).every((id) => MISSIONS.some((m) => m.id === id))).toBe(true);
+    expect(Object.keys(DETAILS).length).toBeGreaterThanOrEqual(140);
+    expect(new Set(SIDE_MISSIONS.map((x) => x.id)).size).toBe(SIDE_MISSIONS.length);
+    expect(SIDE_MISSIONS.every((x) => !MISSIONS.some((m) => m.id === x.id))).toBe(true);
+    expect(REWARD_ROWS.some((r) => r.missionId.startsWith('SF-') && r.verified)).toBe(true);
   });
 });
 
@@ -48,6 +55,13 @@ describe('Progression', () => {
     p = setMission(p, 'C01-01', { completed: false }, today);
     expect(p.missions['C01-01']).toEqual({ completed: false, personalNotes: 'caravane' });
   });
+  it('garde les cases des astuces après réouverture et import', () => {
+    const p = toggleCheck(toggleCheck(emptyProgress(), 'astuce:co02'), 'astuce:v5');
+    const reopened = migrateProgress(JSON.parse(JSON.stringify(p)));
+    expect(reopened.checks).toEqual({ 'astuce:co02': true, 'astuce:v5': true });
+    expect(toggleCheck(reopened, 'astuce:v5').checks).toEqual({ 'astuce:co02': true });
+    expect(mergeProgress(emptyProgress(), reopened).checks['astuce:co02']).toBe(true);
+  });
   it('refuse un fichier qui n’est pas une sauvegarde', () => {
     expect(() => parseExport('{"a":1}')).toThrow();
     expect(() => parseExport('pas du json')).toThrow();
@@ -68,7 +82,7 @@ describe('Progression', () => {
 });
 
 describe('Calcul des gains', () => {
-  const links = rewardLinks(MISSIONS, rewardOf);
+  const links = REWARD_ROWS;
   it('10 000 de billets marqués ne sont pas 10 000 en cash disponible', () => {
     const p = setMoney(emptyProgress(), PELICAN_ID, { status: 'butin', cash_recovered: 1100 });
     const t = moneyTotals(MONEY_PLACES, p, links);
@@ -86,9 +100,9 @@ describe('Calcul des gains', () => {
   });
   it('une récompense compte seulement si elle est vérifiée et la mission terminée', () => {
     const vcia = MISSIONS.find((m) => m.id === 'C04-34')!;
-    const island = MISSIONS.find((m) => m.title.startsWith('Island Dreams'))!;
-    let p = setMission(emptyProgress(), island.id, { completed: true }, today);
-    expect(moneyTotals(MONEY_PLACES, p, links)).toMatchObject({ verifiedRewards: 0, pendingRewards: 400 });
+    const thrill = MISSIONS.find((m) => m.title.startsWith('Thrillbillies'))!;
+    let p = setMission(emptyProgress(), thrill.id, { completed: true }, today);
+    expect(moneyTotals(MONEY_PLACES, p, links)).toMatchObject({ verifiedRewards: 0, pendingRewards: 2500 });
     p = setMission(p, vcia.id, { completed: true }, today);
     expect(moneyTotals(MONEY_PLACES, p, links).verifiedRewards).toBe(250000);
   });
