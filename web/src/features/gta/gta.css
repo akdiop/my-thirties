@@ -141,3 +141,16 @@ html.dark .gta-theme img, html.dark .g-lightbox img { filter: none; }
 .g-overlay .g-gridline.v { width: calc(1px / var(--g-scale, 1)); top: 0; bottom: 0; }
 .g-overlay .g-gridline.h { height: calc(1px / var(--g-scale, 1)); left: 0; right: 0; }
 .g-overlay .g-zone { border-width: calc(2px / var(--g-scale, 1)); }
+
+/* Checklist 100 % */
+.g-cent { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-top: 1px solid var(--g-line); }
+.g-cent:first-child { border-top: 0; }
+.g-cent .g-chapter-head strong { font-size: .95rem; line-height: 1.3; }
+.g-cent .g-chapter-head span { flex: none; display: inline-flex; align-items: center; gap: 3px; }
+.g-cent.done .g-bar > span { background: var(--g-ok); }
+.gta-vi input.g-count { width: 110px; flex: none; text-align: center; font-variant-numeric: tabular-nums; }
+.g-cent .g-icon:disabled { opacity: .4; cursor: default; }
+.g-tip summary { min-height: 32px; display: flex; align-items: center; font-size: .82rem; font-weight: 700; color: var(--g-accent); cursor: pointer; list-style: none; }
+.g-tip summary::-webkit-details-marker { display: none; }
+.g-tip summary::after { content: '+'; margin-left: 6px; }
+.g-tip[open] summary::after { content: '–'; }

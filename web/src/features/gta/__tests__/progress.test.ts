@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DETAILS, GALLERY, MISSIONS, MONEY_PLACES, QUESTLINES, REWARD_ROWS, SIDE_MISSIONS, rewardOf } from '../data';
-import { toggleCheck, addCollection, emptyProgress, exportProgress, mergeProgress, migrateProgress, missionDone, missionStats, moneyTotals, parseExport, setMission, setMoney, toggleStep } from '../progress';
+import { toggleCheck, addCollection, emptyProgress, exportProgress, mergeProgress, migrateProgress, missionDone, missionStats, moneyTotals, parseExport, setCount, setMission, setMoney, toggleStep } from '../progress';
+import { CENT_ITEMS, centDone, centValue } from '../centPourCent';
 import { PELICAN, PELICAN_ID } from '../pelican';
 
 const today = '2026-11-23';
@@ -78,6 +79,32 @@ describe('Progression', () => {
     p = toggleStep(p, PELICAN_ID, 0);
     const reopened = migrateProgress(JSON.parse(JSON.stringify(p)));
     expect(reopened.money[PELICAN_ID]).toMatchObject({ steps: [0, 2], status: 'decouvert' });
+  });
+});
+
+describe('Checklist 100 %', () => {
+  it('reprend les 35 objectifs du guide avec des identifiants uniques', () => {
+    expect(CENT_ITEMS).toHaveLength(35);
+    expect(new Set(CENT_ITEMS.map((i) => i.id)).size).toBe(35);
+    expect(CENT_ITEMS.every((i) => i.need > 0 && (!i.total || i.total >= i.need))).toBe(true);
+  });
+  it('garde les compteurs après réouverture et import, borne les valeurs', () => {
+    let p = setCount(emptyProgress(), 'flamingos', 42);
+    p = setCount(p, 'bills', 205000);
+    p = setCount(p, 'stunts', -5);
+    const reopened = migrateProgress(JSON.parse(JSON.stringify(p)));
+    expect(reopened.counts).toEqual({ flamingos: 42, bills: 205000 });
+    expect(setCount(reopened, 'flamingos', 0).counts).toEqual({ bills: 205000 });
+    expect(mergeProgress(emptyProgress(), parseExport(exportProgress(reopened, '0.3.0'))).counts.flamingos).toBe(42);
+    expect(migrateProgress({ counts: { a: 'x', b: -1, c: 3.6 } }).counts).toEqual({ c: 4 });
+  });
+  it('l’histoire se déduit des missions, le reste des compteurs', () => {
+    const story = CENT_ITEMS.find((i) => i.id === 'story')!;
+    const flam = CENT_ITEMS.find((i) => i.id === 'flamingos')!;
+    expect(centDone(story, {}, true)).toBe(true);
+    expect(centValue(story, { story: 9 }, false)).toBe(0);
+    expect(centDone(flam, { flamingos: 99 }, true)).toBe(false);
+    expect(centDone(flam, { flamingos: 100 }, true)).toBe(true);
   });
 });
 
