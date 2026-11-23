@@ -1,0 +1,143 @@
+/* Module GTA VI : thème entièrement limité à .gta-vi (aucun token global modifié). */
+.gta-vi {
+  --g-ink: #3A3833; --g-muted: #6F6B63; --g-surface: rgba(255,255,255,.72); --g-line: #E5DFD3; --g-paper: #FBFAF7;
+  --g-accent: #7E7254; --g-accent-ink: #fff; --g-soft: #EFE8DA; --g-ok: #5F7A59; --g-warn: #8C5A2B; --g-warn-bg: #F6ECDD;
+  --g-hero: linear-gradient(160deg, #F4F1EA, #E9E3D6); --g-road: #CFC6B4; --g-zone: rgba(126,114,84,.22); --g-zone-line: #7E7254;
+  color: var(--g-ink); display: flex; flex-direction: column; gap: 14px; padding-bottom: 24px;
+}
+.gta-vi.gta-theme {
+  --g-ink: #182938; --g-muted: #4A5866; --g-surface: #FFF9F2; --g-line: #EAD9C2; --g-paper: #FFF9F2;
+  --g-accent: #5A467A; --g-accent-ink: #FFF9F2; --g-soft: #F6E5C8; --g-ok: #0B6E7A; --g-warn: #9A3B24; --g-warn-bg: #FCE3DC;
+  --g-hero: linear-gradient(180deg, #F5A6B7 0%, #F6C9A6 38%, #F6E5C8 62%, #8FD3DB 63%, #07A7BB 100%);
+  --g-road: #F6E5C8; --g-zone: rgba(238,128,105,.28); --g-zone-line: #EE8069;
+  background: #FFF9F2; padding: 12px 12px 24px; border-radius: 24px;
+}
+.gta-vi h1, .gta-vi h2, .gta-vi h3 { color: var(--g-ink); }
+.gta-theme h1, .gta-theme h2, .gta-theme .g-title { font-stretch: condensed; letter-spacing: .01em; text-transform: uppercase; }
+.gta-vi .g-card { background: var(--g-surface); border: 1px solid var(--g-line); border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.gta-theme .g-card { box-shadow: 0 1px 0 rgba(24,41,56,.04), 0 8px 24px -18px rgba(90,70,122,.45); }
+.gta-vi .g-label { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--g-muted); margin: 0; }
+.gta-vi .g-muted { color: var(--g-muted); font-size: .85rem; }
+.gta-vi p { margin: 0; line-height: 1.5; }
+.gta-vi a { color: var(--g-accent); text-underline-offset: 2px; word-break: break-word; }
+.gta-vi .g-btn { min-height: 44px; padding: 0 16px; border-radius: 22px; border: 0; background: var(--g-accent); color: var(--g-accent-ink); font: inherit; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; }
+.gta-vi .g-btn.ghost { background: transparent; color: var(--g-ink); border: 1px solid var(--g-line); }
+.gta-vi .g-btn.soft { background: var(--g-soft); color: var(--g-ink); }
+.gta-vi .g-btn:disabled { opacity: .5; }
+.gta-vi .g-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.gta-vi .g-icon { width: 44px; height: 44px; border-radius: 22px; border: 1px solid var(--g-line); background: var(--g-paper); color: var(--g-ink); display: grid; place-items: center; flex: none; cursor: pointer; }
+.gta-vi .g-icon[aria-pressed="true"] { background: var(--g-accent); color: var(--g-accent-ink); border-color: var(--g-accent); }
+.gta-vi :focus-visible { outline: 3px solid var(--g-accent); outline-offset: 2px; }
+.gta-vi input, .gta-vi select, .gta-vi textarea { min-height: 44px; border-radius: 12px; border: 1px solid var(--g-line); background: #fff; color: var(--g-ink); font: inherit; padding: 8px 12px; width: 100%; box-sizing: border-box; }
+
+/* En-tête et onglets */
+.g-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.g-head h1 { margin: 0; font-size: 1.6rem; line-height: 1.1; }
+.g-tabs { display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; scrollbar-width: none; }
+.g-tabs::-webkit-scrollbar { display: none; }
+.g-tabs button { flex: none; min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid var(--g-line); background: var(--g-paper); color: var(--g-ink); font: inherit; font-weight: 600; cursor: pointer; }
+.g-tabs button[aria-selected="true"] { background: var(--g-ink); color: var(--g-paper); border-color: var(--g-ink); }
+.g-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.g-chip { min-height: 36px; padding: 0 12px; border-radius: 18px; border: 1px solid var(--g-line); background: var(--g-paper); color: var(--g-ink); font: inherit; font-size: .85rem; cursor: pointer; }
+.g-chip[aria-pressed="true"] { background: var(--g-accent); color: var(--g-accent-ink); border-color: var(--g-accent); }
+.g-badge { display: inline-flex; align-items: center; gap: 4px; font-size: .72rem; font-weight: 700; padding: 3px 8px; border-radius: 10px; background: var(--g-soft); color: var(--g-ink); }
+.g-badge.ok { background: #E3EFE6; color: #1F5130; }
+.g-badge.warn { background: var(--g-warn-bg); color: var(--g-warn); }
+.g-badge.info { background: #E7E3F0; color: #3E2F58; }
+.g-alert { border-radius: 14px; padding: 10px 12px; background: var(--g-warn-bg); color: var(--g-warn); font-size: .88rem; display: flex; gap: 8px; align-items: flex-start; }
+.g-alert.info { background: #EEF0F3; color: var(--g-ink); }
+
+/* Accueil : affiche « Carnet de voyage » */
+.g-hero { position: relative; border-radius: 22px; overflow: hidden; background: var(--g-hero); padding: 22px 18px 18px; min-height: 190px; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; color: var(--g-ink); }
+.gta-theme .g-hero::before { content: ''; position: absolute; left: 50%; top: 26%; width: 120px; height: 120px; margin-left: -60px; border-radius: 50%; background: radial-gradient(circle, #FFF3C4 0%, #F6C46A 55%, rgba(246,196,106,0) 72%); }
+.gta-theme .g-hero::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,255,255,.12) 0 2px, transparent 2px 8px); mask: linear-gradient(180deg, transparent 0 62%, #000 63%); pointer-events: none; }
+.g-hero > * { position: relative; z-index: 1; }
+.g-hero-card { background: rgba(255,249,242,.92); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.g-hero h1 { margin: 0; font-size: 1.7rem; line-height: 1.05; }
+.g-road { position: relative; height: 46px; margin: 16px 4px 0; }
+.g-road-track { position: absolute; left: 0; right: 0; top: 20px; height: 6px; border-radius: 3px; background: var(--g-road); border: 1px dashed var(--g-line); }
+.g-road-fill { position: absolute; left: 0; top: 20px; height: 6px; border-radius: 3px; background: var(--g-accent); transition: width .4s ease; }
+.g-road-stop { position: absolute; top: 12px; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; background: var(--g-paper); border: 2px solid var(--g-line); display: grid; place-items: center; font-size: .68rem; font-weight: 800; color: var(--g-ink); }
+.g-road-stop.done { background: var(--g-accent); border-color: var(--g-accent); color: var(--g-accent-ink); }
+.g-road-car { position: absolute; top: -14px; margin-left: -12px; color: var(--g-ink); transition: left .4s ease; }
+.g-stats { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+.g-stat { background: var(--g-paper); border: 1px solid var(--g-line); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 2px; }
+.g-stat b { font-size: 1.25rem; }
+.g-stat small { color: var(--g-muted); font-size: .74rem; }
+.g-bar { height: 8px; border-radius: 4px; background: var(--g-soft); overflow: hidden; }
+.g-bar > span { display: block; height: 100%; background: var(--g-accent); }
+
+/* Listes de missions */
+.g-list { display: flex; flex-direction: column; }
+.g-mission { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--g-line); }
+.g-mission:first-child { border-top: 0; }
+.g-mission .g-open { flex: 1; min-width: 0; min-height: 44px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 3px; text-align: left; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; padding: 0; }
+.g-mission .g-open strong { font-size: .95rem; line-height: 1.3; }
+.g-mission.done .g-open strong { color: var(--g-muted); text-decoration: line-through; text-decoration-color: rgba(0,0,0,.25); }
+.g-num { font-size: .72rem; font-weight: 800; color: var(--g-muted); min-width: 26px; text-align: center; }
+.g-check { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--g-line); background: var(--g-paper); display: grid; place-items: center; color: var(--g-accent-ink); flex: none; cursor: pointer; }
+.g-check[aria-pressed="true"] { background: var(--g-ok); border-color: var(--g-ok); }
+.g-chapter-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.g-spoiler { filter: blur(6px); user-select: none; }
+.g-reveal { border: 1px dashed var(--g-line); border-radius: 12px; background: var(--g-paper); min-height: 44px; font: inherit; color: var(--g-ink); padding: 8px 12px; text-align: left; cursor: pointer; }
+.g-fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.g-field { display: flex; flex-direction: column; gap: 2px; }
+.g-field > span:first-child { font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--g-muted); }
+.g-unverified { font-style: italic; color: var(--g-warn); }
+.g-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.g-steps button { width: 100%; min-height: 44px; display: flex; gap: 10px; align-items: flex-start; text-align: left; border: 0; background: none; font: inherit; color: inherit; padding: 6px 0; cursor: pointer; }
+.g-steps .tick { flex: none; width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--g-line); display: grid; place-items: center; background: var(--g-paper); margin-top: 1px; }
+.g-steps button[aria-pressed="true"] .tick { background: var(--g-ok); border-color: var(--g-ok); color: #fff; }
+.g-steps button[aria-pressed="true"] .txt { color: var(--g-muted); text-decoration: line-through; }
+.g-code { font-family: ui-monospace, Menlo, monospace; font-size: 1.05rem; font-weight: 800; letter-spacing: .12em; background: var(--g-ink); color: var(--g-paper); padding: 4px 10px; border-radius: 8px; }
+.g-money { display: flex; flex-direction: column; gap: 2px; }
+.g-money b { font-size: 1.3rem; }
+.g-money.nominal b { color: var(--g-muted); text-decoration: underline dotted; }
+.g-amounts { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+.g-place { display: flex; flex-direction: column; gap: 6px; text-align: left; border: 1px solid var(--g-line); border-radius: 18px; background: var(--g-surface); padding: 14px; font: inherit; color: inherit; cursor: pointer; width: 100%; }
+.g-place.featured { border-width: 2px; border-color: var(--g-zone-line); }
+.g-table { display: flex; flex-direction: column; }
+.g-table > div { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 4px 10px; padding: 8px 0; border-top: 1px solid var(--g-line); font-size: .88rem; }
+.g-table > div:first-child { border-top: 0; }
+
+/* Carte : zoom et déplacement tactiles */
+.g-map { position: relative; overflow: hidden; border-radius: 18px; border: 1px solid var(--g-line); background: #CFEFF2; height: min(68vh, 620px); touch-action: none; user-select: none; -webkit-user-select: none; }
+.g-map-inner { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+.g-map-inner img { display: block; width: 100%; height: auto; pointer-events: none; -webkit-user-drag: none; }
+.g-overlay { position: absolute; inset: 0; pointer-events: none; }
+.g-gridline { position: absolute; background: rgba(24,41,56,.35); }
+.g-zone { position: absolute; border: 2px solid var(--g-zone-line); background: var(--g-zone); border-radius: 6px; box-sizing: border-box; }
+.g-zone span, .g-pin span { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); white-space: nowrap; font-size: 11px; font-weight: 700; background: rgba(255,249,242,.95); color: #182938; padding: 2px 6px; border-radius: 6px; margin-bottom: 2px; }
+.g-pin { position: absolute; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: #5A467A; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); }
+.g-pin.argent { background: #9A3B24; } .g-pin.mission { background: #0B6E7A; } .g-pin.repere { background: #182938; }
+.g-map-tools { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
+.g-map-hint { position: absolute; left: 8px; bottom: 8px; right: 8px; z-index: 2; background: rgba(255,249,242,.94); color: #182938; border-radius: 12px; padding: 6px 10px; font-size: .8rem; }
+
+/* Galerie */
+.g-mosaic { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+.g-tile { position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--g-line); background: var(--g-soft); aspect-ratio: 4 / 3; padding: 0; cursor: pointer; font: inherit; color: inherit; text-align: left; }
+.g-tile.wide { grid-column: span 2; aspect-ratio: 16 / 9; }
+.g-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gta-vi input[hidden] { display: none; }
+.g-tile .g-cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 6px 8px; background: rgba(24,41,56,.82); color: #FFF9F2; font-size: .78rem; font-weight: 600; }
+.g-lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(15,22,30,.92); display: flex; flex-direction: column; padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)); gap: 10px; color: #FFF9F2; }
+.g-lightbox .g-map { flex: 1; height: auto; background: #0F161E; border-color: #2A3542; }
+.g-lightbox .g-muted, .g-lightbox p { color: #E8DFD3; }
+.g-lightbox .g-icon { background: #FFF9F2; color: #182938; }
+
+@media (min-width: 720px) {
+  .g-fields { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .g-mosaic { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .g-tile.wide { grid-column: span 3; aspect-ratio: 21 / 9; }
+}
+@media (prefers-reduced-motion: reduce) { .gta-vi *, .g-lightbox * { transition: none !important; animation: none !important; } }
+
+/* Mode sombre de l'app (inversion globale) : le thème GTA VI et la visionneuse gardent leurs vraies couleurs. */
+html.dark .gta-theme, html.dark .g-lightbox { filter: invert(1) hue-rotate(180deg); }
+html.dark .gta-theme img, html.dark .g-lightbox img { filter: none; }
+/* Repères et libellés gardent leur taille quand on zoome. */
+.g-overlay .g-pin { transform: scale(calc(1 / var(--g-scale, 1))); }
+.g-overlay .g-zone span, .g-overlay .g-pin span { transform: translateX(-50%) scale(calc(1 / var(--g-scale, 1))); transform-origin: 50% 100%; }
+.g-overlay .g-gridline.v { width: calc(1px / var(--g-scale, 1)); top: 0; bottom: 0; }
+.g-overlay .g-gridline.h { height: calc(1px / var(--g-scale, 1)); left: 0; right: 0; }
+.g-overlay .g-zone { border-width: calc(2px / var(--g-scale, 1)); }

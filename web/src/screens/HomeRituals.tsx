@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Brain, Clapperboard, Star, Feather, HandHeart, Waves, BookHeart, BookOpen, Cake, Gift, CalendarCheck, ChevronDown, ChevronUp, Compass, Flower2, Heart, Leaf, Moon, Pill, Settings2, Sparkles, Timer } from 'lucide-react';
+import { Gamepad2, Brain, Clapperboard, Star, Feather, HandHeart, Waves, BookHeart, BookOpen, Cake, Gift, CalendarCheck, ChevronDown, ChevronUp, Compass, Flower2, Heart, Leaf, Moon, Pill, Settings2, Sparkles, Timer } from 'lucide-react';
 import type { Entry, EntryInput } from '../lib/cloud';
 import { PandaWidget } from '../features/panda/PandaWidget';
 import { MomentBar } from '../features/MomentBar';
@@ -12,7 +12,7 @@ import { prayerDay } from '../lib/wellbeing';
 import { GRAT_KIND, type GratData } from '../lib/gratitude';
 import { accordDeLaSemaine } from '../lib/quatreAccords';
 
-type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'finances' | 'transformation' | 'carnet' | 'gratitude' | 'tcc' | 'hsp' | 'culture' | 'astro' | 'jardin' | 'coran';
+type Target = 'myday' | 'habits' | 'notes' | 'bienetre' | 'bilan' | 'boussole' | 'focus' | 'sommeil' | 'mediter' | 'complements' | 'proches' | 'lectures' | 'envies' | 'panda' | 'finances' | 'transformation' | 'carnet' | 'gratitude' | 'tcc' | 'hsp' | 'culture' | 'astro' | 'jardin' | 'coran' | 'gta';
 type Shortcut = { id: Exclude<Target, 'myday' | 'panda' | 'finances'>; label: string; sub: string; icon: typeof Heart };
 const SHORTCUTS: Shortcut[] = [
   { id: 'habits', label: 'Habitudes', sub: 'Suivi quotidien', icon: Heart },
@@ -32,6 +32,7 @@ const SHORTCUTS: Shortcut[] = [
   { id: 'proches', label: 'Mes proches', sub: 'Anniversaires et idées de cadeaux', icon: Cake },
   { id: 'culture', label: 'Ma culture', sub: 'Lectures, séries et films', icon: Clapperboard },
   { id: 'astro', label: 'Mon thème astral', sub: 'Planètes, maisons, aspects, pistes', icon: Star },
+  { id: 'gta', label: 'GTA VI', sub: 'Carnet de voyage Leonida', icon: Gamepad2 },
   { id: 'coran', label: 'Le Coran', sub: 'Le texte entier, un verset par jour', icon: BookHeart },
   { id: 'jardin', label: 'Le Jardin des vertueux', sub: 'Riyâd as-Sâlihîn, un hadith par jour', icon: BookOpen },
   { id: 'lectures', label: 'Mes lectures', sub: 'Livres et citations', icon: BookOpen },

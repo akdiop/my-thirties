@@ -1,0 +1,2817 @@
+{
+ "source": "https://www.powerpyx.com/gta-6-full-walkthrough-all-missions/",
+ "consulte": "2026-11-23",
+ "note": "Faits repris des fiches individuelles PowerPyx (lieu, donneur, condition, personnage, récompense, objectifs), traduits et reformulés ; textes non recopiés.",
+ "missions": {
+  "C01-01": {
+   "lieu": "Mariana County",
+   "donneur": "Cal",
+   "condition": "Démarre juste après le prologue",
+   "perso": "Jason",
+   "recompense": "Maison de Jason à Key Lento",
+   "synopsis": "Une livraison tourne mal : Jason doit tirer Donnie des griffes des Kingfishers à Pelican Valley, puis rentre aux Keys où Lucia lui annonce sa sortie anticipée.",
+   "etapes": [
+    "Suivre l’avion et récupérer les colis",
+    "Fouiller le camp pour trouver Donnie",
+    "Entrer dans la cabane et détacher Donnie",
+    "Rejoindre l’avion et monter dans l’hydravion",
+    "Revenir en vol à la marina de Brian"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-gone-fishing-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-02": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Jason",
+   "condition": "Après « Gone Fishing »",
+   "perso": "Jason",
+   "recompense": "Une arme longue au choix",
+   "synopsis": "Passage à l’armurerie Ammu-Nation du coin pour acheter une arme longue.",
+   "etapes": [
+    "Aller voir Andrew et acheter une arme longue"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-gear-up-pick-up-another-gun-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-03": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Jason",
+   "condition": "Après « Gone Fishing »",
+   "perso": "Jason",
+   "recompense": "600 $",
+   "synopsis": "Jason va encaisser un loyer pour Brian dans une boutique de souvenirs qui cache un labo ; faute d’argent, il repart avec la marchandise.",
+   "etapes": [
+    "Parler au vendeur",
+    "Entrer dans le labo et prendre la marchandise",
+    "Appeler Brian",
+    "Ranger la marchandise dans le box de Brian"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-lab-fees-collect-brians-rent-walkthrough/",
+   "montant": 600,
+   "manquable": false
+  },
+  "C01-04": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Jason",
+   "condition": "Après « Gone Fishing »",
+   "perso": "Jason",
+   "recompense": "Réparation moteur et peinture offertes",
+   "synopsis": "Jason confie sa Ganado à Joey, au garage Coastal Auto Care.",
+   "etapes": [
+    "Parler à Joey",
+    "Faire réparer le moteur et repeindre la voiture"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-just-a-scratch-fix-your-car-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-05": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Cal",
+   "condition": "Après « Gone Fishing »",
+   "perso": "Jason",
+   "recompense": "Scanner radio de la police et 150 $ à la livraison",
+   "synopsis": "Avec Cal, Jason récupère à la fourrière de Hamlet une voiture dont le coffre contient un paiement dû à Brian, la fait repeindre et la dépose au garage.",
+   "etapes": [
+    "Aller à la fourrière de Hamlet avec Cal",
+    "Trouver la Phoenix dans la fourrière",
+    "Semer la police",
+    "Passer au Pay ’n’ Spray",
+    "Livrer la Phoenix au garage de Brian",
+    "Récupérer l’argent",
+    "Ajuster chapeau et lunettes pour être moins reconnu",
+    "Acheter une tenue à l’armurerie"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-unwanted-attention-go-see-cal-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-06": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Brian, Mandy",
+   "condition": "Après Gear Up, Lab Fees, Just a Scratch et Unwanted Attention",
+   "perso": "Jason",
+   "recompense": "Cigare Macizo (si tu le ramasses quand Mandy le jette)",
+   "synopsis": "En venant encaisser le loyer de Mandy, Jason se retrouve à faire de la plomberie.",
+   "etapes": [
+    "Suivre Mandy",
+    "Prendre la ventouse",
+    "Réparer l’évier"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-pipework-collect-mandys-rent-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-07": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Shirley",
+   "condition": "Après les 4 premières missions du chapitre 1 ; Shirley t’appelle en route vers « Pipework ». Manquable : disparaît définitivement au début de « Tourist Trap ». Aucun trophée ni condition de complétion n’en dépend.",
+   "perso": "Jason",
+   "recompense": "Hausse de Focus et de la réputation de criminel professionnel",
+   "synopsis": "La voisine Shirley a envie de rhum : va lui en acheter.",
+   "etapes": [
+    "Aller chercher le rhum de Shirley",
+    "Demander le rhum au vendeur"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-get-shirleys-rum-walkthrough/",
+   "montant": null,
+   "manquable": true
+  },
+  "C01-08": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Shirley",
+   "condition": "Après « Get Shirley’s Rum ». Manquable : disparaît au début de « Tourist Trap ». Aucun trophée n’en dépend.",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Shirley pense que voler le scooter de sa voisine lui remonterait le moral.",
+   "etapes": [
+    "Voler le scooter de Peggy",
+    "Le livrer à Shirley",
+    "Le garer dans la maison de Shirley"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-steal-the-scooter-walkthrough/",
+   "montant": null,
+   "manquable": true
+  },
+  "C01-09": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Brian",
+   "condition": "Après « Pipework », attendre l’appel de Brian",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Après l’affaire des Kingfishers, Arnold, l’intermédiaire de Brian, ne répond plus : Jason et Cal le retrouvent.",
+   "etapes": [
+    "Suivre Brian",
+    "Aller au magasin d’alcool",
+    "Trouver Arnold, puis aller à la station radar",
+    "Poursuivre Arnold",
+    "Décider du sort d’Arnold"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-hey-arnold-meet-brian-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-10": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Kenton Rees",
+   "condition": "Après « Hey Arnold! »",
+   "perso": "Jason",
+   "recompense": "400 $",
+   "synopsis": "Sous couvert d’une plongée avec un enterrement de vie de garçon, Jason aide Kenton à chercher un trésor sur une épave.",
+   "etapes": [
+    "Aller au point de plongée",
+    "Mettre l’équipement de plongée",
+    "Guider le groupe dans la tranchée",
+    "Chercher le signal et les trésors près de l’épave",
+    "Secourir Dobbs",
+    "Ramener le groupe au bateau"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-island-dreams-work-for-kenton-walkthrough/",
+   "montant": 400,
+   "manquable": false
+  },
+  "C01-11": {
+   "lieu": "Maison de Jason, Key Lento",
+   "donneur": "Cal (message)",
+   "condition": "Après « Island Dreams »",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Soirée entre Jason et Cal : on réaménage la maison avant l’arrivée de Lucia.",
+   "etapes": [
+    "S’asseoir sur le canapé",
+    "Déplacer la télé, la table basse, le canapé et le fauteuil",
+    "Jouer à Tenebrae Lux",
+    "Jouer à Street Trash III"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-feng-shui-meet-cal-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-12": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Lucia",
+   "condition": "Après « Feng Shui »",
+   "perso": "Jason",
+   "recompense": "Relation avec Lucia renforcée",
+   "synopsis": "Faire les courses et les rapporter à la maison.",
+   "etapes": [
+    "Acheter les courses"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-pick-up-groceries-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-13": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Lucia",
+   "condition": "Après « Feng Shui »",
+   "perso": "Jason",
+   "recompense": "Relation avec Lucia renforcée",
+   "synopsis": "Faire livrer des fleurs à la maison pour Lucia.",
+   "etapes": [
+    "Acheter des fleurs"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-buy-flowers-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-14": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Lucia",
+   "condition": "Après « Feng Shui »",
+   "perso": "Jason",
+   "recompense": "Relation avec Lucia renforcée",
+   "synopsis": "Acheter un collier à la bijouterie The Siren’s Chest.",
+   "etapes": [
+    "Acheter un collier"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-buy-lucia-a-necklace-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-15": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Lucia",
+   "condition": "Après « Feng Shui »",
+   "perso": "Jason",
+   "recompense": "Relation avec Lucia renforcée",
+   "synopsis": "Passer chez Barnacle Beauties pour une coupe ou une barbe soignée.",
+   "etapes": [
+    "Changer de coupe de cheveux"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-get-the-chop-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-16": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Lucia",
+   "condition": "Après « Feng Shui »",
+   "perso": "Jason",
+   "recompense": "Relation avec Lucia renforcée",
+   "synopsis": "Récupérer des vêtements de Lucia chez son amie Andy, au bar Manatee’s Rest.",
+   "etapes": [
+    "Parler à Andy",
+    "Suivre Andy",
+    "Prendre les vêtements de Lucia"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-get-lucias-clothes-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-17": {
+   "lieu": "Vice-Dale County > Hamlet",
+   "donneur": "Lucia",
+   "condition": "Après « Feng Shui »",
+   "perso": "Jason",
+   "recompense": "Lucia sort de prison et s’installe chez Jason",
+   "synopsis": "Lucia sort du centre pénitentiaire de Hamlet : il faut aller la chercher.",
+   "etapes": [
+    "Facultatif : faire les 5 petites missions pour Lucia (courses, fleurs, collier, coiffeur, vêtements)",
+    "Attendre l’appel et aller à la prison",
+    "Conduire jusqu’au bar et entrer au Rusty Anchor",
+    "Commander deux verres au bar",
+    "Retrouver Lucia, passer du temps avec les amis et danser",
+    "Trouver Mattia et jouer au billard",
+    "Régler le cas de D-Man",
+    "Suivre Lucia"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-coming-home-lucias-release-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-18": {
+   "lieu": "Vice-Dale County > Hamlet",
+   "donneur": "Donnie (appel)",
+   "condition": "Le lendemain de « Coming Home », Donnie appelle",
+   "perso": "Jason",
+   "recompense": "600 $",
+   "synopsis": "Un colis de la livraison ratée de Donnie émet un signal près d’un coin de pêche à Hamlet.",
+   "etapes": [
+    "Fouiller la zone pour trouver le colis",
+    "Examiner le colis",
+    "Fouiller la cabane",
+    "Livrer la marchandise à la caravane de Donnie"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-clean-up-after-donnie-donnies-drop-walkthrough/",
+   "montant": 600,
+   "manquable": false
+  },
+  "C01-19": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Lucia (appel)",
+   "condition": "Environ une demi-journée après « Coming Home »",
+   "perso": "Jason",
+   "recompense": "Application bancaire BuckMe",
+   "synopsis": "Lucia a besoin d’un compte pour ses indemnités de travaux d’intérêt général : rendez-vous à la banque Fleeca.",
+   "etapes": [
+    "Demander l’ouverture d’un compte",
+    "Parler au directeur",
+    "Ouvrir BuckMe",
+    "Verser de l’argent sur l’épargne familiale"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-buck-me-set-up-bank-account-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-20": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Brian",
+   "condition": "Après « Clean Up After Donnie » et « Buck Me »",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Brian t’attend à la marina.",
+   "etapes": [
+    "Suivre Brian",
+    "Nettoyer le bateau au nettoyeur haute pression",
+    "Prendre l’avion jusqu’à Bobcat Bay et se poser près du bateau",
+    "Neutraliser les ennemis",
+    "Voler jusqu’aux colis largués et se poser",
+    "Se poser près du quai",
+    "Cacher la marchandise dans la cabane",
+    "Aider Lucia"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-down-to-earth-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-21": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Application BuckMe",
+   "condition": "Après « Buck Me »",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Déposer des espèces sur le compte BuckMe à un distributeur.",
+   "etapes": [
+    "Trouver un distributeur avec l’index ou BuckMe et déposer l’argent"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-deposit-cash-into-buckme-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-22": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Application BuckMe",
+   "condition": "Après « Buck Me »",
+   "perso": "Jason",
+   "recompense": "Améliorations du compte à chaque palier d’épargne (plafond plus haut, réductions)",
+   "synopsis": "Alimenter l’épargne familiale pour atteindre le palier suivant.",
+   "etapes": [],
+   "url": "https://www.powerpyx.com/gta-6-save-for-the-future-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-23": {
+   "lieu": "Mariana County",
+   "donneur": "Donnie / Brian (appel)",
+   "condition": "Appel après « Down to Earth »",
+   "perso": "Jason",
+   "recompense": "Pas de récompense directe ; la marchandise peut se revendre à un receleur",
+   "synopsis": "Suivre les signaux et fouiller 4 zones pour retrouver les colis.",
+   "etapes": [
+    "Fouiller l’aire de loisirs",
+    "Fouiller les maisons brûlées",
+    "Fouiller Pelican Valley",
+    "Fouiller Thorpe Adventures"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-find-the-lost-drugs-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-24": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Mattia",
+   "condition": "Appel après « Down to Earth »",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Kat et Mattia proposent une sortie : rendez-vous au Rusty Anchor.",
+   "etapes": [
+    "Monter dans le hors-bord et aller au yacht",
+    "Faire la course contre le jet-ski",
+    "Tirer sur les bouteilles de champagne",
+    "Retrouver Mattia et le suivre jusqu’au Huxley Motel",
+    "Danser avec Jason, puis retrouver Jason"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-day-release-meet-mattia-kat-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-25": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Lucia",
+   "condition": "Le lendemain de « Day Release », Lucia appelle : accepter, puis la chercher avant 16 h (sinon échec)",
+   "perso": "Jason",
+   "recompense": "Relation avec Lucia renforcée",
+   "synopsis": "Lucia a fini plus tôt : aller la chercher au travail avant 16 h.",
+   "etapes": [
+    "Aller chercher Lucia avant 16 h"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-clock-out-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-26": {
+   "lieu": "Mariana County > Southwind",
+   "donneur": "Brian (appel), puis Donnie",
+   "condition": "Appel après « Down to Earth »",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Brian a un travail pour Jason et Donnie : rendez-vous à Southwind.",
+   "etapes": [
+    "Parler à Brian",
+    "Décoller",
+    "Rejoindre le point d’interception",
+    "Rattraper l’avion de Pilot Pete et l’escorter",
+    "Voler jusqu’à la piste suivante",
+    "Suivre Donnie et observer l’échange",
+    "Retrouver et secourir Donnie",
+    "Fuir avec Donnie en tenant tête au Final Chapter",
+    "Prendre une moto pour rattraper Donnie, puis monter dans l’avion"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-clear-skies-join-donnie-on-a-job-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-27": {
+   "lieu": "Maison de Jason",
+   "donneur": "Jason et Lucia",
+   "condition": "Démarre automatiquement après « Clear Skies »",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Jason et Lucia réaménagent la maison ; Jason apprend à Lucia à tenir une arme.",
+   "etapes": [
+    "Monter la table basse",
+    "Poser le plateau en verre"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-building-a-life-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-28": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Brian",
+   "condition": "Après « Day Release », « Clear Skies » et « Building a Life »",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "etapes": [
+    "Aller au camp des Kingfishers",
+    "Fuir avec Brian et rejoindre Lori",
+    "Monter dans l’hélicoptère",
+    "Secourir Lori"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-swamped-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-29": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Brian",
+   "condition": "Démarre automatiquement après « Swamped »",
+   "perso": "Jason",
+   "recompense": "Manquable : arme unique « H&L .38 de Donnie » dans le coffre de sa voiture, avant de la détruire",
+   "synopsis": "Brian veut faire croire que Donnie a quitté la ville.",
+   "etapes": [
+    "Trouver et prendre le sac de Donnie",
+    "Emballer ses affaires",
+    "Prendre la voiture et quitter Key Lento",
+    "Détruire la voiture de Donnie"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-don-gone-head-to-donnies-trailer-walkthrough/",
+   "montant": null,
+   "manquable": true
+  },
+  "C01-30": {
+   "lieu": "Océan, au nord-est de Mariana County",
+   "donneur": "Brian",
+   "condition": "Démarre automatiquement après « Swamped »",
+   "perso": "Jason",
+   "recompense": "1 200 $ si tu revends la marchandise à Brian",
+   "synopsis": "Donnie a coulé son bateau près de Corsair Key : retrouver l’épave et la marchandise.",
+   "etapes": [
+    "Chercher la marchandise sous l’eau"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-donnies-lost-drugs-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-31": {
+   "lieu": "Maison de Jason, Key Lento",
+   "donneur": "Lucia",
+   "condition": "Lucia appelle pendant ou après « Don Gone » et « Donnie’s Lost Drugs » ; démarre en rentrant à la maison",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Cal traverse un deuil : être là pour lui.",
+   "etapes": [
+    "Acheter un pack de bières pour Cal",
+    "Aller chez Cal et lui parler",
+    "Prendre le bateau jusqu’au coin de pêche",
+    "Pêcher",
+    "Revenir au quai de Cal",
+    "Griller le poisson",
+    "Rentrer à la maison avec Lucia"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-recalibration-talk-to-lucia-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-32": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Lucia, Mattia",
+   "condition": "Démarre automatiquement après « Recalibration »",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Mattia propose un travail qui pourrait mener à mieux payé : rejoindre Lucia et passer à l’action.",
+   "etapes": [
+    "Récupérer le sac dans un casier du centre d’accueil",
+    "Revenir à la voiture",
+    "Suivre le policier",
+    "Récupérer le sac",
+    "Protéger Jason et fuir avec lui",
+    "Gagner la haute mer",
+    "Aller chez Cal"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-tourist-trap-take-up-mattias-offer-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-33": {
+   "lieu": "Maison de Jason, Key Lento",
+   "donneur": "Lucia",
+   "condition": "Démarre automatiquement après « Tourist Trap »",
+   "perso": "Lucia",
+   "recompense": "Aucune",
+   "synopsis": "Récupérer quelques affaires de Jason avant de quitter la ville.",
+   "etapes": [
+    "Prendre la cachette de Jason",
+    "Fuir la maison, puis le quartier"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-home-sweet-home-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C01-34": {
+   "lieu": "Hôpital de Vice City",
+   "donneur": "Lucia",
+   "condition": "Enchaîne directement après « Home Sweet Home »",
+   "perso": "Lucia",
+   "recompense": "Aucune",
+   "synopsis": "Lucia rejoint Jason à l’hôpital, mais ils doivent s’en échapper et fuir vers l’ouest, à Kelly County.",
+   "etapes": [
+    "Monter au 2e étage et trouver la chambre de Jason",
+    "Se défendre",
+    "Ramper jusqu’à l’arme",
+    "Défendre l’ambulance"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-discharge-time-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-01": {
+   "lieu": "Kelly County > Starlet Motel",
+   "donneur": "Lucia",
+   "condition": "Après « Discharge Time »",
+   "perso": "Lucia",
+   "recompense": "Trophée Paradise Lost ; Lucia devient jouable en monde libre",
+   "synopsis": "Jason se réveille au motel de Port Gellhorn ; ils découvrent le contenu du sac du casier : une vieille statue et un disque dur.",
+   "etapes": [
+    "Lire le mot"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-whats-in-the-bag-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-02": {
+   "lieu": "Kelly County > Starlet Motel",
+   "donneur": "Jason",
+   "condition": "Après « What’s in the Bag? »",
+   "perso": "Lucia",
+   "recompense": "Relation renforcée",
+   "synopsis": "Passer régulièrement voir Jason au motel jusqu’à ce qu’il soit remis.",
+   "etapes": [
+    "Passer le voir régulièrement"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-take-care-of-jason-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-03": {
+   "lieu": "Kelly County > Starlet Motel",
+   "donneur": "Linda",
+   "condition": "Après « What’s in the Bag? »",
+   "perso": "Lucia",
+   "recompense": "Aucune",
+   "etapes": [
+    "Aller voir Linda, la gérante"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-overnight-charges-see-linda-the-manager-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-04": {
+   "lieu": "Kelly County > Starlet Motel",
+   "donneur": "Lucia / Jason",
+   "condition": "Après « What’s in the Bag? »",
+   "perso": "Lucia",
+   "recompense": "Relation renforcée",
+   "etapes": [
+    "Acheter des provisions"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-just-moved-in-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-05": {
+   "lieu": "Kelly County > Starlet Motel",
+   "donneur": "Vicki",
+   "condition": "Après « Overnight Charges » et « Just Moved In »",
+   "perso": "Lucia",
+   "recompense": "50 $ par BuckMe (Vicki rembourse les cachets)",
+   "etapes": [
+    "Demander des antidouleurs dans le motel",
+    "Aller à la chambre 10 et prendre les cachets de Vicki",
+    "Rapporter les cachets à Jason",
+    "Retourner chez Vicki et monter dans sa voiture",
+    "Aller en ville au Delights et attendre Vicki",
+    "Suivre Frankie, puis Vicki",
+    "Aller à la caravane de Dunk",
+    "Aller au chantier naval rejoindre les amis de Dunk",
+    "Aller à la station de lavage, affronter les Kolts et ouvrir le rideau",
+    "Aborder Dunk, puis le ramener à sa caravane"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-girls-trip-find-painkillers-walkthrough/",
+   "montant": 50,
+   "manquable": false
+  },
+  "C02-06": {
+   "lieu": "Port Gellhorn > Gellhorn Outfitters (Ammu-Nation)",
+   "donneur": "Lucia",
+   "condition": "Après « Girl’s Trip »",
+   "perso": "Lucia",
+   "recompense": "Une arme",
+   "etapes": [
+    "Facultatif : acheter une arme"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-pick-up-a-gun-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-07": {
+   "lieu": "Kelly County > Port Gellhorn",
+   "donneur": "Moses",
+   "condition": "Après « Girl’s Trip »",
+   "perso": "Lucia",
+   "recompense": "Slim Jim (ouvrir les voitures sans alarme), appli Scooter Bros (faire livrer son véhicule), une voiture enregistrée offerte à Lucia, revente de voitures volées sans traceur",
+   "etapes": [
+    "Suivre Moses",
+    "Scanner des véhicules avec l’appli Waink",
+    "Prendre le Slim Jim",
+    "Forcer la Montagne XL",
+    "Suivre Moses",
+    "Voler un véhicule adapté si tu n’en as pas amené",
+    "Enregistrer ton nouveau véhicule personnel"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-moses-take-a-vehicle-to-moses-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-08": {
+   "lieu": "Kelly County > Port Gellhorn",
+   "donneur": "Lucia",
+   "condition": "Après « Girl’s Trip »",
+   "perso": "Lucia",
+   "recompense": "Aucune",
+   "etapes": [
+    "Parler au vendeur"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-new-look-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-09": {
+   "lieu": "Kelly County > Port Gellhorn",
+   "donneur": "Lucia",
+   "condition": "Après « Girl’s Trip »",
+   "perso": "Lucia",
+   "recompense": "Aucune",
+   "etapes": [
+    "Acheter une nouvelle tenue (haut et pantalon)"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-how-do-i-look-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-10": {
+   "lieu": "Kelly County > Port Gellhorn",
+   "donneur": "Dunk",
+   "condition": "Après « Girl’s Trip »",
+   "perso": "Lucia",
+   "recompense": "Aucune, mais lance « Slam Dunk »",
+   "etapes": [
+    "Attendre l’appel"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-painkiller-supplier-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-11": {
+   "lieu": "Kelly County > Starlet Motel",
+   "donneur": "Lucia",
+   "condition": "Après « What’s in the Bag? »",
+   "perso": "Lucia",
+   "recompense": "Aucune",
+   "etapes": [
+    "Arrêter l’ambulance",
+    "Détruire l’ambulance"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-ambulance-chaser-move-the-ambulance-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-12": {
+   "lieu": "Prospectus de Kyle devant le Starlet Motel (Kelly County)",
+   "donneur": "Kyle, via un prospectus",
+   "condition": "Trouver et lire un prospectus de Kyle",
+   "perso": "Lucia ou Jason",
+   "recompense": "400 $",
+   "etapes": [
+    "Aller voir la ferme McKittrick",
+    "Monter dans l’avion d’épandage et décoller",
+    "Survoler Kyle en épandant",
+    "Atterrir sur la piste",
+    "Parler à Kyle"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-check-out-mckittrick-farm-walkthrough/",
+   "montant": 400,
+   "manquable": false
+  },
+  "C02-13": {
+   "lieu": "Kelly County > Starlet Motel",
+   "donneur": "Linda",
+   "condition": "Après « Overnight Charges »",
+   "perso": "Lucia",
+   "recompense": "Aucune",
+   "etapes": [
+    "Payer la chambre à Linda"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-behind-on-payments-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-14": {
+   "lieu": "Port Gellhorn > caravane de Dunk",
+   "donneur": "Dunk",
+   "condition": "Toutes les missions principales précédentes du chapitre 2 faites, puis attendre l’appel de Dunk",
+   "perso": "Lucia",
+   "recompense": "Antidouleurs pour Jason, Dunk devient receleur, 1 700 $ par BuckMe le lendemain ; il signale aussi 2 lieux à braquer",
+   "etapes": [
+    "Suivre Dunk",
+    "Aller aux docks puis au bureau",
+    "S’échapper du site",
+    "Semer les Kolts",
+    "Récupérer le docteur Bill",
+    "Aller au point de rendez-vous",
+    "Se défendre et retrouver Dunk",
+    "Ramener Dunk à sa caravane"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-slam-dunk-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-15": {
+   "lieu": "Leonard County",
+   "donneur": "Kyle",
+   "condition": "Après « Check Out McKittrick Farm », attendre le message de Kyle",
+   "perso": "Lucia ou Jason",
+   "recompense": "1 000 $ ; les fraises mutantes de la ferme deviennent mangeables",
+   "etapes": [
+    "Entrer dans le site",
+    "Aller à la camionnette et inspecter les produits",
+    "Voler la camionnette si tu ne paies pas",
+    "Livrer le bidon à Kyle (et semer le Final Chapter si tu n’as pas payé)"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-collect-chemicals-for-kyle-walkthrough/",
+   "montant": 1000,
+   "manquable": false
+  },
+  "C02-16": {
+   "lieu": "Kelly County > Port Gellhorn",
+   "donneur": "Moses",
+   "condition": "Après « Moses (Take A Vehicle to Moses) »",
+   "perso": "Lucia",
+   "recompense": "1 250 $ + 500 $ si la voiture est en bon état ; Moses offre ensuite le garage de Port Gellhorn",
+   "etapes": [
+    "Chercher la Crawler de 1982 dans la zone",
+    "La livrer à Moses"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-daily-driver-steal-the-crawler-for-moses-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-17": {
+   "lieu": "Kelly County > Starlet Motel",
+   "donneur": "Jason / Lucia",
+   "condition": "Après « Slam Dunk », attendre l’appel de Jason",
+   "perso": "Lucia",
+   "recompense": "Trophée Trust ; Jason et Lucia ont chacun un véhicule personnel",
+   "etapes": [
+    "Aller au Hank’s Waffles",
+    "Braquer le diner, le magasin d’alcool puis la friperie",
+    "Monter dans la voiture",
+    "Semer la police"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-breakfast-run-check-on-jason-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-18": {
+   "lieu": "Kelly County > Starlet Motel",
+   "donneur": "Jason / Lucia",
+   "condition": "Après « Breakfast Run »",
+   "perso": "Jason et Lucia ensemble",
+   "recompense": "On peut désormais passer librement de Lucia à Jason",
+   "etapes": [
+    "Aller à la cuisine du motel avec Lucia",
+    "Offrir un café à Lucia",
+    "Aller à la voiture",
+    "Maintenir pour interagir avec ton partenaire"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-coffee-break-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-19": {
+   "lieu": "Kelly County > Thrillbilly Mud Club",
+   "donneur": "Billy, via Wyman",
+   "condition": "Signalé automatiquement après « Coffee Break »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Selon le classement de la course : jusqu’à 2 500 $ pour la 1re place",
+   "etapes": [
+    "Acheter une tenue au stand",
+    "Louer un véhicule chez Roostere’s Rentals",
+    "Aller voir l’organisateur",
+    "Battre un membre de la bande de Billy"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-thrillbillies-check-out-the-mud-club-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-20": {
+   "lieu": "Kelly County > Port Gellhorn",
+   "donneur": "Billy",
+   "condition": "Après « Thrillbillies », attendre le message de Billy",
+   "perso": "Lucia ou Jason",
+   "recompense": "2 000 $",
+   "etapes": [
+    "Monter sur la moto tout-terrain et suivre Billy",
+    "Arrêter le fourgon blindé",
+    "Aller sur le lieu de l’accident et poser l’explosif sur les portes arrière",
+    "Gérer le garde",
+    "Suivre Billy"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-twist-wrist-smash-grab-join-billy-on-a-job-walkthrough/",
+   "montant": 2000,
+   "manquable": false
+  },
+  "C02-21": {
+   "lieu": "Kelly County > Port Gellhorn",
+   "donneur": "Lucia",
+   "condition": "Après « Coffee Break »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Variable selon ce qui est volé",
+   "etapes": [
+    "Braquer le prêteur sur gages",
+    "Semer la police",
+    "Revendre le butin à un receleur"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-hit-avery-pawn-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-22": {
+   "lieu": "Kelly County > Port Gellhorn",
+   "donneur": "Lucia",
+   "condition": "Après « Coffee Break »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Variable selon ce qui est volé et revendu ; on peut aussi y prendre l’arme de collection « Gutterball Moreland 850 » et une montre de luxe de collection",
+   "etapes": [
+    "Braquer le bowling",
+    "Fuir le site"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-hit-kingpin-bowling-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-23": {
+   "lieu": "Kelly County > Port Gellhorn",
+   "donneur": "Lucia",
+   "condition": "Après « Coffee Break »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Récupérer le véhicule personnel de Lucia",
+   "etapes": [
+    "Reprendre le véhicule de Lucia à la fourrière"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-impounded-vehicle-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-24": {
+   "lieu": "Starlet Motel, salle du café",
+   "donneur": "Lucia",
+   "condition": "Après « Coffee Break »",
+   "perso": "Lucia et Jason",
+   "recompense": "Pas de récompense directe, mais nécessaire pour lancer « Checking Out »",
+   "etapes": [
+    "Réunir au moins 15 000 $ en faisant équipe"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-prepare-for-vice-city-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C02-25": {
+   "lieu": "Lummox County",
+   "donneur": "Bret Vogel",
+   "condition": "Après « Coffee Break », pendant que tu réunis les 15 000 $, Bret envoie un message à Jason",
+   "perso": "Jason uniquement",
+   "recompense": "500 $ par BuckMe + arme unique « Killtelligence SM-69 »",
+   "etapes": [
+    "Monter dans le pick-up",
+    "Suivre les traces de l’animal en mode Focus",
+    "Prendre un fusil de précision ou des jumelles et observer le cerf",
+    "L’abattre au fusil de chasse",
+    "Ramasser la carcasse et la mettre dans le pick-up de Bret",
+    "Rentrer au chalet et la déposer à la zone de découpe"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-veteran-hunted-meet-bret-walkthrough/",
+   "montant": 500,
+   "manquable": false
+  },
+  "C02-26": {
+   "lieu": "Kelly County > Port Gellhorn",
+   "donneur": "Vicki",
+   "condition": "Après « Coffee Break » et les autres missions principales en cours, attendre l’appel de Vicki",
+   "perso": "Lucia ou Jason",
+   "recompense": "10 000 $ le lendemain par BuckMe, de la part de Vicki",
+   "etapes": [
+    "Trouver un passage vers les coulisses",
+    "Regarder le spectacle",
+    "Vider le coffre du Delights",
+    "Sortir et semer les motards"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-afternoon-delight-rob-vickis-boss-walkthrough/",
+   "montant": 10000,
+   "manquable": false
+  },
+  "C02-27": {
+   "lieu": "Kelly County > Starlet Motel",
+   "donneur": "Lucia et Jason",
+   "condition": "Toutes les missions principales du chapitre 2 faites et au moins 15 000 $",
+   "perso": "Lucia et Jason",
+   "recompense": "Aucune",
+   "etapes": [
+    "Rejoindre Lucia",
+    "Se défendre",
+    "Suivre Jason",
+    "Sauter dans la voiture",
+    "Fuir avec Jason"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-checking-out-move-to-vice-city-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-01": {
+   "lieu": "Enchaîne après la mission précédente",
+   "donneur": "Démarre automatiquement",
+   "condition": "Après « Checking Out »",
+   "perso": "Démarre automatiquement",
+   "recompense": "Appartement 201 de Bayside Apartments ; véhicules à traceur standard enregistrables dans les Pay ’n’ Spray ; un trophée",
+   "etapes": [
+    "Aller au Jack of Hearts et entrer",
+    "Passer à l’arrière",
+    "Lancer des billets aux danseuses",
+    "Revenir vers Dre’Quan",
+    "Aller à l’appartement et se garer"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-welcome-to-vice-city-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-02": {
+   "lieu": "Vice City > Crosstown",
+   "donneur": "Dre’Quan",
+   "condition": "Après « Welcome to Vice City »",
+   "perso": "Jason",
+   "recompense": "1 500 $ (en vendant la marchandise pure)",
+   "synopsis": "Boobie estime que Jason lui doit un service : avec Dre’Quan en renfort, Jason va chercher de la marchandise chez Tyrone et la revend à Crosstown. Cal passe ensuite, ne parvient pas à ouvrir le disque dur et évoque un ancien contact de Brian.",
+   "etapes": [
+    "Aller au point de collecte",
+    "Choisir la marchandise",
+    "Aller au lieu de la vente",
+    "Prendre l’argent",
+    "Gérer l’affrontement",
+    "Déposer Dre’Quan à Southside"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-dealers-choice-go-see-drequan-walkthrough/",
+   "montant": 1500,
+   "manquable": false
+  },
+  "C03-03": {
+   "lieu": "Vice City > Bayside (partie 1), Mariana County > Capri (parties 2 et 3)",
+   "donneur": "Jason / Lucia",
+   "condition": "Après « Dealer’s Choice »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Selon le dénouement",
+   "synopsis": "Lucia et Jason font expertiser la statue chez une antiquaire de Capri qui les met dehors ; un antiquaire britannique, Benedict Halifax, propose une estimation officieuse et laisse sa montre en garantie.",
+   "etapes": [],
+   "url": "https://www.powerpyx.com/gta-6-dubious-provenance-visit-the-antique-store-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-04": {
+   "lieu": "Vice City > Peacock Bay",
+   "donneur": "Mia Caminos",
+   "condition": "Après « Dealer’s Choice »",
+   "perso": "Lucia",
+   "recompense": "Aucune",
+   "synopsis": "Lucia retrouve sa mère Mia, qui lance son agence immobilière ; la maison à vendre est en piteux état et le gang voisin les menace.",
+   "etapes": [
+    "Aller à la maison et suivre Mia",
+    "Explorer la maison et aider Mia",
+    "Débarrasser la pelouse",
+    "Prendre le matelas",
+    "Secourir Mia",
+    "Monter dans la pelleteuse et abîmer la propriété du gang",
+    "Monter dans la voiture de Mia et aller à son bureau"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-mami-knows-best-catch-up-with-mia-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-05": {
+   "lieu": "Vice City",
+   "donneur": "Toi-même",
+   "condition": "Tâche ajoutée après « Dealer’s Choice » (visible via l’icône d’histoire de la carte, sans repère)",
+   "perso": "Lucia ou Jason",
+   "recompense": "Un véhicule personnel pour le chapitre 3",
+   "synopsis": "Récupérer ta voiture ou en enregistrer une nouvelle pour circuler à Vice City.",
+   "etapes": [
+    "Enregistrer un véhicule dans un Pay ’n’ Spray ou récupérer un véhicule à la fourrière"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-get-your-wheels-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-06": {
+   "lieu": "Vice City > Salton",
+   "donneur": "Yago, via un message de Manuel",
+   "condition": "Après « Dealer’s Choice »",
+   "perso": "Jason",
+   "recompense": "Selon le classement : 3 000 $ pour la 1re place",
+   "synopsis": "Rejoindre les courses des Hit ’n’ Run à Salton pour gagner de l’argent.",
+   "etapes": [
+    "Choisir un véhicule",
+    "Terminer la course"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-join-a-street-race-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-07": {
+   "lieu": "Vice City > La Perle",
+   "donneur": "Tyrone",
+   "condition": "Après la partie 1 de « Dubious Provenance »",
+   "perso": "Jason",
+   "recompense": "Tyrone devient point de dépôt de marchandises",
+   "synopsis": "Jason retrouve Charles, dans un triste état.",
+   "etapes": [
+    "Aller à l’appartement de Charles",
+    "Découvrir où il est",
+    "Aller au campement de La Perle",
+    "Poursuivre Charles",
+    "L’aborder",
+    "Fouiller le corps de Charles"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-here-kitty-kitty-speak-with-tyrone-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-08": {
+   "lieu": "N’importe où",
+   "donneur": "Lorena",
+   "condition": "Après « Mami Knows Best », en jouant Lucia, par un appel de Lorena (sans repère sur la carte)",
+   "perso": "Lucia",
+   "recompense": "Aucune",
+   "synopsis": "Lorena, la tante de Lucia, traverse une passe difficile : lui envoyer de l’argent par BuckMe.",
+   "etapes": [
+    "Envoyer de l’argent à Lorena"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-send-money-to-lorena-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-09": {
+   "lieu": "Vice City",
+   "donneur": "Cal / Brian",
+   "condition": "Cal passe à l’appartement de Bayside après « Dealer’s Choice » ou « Dubious Provenance » (sans repère)",
+   "perso": "Jason uniquement",
+   "recompense": "Aucune",
+   "synopsis": "Cal n’a pas pu ouvrir le disque dur, mais Brian connaît peut-être quelqu’un.",
+   "etapes": [
+    "Attendre l’appel de Brian"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-encrypted-hard-drive-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-10": {
+   "lieu": "Vice City > Crosstown",
+   "donneur": "Boobie",
+   "condition": "Après la partie 1 de « Dubious Provenance »",
+   "perso": "Jason",
+   "recompense": "Yasmani devient point de dépôt de marchandises",
+   "synopsis": "Jason sert de chauffeur à Boobie pendant sa tournée et rencontre Yasmani, commerçant de Little Cuba qui rachète la marchandise volée.",
+   "etapes": [
+    "Monter dans la voiture de Boobie",
+    "Aller au point de collecte puis au club",
+    "Récupérer le sac d’argent et revenir vers Boobie",
+    "Reprendre ta voiture",
+    "Aller au bureau de tabac et entrer"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-boobie-time-talk-to-boobie-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-11": {
+   "lieu": "Kelly County > ferme McKittrick",
+   "donneur": "Kyle",
+   "condition": "Après « Collect Chemicals for Kyle », Kyle envoie un message au chapitre 3",
+   "perso": "Lucia ou Jason",
+   "recompense": "5 000 $ si tu aides la police contre Kyle, rien si tu laisses Kyle gagner ; compte dans tous les cas pour le trophée Strangers & Freaks",
+   "synopsis": "Kyle a envoyé un message étrange : retourner à la ferme voir ce qui se passe.",
+   "etapes": [
+    "Chercher Kyle",
+    "Fin 1 : laisser Kyle repousser la police, puis lui parler",
+    "Fin 2 : parler à la police et vaincre Kyle",
+    "Suivre l’agent de Mutandis, mettre une combinaison et entrer dans la grange"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-buddy-check-on-kyle-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-12": {
+   "lieu": "Vice City > Bayside",
+   "donneur": "Brian",
+   "condition": "Après « Dealer’s Choice »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Outil de découpe (ouvrir les conteneurs orange SCOOP)",
+   "synopsis": "Au dîner avec Brian et Lori, Brian accepte de présenter Jason et Lucia à son ancien contact Raul, qui peut leur trouver du travail et déchiffrer le disque dur. Raul exige d’abord le vol d’une voiture au port.",
+   "etapes": [
+    "Aller au restaurant et retrouver Brian au bar",
+    "Aller à la camionnette et ouvrir les portes arrière",
+    "Aller aux docks et chercher les conteneurs SCOOP",
+    "Forcer le conteneur",
+    "Voler la voiture et la sortir du conteneur",
+    "Semer la police",
+    "Conduire jusqu’au box"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-meet-the-heders-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-13": {
+   "lieu": "Banques de Vice City et Ocean Beach",
+   "donneur": "Yasmani",
+   "condition": "Après « Boobie Time »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Snap Gun (ouvrir les portes sans alarme), Yasmani récupère aux points de dépôt des garages, 20 000 $ pour les objets demandés + un bonus selon ce que tu voles",
+   "synopsis": "Yasmani veut des objets gardés dans les coffres de trois établissements.",
+   "etapes": [
+    "Braquer Casa de Empeño",
+    "Braquer Richardson Jewelry",
+    "Braquer Donovan Banks & Co."
+   ],
+   "url": "https://www.powerpyx.com/gta-6-yasmanis-jewelry-jobs-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-14": {
+   "lieu": "Vice City > Little Cuba",
+   "donneur": "Yago",
+   "condition": "Après « Join a Street Race », attendre plusieurs jours de jeu",
+   "perso": "Jason uniquement",
+   "recompense": "500 $",
+   "synopsis": "Yago, pilote de rue, veut que tu le coaches : passer à son restaurant de Little Cuba.",
+   "etapes": [
+    "Aller à l’atelier de préparation",
+    "Installer la préparation pro et le nitro",
+    "Sortir de l’atelier et rejoindre l’équipe de course",
+    "Suivre Yago et finir la course",
+    "Semer la police",
+    "Aller au rendez-vous"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-bumper-to-bumper-mentor-yago-walkthrough/",
+   "montant": 500,
+   "manquable": false
+  },
+  "C03-15": {
+   "lieu": "Vice City > Salton",
+   "donneur": "Raul",
+   "condition": "Après « Meet the Heders »",
+   "perso": "Lucia",
+   "recompense": "3 000 $ ; Randy devient point de dépôt de véhicules ; zones recherchées de Port Gellhorn et Key Lento effacées",
+   "synopsis": "Nouveau test de Raul : Lucia vole une voiture dans un atelier de démontage tenu par un gang et la livre au concessionnaire Randy Kozlov, receleur de voitures haut de gamme.",
+   "etapes": [
+    "Chercher la Schafter V12 dans l’atelier",
+    "La voler et quitter la zone",
+    "La livrer à Leonida Auto World"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-car-service-steal-the-car-for-raul-walkthrough/",
+   "montant": 3000,
+   "manquable": false
+  },
+  "C03-16": {
+   "lieu": "N’importe où",
+   "donneur": "Lorena",
+   "condition": "Après « Send Money to Lorena », attendre sa photo de Tommy",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Lorena a encore besoin d’aide : lui renvoyer de l’argent par BuckMe.",
+   "etapes": [
+    "Envoyer de nouveau de l’argent à Lorena"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-send-more-money-to-lorena-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-17": {
+   "lieu": "Vice City > Crosstown",
+   "donneur": "Dre’Quan",
+   "condition": "Après « Car Service »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Le concert des Real Dimez au Jack of Hearts est gâché par le rappeur rival DWNPLY ; Roxy s’enfuit et la bande la retrouve dans une fête pour se réconcilier.",
+   "etapes": [
+    "Aller dans les coulisses et trouver les Dimez",
+    "Les rejoindre au parking et suivre Roxy",
+    "Passer commander chez Peewees",
+    "Monter dans la voiture de Bae-Luxe et aller à la fête",
+    "Trouver Roxy, éloigner Jacki de la porte",
+    "Régler le cas de Kaamal",
+    "Couper le courant et suivre Roxy"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-top-billing-watch-the-real-dimez-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-18": {
+   "lieu": "Vice Beach > Waxman Island",
+   "donneur": "Raul",
+   "condition": "Après « Car Service »",
+   "perso": "Lucia ou Jason",
+   "recompense": "3 000 $",
+   "synopsis": "Première rencontre avec Raul, qui sort d’un braquage : Jason et Raul retiennent la police pendant que Lucia conduit. Ils servaient de diversion à un coup plus gros.",
+   "etapes": [
+    "Monter dans la voiture et aller au rendez-vous",
+    "Retenir la police",
+    "Rouler jusqu’aux Rialto Islands",
+    "Aller au parking, changer pour la camionnette",
+    "Déposer Raul"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-first-impressions-meeting-with-raul-walkthrough/",
+   "montant": 3000,
+   "manquable": false
+  },
+  "C03-19": {
+   "lieu": "Lucia : Stockyard ; Jason : La Perle (Vice City)",
+   "donneur": "Raul",
+   "condition": "Après « Car Service »",
+   "perso": "Lucia ou Jason (point de départ différent)",
+   "recompense": "3 000 $",
+   "synopsis": "Raul veut détourner une cargaison des Guardia Brothers transportée par bateaux sur la Vice River.",
+   "etapes": [
+    "Suivre le bateau",
+    "Aller à la station suivante et prendre le métro",
+    "Affronter le membre des Guardia",
+    "Détourner le bateau et actionner l’arrêt d’urgence",
+    "Défendre le bateau"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-crosstown-traffic-meet-raul-walkthrough/",
+   "montant": 3000,
+   "manquable": false
+  },
+  "C03-20": {
+   "lieu": "Vice City > Crosstown",
+   "donneur": "Raul",
+   "condition": "Après « Crosstown Traffic »",
+   "perso": "Lucia et Jason",
+   "recompense": "6 000 $ + brouilleur de pack d’encre (voler les billets marqués) ; braquages de banques et prêts sur salaire signalés en vert sur la carte",
+   "synopsis": "Raul présente son équipe (Felipe, Karim, Andrea) et envoie Jason et Lucia s’entraîner sur une série de petites banques.",
+   "etapes": [
+    "Parler à Andrea et choisir des masques",
+    "Parler à Karim et prendre le brouilleur",
+    "Braquer trois agences Fleeca l’une après l’autre (se garer, laisser ton partenaire attendre, entrer, braquer, ressortir)",
+    "Semer la police",
+    "Rentrer à l’appartement et ouvrir la porte"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-credit-check-meet-rauls-crew-walkthrough/",
+   "montant": 6000,
+   "manquable": false
+  },
+  "C03-21": {
+   "lieu": "Vice Beach > Ocean Beach",
+   "donneur": "Randy",
+   "condition": "Après « Crosstown Traffic »",
+   "perso": "Lucia ou Jason",
+   "recompense": "21 250 $ + 10 000 $ si la voiture est intacte ; Key Cloner (voler les voitures haut de gamme) ; revente de ces voitures à Randy ; quête facultative « Randy’s Wish List »",
+   "synopsis": "Randy demande une voiture de luxe garée devant un immeuble d’Ocean Beach et fournit un cloneur de clés.",
+   "etapes": [
+    "Installer le cloneur de clés",
+    "Chercher la Zorrusso et la voler",
+    "La conduire chez Randy et le suivre"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-clonin-keys-makin-gs-steal-the-zorrusso-for-randy-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-22": {
+   "lieu": "Vice City > Crosstown",
+   "donneur": "Dre’Quan",
+   "condition": "Après « Credit Check »",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Pour venger les Dimez, Jason se fait passer pour un fan et aide Dre’Quan à voler la voiture de DWNPLY au magasin Eris.",
+   "etapes": [
+    "Aller au magasin Eris",
+    "Trouver une paire de baskets DWNPLY et revenir vers Dre’Quan",
+    "Le suivre au salon VIP",
+    "Approcher DWNPLY, lui tendre les baskets et prendre ses clés",
+    "Fuir avec Dre’Quan",
+    "Trouver la voiture de DWNPLY au parking et la voler",
+    "Rouler jusqu’au Speedshop en semant les poursuivants"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-ride-or-die-meet-drequan-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-23": {
+   "lieu": "Vice City",
+   "donneur": "Raul",
+   "condition": "Après « Credit Check », attendre le message de Raul (environ un jour de jeu)",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune, mais ouvre la série « The Cartel Heist »",
+   "synopsis": "Raul prépare le prochain coup : attendre son message.",
+   "etapes": [
+    "Attendre que Raul te contacte"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-rauls-next-job-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-24": {
+   "lieu": "Vice City > Salton",
+   "donneur": "Yago",
+   "condition": "Après « Bumper to Bumper », attendre quelques jours de jeu le message de Yago",
+   "perso": "Jason",
+   "recompense": "Selon le classement : 3 800 $ pour la 1re place",
+   "synopsis": "Yago t’invite à une course.",
+   "etapes": [
+    "Terminer la course"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-race-against-yago-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-25": {
+   "lieu": "Vice City > Tequesta",
+   "donneur": "Raul",
+   "condition": "Après « Credit Check »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Raul dévoile son plan : braquer la Sinfrontera National Bank, qui blanchit l’argent d’un cartel. Repérage de la banque, puis mission de trouver Nicole Park, experte en sécurité.",
+   "etapes": [
+    "Entrer dans la banque et suivre Jason",
+    "Repérer les dispositifs de sécurité",
+    "Rejoindre Raul"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-sinfrontera-national-bank-scope-out-the-bank-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-26": {
+   "lieu": "Leonard County > Waning Sands",
+   "donneur": "Raul",
+   "condition": "Après « Sinfrontera National Bank »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Jason et Lucia enlèvent Nicole à sa protection et l’amènent à Raul ; elle accepte de rejoindre l’équipe.",
+   "etapes": [
+    "Trouver Nicole et garer le véhicule",
+    "Récupérer Nicole",
+    "Fuir avec elle et quitter la zone",
+    "L’emmener à la salle de préparation"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-security-expert-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-27": {
+   "lieu": "Vice City > Bayside",
+   "donneur": "Jason / Lucia",
+   "condition": "Après « Boobie Time » et « First Impressions »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "En rentrant, ils surprennent un cambriolage ; le disque dur est sauf et ils mettent le sac à l’abri dans un garde-meuble.",
+   "etapes": [
+    "Rattraper les voleurs et fouiller leurs sacs",
+    "Aller à Big House Storage",
+    "Suivre Jason"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-caught-slipping-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-28": {
+   "lieu": "Vice City",
+   "donneur": "Raul",
+   "condition": "Ajoutée automatiquement après « Security Expert »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune, mais permet de lancer « The Cartel Heist » pour finir le chapitre 3",
+   "synopsis": "Terminer les préparatifs du casse de la Sinfrontera National Bank.",
+   "etapes": [
+    "Terminer les préparatifs"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-heist-planning-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-29": {
+   "lieu": "Vice-Dale County > Hamlet",
+   "donneur": "Brian",
+   "condition": "Après « Security Expert »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Le dénouement fixe le nombre d’explosifs disponibles dans « Hidden Charges »",
+   "synopsis": "Brian fait livrer par Pilot Pete des armes dont Raul a besoin ; la livraison est interrompue par les autorités.",
+   "etapes": [
+    "Suivre Brian jusqu’à l’aérodrome",
+    "Charger les caisses d’armes dans le camion",
+    "Fuir avec Pete et quitter la zone",
+    "Protéger la cargaison",
+    "Revenir à la salle de préparation et poser l’avion"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-company-property-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-30": {
+   "lieu": "Vice City > Stockyard",
+   "donneur": "Nicole",
+   "condition": "Après « Company Property »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Si tu fais l’entraînement au crochetage à la fin : pistolet « Kalinga .50 de Gil » et 1 500 $",
+   "synopsis": "Pour s’entraîner, Lucia doit voler un coffre identique à celui de la banque, caché dans une villa, et le traîner jusqu’à la base de Raul.",
+   "etapes": [
+    "Aller à la villa de Gil et trouver un moyen d’entrer",
+    "Suivre l’assistante de Gil et jouer le rôle demandé",
+    "Entrer dans la villa et fouiller le bureau de Gil",
+    "Ouvrir la fenêtre et accrocher le treuil au coffre",
+    "Fuir avec le coffre et le livrer à Felipe",
+    "S’entraîner sur le coffre"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-safe-word-steal-the-practice-safe-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-31": {
+   "lieu": "Mariana County > Watson Bay",
+   "donneur": "Andrea",
+   "condition": "Après « Company Property »",
+   "perso": "Lucia",
+   "recompense": "Si tu le ramasses : pistolet « 1992 de Monty »",
+   "synopsis": "Andrea et Lucia approchent Monty, un homme de main du cartel, l’emmènent à Vice City et l’interrogent avec l’équipe de Raul.",
+   "etapes": [
+    "Suivre Andrea et faire le point avec elle",
+    "Entrer dans la pièce et assommer Monty",
+    "Dégager le passage pour Andrea",
+    "Monter en voiture et aller sur le site",
+    "Rejoindre Lucia et récupérer Monty",
+    "L’interroger jusqu’à obtenir une réponse"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-the-missing-link-meet-andrea-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-32": {
+   "lieu": "Vice Beach > Ocean Beach",
+   "donneur": "Billy",
+   "condition": "Après « Twist Wrist, Smash, Grab », Billy te recontacte au chapitre 3",
+   "perso": "Lucia ou Jason, seul(e)",
+   "recompense": "12 000 $",
+   "etapes": [
+    "Suivre Billy",
+    "Entrer dans la bijouterie et la braquer",
+    "Suivre Billy",
+    "Monter à l’arrière de la camionnette"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-mall-rats-walkthrough/",
+   "montant": 12000,
+   "manquable": false
+  },
+  "C03-33": {
+   "lieu": "Vice City > Little Cuba",
+   "donneur": "Yago",
+   "condition": "Après les missions précédentes de Yago, attendre son message",
+   "perso": "Jason uniquement",
+   "recompense": "La voiture de Yago ; compte pour le trophée Strangers & Freaks",
+   "synopsis": "Accompagner Yago à un rendez-vous avec un trafiquant local.",
+   "etapes": [
+    "Aller au lieu de l’échange et se garer",
+    "Suivre Yago puis Manuel",
+    "Prendre le sac et remonter en voiture",
+    "Suivre Yago et le rejoindre"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-brother-to-brother-back-up-yago-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-34": {
+   "lieu": "Vice City > Crosstown",
+   "donneur": "Dre’Quan",
+   "condition": "Après « Ride or Die »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Batte de Bae-Luxe (variante d’arme)",
+   "synopsis": "Tournage du clip « Cooties » des Dimez, aux dépens de la voiture de DWNPLY.",
+   "etapes": [
+    "Tourner le clip",
+    "Fuir avec la voiture de DWNPLY",
+    "Aller au studio"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-cooties-shoot-the-music-video-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-35": {
+   "lieu": "Vice City > Stockyard",
+   "donneur": "Karim",
+   "condition": "Après « Company Property » et « Cooties »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Plus de temps dans « The Cartel Heist » selon le nombre de charges posées",
+   "synopsis": "Pour couper les communications de la banque pendant le casse, poser des charges sur trois antennes relais. Raul promet de les aider pour le disque dur après le coup.",
+   "etapes": [
+    "Monter dans la camionnette et aller au garage",
+    "Poser la charge sur l’antenne Est",
+    "Poser la charge sur l’antenne Sud",
+    "Poser la charge sur l’antenne Ouest"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-hidden-charges-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-36": {
+   "lieu": "Vice City > Bayside",
+   "donneur": "Boobie",
+   "condition": "Après « Hidden Charges » et toutes les autres missions principales restantes",
+   "perso": "Lucia ou Jason",
+   "recompense": "3 500 $ si tu prends la marchandise de Boobie en quittant l’appartement",
+   "synopsis": "Boobie envoie Jason et Lucia récupérer une dette à Rockridge ; ils tombent dans une descente menée par le capitaine Méndez et décident de quitter l’appartement au plus vite.",
+   "etapes": [
+    "Aller à Venture Apartments et se garer à distance",
+    "Demander Raymond dans le hall",
+    "S’échapper de l’immeuble et aider Lucia",
+    "Prendre une voiture et récupérer Jason",
+    "Semer la police",
+    "Aller au Jack of Hearts"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-bricked-up-return-to-the-apartment-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C03-37": {
+   "lieu": "Mariana County > Hamlet",
+   "donneur": "Mia",
+   "condition": "Après « Mami Knows Best »",
+   "perso": "Lucia",
+   "recompense": "2 000 $ versés par Mia plusieurs jours de jeu plus tard",
+   "synopsis": "Mia est enlevée par un gang ; Lucia aussi. Pour s’en sortir, Mia propose de trouver un nouveau QG au chef du gang ; Lucia l’aide face à une tentative de prise de pouvoir.",
+   "etapes": [
+    "Aller à la maison et chercher Mia",
+    "Sortir et suivre la voiture",
+    "Fouiller le bâtiment pour trouver Mia",
+    "Visiter les propriétés avec Mia",
+    "Protéger Mia et trouver Viper",
+    "Revenir vers Mia"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-south-leonida-real-estate-meet-mia-walkthrough/",
+   "montant": 2000,
+   "manquable": false
+  },
+  "C03-38": {
+   "lieu": "Vice City > Stockyard",
+   "donneur": "Raul",
+   "condition": "Après « Hidden Charges » et toutes les autres missions principales du chapitre 3",
+   "perso": "Lucia ou Jason",
+   "recompense": "120 000 $ + trophée Break the Bank",
+   "synopsis": "Le casse de la Sinfrontera National Bank. Raul envoie ensuite une avance et leur offre une suite au Y Hotel.",
+   "etapes": [
+    "Monter en voiture et se garer près des antennes",
+    "Entrer dans la banque et attendre le signal de Karim",
+    "Neutraliser un garde et prendre l’ascenseur",
+    "Sécuriser le terminal de secours sur le toit",
+    "Ouvrir et vider la chambre forte",
+    "Retenir la police et rejoindre Raul",
+    "Gérer l’équipe d’intervention et fouiller son camion",
+    "Rejoindre le bus, aider Nicole, passer par le sous-sol",
+    "Voler la Brigade et quitter la zone",
+    "Défendre le bus, repousser l’hélicoptère, fuir par l’autoroute"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-the-cartel-heist-walkthrough/",
+   "montant": 120000,
+   "manquable": false
+  },
+  "C04-01": {
+   "lieu": "Vice City > Bayside",
+   "donneur": "Jason / Lucia",
+   "condition": "Après « The Cartel Heist »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Chambre 701 au Y Hotel",
+   "synopsis": "Installation dans une suite du Y Hotel organisée par Valentina, qui promet un rendez-vous avec l’avocat Abraham Gonzalez pour leur offrir une nouvelle vie.",
+   "etapes": [
+    "Aller au Y Hotel et retrouver Valentina",
+    "Monter au 7e étage, chambre 701",
+    "Explorer la suite avec Lucia",
+    "Ouvrir le dressing",
+    "Rejoindre Lucia sur le balcon"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-ocean-beach-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-02": {
+   "lieu": "Vice Beach > Washington Beach",
+   "donneur": "Lucia",
+   "condition": "Après « Ocean Beach »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Compte BuckMe Black (plafond 2 000 000 $) + trophée Vice City, baby!",
+   "synopsis": "Lucia se souvient de sa dernière matinée avec Tomás, avant son arrestation.",
+   "etapes": [
+    "Prendre le téléphone",
+    "Aller voir Tomás, le prendre dans les bras et le consoler",
+    "Monter le son et danser avec lui"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-another-life-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-03": {
+   "lieu": "Vice Beach > Washington Beach",
+   "donneur": "Lucia / Jason",
+   "condition": "Après « Another Life »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Moment détente au bord de la piscine.",
+   "etapes": [
+    "Prendre un cocktail au bar pour Lucia",
+    "Le lui apporter",
+    "Se promener avec Lucia"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-pool-day-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-04": {
+   "lieu": "Vice Beach > Washington Beach",
+   "donneur": "Santino",
+   "condition": "Après « Pool Day »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Nouvelles voitures pour Jason et Lucia",
+   "synopsis": "Récupérer chez Status Auto Imports des voitures haut de gamme offertes par Valentina.",
+   "etapes": [
+    "Parler au vendeur et suivre Rob",
+    "Choisir une voiture pour Jason, puis pour Lucia",
+    "Poursuivre Lucia et faire la course jusqu’au Y Hotel"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-company-cars-speak-to-the-concierge-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-05": {
+   "lieu": "Vice City > Downtown",
+   "donneur": "Valentina",
+   "condition": "Après « Pool Day »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Rendez-vous avec l’avocat Abe Gonzalez, qui accepte d’aider en échange d’un service.",
+   "etapes": [
+    "Aller voir Sandy",
+    "Aller voir Abe"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-lawyer-up-meet-abe-gonzalez-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-06": {
+   "lieu": "Vice City > Crosstown",
+   "donneur": "Raul",
+   "condition": "Après « Lawyer Up »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Raul vise une équipe rivale menée par le culturiste Kordell Grant : Jason et Lucia enquêtent à l’Ajax Gym et découvrent un projet lié à l’aéroport. Karim identifie le propriétaire du disque dur.",
+   "etapes": [
+    "Prendre l’ascenseur jusqu’à la planque",
+    "Aller à la péniche, puis au pont supérieur",
+    "Conduire jusqu’à la salle de sport et entrer",
+    "Parler à l’accueil et suivre J-Wang",
+    "Se changer et fouiller le sac de Raina",
+    "S’entraîner, puis aller au salon de bronzage",
+    "Trouver Nate, le bloquer et fouiller son sac",
+    "Trouver ses plans, puis le sauver",
+    "Filer les culturistes jusqu’au Grand Majestic Aparthotel et monter sur le toit"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-heavy-lifting-bring-raul-the-hard-drive-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-07": {
+   "lieu": "Vice City",
+   "donneur": "Toi-même",
+   "condition": "Signalé automatiquement après « Heavy Lifting »",
+   "perso": "Lucia et Jason ensemble",
+   "recompense": "Relation renforcée",
+   "synopsis": "Passer du temps au Courtyard Bar à Stockyard.",
+   "etapes": [
+    "Prendre un verre au Courtyard Bar"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-its-a-date-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-08": {
+   "lieu": "Vice-Dale County > VCIA",
+   "donneur": "Valentina",
+   "condition": "Après « Lawyer Up »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Jason et Lucia assurent la sécurité d’une star de télénovela lors d’une inauguration qui tourne à la prise d’otages, et sauvent les invités.",
+   "etapes": [
+    "Suivre la voiture et récupérer la commande d’Andrés",
+    "Aller aux bureaux de Megamundo",
+    "Suivre Andrés puis Petra",
+    "Prendre la radio et aller à l’escalier",
+    "Neutraliser les assaillants",
+    "Secourir les Navarro",
+    "Monter dans l’hélicoptère et se poser sur l’héliport"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-party-hard-work-personal-security-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-09": {
+   "lieu": "Vice City",
+   "donneur": "Abe Gonzalez",
+   "condition": "Juste après « Party Hard », message du cabinet d’avocats",
+   "perso": "Lucia ou Jason",
+   "recompense": "Tu paies 75 000 $ ; obligatoire pour avancer",
+   "synopsis": "Contre 75 000 $, Abe Gonzalez fournit de nouvelles identités : payer par BuckMe.",
+   "etapes": [
+    "Payer les 75 000 $ à Abe"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-pay-abes-fee-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-10": {
+   "lieu": "Vice City > Tequesta",
+   "donneur": "Dre’Quan",
+   "condition": "Après « Party Hard »",
+   "perso": "Lucia ou Jason",
+   "recompense": "6 000 $ + variantes W-10 de Roxy et de Bae-Luxe",
+   "synopsis": "Séance photo des Dimez en haut d’un gratte-ciel ; Dre’Quan est enlevé et il faut le secourir.",
+   "etapes": [
+    "Photographier les Dimez",
+    "Poursuivre la voiture de Dre’Quan",
+    "Secourir Dre’Quan"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-photoshoot-shoot-a-promo-walkthrough/",
+   "montant": 6000,
+   "manquable": false
+  },
+  "C04-11": {
+   "lieu": "Lummox County > Millport",
+   "donneur": "Andrea",
+   "condition": "Après « Party Hard ». Manquable : disparaît définitivement après « Power Play ».",
+   "perso": "Lucia ou Jason",
+   "recompense": "Si tu élimines Felipe : 20 000 $ ; si tu l’épargnes : mission facultative « Collect Felipe’s Gift » (son véhicule)",
+   "synopsis": "Andrea a retrouvé Felipe, qui a lâché l’équipe pendant le casse.",
+   "etapes": [
+    "Chercher Felipe",
+    "Le poursuivre",
+    "Régler son sort"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-bad-driver-find-felipe-walkthrough/",
+   "montant": null,
+   "manquable": true
+  },
+  "C04-12": {
+   "lieu": "Vice City > Ocean Beach > Y Hotel",
+   "donneur": "Eddie Acosta",
+   "condition": "Pendant « Pool Day »",
+   "perso": "Lucia ou Jason, seul(e)",
+   "recompense": "Rien si tu refuses de payer Eddie ; perte de 50 000 $ si tu paies",
+   "synopsis": "Eddie Acosta, passionné de crypto rencontré au bar, t’invite à une fête à Heathcliff Heights.",
+   "etapes": [
+    "Aller à la fête d’Eddie Acosta",
+    "Le retrouver à l’ascenseur"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-attend-eddie-acostas-party-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-13": {
+   "lieu": "Vice City > Stockyard",
+   "donneur": "Raul",
+   "condition": "Après « Heavy Lifting »",
+   "perso": "Lucia",
+   "recompense": "Aucune",
+   "synopsis": "Lucia se rapproche de Nate, membre de la bande de Kordell, en s’entraînant avec lui, jusqu’à accéder à l’espace privé de Kordell à l’Ajax Gym.",
+   "etapes": [
+    "Trouver Nate dans la salle et attirer son attention",
+    "Faire du développé couché",
+    "Suivre Nate et faire du vélo",
+    "Quitter la salle et retrouver Jason",
+    "Aller à la salle de préparation"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-making-gainz-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-14": {
+   "lieu": "Vice Beach > Washington Beach (Oldby Island)",
+   "donneur": "Nate",
+   "condition": "Après « Making Gainz »",
+   "perso": "Lucia",
+   "recompense": "Aucune",
+   "synopsis": "S’entraîner sur le Trauma Floor de Kordell pour gagner la confiance de la bande.",
+   "etapes": [
+    "Aller au Trauma Floor et se changer",
+    "Parler à Nate",
+    "S’entraîner avec les culturistes",
+    "Faire une pause, puis partir quand tu veux"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-blood-sweat-and-gear-work-out-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-15": {
+   "lieu": "Vice-Dale County > VCIA",
+   "donneur": "Andrea",
+   "condition": "Après « Making Gainz »",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Jason se fait embaucher comme bagagiste à l’aéroport et y pose des micros pour Karim.",
+   "etapes": [
+    "Entrer sur le parking et aller au bureau",
+    "Suivre Omar",
+    "Atteler les chariots au tracteur à bagages",
+    "Aller à l’avion et prendre le bagage",
+    "Aller à la zone de chargement puis au bureau de sécurité",
+    "Entrer dans les toilettes et poser le dispositif",
+    "Revenir parler à Omar"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-too-much-baggage-scope-out-the-airport-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-16": {
+   "lieu": "Vice Beach > Washington Beach (Washington Island)",
+   "donneur": "Dre’Quan",
+   "condition": "Après « Making Gainz »",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Jason et Dre’Quan rencontrent Royce Jones, patron du club VYB, qui ne rouvrira pas tant qu’un chantage pèsera sur lui.",
+   "etapes": [
+    "Retrouver Dre’Quan et le suivre",
+    "Aller au parking du Cruda et rencontrer le vendeur de montres",
+    "Accompagner Dre’Quan et quitter la zone",
+    "Aller chez Nola puis au Doight d’Or",
+    "Suivre Dre’Quan"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-watch-it-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-17": {
+   "lieu": "Vice Beach > Washington Beach (Oldby Island)",
+   "donneur": "Francisco",
+   "condition": "Après « Blood Sweat and Gear »",
+   "perso": "Lucia",
+   "recompense": "1 000 $",
+   "synopsis": "Cisco demande à Lucia de l’aider à récupérer de l’argent qu’on lui doit : l’occasion de gagner sa confiance.",
+   "etapes": [
+    "Aller au Trauma Floor et se changer",
+    "Aller à la voiture de Francisco puis au point de rendez-vous",
+    "Se garer et attendre sur le banc",
+    "Arrêter le camping-car",
+    "Attendre que Francisco récupère l’argent",
+    "Le déposer derrière l’Ajax Gym et garer sa voiture"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-amateur-hour-walkthrough/",
+   "montant": 1000,
+   "manquable": false
+  },
+  "C04-19": {
+   "lieu": "Vice Beach > Ocean Beach",
+   "donneur": "Nate",
+   "condition": "Après « Amateur Hour » puis « Call Nate »",
+   "perso": "Lucia",
+   "recompense": "Aucune",
+   "synopsis": "Lucia épaule Nate dans une petite vente à Ocean Beach pour gagner sa confiance.",
+   "etapes": [
+    "Suivre Nate et monter dans sa voiture",
+    "Aller au lieu de la vente et ouvrir le coffre",
+    "Protéger Nate",
+    "Poursuivre et récupérer la voiture de Nate",
+    "Semer la police",
+    "Aller au glacier"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-cash-injections-hang-out-with-nate-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-20": {
+   "lieu": "Vice City > Stockyard",
+   "donneur": "Andrea",
+   "condition": "Après « Too Much Baggage » et « Cash Injections »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Pour semer la méfiance contre Raina dans la bande de Kordell, Lucia prend des photos compromettantes pendant que Jason joue un rôle.",
+   "etapes": [
+    "Aller au Velvet Palm Motel",
+    "Choisir un point de vue et photographier Raina",
+    "Rejoindre Lucia",
+    "Retrouver Nate à la piscine et lui parler"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-dirty-work-deal-with-raina-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-22": {
+   "lieu": "Vice Beach > Starfish Island",
+   "donneur": "Andrés",
+   "condition": "Après « Making Gainz »",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Jason protège Andrés de León au club The Vault lors d’une tentative d’enlèvement, puis apprend que son fils Rafa a été enlevé.",
+   "etapes": [
+    "Conduire jusqu’au Vault et escorter Andrés",
+    "Lui commander un verre, puis le photographier",
+    "Discuter avec le groupe et la sécurité",
+    "Retrouver Andrés aux toilettes, parler au vendeur",
+    "Protéger Andrés et suivre Paulo",
+    "Gagner l’héliport et mettre Andrés dans l’hélicoptère",
+    "Défendre Andrés"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-adventures-in-babysitting-work-security-for-andres-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-24": {
+   "lieu": "Vice City > Crosstown",
+   "donneur": "Dre’Quan",
+   "condition": "Après « Watch It » et « Adventures in Babysitting »",
+   "perso": "Jason",
+   "recompense": "10 000 $",
+   "synopsis": "Jason et Dre’Quan s’introduisent chez la star Dante Fresh pour récupérer le moyen de pression qu’il a sur Royce Jones ; les Dimez feront la soirée de réouverture du VYB.",
+   "etapes": [
+    "Suivre Dre’Quan jusqu’à Starfish Island",
+    "Entrer dans la villa et cacher le corps dans le placard",
+    "Trouver la chambre et la carte d’accès",
+    "Gagner l’ascenseur et éloigner le tigre",
+    "Trouver la salle de surveillance et y entrer",
+    "Copier les preuves",
+    "Fuir avec le hors-bord de Dante et semer la police"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-fresh-evidence-walkthrough/",
+   "montant": 10000,
+   "manquable": false
+  },
+  "C04-25": {
+   "lieu": "Vice City > Downtown",
+   "donneur": "Andrés",
+   "condition": "Après « Fresh Evidence »",
+   "perso": "Lucia ou Jason",
+   "recompense": "30 000 $ + trophée Family Matters",
+   "synopsis": "Jason et Lucia aident Andrés à libérer son fils Rafa ; un traître est démasqué, et l’avocat annonce que leurs nouvelles identités sont prêtes.",
+   "etapes": [
+    "Aller à la carrière et au lieu de l’échange",
+    "Repérer Rafa aux jumelles",
+    "Libérer Rafa et protéger Andrés",
+    "Passer à Lucia et fuir avec Rafa",
+    "Poursuivre Gustavo",
+    "Prendre un véhicule et récupérer Rafa",
+    "Régler le cas de Gustavo"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-childs-play-rescue-rafa-from-kidnappers-walkthrough/",
+   "montant": 30000,
+   "manquable": false
+  },
+  "C04-26": {
+   "lieu": "Vice-Dale County > Hamlet",
+   "donneur": "Shayna",
+   "condition": "Après « Lawyer Up »",
+   "perso": "Lucia",
+   "recompense": "Selon le dénouement : jusqu’à environ 6 500 $ d’objets revendables",
+   "synopsis": "Une amie de prison de Lucia sort et a besoin qu’on la ramène.",
+   "etapes": [
+    "Raccompagner Shayna",
+    "Entrer chez Raph",
+    "Partager le sac avec Shayna"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-this-is-a-free-call-from-pick-up-shayna-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-27": {
+   "lieu": "Vice City > Salton",
+   "donneur": "Kordell",
+   "condition": "Après « Child’s Play »",
+   "perso": "Lucia",
+   "recompense": "40 000 $",
+   "synopsis": "Pendant que Lucia participe à un braquage de fourgon avec Kordell, Jason découvre leur plan pour l’aéroport ; Raul décide de les aider en secret pour leur souffler le butin.",
+   "etapes": [
+    "Demander Kordell à l’accueil et le rejoindre",
+    "Trouver un moyen d’entrer et atteindre la salle de préparation",
+    "Trouver les plans du casse",
+    "Poser les cônes sur la route et suivre Kordell",
+    "Prendre une arme et couvrir la bande",
+    "Voler un véhicule et semer la police"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-power-play-help-kordells-crew-walkthrough/",
+   "montant": 40000,
+   "manquable": false
+  },
+  "C04-28": {
+   "lieu": "Vice Beach > Ocean Beach",
+   "donneur": "Karim",
+   "condition": "Après « Power Play »",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Avec un drone, Jason et Karim espionnent Nate et Cisco jusque chez Omar, le chef bagagiste. Karim a aussi déchiffré une vidéo du disque dur.",
+   "etapes": [
+    "Piloter le drone jusqu’au Calique et chercher les culturistes",
+    "Suivre Nate et Francisco, repérer leur voiture",
+    "Entrer dans l’appartement et y placer des caméras",
+    "Écouter l’interrogatoire",
+    "Quitter l’appartement et ramener le drone",
+    "Monter en voiture et déposer Lucia"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-close-surveillance-spy-on-the-bodybuilders-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-29": {
+   "lieu": "Vice City > Crosstown",
+   "donneur": "Andrea",
+   "condition": "Après « Power Play »",
+   "perso": "Jason",
+   "recompense": "Aucune",
+   "synopsis": "Jason pirate le réseau d’une société de sécurité aéroportuaire pour y inscrire Lucia sous sa fausse identité.",
+   "etapes": [
+    "Passer le portail de sécurité et aller au bureau",
+    "Parler à la réceptionniste",
+    "Pirater l’ordinateur et retirer la clé USB",
+    "Provoquer une évacuation",
+    "Trouver le service de sécurité de l’aéroport et un ordinateur relié à la base",
+    "Attendre la fin du piratage, retirer la clé et partir"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-delivery-method-help-andrea-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-30": {
+   "lieu": "Vice Beach > Washington Beach (Oldby Island)",
+   "donneur": "Kordell",
+   "condition": "Après « Power Play »",
+   "perso": "Lucia",
+   "recompense": "Aucune",
+   "synopsis": "Kordell recrute dans un club de combat clandestin et met Lucia à l’épreuve ; sa couverture tient.",
+   "etapes": [
+    "Suivre Kordell jusqu’à l’entrepôt",
+    "Gagner le combat",
+    "Monter dans la voiture de Kordell et aller à Riverbank",
+    "Suivre Kordell"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-team-building-meet-kordell-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-31": {
+   "lieu": "Vice-Dale County > VCIA",
+   "donneur": "Raul",
+   "condition": "Après « Power Play »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Voler un camion de restauration aérienne pour le casse, puis préparer les sacs de faux billets.",
+   "etapes": [
+    "Voler un camion Plane & Simple",
+    "Le livrer au point de dépôt",
+    "Mettre l’argent dans les sacs"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-fully-catered-steal-a-catering-truck-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-33": {
+   "lieu": "Vice Beach > Washington Beach",
+   "donneur": "Dre’Quan",
+   "condition": "Toutes les autres missions principales du chapitre 4 avant « VCIA Takedown »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Selon le dénouement, jusqu’à environ 50 000 $ + poing américain + trophée DWNFALL",
+   "synopsis": "Soirée de lancement des Dimez au VYB : il faut tenir tête à DWNPLY et sa bande, puis profiter du concert.",
+   "etapes": [
+    "Tester les lumières et attribuer les tables VIP",
+    "Aller voir Maleek Rivers puis KD et le photographier",
+    "Retrouver Dre’Quan et lui ouvrir la portière",
+    "Accompagner une invitée sur la piste et libérer une table",
+    "Suivre Jason et attraper DWNPLY",
+    "Regarder le concert"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-headliners-help-with-the-launch-party-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-34": {
+   "lieu": "Vice City > Stockyard",
+   "donneur": "Raul",
+   "condition": "Toutes les préparations de « VCIA Takedown » et « Headliners » terminées",
+   "perso": "Lucia ou Jason",
+   "recompense": "250 000 $ + variante LMG-6 de Francisco (si tu la prends) + trophée Hi-Jacked",
+   "etapes": [
+    "Suivre Nate jusqu’au terminal de fret",
+    "Suivre Janice puis l’assommer",
+    "Suivre le responsable de la chambre forte jusqu’au terminal réseau",
+    "Inspecter la caisse de vin et ouvrir les grilles",
+    "Aller à la chambre forte, suivre Francisco",
+    "Assommer Omar et le mettre dans le conteneur",
+    "Charger les sacs dans l’avion",
+    "Rejoindre Lucia et se défendre",
+    "Poursuivre l’avion puis le camion",
+    "Affronter Raina",
+    "Fouiller le camion, retrouver Raul",
+    "Défendre Andrea et monter dans la camionnette"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-vcia-takedown-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-35": {
+   "lieu": "N’importe où",
+   "donneur": "Jason / Lucia",
+   "condition": "Après « VCIA Takedown »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Raul tarde à donner des nouvelles : en profiter pour régler les affaires en cours et mettre de l’argent de côté.",
+   "etapes": [
+    "Attendre un message"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-tie-up-loose-ends-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-36": {
+   "lieu": "Vice Beach > Ocean Beach",
+   "donneur": "Yasmani",
+   "condition": "Après « VCIA Takedown »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Yasmani vend des tuyaux sur les fourgons + environ 80 000 $ (si tu prends tous les billets marqués) + un trophée si pas encore obtenu",
+   "synopsis": "Yasmani propose une chambre forte : attendre le fourgon au Café Orquidea et le suivre jusqu’à la banque.",
+   "etapes": [
+    "Suivre le fourgon, puis le convoyeur",
+    "Braquer la chambre forte",
+    "Semer la police"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-thats-where-the-money-is-wait-at-the-cafe-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-37": {
+   "lieu": "N’importe où",
+   "donneur": "Valentina",
+   "condition": "Après « VCIA Takedown »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Attendre que Valentina négocie la vente du disque dur, ou la rappeler.",
+   "etapes": [
+    "Rappeler Valentina"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-call-valentina-back-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-38": {
+   "lieu": "Vice Beach > Washington Beach",
+   "donneur": "Jason / Lucia",
+   "condition": "Après « VCIA Takedown »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Une lettre mystérieuse les mène à la péniche de Raul, trahi ; ils doivent ensuite échapper à la police.",
+   "etapes": [
+    "Aller à la marina puis à la péniche de Raul",
+    "Chercher Raul",
+    "Fuir avec Jason",
+    "Monter dans le bateau et le défendre"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-sunset-stop-by-the-front-desk-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C04-39": {
+   "lieu": "Vice City > Southside",
+   "donneur": "Jason / Lucia",
+   "condition": "Après « Sunset »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Trophée Top of the World, Ma",
+   "synopsis": "Recherchés et comptes gelés, Jason et Lucia récupèrent le disque dur et la statue ; un message de Mattia les mène à son patron, propriétaire du sac depuis le début.",
+   "etapes": [
+    "Aller à l’Aqua Stadium et trouver Andrea",
+    "Aller à Big House Storage",
+    "Prendre l’ascenseur et suivre l’hôtesse jusqu’à la terrasse",
+    "Suivre Giorgio puis Dardan"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-starting-from-zero-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C05-01": {
+   "lieu": "Vice City > Tequesta Retreat",
+   "donneur": "Giorgio",
+   "condition": "Après « Starting from Zero »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "etapes": [
+    "Se changer au dressing et rejoindre Giorgio",
+    "Voler jusqu’à la base des garde-côtes et la repérer",
+    "Voler jusqu’au pont puis rejoindre Kevin",
+    "Monter sur le bateau et aller à la base militaire",
+    "Suivre Vinny et ouvrir la grille",
+    "Aller au hangar et atteindre la trappe du toit",
+    "Ouvrir les portes du hangar et tenir tête aux militaires",
+    "Monter dans l’hélicoptère et le défendre"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-bird-in-the-hand-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C05-02": {
+   "lieu": "Vice City > Tequesta Retreat",
+   "donneur": "Giorgio",
+   "condition": "Après « Bird in the Hand »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Giorgio promet une grâce présidentielle en échange de leur aide ; la discussion est interrompue par un tueur qui lui impose de détruire une cargaison rivale.",
+   "etapes": [
+    "Retrouver Giorgio"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-taking-liberties-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C05-03": {
+   "lieu": "Vice City > Tequesta Retreat",
+   "donneur": "Vinny",
+   "condition": "Après « Taking Liberties »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Pour trouver la cargaison, il faut le meilleur chien renifleur des garde-côtes : Lucia aide Vinny à l’emmener depuis un paquebot.",
+   "etapes": [
+    "Monter à bord et prendre l’ascenseur jusqu’au pont supérieur",
+    "Trouver Rocco et lui donner le biscuit",
+    "Prendre Rocco et rejoindre la zone d’atterrissage",
+    "Monter dans l’hélicoptère"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-doggie-bag-meet-vinny-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C05-04": {
+   "lieu": "Vice City > Tequesta Retreat",
+   "donneur": "Mattia",
+   "condition": "Après « Taking Liberties »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Kat accouche dans le penthouse de Giorgio : Mattia a besoin d’aide pour l’emmener à l’hôpital.",
+   "etapes": [
+    "Suivre Mattia",
+    "Attendre que Lucia distraie Dardan et voler la clé",
+    "Revenir vers Mattia et trouver un véhicule",
+    "Conduire Mattia à l’hôpital et le suivre"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-vc-baby-talk-to-mattia-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C05-05": {
+   "lieu": "Vice City > Tequesta Retreat",
+   "donneur": "Vinny",
+   "condition": "Après « Doggie Bag » et « VC Baby »",
+   "perso": "Lucia ou Jason",
+   "recompense": "50 000 $ + penthouse Pegassi Residences + restitution des armes, équipements et tenues + trophée Snow Storm",
+   "synopsis": "Détruire la cargaison rivale et récupérer la marchandise saisie de Giorgio chez les garde-côtes ; Giorgio leur laisse ensuite le penthouse le temps que la pression retombe.",
+   "etapes": [
+    "Retrouver Vinny et aller au pont",
+    "Poser les explosifs sur le pilier",
+    "Nettoyer le cargo et suivre Rocco jusqu’à la cargaison",
+    "Poser les explosifs sur le conteneur et l’ouvrir",
+    "Monter dans l’hélicoptère et faire exploser les charges",
+    "Lever le pont et plonger",
+    "Poser les explosifs sur le bateau",
+    "Entrer dans les bureaux des garde-côtes et ouvrir le rideau",
+    "Voler jusqu’à la base, défendre la cargaison et protéger Kevin",
+    "Accrocher le treuil et défendre l’hélicoptère",
+    "Quitter le penthouse quand tu veux"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-operation-savage-glory-walkthrough/",
+   "montant": 50000,
+   "manquable": false
+  },
+  "C05-06": {
+   "lieu": "Vice City > Tequesta Retreat",
+   "donneur": "Abe",
+   "condition": "Après « Operation Savage Glory »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Giorgio a trouvé un arrangement pour leurs problèmes judiciaires : rendez-vous au bureau d’Abe.",
+   "etapes": [
+    "Retrouver Abe à son bureau"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-honest-abe-negotiate-a-deal-with-abe-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C05-08": {
+   "lieu": "Vice City",
+   "donneur": "Abe Gonzalez",
+   "condition": "Fiche PowerPyx partagée avec « Pay Abe’s Fee » du chapitre 4",
+   "perso": "Lucia ou Jason",
+   "recompense": "Tu paies 75 000 $ ; obligatoire pour avancer",
+   "synopsis": "Payer les honoraires d’Abe par BuckMe pour obtenir de nouvelles identités. Le kit liste cette entrée deux fois (chapitres 4 et 5) : à vérifier en jeu.",
+   "etapes": [
+    "Payer les 75 000 $ à Abe"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-pay-abes-fee-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C05-09": {
+   "lieu": "Vice City > Downtown",
+   "donneur": "Abe",
+   "condition": "Après « Pay Abe’s Fee » (chapitre 5)",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Trahis par Giorgio, Jason et Lucia sont arrêtés séparément ; ils doivent survivre aux policiers corrompus jusqu’à l’affrontement avec Méndez.",
+   "etapes": [
+    "Aller au penthouse et rentrer la boule 8",
+    "Aller au point de dépôt et s’asseoir sur le banc",
+    "Revenir vers Dardan",
+    "Aller à la cellule et échapper à l’embuscade",
+    "Aller au commissariat et s’en échapper",
+    "Barricader la porte et monter",
+    "Sortir par l’est et passer par-dessus la rambarde",
+    "Aller à l’armurerie et défendre le commissariat",
+    "Ouvrir un chemin jusqu’à l’entrepôt et survivre à l’assaut",
+    "Rejoindre Jason et vaincre l’équipe de Méndez"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-protective-custody-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  "C05-10": {
+   "lieu": "Mariana County > Key Lento",
+   "donneur": "Jason / Lucia",
+   "condition": "Après « Protective Custody »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Liste de complétion 100 % débloquée + un trophée",
+   "etapes": [
+    "Choisir des armes et partir",
+    "Attaquer le penthouse",
+    "Trouver un chemin jusqu’au bureau de Giorgio et utiliser l’ordinateur",
+    "Distraire l’hélicoptère et couvrir Jason",
+    "Récupérer le disque dur",
+    "Échapper à l’hélicoptère et rejoindre Lucia",
+    "Libérer Lucia et trouver une sortie",
+    "Prendre l’ascenseur",
+    "Rouler jusqu’à chez Cal puis aller à Fleming Key"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-the-end-of-the-road-walkthrough/",
+   "montant": null,
+   "manquable": false
+  }
+ },
+ "annexes": [
+  {
+   "id": "SF-CAL-1",
+   "arc": "Cal",
+   "titre": "Catch a Bigger Fish",
+   "chapitre": 1,
+   "lieu": "Mariana County > Gambit Bay",
+   "donneur": "Cal",
+   "condition": "Après « Feng Shui »",
+   "perso": "Jason",
+   "recompense": "Hausse de Focus + trophée Baited My Tackle",
+   "synopsis": "Cal te met au défi de pêcher un poisson-perroquet de plus de 2 livres (environ 0,9 kg).",
+   "etapes": [
+    "Pêcher un poisson plus gros"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-catch-a-bigger-fish-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  {
+   "id": "SF-KIRK-1",
+   "arc": "Kirk",
+   "titre": "Search for the Skunk Ape (Skunk Apeology 101)",
+   "chapitre": 1,
+   "lieu": "Un prospectus « Skunk Ape »",
+   "donneur": "Kirk",
+   "condition": "Lire un prospectus de Kirk puis l’appeler depuis tes contacts",
+   "perso": "Lucia ou Jason, de nuit",
+   "recompense": "1 000 $",
+   "synopsis": "Un certain Kirk cherche des informations sur une créature des marais : le retrouver près de la Pelican River.",
+   "etapes": [
+    "Partir à la recherche de la créature",
+    "Suivre le drone",
+    "Aller voir d’où vient le bruit",
+    "Fouiller la zone",
+    "Inspecter l’arbre",
+    "Revenir au pick-up"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-search-for-the-skunk-ape-walkthrough/",
+   "montant": 1000,
+   "manquable": false
+  },
+  {
+   "id": "SF-KIRK-2",
+   "arc": "Kirk",
+   "titre": "Search for Tree Effigies",
+   "chapitre": 1,
+   "lieu": "Mariana County > Pelican Valley",
+   "donneur": "Kirk",
+   "condition": "Après la 1re quête de Kirk, attendre son message",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Trouver des figures sculptées sur des arbres de Pelican Valley et envoyer leur position à Kirk.",
+   "etapes": [
+    "Trouver 3 figures sculptées"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-search-for-tree-effigies-locations-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  {
+   "id": "SF-KIRK-3",
+   "arc": "Kirk",
+   "titre": "Help Kirk Find Mr. Mangrove (Advanced Skunk Apeonomics)",
+   "chapitre": 2,
+   "lieu": "Mariana County > Cottonmouth Lake",
+   "donneur": "Kirk",
+   "condition": "Après « Search for Tree Effigies », message de Kirk quelques jours plus tard",
+   "perso": "Lucia uniquement, de nuit",
+   "recompense": "Fusil tranquillisant unique « Mister Mangrove Laird 350 » ; 10 000 $ selon le choix final",
+   "synopsis": "Nouvelle expédition avec Kirk près de Cottonmouth Lake.",
+   "etapes": [
+    "Traquer la créature et fouiller la zone",
+    "Ramasser ce que tu trouves",
+    "Trouver des mouches",
+    "Retrouver Kirk",
+    "Faire ton choix final"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-help-kirk-find-mr-mangrove-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  {
+   "id": "SF-MOSES-1",
+   "arc": "Moses",
+   "titre": "Steal Vehicles for Moses",
+   "chapitre": 2,
+   "lieu": "Selon le véhicule",
+   "donneur": "Moses",
+   "condition": "Après « Daily Driver »",
+   "perso": "Lucia ou Jason",
+   "recompense": "Selon le véhicule + bonus selon son état",
+   "synopsis": "Moses a une liste de six véhicules à lui livrer.",
+   "etapes": [
+    "Declasse Yosemite 1500",
+    "Karin Futo",
+    "Annis Hellion",
+    "BF Bandito",
+    "Declasse Vamos",
+    "Western Nightblade"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-steal-vehicles-for-moses-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  {
+   "id": "SF-MOSES-2",
+   "arc": "Moses",
+   "titre": "Collect Moses’ Gift",
+   "chapitre": 2,
+   "lieu": "Kelly County > Port Gellhorn",
+   "donneur": "Moses",
+   "condition": "Après avoir livré tous les véhicules de la liste",
+   "perso": "Lucia ou Jason",
+   "recompense": "Véhicule unique : la Sultan de Moses",
+   "synopsis": "Moses te remercie avec un cadeau à son garage.",
+   "etapes": [
+    "Récupérer le cadeau de Moses"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-collect-moses-gift-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  {
+   "id": "SF-BILLY-4",
+   "arc": "Billy",
+   "titre": "The Impaler (Steal the Impaler)",
+   "chapitre": 3,
+   "lieu": "Kelly County > Ambrosia",
+   "donneur": "Billy",
+   "condition": "Après « Mall Rats », appel de Billy quelques jours plus tard",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Voler un véhicule de police mis en fourrière au commissariat d’Ambrosia.",
+   "etapes": [
+    "Voler le véhicule de police",
+    "Semer la police",
+    "Le laisser dans le tunnel au point de dépôt"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-the-impaler-steal-the-impaler-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  {
+   "id": "SF-BILLY-5",
+   "arc": "Billy",
+   "titre": "Hometown Heroes (Join Billy on a Job)",
+   "chapitre": 3,
+   "lieu": "Kelly County > Thrillbilly Mud Club",
+   "donneur": "Billy",
+   "condition": "Après « The Impaler », message de Billy quelques jours plus tard",
+   "perso": "Lucia ou Jason",
+   "recompense": "10 000 $ + trophée The Lone Rider (fin de l’arc de Billy)",
+   "synopsis": "Le grand coup préparé par Billy.",
+   "etapes": [
+    "Suivre Billy sur le circuit et bousculer les autres pilotes",
+    "Vider le coffre avec Billy",
+    "Protéger Billy",
+    "Le suivre à moto jusqu’à la sucrerie",
+    "Retrouver Lucia et sortir de l’usine"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-hometown-heroes-walkthrough/",
+   "montant": 10000,
+   "manquable": false
+  },
+  {
+   "id": "SF-ANDY-1",
+   "arc": "Andy",
+   "titre": "Climbing the Cellerichain (parties 1 à 3)",
+   "chapitre": 3,
+   "lieu": "Leonard County > Belville, chez Andy",
+   "donneur": "Andy",
+   "condition": "Au chapitre 3, en jouant Lucia : appel puis adresse d’Andy",
+   "perso": "Lucia uniquement",
+   "recompense": "Kit de bienvenue Cellerica (produit et casquette)",
+   "synopsis": "Andy a besoin d’aide pour livrer des produits Cellerica.",
+   "etapes": [
+    "Partie 1 : ouvrir le kit et livrer le colis",
+    "Partie 2 : photographier Andy, prendre le colis et le livrer au stand",
+    "Partie 3 : livrer le colis au client"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-climbing-the-cellerichain-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  {
+   "id": "SF-ANDY-2",
+   "arc": "Andy",
+   "titre": "Pay the Cellerica Fee",
+   "chapitre": 3,
+   "lieu": "N’importe où (message d’Andy)",
+   "donneur": "Andy",
+   "condition": "Après « Climbing the Cellerichain », attendre l’appel d’Andy (en jouant Lucia)",
+   "perso": "Lucia uniquement",
+   "recompense": "Aucune (tu paies 5 000 $)",
+   "synopsis": "Payer les frais d’entrée chez Cellerica par BuckMe.",
+   "etapes": [
+    "Payer les frais"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-pay-the-cellerica-fee-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  {
+   "id": "SF-ANDY-3",
+   "arc": "Andy",
+   "titre": "Peach! (Join the Cellerica Initiation)",
+   "chapitre": 3,
+   "lieu": "Leonard County > Belville",
+   "donneur": "Andy",
+   "condition": "Après « Pay the Cellerica Fee », message d’Andy",
+   "perso": "Lucia uniquement",
+   "recompense": "Lucia devient membre de Cellerica",
+   "synopsis": "Rendez-vous au campus Cellerica pour l’initiation.",
+   "etapes": [
+    "Suivre Andy et se changer",
+    "Participer à l’initiation",
+    "Aller au manoir de Cecilia et s’asseoir",
+    "Revenir vers Andy"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-peach-join-the-cellerica-initiation-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  {
+   "id": "SF-ANDY-4",
+   "arc": "Andy",
+   "titre": "Read the Label (Retrieve the Cellerica Van)",
+   "chapitre": 3,
+   "lieu": "Vice City",
+   "donneur": "Andy / Cecilia",
+   "condition": "Après « Peach! », attendre Cecilia (en jouant Lucia)",
+   "perso": "Lucia uniquement",
+   "recompense": "1 800 $ par BuckMe",
+   "synopsis": "Récupérer une camionnette volée et la déposer à l’entrepôt.",
+   "etapes": [
+    "Livrer la camionnette à l’entrepôt"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-read-the-label-retrieve-the-cellerica-van-walkthrough/",
+   "montant": 1800,
+   "manquable": false
+  },
+  {
+   "id": "SF-ANDY-5",
+   "arc": "Andy",
+   "titre": "Puff Puff Pass (Meet at the Warehouse)",
+   "chapitre": 3,
+   "lieu": "Leonard County > manoir de Cecilia",
+   "donneur": "Andy / Cecilia",
+   "condition": "Après « Read the Label », attendre Cecilia (en jouant Lucia)",
+   "perso": "Lucia uniquement",
+   "recompense": "10 000 $ + trophée Road to Rehabilitation",
+   "synopsis": "Cecilia a un problème à régler à l’entrepôt.",
+   "etapes": [
+    "Suivre Felix et entrer dans la pièce",
+    "S’échapper de l’entrepôt",
+    "Aller au manoir et trouver Cecilia"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-puff-puff-pass-meet-at-the-warehouse-walkthrough/",
+   "montant": 10000,
+   "manquable": false
+  },
+  {
+   "id": "SF-TYRONE-2",
+   "arc": "Tyrone",
+   "titre": "Spin On This (Shut Down the Labs)",
+   "chapitre": 3,
+   "lieu": "Lummox County > Grayson",
+   "donneur": "Tyrone",
+   "condition": "Avoir détruit assez de labos « Kitty Litter »",
+   "perso": "Jason",
+   "recompense": "10 000 $ + trophée Spin On This!",
+   "synopsis": "Tyrone veut fermer pour de bon le labo principal.",
+   "etapes": [
+    "Aller au motel et trouver le labo",
+    "Revenir vers Tyrone",
+    "Entrer dans le labo et le nettoyer",
+    "Poser les explosifs sur les cuves",
+    "Rejoindre Tyrone",
+    "Poursuivre Rocky"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-spin-on-this-shut-down-the-labs-walkthrough/",
+   "montant": 10000,
+   "manquable": false
+  },
+  {
+   "id": "SF-STUNT",
+   "arc": "Papa Audacity",
+   "titre": "The Unknown Stuntman",
+   "chapitre": 3,
+   "lieu": "Vice Beach > Ocean Beach",
+   "donneur": "Papa Audacity",
+   "condition": "Aucune (annonce au tableau de l’appartement)",
+   "perso": "Lucia ou Jason",
+   "recompense": "Aucune",
+   "synopsis": "Un cascadeur organise un événement promotionnel à Ocean Beach.",
+   "etapes": [
+    "Réparer la bonbonne",
+    "Revenir vers Papa Audacity",
+    "Allumer la mèche",
+    "Parler à l’ingénieur"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-the-unknown-stuntman-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  {
+   "id": "SF-PETE-1",
+   "arc": "Pilot Pete",
+   "titre": "The Last Mile: Passing the Torch (Recover Pete’s Plane)",
+   "chapitre": 4,
+   "lieu": "Leonard County > aérodrome privé de Sundown",
+   "donneur": "Pilot Pete",
+   "condition": "Appel de Pete au début du chapitre 4, après « Pool Day »",
+   "perso": "Jason uniquement",
+   "recompense": "12 000 $",
+   "synopsis": "Récupérer l’avion de Pete et faire ses livraisons.",
+   "etapes": [
+    "Fouiller le hangar",
+    "Monter dans l’avion de Pete",
+    "Livrer les acheteurs",
+    "Ramener l’avion au hangar"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-the-last-mile-passing-the-torch-recover-petes-plane-walkthrough/",
+   "montant": 12000,
+   "manquable": false
+  },
+  {
+   "id": "SF-PETE-2",
+   "arc": "Pilot Pete",
+   "titre": "The Last Mile: Backseat Pilot (Deliver Packages)",
+   "chapitre": 4,
+   "lieu": "Kelly County > aérodrome de Wild Hog",
+   "donneur": "Pilot Pete",
+   "condition": "Après « Passing the Torch », attendre Pete",
+   "perso": "Jason uniquement",
+   "recompense": "20 000 $ si tout est livré dans le temps imparti",
+   "synopsis": "Nouvelles livraisons depuis Wild Hog.",
+   "etapes": [
+    "Se poser près du fournisseur",
+    "Livrer les colis aux acheteurs"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-the-last-mile-backseat-pilot-deliver-packages-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  {
+   "id": "SF-PETE-3",
+   "arc": "Pilot Pete",
+   "titre": "Pete’s Deliveries: Southpoint Airfield, Avery Allen & Co., Deliver Packages",
+   "chapitre": 4,
+   "lieu": "Mariana County (Southpoint) et Kelly County (Avery Allen & Co.)",
+   "donneur": "Pilot Pete",
+   "condition": "Après « Backseat Pilot », Pete propose les missions suivantes",
+   "perso": "Jason uniquement",
+   "recompense": "20 000 $ par mission si tout est livré à temps ; compte pour le trophée Strangers & Freaks",
+   "synopsis": "Trois séries de livraisons pour Pete.",
+   "etapes": [
+    "Southpoint Airfield : se poser près du fournisseur et livrer",
+    "Avery Allen & Co. : se poser près du fournisseur et livrer",
+    "Deliver Packages : se poser près du fournisseur et livrer"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-petes-deliveries-southpoint-airfield-avery-allen-co-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  {
+   "id": "SF-MERLE",
+   "arc": "Dr. Merle",
+   "titre": "The Final Flush (Meet at Frank’s Waffles)",
+   "chapitre": 0,
+   "lieu": "Vice City > Tequesta",
+   "donneur": "Dr. Merle",
+   "condition": "Scanner une affiche « No Flusher » (n’importe quel chapitre)",
+   "perso": "Lucia ou Jason, seul(e)",
+   "recompense": "Hausse permanente d’endurance ; compte pour le trophée Strangers & Freaks",
+   "synopsis": "Un membre du mouvement « No Flusher » répond à ton message : rendez-vous au Frank’s Waffles.",
+   "etapes": [
+    "Monter dans le van du docteur Merle et suivre ses instructions",
+    "Se garer sur la côte près du site",
+    "Entrer dans le site avec lui",
+    "Trouver le traceur",
+    "Chercher un passage vers le bas"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-the-final-flush-meet-at-franks-waffles-walkthrough/",
+   "montant": null,
+   "manquable": false
+  },
+  {
+   "id": "SF-FREDDIE",
+   "arc": "Freddie",
+   "titre": "Retest Freddie’s Defenses",
+   "chapitre": 0,
+   "lieu": "Leonard County > North Leonard County",
+   "donneur": "Freddie",
+   "condition": "Entrer dans le domaine de Freddie (n’importe quel chapitre)",
+   "perso": "Lucia ou Jason",
+   "recompense": "10 000 $ ; compte pour le trophée Strangers & Freaks",
+   "synopsis": "Freddie, survivaliste, te défie de franchir les nouvelles défenses de son domaine.",
+   "etapes": [
+    "Trouver un moyen d’entrer dans le bunker",
+    "Suivre Freddie"
+   ],
+   "url": "https://www.powerpyx.com/gta-6-retest-freddies-defenses-walkthrough/",
+   "montant": 10000,
+   "manquable": false
+  }
+ ]
+}
