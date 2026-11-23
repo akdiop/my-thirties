@@ -13,7 +13,8 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(fetch(req).then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put('/', copy)); return res; }).catch(() => caches.match('/')));
     return;
   }
-  if (url.pathname.startsWith('/assets/') || /\.(png|svg|webp|woff2?|webmanifest)$/.test(url.pathname)) {
+  // Textes du Jardin des vertueux et du Coran : fixes, gardés après la première lecture pour être relus hors connexion.
+  if (url.pathname.startsWith('/assets/') || /\.(png|svg|webp|woff2?|webmanifest)$/.test(url.pathname) || /^\/(riyad|coran)\/[\w-]+\.json$/.test(url.pathname)) {
     // Fichiers versionnés : la copie d'abord, puis le réseau.
     event.respondWith(caches.match(req).then((hit) => hit || fetch(req).then((res) => { if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); } return res; })));
   }

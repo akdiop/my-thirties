@@ -2,7 +2,7 @@
  * Media is local to this browser profile: never sent to Supabase or another server.
  * The user must be informed that IndexedDB is not encrypted and is not in backups.
  */
-export type MediaModule = 'sport' | 'cuisine' | 'decouvertes' | 'passions';
+export type MediaModule = 'sport' | 'cuisine' | 'decouvertes' | 'passions' | 'gta';
 export type MediaRecord = {
   id: string;
   ownerId: string;

@@ -1,0 +1,63 @@
+[
+  {
+    "id": "leonida-map",
+    "label": "Carte complète de Leonida",
+    "category": "carte",
+    "local_file": "Leonida_Map_Poster.jpg",
+    "rights": "Image fournie par l’utilisatrice ; usage local privé à confirmer",
+    "source": "upload utilisateur"
+  },
+  {
+    "id": "nord_leonida",
+    "label": "Nord Leonida",
+    "category": "découpage de carte",
+    "local_file": "carte_nord_leonida.jpg",
+    "rights": "Dérivé de l’image fournie ; usage local privé",
+    "source": "upload utilisateur"
+  },
+  {
+    "id": "port_gellhorn",
+    "label": "Port Gellhorn",
+    "category": "découpage de carte",
+    "local_file": "carte_port_gellhorn.jpg",
+    "rights": "Dérivé de l’image fournie ; usage local privé",
+    "source": "upload utilisateur"
+  },
+  {
+    "id": "vice_city",
+    "label": "Vice City",
+    "category": "découpage de carte",
+    "local_file": "carte_vice_city.jpg",
+    "rights": "Dérivé de l’image fournie ; usage local privé",
+    "source": "upload utilisateur"
+  },
+  {
+    "id": "keys",
+    "label": "Keys",
+    "category": "découpage de carte",
+    "local_file": "carte_keys.jpg",
+    "rights": "Dérivé de l’image fournie ; usage local privé",
+    "source": "upload utilisateur"
+  },
+  {
+    "id": "official-photos",
+    "label": "Galerie officielle Rockstar — captures",
+    "category": "photos",
+    "external_url": "https://www.rockstargames.com/VI/media/screenshots",
+    "rights": "Images appartenant à Rockstar ; ne pas automatiser leur copie sans autorisation"
+  },
+  {
+    "id": "launch-gallery",
+    "label": "Galerie de lancement",
+    "category": "photos",
+    "external_url": "https://www.rockstargames.com/VI/launch-gallery",
+    "rights": "Consultation externe, droits de reproduction à vérifier"
+  },
+  {
+    "id": "pelican-swamps-overview",
+    "file": "carte_marais_pelican_valley.jpg",
+    "caption": "Recadrage de la carte fournie par l’utilisatrice, pas une localisation exacte",
+    "rights": "user_supplied_crop",
+    "precision": "regional_only"
+  }
+]

@@ -13,6 +13,7 @@ const LABEL: Record<MediaModule, string> = {
   cuisine: 'Photos de mes plats et tutoriels',
   decouvertes: 'Mes souvenirs de voyage',
   passions: 'Mes créations et inspirations',
+  gta: 'Mes images GTA VI',
 };
 
 function Preview({ item }: { item: MediaRecord }) {

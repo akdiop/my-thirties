@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "created": "2026-11-23",
+  "money_unit": "GTA$",
+  "warning": "Locations and grid cells are indicative, not GPS-confirmed. No real-money activity.",
+  "places": [
+    {
+      "id": "pelican-crab-outpost",
+      "title": "Station de recherche de Pelican Valley",
+      "region": "Mariana County / Gullet Marsh",
+      "chapter_min": 1,
+      "category": "cache_et_enigme",
+      "amount_currency": "GTA$",
+      "amount_cash_reported": 1100,
+      "amount_other_nominal": 10000,
+      "amount_is_estimate": true,
+      "grid": "Zone J–K / 4–6 environ (à confirmer sur la carte fournie)",
+      "difficulty": "modérée",
+      "access": "En bateau, île marécageuse au sud-ouest de Pelican Valley, à l’ouest du nom Pelican Valley sur la carte du jeu.",
+      "landmarks": [
+        "ponton de Stillwater Path",
+        "maison de recherche avec antennes",
+        "passerelle en bois",
+        "bâtiment au bout du ponton"
+      ],
+      "steps": [
+        "Rejoindre Pelican Valley par bateau depuis Stillwater Path ou un autre embarcadère des marécages.",
+        "Accoster au groupe de bâtiments isolés et repérer la maison principale.",
+        "Actionner le boîtier électrique extérieur près du tuyau vert.",
+        "Lire les inscriptions au sol de la chambre puis saisir CLEAVES sur l’ordinateur.",
+        "Dans la dépendance de recherche, relever le spécimen réussi 0036, puis doubler ce nombre.",
+        "Ouvrir le coffre de la maison avec 0072.",
+        "Prendre la somme d’argent et relever le code 0212.",
+        "Suivre la passerelle en bois et ouvrir la dépendance du ponton avec 0212.",
+        "Examiner les objets de collection et le sac de billets marqués; repartir par le ponton."
+      ],
+      "codes": {
+        "ordinateur": "CLEAVES",
+        "coffre": "0072",
+        "ponton": "0212"
+      },
+      "notes": [
+        "Le montant nominal des billets marqués ne correspond pas nécessairement à du cash utilisable.",
+        "Les guides diffèrent sur la disponibilité exacte de la conversion du butin selon le chapitre."
+      ],
+      "verification": "corroboré_guides_tiers",
+      "sources": [
+        "https://www.thebiglead.com/gta-6-pelican-valley-crab-research-outpost-computer-password-keypad-codes/",
+        "https://gta6.house/library/locations/pelican-valley-outpost",
+        "https://finalboss.io/gta-6-pelican-valley-crab-research-outpost"
+      ]
+    },
+    {
+      "id": "apollo-aggregates",
+      "title": "Entrepôt Apollo Aggregates",
+      "region": "South Vice-Dale County / près de Hamlet",
+      "chapter_min": 1,
+      "category": "entrepot",
+      "amount_cash_reported": null,
+      "amount_other_nominal": 13000,
+      "amount_is_estimate": true,
+      "grid": "Zone H–I / 5–6 environ (à confirmer)",
+      "difficulty": "variable",
+      "access": "Entrepôt rouge, à l’est ou au nord-est de Hamlet, près d’un virage d’autoroute et de trois bassins rectangulaires.",
+      "landmarks": [
+        "panneau Apollo Aggregates",
+        "trois bassins de rétention",
+        "entrepôt rouge"
+      ],
+      "steps": [
+        "Se diriger vers l’est de Hamlet.",
+        "Repérer les trois bassins et l’entrepôt rouge Apollo Aggregates.",
+        "Examiner les caisses et les éléments interactifs indiqués en jeu.",
+        "Comparer l’inventaire final et les montants réellement récupérés."
+      ],
+      "codes": {},
+      "notes": [
+        "Les guides divergent sur les estimations 13 000 à 20 000 $ car ils combinent différents types de butin.",
+        "Ne pas compter les objets non convertis comme argent disponible."
+      ],
+      "verification": "corroboré_guides_tiers_montants_variables",
+      "sources": [
+        "https://www.gtaboom.com/gta-6-apollo-aggregates-warehouse-stash-5820",
+        "https://www.gamingdeputy.com/france/gta-vi-faire-argent-rapidement/"
+      ]
+    },
+    {
+      "id": "parrot-stash",
+      "title": "Cache du perroquet — Three Sheets Liquor",
+      "region": "Key Lento / Mariana County",
+      "chapter_min": 1,
+      "category": "cache",
+      "amount_cash_reported": 1300,
+      "amount_other_nominal": null,
+      "amount_is_estimate": true,
+      "grid": "Zone K–L / 5–6 environ (à confirmer)",
+      "difficulty": "facile",
+      "access": "Cour située derrière Three Sheets Liquor, près du Pay N Spray de Key Lento.",
+      "landmarks": [
+        "commerce Three Sheets Liquor",
+        "perroquet rouge",
+        "générateur",
+        "grille de ventilation"
+      ],
+      "steps": [
+        "Trouver Three Sheets Liquor à Key Lento.",
+        "Explorer la zone derrière le bâtiment.",
+        "Repérer le perroquet rouge et écouter son indice.",
+        "Inspecter les éléments proches du générateur, notamment la grille de ventilation.",
+        "Vérifier le montant effectivement récupéré."
+      ],
+      "codes": {},
+      "notes": [
+        "Les guides donnent des totaux différents lorsqu’ils additionnent cache, coffre et autres espèces."
+      ],
+      "verification": "corroboré_guides_tiers_montants_variables",
+      "sources": [
+        "https://www.gamesradar.com/games/grand-theft-auto/exotic-animals-front-illegal-operation-gta-6/",
+        "https://www.gtaboom.com/gta-6-early-money-the-three-sheets-liquor-parrot-stash-555d/"
+      ]
+    },
+    {
+      "id": "manatee-motel",
+      "title": "Manatee Motel",
+      "region": "Mariana County / sud de Hamlet",
+      "chapter_min": 1,
+      "category": "coffre",
+      "amount_cash_reported": null,
+      "amount_other_nominal": 3000,
+      "amount_is_estimate": true,
+      "grid": "Zone I–J / 4–6 environ (à confirmer)",
+      "difficulty": "variable",
+      "access": "Au sud de Hamlet et au nord-est de Cottonmouth Lake.",
+      "landmarks": [
+        "Manatee Motel",
+        "pièces du motel",
+        "coffre"
+      ],
+      "steps": [
+        "Depuis Hamlet, chercher le motel au sud, en direction du lac Cottonmouth.",
+        "Explorer les pièces et repérer le coffre et les objets interactifs.",
+        "Noter les montants réellement récupérés."
+      ],
+      "codes": {},
+      "notes": [
+        "Le montant de 3 000 $ est une estimation globale; le contenu du coffre peut être nettement inférieur."
+      ],
+      "verification": "corroboré_guides_tiers_montants_variables",
+      "sources": [
+        "https://gta6central.fr/en/database/locations/manatee-motel",
+        "https://insider-gaming.com/gta-6-early-game-locations-make-money/"
+      ]
+    }
+  ]
+}
